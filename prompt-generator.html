@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt-Generator – Differenzierte Lernseiten</title>
+<style>
+  :root{
+    --paper:#f4f5f7;--ink:#1b1e24;--ink-soft:#565c68;--line:#d7dae1;--line-strong:#aeb4bf;
+    --accent:#2857a8;--accent-soft:#e4ecf7;--ok:#2f8f6f;--card:#ffffff;
+    --shadow:0 1px 2px rgba(27,30,36,.06),0 8px 24px rgba(27,30,36,.05);
+  }
+  *{box-sizing:border-box;}html{-webkit-text-size-adjust:100%;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,sans-serif;line-height:1.55;padding:clamp(1rem,4vw,3rem) 1rem 5rem;}
+  .wrap{max-width:860px;margin:0 auto;}
+  .eyebrow{font-size:.78rem;color:var(--ink-soft);margin:0 0 .4rem;letter-spacing:.03em;}
+  h1{font-size:clamp(1.7rem,5vw,2.4rem);line-height:1.12;margin:0 0 .5rem;font-weight:700;}
+  .lead{font-size:1.04rem;color:var(--ink-soft);margin:0 0 1.8rem;max-width:64ch;}
+  .layout{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:start;}
+  @media(max-width:760px){.layout{grid-template-columns:1fr;}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.3rem 1.4rem;box-shadow:var(--shadow);}
+  .card h2{margin:.1rem 0 1rem;font-size:1.1rem;}
+  label.field{display:block;margin:0 0 1rem;}
+  label.field .lab{display:block;font-size:.85rem;font-weight:600;margin-bottom:.35rem;}
+  label.field .hint{font-weight:400;color:var(--ink-soft);font-size:.8rem;}
+  input[type=text],textarea,select{width:100%;font:inherit;font-size:.95rem;padding:.55rem .7rem;border:1px solid var(--line-strong);border-radius:8px;background:#fff;color:var(--ink);}
+  input[type=text]:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+  textarea{resize:vertical;min-height:2.5rem;}
+  .seg{display:flex;gap:.4rem;flex-wrap:wrap;}
+  .seg button{font:inherit;font-size:.85rem;border:1px solid var(--line-strong);background:#fff;color:var(--ink);border-radius:8px;padding:.45rem .75rem;cursor:pointer;}
+  .seg button:hover{border-color:var(--accent);}
+  .seg button.on{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .out{position:relative;}
+  .out pre{white-space:pre-wrap;word-wrap:break-word;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.82rem;line-height:1.5;background:#1e2430;color:#e8ebf0;border-radius:12px;padding:1.1rem 1.2rem;max-height:60vh;overflow:auto;margin:0;}
+  .out pre .ph{color:#e8b26b;}
+  .actions{display:flex;gap:.6rem;margin-top:.8rem;flex-wrap:wrap;}
+  .btn{font:inherit;font-size:.9rem;font-weight:600;border:none;border-radius:9px;padding:.6rem 1.1rem;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem;box-shadow:var(--shadow);}
+  .btn.primary{background:var(--accent);color:#fff;}
+  .btn.primary:hover{background:#204688;}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line-strong);}
+  .btn.ghost:hover{border-color:var(--accent);}
+  .copied{color:var(--ok);font-size:.85rem;font-weight:600;align-self:center;opacity:0;transition:opacity .2s;}
+  .copied.show{opacity:1;}
+  .note{font-size:.82rem;color:var(--ink-soft);margin-top:1.4rem;background:var(--accent-soft);border-radius:10px;padding:.8rem 1rem;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Werkzeug · EDUTECSOL</p>
+  <h1>Prompt-Generator für differenzierte Lernseiten</h1>
+  <p class="lead">Felder ausfüllen, Prompt kopieren, zusammen mit einem Foliensatz (PPTX/PDF) an Claude schicken – fertig ist die interaktive A/B/C-Lernseite.</p>
+
+  <div class="layout">
+
+    <!-- Eingabe -->
+    <div class="card">
+      <h2>1 · Anpassen</h2>
+
+      <label class="field">
+        <span class="lab">Fach / Kontext</span>
+        <input type="text" id="fach" placeholder="z. B. Pharma-Fachrechnen">
+      </label>
+
+      <label class="field">
+        <span class="lab">Zielstufe</span>
+        <input type="text" id="stufe" placeholder="z. B. Berufsmaturität · FaGe · Sek II">
+      </label>
+
+      <label class="field">
+        <span class="lab">Thema <span class="hint">(optional – leer = KI wählt aus dem Foliensatz)</span></span>
+        <input type="text" id="thema" placeholder="z. B. Dosisberechnung, oder «Folie 12–14»">
+      </label>
+
+      <label class="field">
+        <span class="lab">Art der Kernkompetenz <span class="hint">(optional)</span></span>
+        <div class="seg" id="kompetenz">
+          <button data-v="">egal</button>
+          <button data-v="Rechnen">Rechnen</button>
+          <button data-v="Zuordnen/Klassifizieren">Zuordnen</button>
+          <button data-v="Beurteilen/Erkennen">Beurteilen</button>
+        </div>
+      </label>
+
+      <label class="field">
+        <span class="lab">Zusatzwunsch <span class="hint">(optional – frei)</span></span>
+        <textarea id="extra" placeholder="z. B. besonders alltagsnahes Beispiel, oder ein bestimmter Twist"></textarea>
+      </label>
+    </div>
+
+    <!-- Ausgabe -->
+    <div class="card out">
+      <h2>2 · Fertiger Prompt</h2>
+      <pre id="output"></pre>
+      <div class="actions">
+        <button class="btn primary" id="copyBtn">📋 Prompt kopieren</button>
+        <button class="btn ghost" id="dlBtn">⬇ Als .txt speichern</button>
+        <span class="copied" id="copied">Kopiert!</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="note">
+    <b>So geht's:</b> Prompt kopieren → neuen Claude-Chat öffnen → Prompt einfügen → deinen Foliensatz (PPTX oder PDF) dazu hochladen → abschicken. Du bekommst eine fertige, offline nutzbare HTML-Lernseite mit den Zugängen A/B/C, Lösungen für die Lehrperson und PDF-Button.
+  </div>
+
+</div>
+
+<script>
+  const el=id=>document.getElementById(id);
+  const state={fach:'',stufe:'',thema:'',kompetenz:'',extra:''};
+
+  // Segment-Auswahl Kompetenz
+  el('kompetenz').querySelectorAll('button').forEach((b,i)=>{
+    if(i===0) b.classList.add('on');
+    b.addEventListener('click',()=>{
+      el('kompetenz').querySelectorAll('button').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');state.kompetenz=b.dataset.v;render();
+    });
+  });
+  ['fach','stufe','thema','extra'].forEach(k=>el(k).addEventListener('input',()=>{state[k]=el(k).value;render();}));
+
+  function build(){
+    const fach = state.fach.trim() || '[Fach/Kontext einsetzen]';
+    const stufe = state.stufe.trim() || '[Zielstufe einsetzen]';
+    const themaLine = state.thema.trim()
+      ? `- Thema: ${state.thema.trim()}`
+      : `- Thema: leer lassen – wähle das geeignetste Thema selbst aus dem Foliensatz`;
+    const kompLine = state.kompetenz
+      ? `- Art der Kernkompetenz: ${state.kompetenz}`
+      : `- Art der Kernkompetenz: passend zum Thema wählen (Rechnen / Zuordnen / Beurteilen)`;
+    const extraLine = state.extra.trim()
+      ? `- Zusatzwunsch: ${state.extra.trim()}`
+      : '';
+
+    return `ROLLE
+Du bist Fachdidaktiker:in für ${fach} auf der Stufe ${stufe} und Frontend-Entwickler:in.
+
+ANGABEN
+- Fach/Kontext: ${fach}
+- Zielstufe: ${stufe}
+${themaLine}
+${kompLine}${extraLine ? '\n'+extraLine : ''}
+- Datei: wird als Foliensatz (PPTX/PDF) mit hochgeladen
+
+AUFGABE
+Lies den hochgeladenen Foliensatz aus, wähle das didaktisch geeignetste Thema für eine differenzierte Übung (sofern oben keines vorgegeben ist) und erstelle daraus eine interaktive Lernseite.
+
+THEMENWAHL
+Wähle einen Inhalt mit einer klaren, überprüfbaren Kompetenz – ein berechenbares Verfahren, eine eindeutige Klassifikation oder eine begründbare Beurteilung –, der sich für Selbstkontrolle mit eindeutigen Lösungen eignet und Raum für einen Aha-Moment in der Vertiefung bietet. Nenne zu Beginn kurz, welches Thema du gewählt hast und warum. Enthält der Foliensatz einen konkreten Aufgabentext oder Datensatz, verwende diesen; stehen an der Stelle nur Bilder ohne auslesbaren Text, wähle ein fachlich stimmiges, alltagsnahes Beispiel und weise am Ende darauf hin.
+
+KOMPETENZZIEL
+Leite aus dem gewählten Folieninhalt ein präzises Kompetenzziel ab (berechnen / unterscheiden / interpretieren).
+
+KERNAUFGABE FÜR ALLE
+Formuliere eine Kernaufgabe mit (1) Berechnung/Bestimmung, (2) nachvollziehbarem Rechen- oder Begründungsweg und (3) einem sachlichen Ergebnissatz. Definiere zugleich die Erfolgskriterien.
+
+AUSGABEFORMAT
+Erstelle eine einzige, voll funktionsfähige interaktive HTML-Seite (eine Datei, ohne externe Abhängigkeiten, offline lauffähig) mit folgendem Aufbau:
+- Visualisierung der Kernaufgabe als durchgehende Leitidee, passend zum Thema (Zahlenstrahl, Anteils-Balken, Boxplot, Zuordnungsfeld, Behälter o. Ä.). Optionale Hilfslinien/Marker erscheinen erst, wenn die Lernenden korrekt gearbeitet haben.
+- Zugangswahl per Klick (Reiter A / B / C): Die Lernenden sehen nur ihren gewählten Zugang.
+- Zugang A – Mit Unterstützung: gleiche Kernaufgabe und Erfolgskriterien; kurze Erklärung der Fachbegriffe; ein interaktiver Rechen- bzw. Zuordnungsrahmen mit Eingabefeldern oder Auswahlbuttons, die bei korrekter Eingabe ein grünes Häkchen zeigen und bei falscher einen Hinweis geben, ohne die Lösung zu verraten; drei Leitfragen; ein Satzanfang für den Ergebnissatz. Weder Rechnung noch Ergebnis vollständig nennen.
+- Zugang B – Eigenständig: gleiche Kernaufgabe ohne Hilfen; eine freiwillige Ergebnisprüfung (Eingabefelder/Auswahl mit Feedback) und eine Selbstcheck-Liste mit vier Fragen zum Abhaken.
+- Zugang C – Vertiefung: zuerst die Kernaufgabe; danach ein thematisch passender Twist, der zusätzliche Denkarbeit verlangt statt nur mehr Aufgaben (z. B. ein Ausreisser, mehrere Fälle mit gleichem Ergebnis, ein Grenzfall, ein bewusst eingebauter Fehler zum Erkennen). Ergänze eine Begründungsfrage und eine Transferfrage in den Berufskontext. Baue einen Button ein, der den Kernzusammenhang sichtbar macht (Aha-Moment).
+- Bereich «Für die Lehrperson»: ausklappbar (verborgen bis Klick), mit vollständigen Lösungen und Rechen- bzw. Begründungswegen, getrennt vom Aufgabenteil. Ergänze dort einen Satz zum didaktischen Anschluss an die nächsten Folien des Satzes.
+- PDF-Button oben auf der Seite («Als PDF herunterladen»): blendet für den Export alle drei Zugänge (A/B/C) und den Lehrpersonen-Bereich ein und löst den Druckdialog des Browsers aus («In PDF speichern»). Eigene Druck-CSS (@media print) blendet Reiter und Buttons aus und macht alle Inhalte sichtbar. Baue einen Fallback ein, der die Seite in einem neuen Tab öffnet, falls der Druckdialog in einer eingebetteten Vorschau blockiert ist.
+
+GESTALTUNG
+Ruhiges, altersgerechtes Design für die Zielstufe; die themenpassende Visualisierung als visuelle Leitidee; Farbwelt zum Fach passend; responsiv bis Mobile; Tastaturbedienbarkeit und sichtbarer Fokus. Vermeide generische KI-Optik (keine cremefarbenen Hintergründe, keine Akzentstreifen).
+
+VORGABEN
+Schweizer Standarddeutsch · keine Fehler: rechne alle Lösungen bzw. prüfe alle Zuordnungen vor der Ausgabe selbst nach und stelle sicher, dass die Feedback-Logik der Eingabefelder exakt zu den richtigen Werten passt · Selbstcheck-Listen abhakbar. Gib mir am Ende eine kurze Notiz, welches Thema du gewählt hast und welchen Twist die Vertiefung nutzt.`;
+  }
+
+  function render(){
+    const txt=build();
+    // Platzhalter [..] hervorheben
+    el('output').innerHTML = txt.replace(/\[([^\]]+)\]/g,'<span class="ph">[$1]</span>');
+  }
+  render();
+
+  el('copyBtn').addEventListener('click',async()=>{
+    try{
+      await navigator.clipboard.writeText(build());
+      el('copied').classList.add('show');
+      setTimeout(()=>el('copied').classList.remove('show'),1600);
+    }catch(e){
+      // Fallback: Textbereich selektieren
+      const ta=document.createElement('textarea');ta.value=build();document.body.appendChild(ta);ta.select();
+      try{document.execCommand('copy');el('copied').classList.add('show');setTimeout(()=>el('copied').classList.remove('show'),1600);}catch(_){}
+      document.body.removeChild(ta);
+    }
+  });
+
+  el('dlBtn').addEventListener('click',()=>{
+    const blob=new Blob([build()],{type:'text/plain;charset=utf-8'});
+    const a=document.createElement('a');
+    const name=(state.fach.trim()||'lernseite').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    a.href=URL.createObjectURL(blob);a.download='prompt-'+name+'.txt';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  });
+</script>
+</body>
+</html>

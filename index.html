@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Differenzierte Lernseiten – EDUTECSOL</title>
+<style>
+  :root{
+    --navy:#1E3246;--terra:#B84816;--ochre:#F1A51A;--cream:#F6EFE2;
+    --ink:#1E3246;--ink-soft:#5b6572;--line:#e2dbcb;--line-strong:#cdc4ad;
+    --card:#ffffff;--shadow:0 1px 2px rgba(30,50,70,.06),0 10px 30px rgba(30,50,70,.07);
+  }
+  *{box-sizing:border-box;}html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:"Arial Nova Light",Arial,ui-sans-serif,system-ui,sans-serif;line-height:1.55;}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 1.1rem;}
+
+  /* Hero */
+  header{background:var(--navy);color:#fff;padding:clamp(2.4rem,7vw,4.5rem) 0 clamp(2rem,6vw,3.5rem);}
+  .brand{font-size:.82rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ochre);margin:0 0 1rem;font-weight:600;}
+  header h1{font-size:clamp(2rem,6vw,3.2rem);line-height:1.08;margin:0 0 .8rem;font-weight:600;max-width:20ch;}
+  header p{font-size:clamp(1.05rem,2.4vw,1.25rem);color:#cdd6df;margin:0 0 1.8rem;max-width:60ch;}
+  .hero-tags{display:flex;gap:.6rem;flex-wrap:wrap;}
+  .tag{font-size:.85rem;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:.35rem .9rem;}
+
+  /* Prinzip-Band */
+  .principle{background:var(--terra);color:#fff;padding:1.2rem 0;}
+  .principle .wrap{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+  .principle .big{font-size:1.15rem;font-weight:600;}
+  .principle .small{color:#ffe4d6;font-size:.95rem;}
+
+  main{padding:clamp(2.2rem,6vw,3.5rem) 0 4rem;}
+  .sec-head{margin:2.6rem 0 1.1rem;}
+  .sec-head:first-child{margin-top:0;}
+  .sec-head h2{font-size:1.4rem;margin:0 0 .3rem;}
+  .sec-head p{margin:0;color:var(--ink-soft);font-size:.98rem;max-width:66ch;}
+  .kicker{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--terra);font-weight:600;margin:0 0 .3rem;}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;}
+  a.tile{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.1rem 1.2rem;box-shadow:var(--shadow);transition:transform .12s,border-color .2s,box-shadow .2s;}
+  a.tile:hover{transform:translateY(-2px);border-color:var(--ochre);box-shadow:0 4px 10px rgba(30,50,70,.08),0 16px 36px rgba(30,50,70,.1);}
+  a.tile:focus-visible{outline:2px solid var(--terra);outline-offset:2px;}
+  .tile .top{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;}
+  .tile .ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;flex:none;}
+  .tile h3{font-size:1.05rem;margin:0;font-weight:600;line-height:1.2;}
+  .tile p{margin:.1rem 0 .7rem;font-size:.9rem;color:var(--ink-soft);flex:1;}
+  .tile .foot{font-size:.82rem;color:var(--terra);font-weight:600;display:flex;align-items:center;gap:.3rem;}
+  .badge{align-self:flex-start;font-size:.72rem;font-weight:600;border-radius:20px;padding:.15rem .6rem;margin-bottom:.5rem;}
+  .badge.tool{background:#e9eef3;color:var(--navy);}
+  .badge.new{background:var(--ochre);color:var(--navy);}
+
+  /* Werkzeug-Tiles hervorheben */
+  a.tile.tool-tile{background:var(--navy);color:#fff;border-color:var(--navy);}
+  a.tile.tool-tile p{color:#c3ccd6;}
+  a.tile.tool-tile .foot{color:var(--ochre);}
+  a.tile.tool-tile:hover{border-color:var(--ochre);}
+
+  footer{background:var(--navy);color:#c3ccd6;padding:2rem 0;font-size:.9rem;}
+  footer .wrap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:center;}
+  footer a{color:var(--ochre);text-decoration:none;}
+  footer a:hover{text-decoration:underline;}
+
+  .how{background:#fff;border:1px solid var(--line);border-radius:14px;padding:1.3rem 1.4rem;box-shadow:var(--shadow);margin-top:1rem;}
+  .how ol{margin:.4rem 0 0;padding-left:1.3rem;}
+  .how li{margin:.35rem 0;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <p class="brand">EDUTECSOL · Digitale Schulentwicklung</p>
+    <h1>Differenzierte, interaktive Lernseiten</h1>
+    <p>Aus einem Foliensatz entsteht eine Übung mit mehreren Zugängen: Selbstkontrolle für die Lernenden, Lösungen für die Lehrperson, offline nutzbar und als PDF exportierbar. Eine kleine Sammlung – und die Werkzeuge, um selbst weitere zu bauen.</p>
+    <div class="hero-tags">
+      <span class="tag">A/B/C-Differenzierung</span>
+      <span class="tag">Selbstkontrolle</span>
+      <span class="tag">Offline &amp; druckbar</span>
+      <span class="tag">Schweizer Berufsbildung</span>
+    </div>
+  </div>
+</header>
+
+<div class="principle">
+  <div class="wrap">
+    <span class="big">Produkt ohne Prozess stirbt.</span>
+    <span class="small">Technik wird erst dann Unterricht, wenn sie didaktisch strukturiert und einbettbar ist.</span>
+  </div>
+</div>
+
+<main>
+  <div class="wrap">
+
+    <!-- Werkzeuge -->
+    <div class="sec-head">
+      <p class="kicker">Werkzeuge</p>
+      <h2>Selbst Lernseiten erzeugen</h2>
+      <p>Der Generator baut den passenden Prompt. Diesen mit einem Foliensatz an Claude schicken – fertig ist die interaktive Übung.</p>
+    </div>
+    <div class="grid">
+      <a class="tile tool-tile" href="prompt-generator-v2.html">
+        <span class="badge new">empfohlen</span>
+        <div class="top"><span class="ic" style="background:var(--ochre);color:var(--navy)">⚙︎</span><h3>Prompt-Generator</h3></div>
+        <p>Vier didaktische Achsen: Differenzierungsart, Sprache, Twist-Typ und Anforderungsniveau. Mit Schnellstart-Presets.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+      <a class="tile" href="prompt-generator.html">
+        <span class="badge tool">schlank</span>
+        <div class="top"><span class="ic" style="background:#e9eef3;color:var(--navy)">▤</span><h3>Generator (Basis)</h3></div>
+        <p>Die einfache Fassung mit den Grundfeldern – schnell, wenn du meist A/B/C nach Niveau nutzt.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+      <a class="tile" href="master-prompt.html">
+        <span class="badge tool">Vorlage</span>
+        <div class="top"><span class="ic" style="background:#e9eef3;color:var(--navy)">✎</span><h3>Prompt-Textvorlage</h3></div>
+        <p>Der Master-Prompt als Textdatei zum manuellen Ausfüllen und Ablegen.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+    </div>
+
+    <!-- Mathematik / Statistik -->
+    <div class="sec-head">
+      <p class="kicker">Mathematik &amp; Statistik · Berufsmaturität</p>
+      <h2>Rechnen und Daten</h2>
+      <p>Verfahren üben mit Selbstkontrolle und einem Aha-Moment in der Vertiefung.</p>
+    </div>
+    <div class="grid">
+      <a class="tile" href="statistik-lagemasse.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">📊</span><h3>Lagemasse</h3></div>
+        <p>Mittelwert, Median, Modus. Vertiefung: Wie ein Ausreisser die Masse verschiebt.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+      <a class="tile" href="statistik-quartile-boxplot.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">📦</span><h3>Quartile &amp; Boxplot</h3></div>
+        <p>Fünf-Punkte-Zusammenfassung mit gezeichnetem Boxplot. Vertiefung: IQR &amp; Robustheit.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+      <a class="tile" href="statistik-variablentypen.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">🏷️</span><h3>Variablentypen</h3></div>
+        <p>Nominal, ordinal, diskret, stetig zuordnen. Vertiefung: Grenzfälle wie die Postleitzahl.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+      <a class="tile" href="degressive-abschreibung.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">📉</span><h3>Degressive Abschreibung</h3></div>
+        <p>Buchwertverlauf über drei Jahre. Vertiefung: Vergleich mit der linearen Methode.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+      <a class="tile" href="prozentrechnen.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">％</span><h3>Prozentrechnen</h3></div>
+        <p>Grundwert, Prozentwert, Prozentsatz. Vertiefung: gleicher Anteil trotz anderer Zahlen.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+    </div>
+
+    <!-- Pharma -->
+    <div class="sec-head">
+      <p class="kicker">Medizinisches Rechnen · Pharma-Assistentinnen</p>
+      <h2>Fachrechnen in der Apotheke</h2>
+      <p>Berufstypische Aufgaben – mit der im Lehrmittel geforderten Plausibilitätsprüfung.</p>
+    </div>
+    <div class="grid">
+      <a class="tile" href="dosisberechnung-pharma.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">💊</span><h3>Dosisberechnung</h3></div>
+        <p>Von mg/kg zur ml-Menge. Vertiefung: Dosierungsfehler erkennen, bevor sie zum Kunden gelangen.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+      <a class="tile" href="dichte-pharma.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">⚗️</span><h3>Rechnen mit der Dichte</h3></div>
+        <p>Masse, Volumen, Dichte. Vertiefung: Passt die Einwaage in die Flasche? Faustregel entdecken.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+      <a class="tile" href="verduennungen-pharma.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">🧪</span><h3>Verdünnungen</h3></div>
+        <p>C₁·V₁ = C₂·V₂. Vertiefung: typische Denkfehler beim Verdünnen entlarven.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+    </div>
+
+    <!-- IT -->
+    <div class="sec-head">
+      <p class="kicker">IT-Security · Sek II &amp; Berufsbildung</p>
+      <h2>Persönliche Sicherheit</h2>
+      <p>Erkennen und beurteilen statt rechnen – dieselbe Differenzierungslogik, anderer Aufgabentyp.</p>
+    </div>
+    <div class="grid">
+      <a class="tile" href="it-security-malware.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">🛡️</span><h3>Malware &amp; Sicherheit</h3></div>
+        <p>Malware-Arten zuordnen, Szenarien einschätzen. Vertiefung: eine Phishing-Mail entlarven.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+    </div>
+
+    <!-- So funktioniert es -->
+    <div class="sec-head">
+      <p class="kicker">Und so entsteht eine neue Seite</p>
+      <h2>In vier Schritten</h2>
+    </div>
+    <div class="how">
+      <ol>
+        <li>Im <b>Prompt-Generator</b> Fach, Stufe und die didaktischen Achsen wählen.</li>
+        <li>Prompt kopieren, einen neuen Claude-Chat öffnen und einfügen.</li>
+        <li>Den <b>Foliensatz</b> (PPTX oder PDF) dazu hochladen und abschicken.</li>
+        <li>Die fertige HTML-Datei herunterladen – offline nutzbar, ins Moodle ladbar, als PDF druckbar.</li>
+      </ol>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© EDUTECSOL GmbH · Differenzierte Lernseiten für die Schweizer Berufsbildung</span>
+    <span><a href="mailto:info@edutecsol.ch">info@edutecsol.ch</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rechnen mit der Dichte – Pharma-Assistentinnen</title>
+<style>
+  :root{
+    --paper:#f7f6f2;--ink:#1e2422;--ink-soft:#5c625d;--line:#dcd7cb;--line-strong:#b7b0a0;
+    --pharma:#3a6ea5;--pharma-soft:#e6eef6;--fit:#2f8f6f;--nofit:#c25a3a;--nofit-soft:#f6e6df;
+    --liquid:#c9a24b;--glass:#dce6ea;--card:#ffffff;--shadow:0 1px 2px rgba(30,36,34,.06),0 8px 24px rgba(30,36,34,.05);
+  }
+  *{box-sizing:border-box;}html{-webkit-text-size-adjust:100%;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;line-height:1.55;padding:clamp(1rem,4vw,3rem) 1rem 5rem;}
+  .wrap{max-width:800px;margin:0 auto;}
+  .eyebrow{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.78rem;color:var(--ink-soft);margin:0 0 .4rem;}
+  h1{font-size:clamp(1.8rem,5vw,2.6rem);line-height:1.1;margin:0 0 .6rem;font-weight:600;}
+  .lead{font-size:1.06rem;color:var(--ink-soft);margin:0 0 1.6rem;max-width:62ch;}
+  .core{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.4rem 1.5rem;box-shadow:var(--shadow);margin-bottom:1.8rem;}
+  .core h2{margin:.1rem 0 .7rem;font-size:1.15rem;}
+  .formula{font-family:ui-monospace,monospace;font-size:1.05rem;background:var(--pharma-soft);border:1px solid var(--line);border-radius:9px;padding:.7rem 1rem;margin:.4rem 0 1rem;text-align:center;letter-spacing:.02em;}
+  .tasklist{margin:0;padding-left:1.2rem;}.tasklist li{margin:.25rem 0;}
+  .pick-label{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem;color:var(--ink-soft);margin:0 0 .6rem;}
+  .tabs{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.4rem;}
+  .tab{flex:1 1 210px;text-align:left;cursor:pointer;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.85rem 1rem;font-family:inherit;color:var(--ink);transition:border-color .2s,box-shadow .2s;}
+  .tab:hover{border-color:var(--line-strong);}.tab:focus-visible{outline:2px solid var(--pharma);outline-offset:2px;}
+  .tab .tname{font-size:1.05rem;font-weight:600;display:block;}
+  .tab .tsub{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.8rem;color:var(--ink-soft);}
+  .tab.active{border-color:var(--pharma);box-shadow:0 0 0 1px var(--pharma),var(--shadow);}
+  .tab.active .tname{color:var(--pharma);}
+  .panel{display:none;animation:rise .35s ease;}.panel.show{display:block;}
+  @keyframes rise{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.4rem 1.5rem;box-shadow:var(--shadow);margin-bottom:1.2rem;}
+  .card h3{margin:.1rem 0 .5rem;font-size:1.2rem;}
+  .card h4{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.82rem;color:var(--ink-soft);margin:1.3rem 0 .5rem;font-weight:600;}
+  .defs{margin:.4rem 0;padding:0;list-style:none;}.defs li{margin:.45rem 0;}.defs b{color:var(--pharma);}
+  .calc{font-family:ui-monospace,monospace;background:var(--pharma-soft);border:1px solid var(--line);border-radius:10px;padding:1rem 1.1rem;margin:.6rem 0;display:grid;gap:.55rem;}
+  .calc-row{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
+  .calc-row label{min-width:230px;color:var(--ink-soft);font-size:.92rem;}
+  .calc-row .unit{font-size:.85rem;color:var(--ink-soft);}
+  input[type=number]{font-family:inherit;font-size:1rem;width:6rem;padding:.35rem .5rem;border:1px solid var(--line-strong);border-radius:7px;background:#fff;color:var(--ink);text-align:center;}
+  input[type=number]:focus-visible{outline:2px solid var(--pharma);outline-offset:1px;}
+  .verdict{font-family:ui-sans-serif,sans-serif;font-size:.85rem;min-width:1.4rem;font-weight:600;}
+  .verdict.ok{color:var(--fit);}.verdict.no{color:var(--nofit);}
+  .hint{font-family:ui-sans-serif,sans-serif;font-size:.82rem;color:var(--nofit);min-height:1.1rem;margin:.2rem 0 0;}
+  .qlist{margin:.3rem 0;padding-left:1.2rem;}.qlist li{margin:.3rem 0;}
+  .starter{font-style:italic;color:var(--ink-soft);border-left:3px solid var(--line-strong);padding-left:.9rem;margin:.6rem 0;}
+  .impulse{background:var(--pharma-soft);border-radius:10px;padding:.8rem 1rem;font-size:.95rem;margin:.6rem 0;}
+  .check{list-style:none;margin:.4rem 0;padding:0;}.check li{margin:.4rem 0;}
+  .check label{display:flex;gap:.6rem;align-items:flex-start;cursor:pointer;font-family:ui-sans-serif,sans-serif;font-size:.95rem;}
+  .check input{margin-top:.25rem;width:1.05rem;height:1.05rem;accent-color:var(--pharma);}
+  .check input:checked + span{color:var(--ink-soft);text-decoration:line-through;}
+  /* Substanz-Zeilen Zugang C */
+  .sub{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;padding:.6rem .3rem;border-bottom:1px solid var(--line);}
+  .sub .sname{flex:1 1 170px;font-size:1rem;}
+  .sub .sd{font-family:ui-monospace,monospace;font-size:.85rem;color:var(--ink-soft);min-width:110px;}
+  .sub .opts{display:flex;gap:.35rem;}
+  .sub .opt{font-family:ui-sans-serif,sans-serif;font-size:.82rem;border:1px solid var(--line-strong);background:#fff;color:var(--ink);border-radius:7px;padding:.35rem .7rem;cursor:pointer;}
+  .sub .opt:hover{border-color:var(--pharma);}
+  .sub .opt.fit{background:var(--fit);color:#fff;border-color:var(--fit);}
+  .sub .opt.nofit{background:var(--nofit);color:#fff;border-color:var(--nofit);}
+  .reveal-btn{font-family:ui-sans-serif,sans-serif;font-size:.9rem;background:var(--pharma);color:#fff;border:none;border-radius:8px;padding:.55rem 1rem;cursor:pointer;margin-top:.6rem;}
+  .reveal-btn:hover{background:#2f5a87;}
+  .aha{display:none;margin-top:.8rem;font-size:.98rem;background:var(--pharma-soft);border-radius:10px;padding:.9rem 1.1rem;}
+  .aha.show{display:block;animation:rise .35s ease;}
+  .flasche{display:flex;gap:1rem;align-items:flex-end;margin:.8rem 0;flex-wrap:wrap;}
+  .teacher{margin-top:2.4rem;border-top:1px solid var(--line);padding-top:1.4rem;}
+  details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.2rem 1.2rem;box-shadow:var(--shadow);}
+  summary{cursor:pointer;font-family:ui-sans-serif,sans-serif;font-weight:600;padding:.9rem 0;list-style:none;}
+  summary::-webkit-details-marker{display:none;}summary::before{content:"▸ ";color:var(--pharma);}details[open] summary::before{content:"▾ ";}
+  .teacher h4{margin:1.1rem 0 .3rem;font-family:inherit;font-size:1.02rem;color:var(--ink);}
+  .teacher p,.teacher ul{margin:.3rem 0;}
+  .teacher table{border-collapse:collapse;font-size:.9rem;margin:.4rem 0;}
+  .teacher td,.teacher th{border:1px solid var(--line);padding:.3rem .6rem;text-align:left;}
+  .teacher code{font-family:ui-monospace,monospace;background:var(--pharma-soft);padding:.1rem .35rem;border-radius:5px;font-size:.92em;}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Fachrechnen · Pharma-Assistentinnen · Dichte</p>
+  <h1>Rechnen mit der Dichte</h1>
+  <p class="lead">Aus Masse und Volumen die Dichte bestimmen – und umgekehrt beurteilen, ob eine Menge in ein gegebenes Gefäss passt. Die Dichte verbindet Gewicht und Rauminhalt. Wähle deinen Zugang.</p>
+
+  <div class="core">
+    <h2>Die Kernaufgabe</h2>
+    <p>In der Apotheke sollen <b>100 g Glycerin</b> in eine <b>100-ml-Veral-Flasche</b> abgefüllt werden. Glycerin hat eine Dichte von <b>1,26 g/ml</b>.</p>
+    <div class="formula">Dichte D = Masse m ÷ Volumen V &nbsp;→&nbsp; V = m ÷ D</div>
+    <ol class="tasklist">
+      <li>Berechne, welches Volumen 100 g Glycerin einnehmen.</li>
+      <li>Zeige deinen Rechenweg mit Einheiten.</li>
+      <li>Beurteile in einem Satz, ob die Menge in die 100-ml-Flasche passt.</li>
+    </ol>
+  </div>
+
+  <p class="pick-label">Wähle deinen Zugang:</p>
+  <div class="tabs" role="tablist">
+    <button class="tab active" role="tab" data-tab="A"><span class="tname">A · Mit Unterstützung</span><span class="tsub">Formel, Rechenrahmen, Leitfragen</span></button>
+    <button class="tab" role="tab" data-tab="B"><span class="tname">B · Eigenständig</span><span class="tsub">Aufgabe ohne Hilfen + Selbstcheck</span></button>
+    <button class="tab" role="tab" data-tab="C"><span class="tname">C · Vertiefung</span><span class="tsub">Mehrere Substanzen beurteilen</span></button>
+  </div>
+
+  <!-- A -->
+  <section class="panel show" id="panel-A">
+    <div class="card">
+      <h3>Zugang A – Mit Unterstützung</h3>
+      <p>Die Hilfen führen dich von der Masse zum Volumen und zur Beurteilung.</p>
+      <h4>Merke</h4>
+      <ul class="defs">
+        <li><b>Dichte</b> sagt, wie viel Gramm ein Milliliter wiegt (Einheit g/ml).</li>
+        <li>Gesucht ist hier das <b>Volumen</b>: Du stellst die Formel nach V um → <b>V = m ÷ D</b>.</li>
+        <li><b>Beurteilung:</b> Passt V in die Flasche, wenn das berechnete Volumen kleiner oder gleich 100 ml ist?</li>
+      </ul>
+      <h4>Rechenrahmen – trag die Werte ein</h4>
+      <div class="calc">
+        <div class="calc-row"><label>Masse m =</label><input type="number" id="aM"><span class="unit">g</span><span class="verdict" id="vM"></span></div>
+        <div class="calc-row"><label>Dichte D =</label><input type="number" id="aD" step="0.01"><span class="unit">g/ml</span><span class="verdict" id="vD"></span></div>
+        <div class="calc-row"><label>Volumen V = m ÷ D =</label><input type="number" id="aV" step="0.1"><span class="unit">ml</span><span class="verdict" id="vV"></span></div>
+      </div>
+      <p class="hint" id="aHint"></p>
+      <h4>Leitfragen</h4>
+      <ol class="qlist">
+        <li>Welche Grösse ist gegeben, welche gesucht?</li>
+        <li>Wie stellst du D = m ÷ V nach V um?</li>
+        <li>Ist das berechnete Volumen grösser oder kleiner als 100 ml?</li>
+      </ol>
+      <h4>Satzanfang für dein Ergebnis</h4>
+      <p class="starter">«100 g Glycerin nehmen ______ ml ein; die Menge passt / passt nicht in die 100-ml-Flasche, weil …»</p>
+      <h4>Selbstcheck</h4>
+      <ul class="check">
+        <li><label><input type="checkbox"><span>Ich habe die Formel korrekt nach V umgestellt.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich habe die Einheiten mitgeführt (g, g/ml, ml).</span></label></li>
+        <li><label><input type="checkbox"><span>Meine Beurteilung folgt logisch aus dem Volumen.</span></label></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- B -->
+  <section class="panel" id="panel-B">
+    <div class="card">
+      <h3>Zugang B – Eigenständig</h3>
+      <p>Löse die Aufgabe ohne Hilfen. Zum Prüfen kannst du dein Ergebnis eintragen.</p>
+      <h4>Ergebnis prüfen (freiwillig)</h4>
+      <div class="calc">
+        <div class="calc-row"><label>Volumen V =</label><input type="number" id="bV" step="0.1"><span class="unit">ml</span><span class="verdict" id="vBV"></span></div>
+      </div>
+      <p class="hint" id="bHint"></p>
+      <h4>Selbstcheck</h4>
+      <ul class="check">
+        <li><label><input type="checkbox"><span>Ich habe erkannt, dass das Volumen gesucht ist.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich habe V = m ÷ D korrekt angewendet.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich habe das Ergebnis mit 100 ml verglichen.</span></label></li>
+        <li><label><input type="checkbox"><span>Mein Beurteilungssatz ist sachlich und richtig.</span></label></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- C -->
+  <section class="panel" id="panel-C">
+    <div class="card">
+      <h3>Zugang C – Vertiefung</h3>
+      <p>Von jeder Substanz sollen <b>100 g</b> in eine <b>100-ml-Veral-Flasche</b>. Entscheide für jede, ob die Menge Platz hat – rechne dazu das Volumen im Kopf oder auf Papier.</p>
+      <div class="impulse">💡 <b>Denkimpuls:</b> Du musst nicht immer rechnen. Überlege: Bei welcher Dichte nehmen 100 g <em>mehr</em> als 100 ml ein – bei hoher oder bei niedriger Dichte?</div>
+      <h4>Passt 100 g in die 100-ml-Flasche?</h4>
+      <div id="listC"></div>
+      <p class="hint" id="cHint"></p>
+      <h4>Deine Denkaufgabe</h4>
+      <ol class="qlist">
+        <li>Bei welchen Substanzen passt die Menge – und was haben deren Dichten gemeinsam?</li>
+        <li><b>Begründungsfrage:</b> Warum passen 100 g Wasser (D = 1,0 g/ml) genau in eine 100-ml-Flasche, 100 g Wundbenzin (D = 0,68 g/ml) aber nicht?</li>
+        <li><b>Transferfrage:</b> Formuliere die Faustregel: Ab welcher Dichte passen 100 g sicher in 100 ml?</li>
+      </ol>
+      <button class="reveal-btn" id="revealAha">Faustregel und Rechnungen zeigen</button>
+      <div class="aha" id="aha">
+        100 g nehmen genau dann <b>100 ml oder weniger</b> ein, wenn die Dichte <b>≥ 1,0 g/ml</b> ist – dann drängt sich die Masse auf ein kleineres Volumen zusammen. Ist die Dichte <b>kleiner als 1,0</b>, brauchen 100 g <em>mehr</em> als 100 ml und passen nicht. Deshalb passen Sorbitol-Lsg. (1,29) und Wasser (1,0) knapp, während Erdnussöl (0,915) und Wundbenzin (0,68) übervoll wären. Die Faustregel lautet: <b>Dichte ≥ 1,0 g/ml → passt.</b>
+      </div>
+      <h4>Selbstcheck</h4>
+      <ul class="check">
+        <li><label><input type="checkbox"><span>Ich habe für jede Substanz das Volumen bestimmt oder abgeschätzt.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich habe die passenden von den nicht passenden getrennt.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich erkläre den Zusammenhang von Dichte und Volumen.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich kann die Faustregel formulieren.</span></label></li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="teacher">
+    <details>
+      <summary>Lösungen und Rechenwege – für die Lehrperson</summary>
+      <h4>Kernaufgabe: 100 g Glycerin, D = 1,26 g/ml, 100-ml-Flasche</h4>
+      <ul>
+        <li><b>Volumen</b>: <code>V = m ÷ D = 100 g ÷ 1,26 g/ml ≈ 79,4 ml</code>.</li>
+        <li><b>Beurteilung</b>: 79,4 ml &lt; 100 ml → die Menge passt problemlos.</li>
+      </ul>
+      <p>Beispielsatz: «100 g Glycerin nehmen rund 79 ml ein und passen damit gut in die 100-ml-Flasche.»</p>
+      <h4>Zugang C: je 100 g in 100-ml-Flasche (V = 100 ÷ D)</h4>
+      <table>
+        <tr><th>Substanz</th><th>Dichte</th><th>Volumen von 100 g</th><th>Passt?</th></tr>
+        <tr><td>Erdnussöl</td><td>0,915 g/ml</td><td><code>≈ 109,3 ml</code></td><td>nein</td></tr>
+        <tr><td>Sorbitol-Lsg. 70 %</td><td>1,29 g/ml</td><td><code>≈ 77,5 ml</code></td><td>ja</td></tr>
+        <tr><td>Wundbenzin</td><td>0,68 g/ml</td><td><code>≈ 147,1 ml</code></td><td>nein</td></tr>
+        <tr><td>Wasser</td><td>1,0 g/ml</td><td><code>100 ml</code></td><td>ja (genau)</td></tr>
+      </table>
+      <p><b>Erwartungshorizont:</b> 100 g passen genau dann in 100 ml, wenn die Dichte ≥ 1,0 g/ml ist. Substanzen leichter als Wasser (Dichte &lt; 1,0) brauchen mehr Volumen und laufen über. Faustregel: Dichte ≥ 1,0 g/ml → 100 g passen in 100 ml.</p>
+      <p style="font-size:.9rem;color:var(--ink-soft)">Anschluss an das Lehrmittel: Diese Aufgabe entspricht direkt den Aufgaben 12 und 13 (Kapitel 2) und verbindet die Umstellung der Dichteformel mit der praktischen Beurteilung einer Einwaage.</p>
+    </details>
+  </div>
+</div>
+
+<script>
+  const mark=(el,ok)=>{el.textContent=ok?'✓':'✗';el.className='verdict '+(ok?'ok':'no');};
+  const clear=el=>{el.textContent='';el.className='verdict';};
+  const near=(a,b,tol)=>Math.abs(a-b)<(tol||0.05);
+
+  const tabs=document.querySelectorAll('.tab');
+  const panels={A:document.getElementById('panel-A'),B:document.getElementById('panel-B'),C:document.getElementById('panel-C')};
+  tabs.forEach(t=>t.addEventListener('click',()=>{tabs.forEach(x=>x.classList.remove('active'));t.classList.add('active');Object.values(panels).forEach(p=>p.classList.remove('show'));panels[t.dataset.tab].classList.add('show');}));
+
+  // A – Volumen 100/1.26 ≈ 79.37; Toleranz grosszügig
+  const aM=document.getElementById('aM'),aD=document.getElementById('aD'),aV=document.getElementById('aV');
+  const vM=document.getElementById('vM'),vD=document.getElementById('vD'),vV=document.getElementById('vV'),aHint=document.getElementById('aHint');
+  function checkA(){
+    aM.value===''?clear(vM):mark(vM,+aM.value===100);
+    aD.value===''?clear(vD):mark(vD,near(+aD.value,1.26,0.001));
+    if(aV.value===''){clear(vV);aHint.textContent='';}
+    else{const ok=near(+aV.value,79.37,0.6);mark(vV,ok);
+      aHint.textContent=ok?'':'Rechne 100 g ÷ 1,26 g/ml. Ergebnis auf ml runden.';}
+  }
+  [aM,aD,aV].forEach(i=>i.addEventListener('input',checkA));
+
+  // B
+  const bV=document.getElementById('bV'),vBV=document.getElementById('vBV'),bHint=document.getElementById('bHint');
+  bV.addEventListener('input',()=>{
+    if(bV.value===''){clear(vBV);bHint.textContent='';return;}
+    const ok=near(+bV.value,79.37,0.6);mark(vBV,ok);
+    bHint.textContent=ok?'':'V = m ÷ D = 100 ÷ 1,26 ≈ 79,4 ml.';
+  });
+
+  // C – Substanzen, fit = passt (Dichte >= 1.0)
+  const subs=[
+    {n:'Erdnussöl',d:'0,915 g/ml',fit:false},
+    {n:'Sorbitol-Lsg. 70 %',d:'1,29 g/ml',fit:true},
+    {n:'Wundbenzin',d:'0,68 g/ml',fit:false},
+    {n:'Wasser',d:'1,0 g/ml',fit:true}
+  ];
+  const listC=document.getElementById('listC'),cHint=document.getElementById('cHint');
+  let done=0;
+  subs.forEach(s=>{
+    const row=document.createElement('div');row.className='sub';
+    row.innerHTML=`<span class="sname">${s.n}</span><span class="sd">D = ${s.d}</span>`;
+    const opts=document.createElement('div');opts.className='opts';
+    [['Passt',true],['Passt nicht',false]].forEach(([lab,val])=>{
+      const b=document.createElement('button');b.className='opt';b.textContent=lab;
+      b.addEventListener('click',()=>{
+        if(row.dataset.locked)return;
+        const ok=(val===s.fit);
+        b.classList.add(ok?'fit':'nofit');
+        if(ok){row.dataset.locked='1';done++;cHint.textContent=(done===subs.length)?'Alle richtig – erkennst du die Faustregel?':'Richtig.';cHint.style.color='var(--fit)';}
+        else{cHint.textContent='Rechne das Volumen dieser Substanz nach: 100 ÷ Dichte.';cHint.style.color='var(--nofit)';}
+      });
+      opts.appendChild(b);
+    });
+    row.appendChild(opts);listC.appendChild(row);
+  });
+
+  document.getElementById('revealAha').addEventListener('click',()=>document.getElementById('aha').classList.add('show'));
+</script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dosisberechnung – Pharma-Assistentinnen</title>
+<style>
+  :root{
+    --paper:#f7f6f2;--ink:#1e2422;--ink-soft:#5c625d;--line:#dcd7cb;--line-strong:#b7b0a0;
+    --pharma:#3a6ea5;--pharma-soft:#e6eef6;--dose:#2f8f6f;--warn:#c25a3a;--warn-soft:#f6e6df;
+    --rest:#e9e5da;--card:#ffffff;--shadow:0 1px 2px rgba(30,36,34,.06),0 8px 24px rgba(30,36,34,.05);
+  }
+  *{box-sizing:border-box;}html{-webkit-text-size-adjust:100%;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;line-height:1.55;padding:clamp(1rem,4vw,3rem) 1rem 5rem;}
+  .wrap{max-width:800px;margin:0 auto;}
+  .eyebrow{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.78rem;color:var(--ink-soft);margin:0 0 .4rem;}
+  h1{font-size:clamp(1.8rem,5vw,2.6rem);line-height:1.1;margin:0 0 .6rem;font-weight:600;}
+  .lead{font-size:1.06rem;color:var(--ink-soft);margin:0 0 1.6rem;max-width:62ch;}
+  .core{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.4rem 1.5rem;box-shadow:var(--shadow);margin-bottom:1.8rem;}
+  .core h2{margin:.1rem 0 .7rem;font-size:1.15rem;}
+  .rx{font-family:ui-sans-serif,sans-serif;font-size:.95rem;background:var(--pharma-soft);border:1px solid var(--line);border-radius:10px;padding:.9rem 1.1rem;margin:.5rem 0 1rem;}
+  .rx b{color:var(--pharma);}
+  .rx .rxline{display:flex;justify-content:space-between;gap:1rem;padding:.15rem 0;border-bottom:1px dashed var(--line);}
+  .rx .rxline:last-child{border-bottom:none;}
+  .tasklist{margin:0;padding-left:1.2rem;}.tasklist li{margin:.25rem 0;}
+  .pick-label{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem;color:var(--ink-soft);margin:0 0 .6rem;}
+  .tabs{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.4rem;}
+  .tab{flex:1 1 210px;text-align:left;cursor:pointer;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.85rem 1rem;font-family:inherit;color:var(--ink);transition:border-color .2s,box-shadow .2s;}
+  .tab:hover{border-color:var(--line-strong);}.tab:focus-visible{outline:2px solid var(--pharma);outline-offset:2px;}
+  .tab .tname{font-size:1.05rem;font-weight:600;display:block;}
+  .tab .tsub{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.8rem;color:var(--ink-soft);}
+  .tab.active{border-color:var(--pharma);box-shadow:0 0 0 1px var(--pharma),var(--shadow);}
+  .tab.active .tname{color:var(--pharma);}
+  .panel{display:none;animation:rise .35s ease;}.panel.show{display:block;}
+  @keyframes rise{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.4rem 1.5rem;box-shadow:var(--shadow);margin-bottom:1.2rem;}
+  .card h3{margin:.1rem 0 .5rem;font-size:1.2rem;}
+  .card h4{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.82rem;color:var(--ink-soft);margin:1.3rem 0 .5rem;font-weight:600;}
+  .defs{margin:.4rem 0;padding:0;list-style:none;}.defs li{margin:.45rem 0;}.defs b{color:var(--pharma);}
+  .calc{font-family:ui-monospace,monospace;background:var(--pharma-soft);border:1px solid var(--line);border-radius:10px;padding:1rem 1.1rem;margin:.6rem 0;display:grid;gap:.55rem;}
+  .calc-row{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
+  .calc-row label{min-width:210px;color:var(--ink-soft);font-size:.92rem;}
+  .calc-row .unit{font-size:.85rem;color:var(--ink-soft);}
+  input[type=number]{font-family:inherit;font-size:1rem;width:5.5rem;padding:.35rem .5rem;border:1px solid var(--line-strong);border-radius:7px;background:#fff;color:var(--ink);text-align:center;}
+  input[type=number]:focus-visible{outline:2px solid var(--pharma);outline-offset:1px;}
+  .verdict{font-family:ui-sans-serif,sans-serif;font-size:.85rem;min-width:1.4rem;font-weight:600;}
+  .verdict.ok{color:var(--dose);}.verdict.no{color:var(--warn);}
+  .hint{font-family:ui-sans-serif,sans-serif;font-size:.82rem;color:var(--warn);min-height:1.1rem;margin:.2rem 0 0;}
+  .qlist{margin:.3rem 0;padding-left:1.2rem;}.qlist li{margin:.3rem 0;}
+  .starter{font-style:italic;color:var(--ink-soft);border-left:3px solid var(--line-strong);padding-left:.9rem;margin:.6rem 0;}
+  .impulse{background:var(--pharma-soft);border-radius:10px;padding:.8rem 1rem;font-size:.95rem;margin:.6rem 0;}
+  .warnbox{background:var(--warn-soft);border-radius:10px;padding:.8rem 1rem;font-size:.95rem;margin:.6rem 0;}
+  .check{list-style:none;margin:.4rem 0;padding:0;}.check li{margin:.4rem 0;}
+  .check label{display:flex;gap:.6rem;align-items:flex-start;cursor:pointer;font-family:ui-sans-serif,sans-serif;font-size:.95rem;}
+  .check input{margin-top:.25rem;width:1.05rem;height:1.05rem;accent-color:var(--pharma);}
+  .check input:checked + span{color:var(--ink-soft);text-decoration:line-through;}
+  .plausi{display:flex;gap:.6rem;margin:.6rem 0;flex-wrap:wrap;}
+  .plausi button{font-family:ui-sans-serif,sans-serif;font-size:.92rem;border:1px solid var(--line-strong);background:#fff;border-radius:8px;padding:.5rem .9rem;cursor:pointer;}
+  .plausi button:hover{border-color:var(--pharma);}
+  .plausi button.sel-ok{background:var(--dose);color:#fff;border-color:var(--dose);}
+  .plausi button.sel-no{background:var(--warn);color:#fff;border-color:var(--warn);}
+  .reveal-btn{font-family:ui-sans-serif,sans-serif;font-size:.9rem;background:var(--pharma);color:#fff;border:none;border-radius:8px;padding:.55rem 1rem;cursor:pointer;margin-top:.3rem;}
+  .reveal-btn:hover{background:#2f5a87;}
+  .aha{display:none;margin-top:.8rem;font-size:.98rem;background:var(--warn-soft);border-radius:10px;padding:.9rem 1.1rem;}
+  .aha.show{display:block;animation:rise .35s ease;}
+  .teacher{margin-top:2.4rem;border-top:1px solid var(--line);padding-top:1.4rem;}
+  details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.2rem 1.2rem;box-shadow:var(--shadow);}
+  summary{cursor:pointer;font-family:ui-sans-serif,sans-serif;font-weight:600;padding:.9rem 0;list-style:none;}
+  summary::-webkit-details-marker{display:none;}summary::before{content:"▸ ";color:var(--pharma);}details[open] summary::before{content:"▾ ";}
+  .teacher h4{margin:1.1rem 0 .3rem;font-family:inherit;font-size:1.02rem;color:var(--ink);}
+  .teacher p,.teacher ul{margin:.3rem 0;}
+  .teacher code{font-family:ui-monospace,monospace;background:var(--pharma-soft);padding:.1rem .35rem;border-radius:5px;font-size:.92em;}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Fachrechnen · Pharma-Assistentinnen · Dosisberechnung</p>
+  <h1>Die richtige Dosis berechnen</h1>
+  <p class="lead">Von der ärztlichen Verordnung (mg pro kg Körpergewicht) zur abzumessenden Menge in ml – und immer die Plausibilität prüfen, denn hier geht es um Menschen. Wähle deinen Zugang.</p>
+
+  <div class="core">
+    <h2>Die Kernaufgabe</h2>
+    <div class="rx">
+      <div class="rxline"><span><b>Präparat</b></span><span>Schmerzsirup</span></div>
+      <div class="rxline"><span><b>Konzentration</b></span><span>100 mg / 5 ml</span></div>
+      <div class="rxline"><span><b>Verordnung</b></span><span>10 mg pro kg Körpergewicht, 3× täglich</span></div>
+      <div class="rxline"><span><b>Kind</b></span><span>12 kg schwer, Behandlung über 5 Tage</span></div>
+    </div>
+    <ol class="tasklist">
+      <li>Berechne die Wirkstoffmenge pro Dosis (in mg).</li>
+      <li>Rechne die Menge in ml Sirup pro Dosis um.</li>
+      <li>Bestimme den Tagesbedarf und den Gesamtbedarf für 5 Tage.</li>
+      <li>Prüfe die Plausibilität deines Ergebnisses.</li>
+    </ol>
+  </div>
+
+  <p class="pick-label">Wähle deinen Zugang:</p>
+  <div class="tabs" role="tablist">
+    <button class="tab active" role="tab" data-tab="A"><span class="tname">A · Mit Unterstützung</span><span class="tsub">Dreisatz-Rahmen, Leitfragen</span></button>
+    <button class="tab" role="tab" data-tab="B"><span class="tname">B · Eigenständig</span><span class="tsub">Aufgabe ohne Hilfen + Selbstcheck</span></button>
+    <button class="tab" role="tab" data-tab="C"><span class="tname">C · Vertiefung</span><span class="tsub">Dosierungsfehler erkennen</span></button>
+  </div>
+
+  <!-- A -->
+  <section class="panel show" id="panel-A">
+    <div class="card">
+      <h3>Zugang A – Mit Unterstützung</h3>
+      <p>Rechne in vier klaren Schritten vom Körpergewicht zur Menge in ml.</p>
+      <h4>Merke</h4>
+      <ul class="defs">
+        <li><b>Schritt 1:</b> Wirkstoff pro Dosis = Dosis pro kg × Körpergewicht.</li>
+        <li><b>Schritt 2:</b> Über die Konzentration von mg auf ml umrechnen (Dreisatz).</li>
+        <li><b>Schritt 3:</b> Tagesbedarf = ml pro Dosis × Anzahl Dosen pro Tag.</li>
+      </ul>
+      <h4>Rechenrahmen – trag die Werte ein</h4>
+      <div class="calc">
+        <div class="calc-row"><label>1) Wirkstoff/Dosis = 10 × 12 =</label><input type="number" id="aMg"><span class="unit">mg</span><span class="verdict" id="vMg"></span></div>
+        <div class="calc-row"><label>2) ml/Dosis: 100 mg → 5 ml, also</label><input type="number" id="aMl" step="0.1"><span class="unit">ml</span><span class="verdict" id="vMl"></span></div>
+        <div class="calc-row"><label>3) Tagesbedarf = ml × 3 =</label><input type="number" id="aDay" step="0.1"><span class="unit">ml</span><span class="verdict" id="vDay"></span></div>
+        <div class="calc-row"><label>4) Gesamt (5 Tage) =</label><input type="number" id="aTot" step="0.1"><span class="unit">ml</span><span class="verdict" id="vTot"></span></div>
+      </div>
+      <p class="hint" id="aHint"></p>
+      <h4>Leitfragen</h4>
+      <ol class="qlist">
+        <li>Wie viel mg Wirkstoff braucht ein 12 kg schweres Kind bei 10 mg/kg?</li>
+        <li>Wenn 100 mg in 5 ml stecken – wie viele ml enthalten die berechnete mg-Menge?</li>
+        <li>Wie oft pro Tag und über wie viele Tage wird die Dosis gegeben?</li>
+      </ol>
+      <h4>Satzanfang für dein Ergebnis</h4>
+      <p class="starter">«Das Kind erhält pro Dosis ______ ml Sirup, also täglich ______ ml; für die ganze Behandlung werden ______ ml benötigt.»</p>
+      <h4>Selbstcheck</h4>
+      <ul class="check">
+        <li><label><input type="checkbox"><span>Ich habe zuerst die mg-Menge, dann die ml berechnet.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich habe die Einheiten durchgehend kontrolliert.</span></label></li>
+        <li><label><input type="checkbox"><span>Mein Ergebnis ist plausibel (keine unmöglichen Mengen).</span></label></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- B -->
+  <section class="panel" id="panel-B">
+    <div class="card">
+      <h3>Zugang B – Eigenständig</h3>
+      <p>Löse die Aufgabe ohne Hilfen. Zum Prüfen kannst du deine Ergebnisse eintragen.</p>
+      <h4>Ergebnisse prüfen (freiwillig)</h4>
+      <div class="calc">
+        <div class="calc-row"><label>Wirkstoff pro Dosis =</label><input type="number" id="bMg"><span class="unit">mg</span><span class="verdict" id="vBMg"></span></div>
+        <div class="calc-row"><label>ml pro Dosis =</label><input type="number" id="bMl" step="0.1"><span class="unit">ml</span><span class="verdict" id="vBMl"></span></div>
+        <div class="calc-row"><label>ml pro Tag =</label><input type="number" id="bDay" step="0.1"><span class="unit">ml</span><span class="verdict" id="vBDay"></span></div>
+        <div class="calc-row"><label>ml gesamt (5 Tage) =</label><input type="number" id="bTot" step="0.1"><span class="unit">ml</span><span class="verdict" id="vBTot"></span></div>
+      </div>
+      <p class="hint" id="bHint"></p>
+      <h4>Selbstcheck</h4>
+      <ul class="check">
+        <li><label><input type="checkbox"><span>Ich habe die Wirkstoffmenge aus Dosis × Gewicht bestimmt.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich habe die Konzentration korrekt als Dreisatz genutzt.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich habe Tages- und Gesamtbedarf sauber berechnet.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich habe die Plausibilität meines Ergebnisses geprüft.</span></label></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- C -->
+  <section class="panel" id="panel-C">
+    <div class="card">
+      <h3>Zugang C – Vertiefung: Fehler erkennen</h3>
+      <p>In der Apotheke reicht die richtige Rechnung nicht – du musst auch <b>falsche</b> Ergebnisse erkennen, bevor sie zum Kunden gelangen. Prüfe die folgenden drei Fälle.</p>
+      <div class="impulse">💡 <b>Denkimpuls:</b> Rechne selbst nach und frage bei jedem Fall: Ist diese Menge für ein Kind realistisch abmessbar und einnehmbar?</div>
+
+      <h4>Fall 1</h4>
+      <p>Eine Kollegin hat für das 12-kg-Kind <b>60 ml pro Dosis</b> notiert. Ist das plausibel?</p>
+      <div class="plausi" data-case="1"><button data-v="ok">Plausibel</button><button data-v="no">Nicht plausibel</button></div>
+
+      <h4>Fall 2</h4>
+      <p>Für ein 20 kg schweres Kind wurde bei gleicher Verordnung (10 mg/kg) und gleichem Sirup <b>10 ml pro Dosis</b> berechnet. Ist das plausibel?</p>
+      <div class="plausi" data-case="2"><button data-v="ok">Plausibel</button><button data-v="no">Nicht plausibel</button></div>
+
+      <h4>Fall 3</h4>
+      <p>Für ein Kind wurde die Konzentration mit <b>50 mg/5 ml</b> statt 100 mg/5 ml verwechselt. Wird dadurch zu viel oder zu wenig Sirup abgemessen?</p>
+      <div class="plausi" data-case="3"><button data-v="ok">Zu wenig</button><button data-v="no">Zu viel</button></div>
+      <p class="hint" id="cHint"></p>
+
+      <h4>Deine Denkaufgabe</h4>
+      <ol class="qlist">
+        <li>Warum ist eine Plausibilitätsprüfung bei Dosierungen wichtiger als bei einer gewöhnlichen Rechenaufgabe?</li>
+        <li><b>Begründungsfrage:</b> Ein Kommafehler (6 ml statt 0,6 ml) verzehnfacht die Menge. An welcher Stelle der Rechnung entstehen solche Fehler am leichtesten?</li>
+        <li><b>Transferfrage:</b> Welche zwei Kontrollen würdest du in der Apotheke einbauen, bevor ein Sirup abgegeben wird?</li>
+      </ol>
+      <button class="reveal-btn" id="revealAha">Auflösung der drei Fälle zeigen</button>
+      <div class="aha" id="aha">
+        <b>Fall 1 – nicht plausibel:</b> Richtig sind 120 mg = 6 ml pro Dosis. 60 ml wären das Zehnfache – ein klassischer Kommafehler. <b>Fall 2 – plausibel:</b> 20 kg × 10 mg = 200 mg → 200 mg ÷ 100 mg × 5 ml = 10 ml, das stimmt. <b>Fall 3 – zu viel:</b> Bei halber Konzentration (50 statt 100 mg/5 ml) braucht es die doppelte Menge, um dieselbe Wirkstoffmenge zu erreichen – wer die Verwechslung nicht bemerkt, misst zu viel Sirup ab.
+      </div>
+      <h4>Selbstcheck</h4>
+      <ul class="check">
+        <li><label><input type="checkbox"><span>Ich habe jeden Fall selbst nachgerechnet.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich erkenne einen Kommafehler an einer unrealistischen Menge.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich verstehe, wie eine falsche Konzentration die ml-Menge verändert.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich kann zwei sinnvolle Kontrollen benennen.</span></label></li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="teacher">
+    <details>
+      <summary>Lösungen und Rechenwege – für die Lehrperson</summary>
+      <h4>Kernaufgabe: Schmerzsirup 100 mg/5 ml, 10 mg/kg, Kind 12 kg, 3× täglich, 5 Tage</h4>
+      <ul>
+        <li><b>Wirkstoff pro Dosis</b>: <code>10 mg × 12 = 120 mg</code>.</li>
+        <li><b>ml pro Dosis</b>: <code>120 mg ÷ 100 mg × 5 ml = 6 ml</code>.</li>
+        <li><b>Tagesbedarf</b>: <code>6 ml × 3 = 18 ml</code>.</li>
+        <li><b>Gesamt (5 Tage)</b>: <code>18 ml × 5 = 90 ml</code>.</li>
+      </ul>
+      <p>Beispielsatz: «Das Kind erhält 6 ml pro Dosis, täglich 18 ml; für die ganze Behandlung werden 90 ml benötigt.»</p>
+      <h4>Zugang C – Fallauflösung</h4>
+      <ul>
+        <li><b>Fall 1</b>: nicht plausibel – korrekt sind 6 ml, nicht 60 ml (Zehnerfehler).</li>
+        <li><b>Fall 2</b>: plausibel – <code>20 × 10 = 200 mg → 200 ÷ 100 × 5 = 10 ml</code>.</li>
+        <li><b>Fall 3</b>: zu viel – halbe Konzentration erfordert doppeltes Volumen für dieselbe Wirkstoffmenge.</li>
+      </ul>
+      <p><b>Erwartungshorizont Denkaufgabe:</b> Dosierungsfehler betreffen die Gesundheit direkt; die Plausibilitätsprüfung ist die letzte Sicherung. Kommafehler entstehen besonders beim Umrechnen zwischen mg und ml und beim Verschieben von Einheiten (mg ↔ g, ml ↔ l). Sinnvolle Kontrollen: Einheiten explizit mitschreiben, Ergebnis gegen eine Erfahrungsgrösse prüfen (ein Kind trinkt keine 60 ml Sirup pro Einzeldosis), Vier-Augen-Prinzip.</p>
+      <p style="font-size:.9rem;color:var(--ink-soft)">Anschluss an das Lehrmittel: Diese Aufgabe verbindet Kapitel 7 (Dreisatz), Kapitel 1 (Masseinheiten) und Kapitel 9 (komplexe Aufgaben / Dosisberechnung) und macht die im Lehrmittel geforderte Plausibilitätsprüfung zum eigenen Lernschritt.</p>
+    </details>
+  </div>
+</div>
+
+<script>
+  const mark=(el,ok)=>{el.textContent=ok?'✓':'✗';el.className='verdict '+(ok?'ok':'no');};
+  const clear=el=>{el.textContent='';el.className='verdict';};
+  const near=(a,b)=>Math.abs(a-b)<0.011;
+
+  const tabs=document.querySelectorAll('.tab');
+  const panels={A:document.getElementById('panel-A'),B:document.getElementById('panel-B'),C:document.getElementById('panel-C')};
+  tabs.forEach(t=>t.addEventListener('click',()=>{tabs.forEach(x=>x.classList.remove('active'));t.classList.add('active');Object.values(panels).forEach(p=>p.classList.remove('show'));panels[t.dataset.tab].classList.add('show');}));
+
+  // A
+  const A={mg:['aMg','vMg',120],ml:['aMl','vMl',6],day:['aDay','vDay',18],tot:['aTot','vTot',90]};
+  const aHint=document.getElementById('aHint');
+  function checkA(){
+    let all=true;
+    for(const k in A){const [id,v,val]=A[k];const el=document.getElementById(id);
+      if(el.value===''){clear(document.getElementById(v));all=false;continue;}
+      const ok=near(+el.value,val);mark(document.getElementById(v),ok);if(!ok)all=false;}
+    aHint.textContent='';
+    if(document.getElementById('aMl').value!==''&&!near(+document.getElementById('aMl').value,6)&&near(+document.getElementById('aMg').value,120))
+      aHint.textContent='Dreisatz: 120 mg ÷ 100 mg × 5 ml.';
+  }
+  Object.values(A).forEach(([id])=>document.getElementById(id).addEventListener('input',checkA));
+
+  // B
+  const B={mg:['bMg','vBMg',120],ml:['bMl','vBMl',6],day:['bDay','vBDay',18],tot:['bTot','vBTot',90]};
+  const bHint=document.getElementById('bHint');
+  function checkB(){
+    let all=true,any=false;
+    for(const k in B){const [id,v,val]=B[k];const el=document.getElementById(id);
+      if(el.value===''){clear(document.getElementById(v));all=false;continue;}
+      any=true;const ok=near(+el.value,val);mark(document.getElementById(v),ok);if(!ok)all=false;}
+    bHint.textContent=(any&&!all)?'Prüfe die Werte ohne Häkchen. Kontrolliere die Einheiten.':'';
+  }
+  Object.values(B).forEach(([id])=>document.getElementById(id).addEventListener('input',checkB));
+
+  // C – Plausibilitätsfälle. Richtige Antwort je Fall:
+  const answers={'1':'no','2':'ok','3':'no'}; // Fall3: "no"-Button trägt Label "Zu viel"
+  const cHint=document.getElementById('cHint');
+  document.querySelectorAll('.plausi').forEach(group=>{
+    const c=group.dataset.case;
+    group.querySelectorAll('button').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        group.querySelectorAll('button').forEach(b=>b.classList.remove('sel-ok','sel-no'));
+        const chosen=btn.dataset.v;
+        const correct=(chosen===answers[c]);
+        btn.classList.add(correct?'sel-ok':'sel-no');
+        cHint.textContent=correct?'Richtig erkannt.':'Rechne diesen Fall noch einmal nach.';
+        cHint.style.color=correct?'var(--dose)':'var(--warn)';
+      });
+    });
+  });
+
+  document.getElementById('revealAha').addEventListener('click',()=>document.getElementById('aha').classList.add('show'));
+</script>
+</body>
+</html>

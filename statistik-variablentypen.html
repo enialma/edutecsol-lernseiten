@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Variablentypen zuordnen</title>
+<style>
+  :root{
+    --paper:#f7f6f2;--ink:#1e2422;--ink-soft:#5c625d;--line:#dcd7cb;--line-strong:#b7b0a0;
+    --qual:#8a5a2f;--qual-soft:#f0e7dc;--quant:#2f6f8f;--quant-soft:#e3eef2;
+    --ok:#3a7d5c;--no:#c25a3a;--card:#ffffff;--shadow:0 1px 2px rgba(30,36,34,.06),0 8px 24px rgba(30,36,34,.05);
+  }
+  *{box-sizing:border-box;}html{-webkit-text-size-adjust:100%;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;line-height:1.55;padding:clamp(1rem,4vw,3rem) 1rem 5rem;}
+  .wrap{max-width:800px;margin:0 auto;}
+  .eyebrow{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.78rem;color:var(--ink-soft);margin:0 0 .4rem;}
+  h1{font-size:clamp(1.8rem,5vw,2.6rem);line-height:1.1;margin:0 0 .6rem;font-weight:600;}
+  .lead{font-size:1.06rem;color:var(--ink-soft);margin:0 0 1.6rem;max-width:62ch;}
+  .core{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.4rem 1.5rem;box-shadow:var(--shadow);margin-bottom:1.8rem;}
+  .core h2{margin:.1rem 0 .7rem;font-size:1.15rem;}
+  .tree{font-family:ui-sans-serif,sans-serif;font-size:.9rem;background:var(--quant-soft);border:1px solid var(--line);border-radius:10px;padding:1rem 1.1rem;margin:.4rem 0;line-height:1.7;}
+  .tree b{color:var(--quant);}
+  .pick-label{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem;color:var(--ink-soft);margin:0 0 .6rem;}
+  .tabs{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.4rem;}
+  .tab{flex:1 1 210px;text-align:left;cursor:pointer;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.85rem 1rem;font-family:inherit;color:var(--ink);transition:border-color .2s,box-shadow .2s;}
+  .tab:hover{border-color:var(--line-strong);}.tab:focus-visible{outline:2px solid var(--quant);outline-offset:2px;}
+  .tab .tname{font-size:1.05rem;font-weight:600;display:block;}
+  .tab .tsub{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.8rem;color:var(--ink-soft);}
+  .tab.active{border-color:var(--quant);box-shadow:0 0 0 1px var(--quant),var(--shadow);}
+  .tab.active .tname{color:var(--quant);}
+  .panel{display:none;animation:rise .35s ease;}.panel.show{display:block;}
+  @keyframes rise{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.4rem 1.5rem;box-shadow:var(--shadow);margin-bottom:1.2rem;}
+  .card h3{margin:.1rem 0 .5rem;font-size:1.2rem;}
+  .card h4{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.82rem;color:var(--ink-soft);margin:1.3rem 0 .5rem;font-weight:600;}
+  .defs{margin:.4rem 0;padding:0;list-style:none;}.defs li{margin:.45rem 0;}
+  .defs b.qual{color:var(--qual);}.defs b.quant{color:var(--quant);}
+  /* Zuordnungszeile */
+  .item{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;padding:.6rem .3rem;border-bottom:1px solid var(--line);}
+  .item .name{flex:1 1 190px;font-size:1rem;}
+  .opts{display:flex;gap:.35rem;flex-wrap:wrap;}
+  .opt{font-family:ui-sans-serif,sans-serif;font-size:.82rem;border:1px solid var(--line-strong);background:#fff;color:var(--ink);border-radius:7px;padding:.35rem .6rem;cursor:pointer;transition:background .15s,border-color .15s;}
+  .opt:hover{border-color:var(--quant);}
+  .opt.sel{background:var(--quant);color:#fff;border-color:var(--quant);}
+  .opt.correct{background:var(--ok);color:#fff;border-color:var(--ok);}
+  .opt.wrong{background:var(--no);color:#fff;border-color:var(--no);}
+  .fb{font-family:ui-sans-serif,sans-serif;font-size:.85rem;min-width:1.3rem;font-weight:600;}
+  .fb.ok{color:var(--ok);}.fb.no{color:var(--no);}
+  .scorebar{font-family:ui-sans-serif,sans-serif;font-size:.9rem;color:var(--ink-soft);margin:.9rem 0 .2rem;}
+  .qlist{margin:.3rem 0;padding-left:1.2rem;}.qlist li{margin:.3rem 0;}
+  .impulse{background:var(--quant-soft);border-radius:10px;padding:.8rem 1rem;font-size:.95rem;margin:.6rem 0;}
+  .check{list-style:none;margin:.4rem 0;padding:0;}.check li{margin:.4rem 0;}
+  .check label{display:flex;gap:.6rem;align-items:flex-start;cursor:pointer;font-family:ui-sans-serif,sans-serif;font-size:.95rem;}
+  .check input{margin-top:.25rem;width:1.05rem;height:1.05rem;accent-color:var(--quant);}
+  .check input:checked + span{color:var(--ink-soft);text-decoration:line-through;}
+  .reveal-btn{font-family:ui-sans-serif,sans-serif;font-size:.9rem;background:var(--quant);color:#fff;border:none;border-radius:8px;padding:.55rem 1rem;cursor:pointer;margin-top:.3rem;}
+  .reveal-btn:hover{background:#255a75;}
+  .aha{display:none;margin-top:.8rem;font-size:.98rem;background:var(--quant-soft);border-radius:10px;padding:.9rem 1.1rem;}
+  .aha.show{display:block;animation:rise .35s ease;}
+  .teacher{margin-top:2.4rem;border-top:1px solid var(--line);padding-top:1.4rem;}
+  details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.2rem 1.2rem;box-shadow:var(--shadow);}
+  summary{cursor:pointer;font-family:ui-sans-serif,sans-serif;font-weight:600;padding:.9rem 0;list-style:none;}
+  summary::-webkit-details-marker{display:none;}summary::before{content:"▸ ";color:var(--quant);}details[open] summary::before{content:"▾ ";}
+  .teacher h4{margin:1.1rem 0 .3rem;font-family:inherit;font-size:1.02rem;color:var(--ink);}
+  .teacher p,.teacher ul{margin:.3rem 0;}.teacher table{border-collapse:collapse;font-size:.9rem;margin:.4rem 0;}
+  .teacher td,.teacher th{border:1px solid var(--line);padding:.3rem .6rem;text-align:left;}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Mathematik · Statistik · Variablentypen</p>
+  <h1>Merkmale richtig einordnen</h1>
+  <p class="lead">Qualitativ oder quantitativ? Nominal, ordinal oder kardinal? Diskret oder stetig? Ordne jedes Merkmal seinem Typ zu und begründe deine Wahl. Wähle deinen Zugang.</p>
+
+  <div class="core">
+    <h2>Die Kernaufgabe</h2>
+    <p>Ordne jedes der folgenden Merkmale seinem Variablentyp zu und formuliere zu zweien deiner Zuordnungen eine kurze Begründung:</p>
+    <div class="tree">
+      <b>Qualitativ</b> (Kategorien): nominal (ohne Rangfolge) · ordinal (mit Rangfolge)<br>
+      <b>Quantitativ</b> (Zahlen, mit denen man rechnen kann): diskret (abzählbar) · stetig (jeder Zwischenwert möglich)
+    </div>
+  </div>
+
+  <p class="pick-label">Wähle deinen Zugang:</p>
+  <div class="tabs" role="tablist">
+    <button class="tab active" role="tab" data-tab="A"><span class="tname">A · Mit Unterstützung</span><span class="tsub">Begriffe, Leitfragen, weniger Merkmale</span></button>
+    <button class="tab" role="tab" data-tab="B"><span class="tname">B · Eigenständig</span><span class="tsub">Alle Merkmale + Selbstcheck</span></button>
+    <button class="tab" role="tab" data-tab="C"><span class="tname">C · Vertiefung</span><span class="tsub">Grenzfälle begründen</span></button>
+  </div>
+
+  <!-- A -->
+  <section class="panel show" id="panel-A">
+    <div class="card">
+      <h3>Zugang A – Mit Unterstützung</h3>
+      <h4>Die Begriffe</h4>
+      <ul class="defs">
+        <li><b class="qual">Nominal</b> – Kategorien ohne Rangfolge (z. B. Farbe, Geschlecht).</li>
+        <li><b class="qual">Ordinal</b> – Kategorien mit Rangfolge, aber ohne rechenbare Abstände (z. B. Schulnote in Worten, Zufriedenheit).</li>
+        <li><b class="quant">Diskret</b> – abzählbare Zahlen, meist ganzzahlig (z. B. Anzahl Kinder).</li>
+        <li><b class="quant">Stetig</b> – jeder Zwischenwert ist möglich (z. B. Körpergrösse, Zeit).</li>
+      </ul>
+      <h4>Leitfragen</h4>
+      <ol class="qlist">
+        <li>Kann man mit den Werten sinnvoll rechnen? → quantitativ, sonst qualitativ.</li>
+        <li>Gibt es eine natürliche Reihenfolge? → ordinal statt nominal.</li>
+        <li>Sind Zwischenwerte möglich (z. B. 1,73 m)? → stetig statt diskret.</li>
+      </ol>
+      <h4>Ordne zu</h4>
+      <div id="listA"></div>
+      <div class="scorebar" id="scoreA"></div>
+      <h4>Selbstcheck</h4>
+      <ul class="check">
+        <li><label><input type="checkbox"><span>Ich habe zuerst qualitativ/quantitativ unterschieden.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich habe auf Rangfolge und Zwischenwerte geachtet.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich kann meine Zuordnungen begründen.</span></label></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- B -->
+  <section class="panel" id="panel-B">
+    <div class="card">
+      <h3>Zugang B – Eigenständig</h3>
+      <p>Ordne alle Merkmale ohne Hilfen zu. Die Rückmeldung erscheint pro Zeile.</p>
+      <h4>Ordne zu</h4>
+      <div id="listB"></div>
+      <div class="scorebar" id="scoreB"></div>
+      <h4>Selbstcheck</h4>
+      <ul class="check">
+        <li><label><input type="checkbox"><span>Ich habe jedes Merkmal qualitativ oder quantitativ eingeordnet.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich habe nominal von ordinal sauber anhand der Rangfolge getrennt.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich habe diskret von stetig über mögliche Zwischenwerte getrennt.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich kann jede Zuordnung in einem Satz begründen.</span></label></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- C -->
+  <section class="panel" id="panel-C">
+    <div class="card">
+      <h3>Zugang C – Vertiefung</h3>
+      <p>Diese Merkmale sind <b>Grenzfälle</b> – sie sehen nach einem Typ aus, gehören aber zu einem anderen. Ordne zu und begründe jeweils.</p>
+      <div class="impulse">💡 <b>Denkimpuls:</b> Eine Zahl macht ein Merkmal nicht automatisch quantitativ. Entscheidend ist, ob Rechnen mit den Werten <em>sinnvoll</em> ist.</div>
+      <h4>Ordne zu</h4>
+      <div id="listC"></div>
+      <div class="scorebar" id="scoreC"></div>
+      <h4>Deine Denkaufgabe</h4>
+      <ol class="qlist">
+        <li>Warum ist eine Postleitzahl trotz Ziffern <em>kein</em> quantitatives Merkmal?</li>
+        <li><b>Begründungsfrage:</b> Schulnoten (1–6) werden oft gemittelt. Ist das statistisch sauber? Begründe mit dem Unterschied ordinal/kardinal.</li>
+        <li><b>Transferfrage:</b> Nenne ein Merkmal aus deinem Berufsfeld, das man leicht falsch einordnet – und erkläre, warum.</li>
+      </ol>
+      <button class="reveal-btn" id="revealAha">Auflösung der Grenzfälle zeigen</button>
+      <div class="aha" id="aha">
+        <b>Postleitzahl:</b> nominal – die Ziffern sind nur ein Etikett; 8001 ist nicht «mehr» als 6314, und ein Mittelwert wäre unsinnig. <b>Rückennummer / Startnummer:</b> ebenfalls nominal. <b>Schulnote (1–6):</b> streng genommen ordinal – die Reihenfolge stimmt, aber die Abstände sind nicht garantiert gleich gross, deshalb ist ein Mittelwert eine (praktische, aber theoretisch angreifbare) Vereinfachung. <b>Temperatur in °C:</b> kardinal/stetig, aber ohne echten Nullpunkt – Differenzen sind sinnvoll, Verhältnisse («doppelt so warm») nicht.
+      </div>
+      <h4>Selbstcheck</h4>
+      <ul class="check">
+        <li><label><input type="checkbox"><span>Ich unterscheide «Zahl als Etikett» von «rechenbarer Zahl».</span></label></li>
+        <li><label><input type="checkbox"><span>Ich begründe die Einordnung der Postleitzahl.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich erkläre, warum das Mitteln von Noten heikel ist.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich finde ein eigenes Beispiel aus meinem Berufsfeld.</span></label></li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="teacher">
+    <details>
+      <summary>Lösungen und Begründungen – für die Lehrperson</summary>
+      <h4>Kernaufgabe / Zugänge A & B</h4>
+      <table>
+        <tr><th>Merkmal</th><th>Typ</th></tr>
+        <tr><td>Augenfarbe</td><td>nominal</td></tr>
+        <tr><td>Zufriedenheit (sehr/eher/wenig)</td><td>ordinal</td></tr>
+        <tr><td>Anzahl Geschwister</td><td>diskret</td></tr>
+        <tr><td>Körpergrösse in cm</td><td>stetig</td></tr>
+        <tr><td>Höchster Schulabschluss</td><td>ordinal</td></tr>
+        <tr><td>Wohnkanton</td><td>nominal</td></tr>
+        <tr><td>Reaktionszeit in Sekunden</td><td>stetig</td></tr>
+        <tr><td>Anzahl verkaufter Artikel</td><td>diskret</td></tr>
+      </table>
+      <p>In Zugang A werden nur die ersten vier Merkmale gezeigt, in B alle acht.</p>
+      <h4>Zugang C – Grenzfälle</h4>
+      <table>
+        <tr><th>Merkmal</th><th>Typ</th><th>Begründung</th></tr>
+        <tr><td>Postleitzahl</td><td>nominal</td><td>Ziffern als Etikett, kein Rang, kein Rechnen</td></tr>
+        <tr><td>Startnummer im Lauf</td><td>nominal</td><td>reine Kennung, kein Wert</td></tr>
+        <tr><td>Schulnote 1–6</td><td>ordinal</td><td>Rangfolge ja, gleiche Abstände nicht gesichert</td></tr>
+        <tr><td>Temperatur in °C</td><td>stetig (kardinal, ohne absoluten Nullpunkt)</td><td>Differenzen sinnvoll, Verhältnisse nicht</td></tr>
+      </table>
+      <p style="font-size:.9rem;color:var(--ink-soft)">Anschluss an den Foliensatz: Die Unterscheidung entscheidet, welche Auswertung erlaubt ist – nominale Merkmale erlauben nur Modus und Häufigkeiten, ordinale zusätzlich den Median, kardinale erst den Mittelwert. Das verbindet diese Lektion direkt mit den Lagemassen.</p>
+    </details>
+  </div>
+</div>
+
+<script>
+  const OPTS=['nominal','ordinal','diskret','stetig'];
+  const dataA=[
+    {n:'Augenfarbe',t:'nominal'},
+    {n:'Zufriedenheit (sehr / eher / wenig)',t:'ordinal'},
+    {n:'Anzahl Geschwister',t:'diskret'},
+    {n:'Körpergrösse in cm',t:'stetig'}
+  ];
+  const dataB=dataA.concat([
+    {n:'Höchster Schulabschluss',t:'ordinal'},
+    {n:'Wohnkanton',t:'nominal'},
+    {n:'Reaktionszeit in Sekunden',t:'stetig'},
+    {n:'Anzahl verkaufter Artikel',t:'diskret'}
+  ]);
+  const dataC=[
+    {n:'Postleitzahl',t:'nominal'},
+    {n:'Startnummer im Lauf',t:'nominal'},
+    {n:'Schulnote (1–6)',t:'ordinal'},
+    {n:'Temperatur in °C',t:'stetig'}
+  ];
+
+  function build(listEl,data,scoreEl){
+    listEl.innerHTML='';
+    data.forEach((d,i)=>{
+      const row=document.createElement('div');row.className='item';
+      const name=document.createElement('span');name.className='name';name.textContent=d.n;row.appendChild(name);
+      const opts=document.createElement('div');opts.className='opts';
+      OPTS.forEach(o=>{
+        const b=document.createElement('button');b.className='opt';b.textContent=o;
+        b.addEventListener('click',()=>{
+          if(row.dataset.locked)return;
+          opts.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));
+          b.classList.add('sel');
+          const ok=(o===d.t);
+          b.classList.add(ok?'correct':'wrong');
+          fb.textContent=ok?'✓':'✗';fb.className='fb '+(ok?'ok':'no');
+          if(ok){row.dataset.locked='1';d._done=true;}
+          updateScore(data,scoreEl);
+        });
+        opts.appendChild(b);
+      });
+      row.appendChild(opts);
+      const fb=document.createElement('span');fb.className='fb';row.appendChild(fb);
+      listEl.appendChild(row);
+    });
+    updateScore(data,scoreEl);
+  }
+  function updateScore(data,scoreEl){
+    const done=data.filter(d=>d._done).length;
+    scoreEl.textContent=`Richtig zugeordnet: ${done} von ${data.length}`+(done===data.length?' – alle korrekt!':'');
+  }
+
+  build(document.getElementById('listA'),dataA,document.getElementById('scoreA'));
+  build(document.getElementById('listB'),dataB,document.getElementById('scoreB'));
+  build(document.getElementById('listC'),dataC,document.getElementById('scoreC'));
+
+  const tabs=document.querySelectorAll('.tab');
+  const panels={A:document.getElementById('panel-A'),B:document.getElementById('panel-B'),C:document.getElementById('panel-C')};
+  tabs.forEach(t=>t.addEventListener('click',()=>{tabs.forEach(x=>x.classList.remove('active'));t.classList.add('active');Object.values(panels).forEach(p=>p.classList.remove('show'));panels[t.dataset.tab].classList.add('show');}));
+
+  document.getElementById('revealAha').addEventListener('click',()=>document.getElementById('aha').classList.add('show'));
+</script>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quartile und Boxplot</title>
+<style>
+  :root{
+    --paper:#f7f6f2;--ink:#1e2422;--ink-soft:#5c625d;--line:#dcd7cb;--line-strong:#b7b0a0;
+    --data:#2f6f8f;--data-soft:#e3eef2;--median:#c25a3a;--box:#3a7d5c;--rest:#e9e5da;
+    --card:#ffffff;--shadow:0 1px 2px rgba(30,36,34,.06),0 8px 24px rgba(30,36,34,.05);
+  }
+  *{box-sizing:border-box;}html{-webkit-text-size-adjust:100%;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;line-height:1.55;padding:clamp(1rem,4vw,3rem) 1rem 5rem;}
+  .wrap{max-width:800px;margin:0 auto;}
+  .eyebrow{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.78rem;color:var(--ink-soft);margin:0 0 .4rem;}
+  h1{font-size:clamp(1.8rem,5vw,2.6rem);line-height:1.1;margin:0 0 .6rem;font-weight:600;}
+  .lead{font-size:1.06rem;color:var(--ink-soft);margin:0 0 1.6rem;max-width:62ch;}
+  .core{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.4rem 1.5rem;box-shadow:var(--shadow);margin-bottom:1.8rem;}
+  .core h2{margin:.1rem 0 .7rem;font-size:1.15rem;}
+  .dataset{font-family:ui-monospace,monospace;font-size:1.05rem;background:var(--data-soft);border:1px solid var(--line);border-radius:9px;padding:.7rem 1rem;margin:.3rem 0 1rem;letter-spacing:.04em;line-height:1.9;}
+  .tasklist{margin:0;padding-left:1.2rem;}.tasklist li{margin:.25rem 0;}
+  .pick-label{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem;color:var(--ink-soft);margin:0 0 .6rem;}
+  .tabs{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.4rem;}
+  .tab{flex:1 1 210px;text-align:left;cursor:pointer;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.85rem 1rem;font-family:inherit;color:var(--ink);transition:border-color .2s,box-shadow .2s;}
+  .tab:hover{border-color:var(--line-strong);}.tab:focus-visible{outline:2px solid var(--data);outline-offset:2px;}
+  .tab .tname{font-size:1.05rem;font-weight:600;display:block;}
+  .tab .tsub{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.8rem;color:var(--ink-soft);}
+  .tab.active{border-color:var(--data);box-shadow:0 0 0 1px var(--data),var(--shadow);}
+  .tab.active .tname{color:var(--data);}
+  .panel{display:none;animation:rise .35s ease;}.panel.show{display:block;}
+  @keyframes rise{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.4rem 1.5rem;box-shadow:var(--shadow);margin-bottom:1.2rem;}
+  .card h3{margin:.1rem 0 .5rem;font-size:1.2rem;}
+  .card h4{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.82rem;color:var(--ink-soft);margin:1.3rem 0 .5rem;font-weight:600;}
+  .defs{margin:.4rem 0;padding:0;list-style:none;}.defs li{margin:.45rem 0;}.defs b{color:var(--data);}
+  .calc{font-family:ui-monospace,monospace;background:var(--data-soft);border:1px solid var(--line);border-radius:10px;padding:1rem 1.1rem;margin:.6rem 0;display:grid;gap:.55rem;}
+  .calc-row{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
+  .calc-row label{min-width:150px;color:var(--ink-soft);font-size:.92rem;}
+  input[type=number]{font-family:inherit;font-size:1rem;width:5rem;padding:.35rem .5rem;border:1px solid var(--line-strong);border-radius:7px;background:#fff;color:var(--ink);text-align:center;}
+  input[type=number]:focus-visible{outline:2px solid var(--data);outline-offset:1px;}
+  .verdict{font-family:ui-sans-serif,sans-serif;font-size:.85rem;min-width:1.4rem;font-weight:600;}
+  .verdict.ok{color:var(--box);}.verdict.no{color:var(--median);}
+  .hint{font-family:ui-sans-serif,sans-serif;font-size:.82rem;color:var(--median);min-height:1.1rem;margin:.2rem 0 0;}
+  .qlist{margin:.3rem 0;padding-left:1.2rem;}.qlist li{margin:.3rem 0;}
+  .starter{font-style:italic;color:var(--ink-soft);border-left:3px solid var(--line-strong);padding-left:.9rem;margin:.6rem 0;}
+  .impulse{background:var(--data-soft);border-radius:10px;padding:.8rem 1rem;font-size:.95rem;margin:.6rem 0;}
+  .check{list-style:none;margin:.4rem 0;padding:0;}.check li{margin:.4rem 0;}
+  .check label{display:flex;gap:.6rem;align-items:flex-start;cursor:pointer;font-family:ui-sans-serif,sans-serif;font-size:.95rem;}
+  .check input{margin-top:.25rem;width:1.05rem;height:1.05rem;accent-color:var(--data);}
+  .check input:checked + span{color:var(--ink-soft);text-decoration:line-through;}
+  .reveal-btn{font-family:ui-sans-serif,sans-serif;font-size:.9rem;background:var(--data);color:#fff;border:none;border-radius:8px;padding:.55rem 1rem;cursor:pointer;margin-top:.3rem;}
+  .reveal-btn:hover{background:#255a75;}
+  .aha{display:none;margin-top:.8rem;font-size:.98rem;background:var(--data-soft);border-radius:10px;padding:.9rem 1.1rem;}
+  .aha.show{display:block;animation:rise .35s ease;}
+  .boxwrap{margin:1rem 0 .3rem;}
+  svg{width:100%;height:auto;display:block;}
+  .teacher{margin-top:2.4rem;border-top:1px solid var(--line);padding-top:1.4rem;}
+  details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.2rem 1.2rem;box-shadow:var(--shadow);}
+  summary{cursor:pointer;font-family:ui-sans-serif,sans-serif;font-weight:600;padding:.9rem 0;list-style:none;}
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸ ";color:var(--data);}details[open] summary::before{content:"▾ ";}
+  .teacher h4{margin:1.1rem 0 .3rem;font-family:inherit;font-size:1.02rem;color:var(--ink);}
+  .teacher p,.teacher ul{margin:.3rem 0;}
+  .teacher code{font-family:ui-monospace,monospace;background:var(--data-soft);padding:.1rem .35rem;border-radius:5px;font-size:.92em;}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Mathematik · Statistik · Quartile & Boxplot</p>
+  <h1>Von den Quartilen zum Boxplot</h1>
+  <p class="lead">Eine geordnete Stichprobe in vier gleich grosse Teile zerlegen, die Fünf-Punkte-Zusammenfassung bestimmen und daraus einen Boxplot lesen. Wähle deinen Zugang.</p>
+
+  <div class="core">
+    <h2>Die Kernaufgabe</h2>
+    <p>In einer Klasse wurden die erreichten Punkte einer Prüfung erfasst. Die geordnete Stichprobe (n = 11) lautet:</p>
+    <p class="dataset">4 &nbsp; 7 &nbsp; 8 &nbsp; 10 &nbsp; 12 &nbsp; 14 &nbsp; 15 &nbsp; 16 &nbsp; 18 &nbsp; 19 &nbsp; 22</p>
+    <ol class="tasklist">
+      <li>Bestimme Minimum, Q1, Median (Q2), Q3 und Maximum.</li>
+      <li>Zeige, wie du die Positionen findest.</li>
+      <li>Beschreibe in einem Satz, was der Boxplot über die Streuung aussagt.</li>
+    </ol>
+    <div class="boxwrap"><svg id="boxplot" viewBox="0 0 700 130" role="img" aria-label="Boxplot der Stichprobe"></svg></div>
+    <p style="font-family:ui-sans-serif,sans-serif;font-size:.78rem;color:var(--ink-soft);margin:.4rem 0 0;">Die Fünf-Punkte-Zusammenfassung erscheint im Boxplot, sobald du die Werte korrekt eingetragen hast.</p>
+  </div>
+
+  <p class="pick-label">Wähle deinen Zugang:</p>
+  <div class="tabs" role="tablist">
+    <button class="tab active" role="tab" data-tab="A"><span class="tname">A · Mit Unterstützung</span><span class="tsub">Positionsregel, Rechenrahmen, Leitfragen</span></button>
+    <button class="tab" role="tab" data-tab="B"><span class="tname">B · Eigenständig</span><span class="tsub">Aufgabe ohne Hilfen + Selbstcheck</span></button>
+    <button class="tab" role="tab" data-tab="C"><span class="tname">C · Vertiefung</span><span class="tsub">Nicht ganzzahlige Position & IQR</span></button>
+  </div>
+
+  <!-- A -->
+  <section class="panel show" id="panel-A">
+    <div class="card">
+      <h3>Zugang A – Mit Unterstützung</h3>
+      <p>Die Hilfen führen dich Schritt für Schritt zur Fünf-Punkte-Zusammenfassung.</p>
+      <h4>Die Begriffe</h4>
+      <ul class="defs">
+        <li><b>Median (Q2)</b> – teilt die geordnete Stichprobe in zwei Hälften.</li>
+        <li><b>Q1 (unteres Quartil)</b> – der Median der unteren Hälfte.</li>
+        <li><b>Q3 (oberes Quartil)</b> – der Median der oberen Hälfte.</li>
+      </ul>
+      <h4>Positionsregel für diese Aufgabe (n = 11)</h4>
+      <div class="impulse">Bei 11 Werten steht der Median an Position 6. Die untere Hälfte sind die Positionen 1–5, die obere Hälfte die Positionen 7–11. Q1 ist der mittlere Wert der unteren fünf, Q3 der mittlere Wert der oberen fünf.</div>
+      <h4>Rechenrahmen – trag die Werte ein</h4>
+      <div class="calc">
+        <div class="calc-row"><label>Minimum =</label><input type="number" id="aMin"><span class="verdict" id="vMin"></span></div>
+        <div class="calc-row"><label>Q1 =</label><input type="number" id="aQ1"><span class="verdict" id="vQ1"></span><span style="font-size:.85rem;color:var(--ink-soft)">Position 3</span></div>
+        <div class="calc-row"><label>Median (Q2) =</label><input type="number" id="aMed"><span class="verdict" id="vMed"></span><span style="font-size:.85rem;color:var(--ink-soft)">Position 6</span></div>
+        <div class="calc-row"><label>Q3 =</label><input type="number" id="aQ3"><span class="verdict" id="vQ3"></span><span style="font-size:.85rem;color:var(--ink-soft)">Position 9</span></div>
+        <div class="calc-row"><label>Maximum =</label><input type="number" id="aMax"><span class="verdict" id="vMax"></span></div>
+      </div>
+      <p class="hint" id="aHint"></p>
+      <h4>Leitfragen</h4>
+      <ol class="qlist">
+        <li>An welcher Position steht bei 11 Werten der Median?</li>
+        <li>Welche Werte bilden die untere, welche die obere Hälfte?</li>
+        <li>Welcher Wert steht jeweils in der Mitte dieser Hälften?</li>
+      </ol>
+      <h4>Satzanfang für dein Ergebnis</h4>
+      <p class="starter">«Die mittleren 50 % der Prüfungsergebnisse liegen zwischen ______ und ______ Punkten; der Median beträgt ______ …»</p>
+      <h4>Selbstcheck</h4>
+      <ul class="check">
+        <li><label><input type="checkbox"><span>Ich habe Q1, Median und Q3 richtig zugeordnet.</span></label></li>
+        <li><label><input type="checkbox"><span>Meine Positionen stimmen.</span></label></li>
+        <li><label><input type="checkbox"><span>Mein Satz beschreibt die Streuung verständlich.</span></label></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- B -->
+  <section class="panel" id="panel-B">
+    <div class="card">
+      <h3>Zugang B – Eigenständig</h3>
+      <p>Bestimme die Fünf-Punkte-Zusammenfassung ohne Hilfen. Zum Prüfen kannst du deine Werte eintragen.</p>
+      <h4>Ergebnisse prüfen (freiwillig)</h4>
+      <div class="calc">
+        <div class="calc-row"><label>Minimum =</label><input type="number" id="bMin"><span class="verdict" id="vBMin"></span></div>
+        <div class="calc-row"><label>Q1 =</label><input type="number" id="bQ1"><span class="verdict" id="vBQ1"></span></div>
+        <div class="calc-row"><label>Median =</label><input type="number" id="bMed"><span class="verdict" id="vBMed"></span></div>
+        <div class="calc-row"><label>Q3 =</label><input type="number" id="bQ3"><span class="verdict" id="vBQ3"></span></div>
+        <div class="calc-row"><label>Maximum =</label><input type="number" id="bMax"><span class="verdict" id="vBMax"></span></div>
+      </div>
+      <p class="hint" id="bHint"></p>
+      <h4>Selbstcheck</h4>
+      <ul class="check">
+        <li><label><input type="checkbox"><span>Ich habe die Stichprobe als geordnet geprüft.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich habe den Median korrekt an der mittleren Position bestimmt.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich habe Q1 und Q3 als Mediane der Hälften bestimmt.</span></label></li>
+        <li><label><input type="checkbox"><span>Mein Satz beschreibt Lage und Streuung sachlich und richtig.</span></label></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- C -->
+  <section class="panel" id="panel-C">
+    <div class="card">
+      <h3>Zugang C – Vertiefung</h3>
+      <p>Bearbeite zuerst die Kernaufgabe. Untersuche danach, was sich ändert, wenn die Position nicht mehr ganzzahlig ist.</p>
+      <h4>Neue Situation (n = 12)</h4>
+      <p>Eine zwölfte Person schreibt mit und erreicht 20 Punkte. Die geordnete Stichprobe lautet nun:</p>
+      <p class="dataset">4 &nbsp; 7 &nbsp; 8 &nbsp; 10 &nbsp; 12 &nbsp; 14 &nbsp; 15 &nbsp; 16 &nbsp; 18 &nbsp; 19 &nbsp; 20 &nbsp; 22</p>
+      <div class="impulse">💡 <b>Denkimpuls:</b> Bei gerader Anzahl liegt der Median <em>zwischen</em> zwei Werten. Berechne ihn als Mittel der Positionen 6 und 7. Für Q1 und Q3 gilt dasselbe innerhalb der Hälften (je 6 Werte).</div>
+      <h4>Berechne die neue Zusammenfassung</h4>
+      <div class="calc">
+        <div class="calc-row"><label>Q1 =</label><input type="number" id="cQ1" step="0.5"><span class="verdict" id="vCQ1"></span></div>
+        <div class="calc-row"><label>Median =</label><input type="number" id="cMed" step="0.5"><span class="verdict" id="vCMed"></span></div>
+        <div class="calc-row"><label>Q3 =</label><input type="number" id="cQ3" step="0.5"><span class="verdict" id="vCQ3"></span></div>
+        <div class="calc-row"><label>IQR = Q3 − Q1 =</label><input type="number" id="cIQR" step="0.5"><span class="verdict" id="vCIQR"></span></div>
+      </div>
+      <p class="hint" id="cHint"></p>
+      <h4>Deine Denkaufgabe</h4>
+      <ol class="qlist">
+        <li>Warum ist der Median jetzt keine ganze Zahl mehr, obwohl alle Messwerte ganze Zahlen sind?</li>
+        <li><b>Begründungsfrage:</b> Der Interquartilsabstand (IQR) umfasst die mittleren 50 % der Daten. Warum ist er robuster gegen Ausreisser als die Spannweite (Max − Min)?</li>
+        <li><b>Transferfrage:</b> Zwei Klassen haben denselben Median, aber sehr unterschiedliche IQR. Was sagt das über die beiden Klassen aus?</li>
+      </ol>
+      <button class="reveal-btn" id="revealAha">Median-Berechnung zeigen</button>
+      <div class="aha" id="aha">
+        Bei 12 Werten gibt es keine einzelne Mitte – die Positionen 6 und 7 tragen die Werte 14 und 15, also ist der <b>Median (14 + 15) ÷ 2 = 14,5</b>. Genau deshalb kann der Median «zwischen» den Messwerten liegen. Der <b>IQR</b> misst nur den Abstand von Q1 bis Q3 und ignoriert die äussersten Werte – ein einzelner Ausreisser am Rand verändert ihn nicht, die Spannweite dagegen sofort.
+      </div>
+      <h4>Selbstcheck</h4>
+      <ul class="check">
+        <li><label><input type="checkbox"><span>Ich habe den Median als Mittel zweier Positionen berechnet.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich habe den IQR korrekt als Q3 − Q1 bestimmt.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich erkläre, warum der IQR robuster ist als die Spannweite.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich deute unterschiedliche IQR bei gleichem Median.</span></label></li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="teacher">
+    <details>
+      <summary>Lösungen und Rechenwege – für die Lehrperson</summary>
+      <h4>Kernaufgabe: 4 7 8 10 12 14 15 16 18 19 22 (n = 11)</h4>
+      <ul>
+        <li><b>Minimum</b> = 4, <b>Maximum</b> = 22.</li>
+        <li><b>Median (Q2)</b>: Position (11+1)/2 = 6 → Wert <code>14</code>.</li>
+        <li><b>Q1</b>: untere Hälfte 4 7 8 10 12, Mitte = Position 3 → <code>8</code>.</li>
+        <li><b>Q3</b>: obere Hälfte 15 16 18 19 22, Mitte = Position 9 → <code>18</code>.</li>
+      </ul>
+      <p>Fünf-Punkte-Zusammenfassung: 4 / 8 / 14 / 18 / 22. Beispielsatz: «Die mittleren 50 % liegen zwischen 8 und 18 Punkten, der Median beträgt 14.»</p>
+      <h4>Zugang C: 4 7 8 10 12 14 15 16 18 19 20 22 (n = 12)</h4>
+      <ul>
+        <li><b>Median</b>: Mittel der Positionen 6 und 7 = <code>(14 + 15) ÷ 2 = 14,5</code>.</li>
+        <li><b>Q1</b>: untere 6 Werte 4 7 8 10 12 14, Mitte = <code>(8 + 10) ÷ 2 = 9</code>.</li>
+        <li><b>Q3</b>: obere 6 Werte 15 16 18 19 20 22, Mitte = <code>(18 + 19) ÷ 2 = 18,5</code>.</li>
+        <li><b>IQR</b> = <code>18,5 − 9 = 9,5</code>.</li>
+      </ul>
+      <p><b>Erwartungshorizont:</b> Der Median liegt bei gerader Anzahl zwischen zwei Werten, daher der Halbschritt. Der IQR beschreibt die Streuung der mittleren 50 % und bleibt unbeeinflusst von einzelnen Extremwerten – anders als die Spannweite. Gleicher Median bei unterschiedlichem IQR heisst: gleiches «Zentrum», aber die eine Klasse ist homogener (kleiner IQR), die andere streut stärker (grosser IQR).</p>
+      <p style="font-size:.9rem;color:var(--ink-soft)">Anschluss an den Foliensatz: Diese Fünf-Punkte-Zusammenfassung ist genau die Grundlage des Boxplots (Min – Q1 – Median – Q3 – Max) und verbindet die Lagemasse-Lektion mit der Streuungs- und Boxplot-Lektion.</p>
+    </details>
+  </div>
+</div>
+
+<script>
+  const NS="http://www.w3.org/2000/svg";
+  // Boxplot-Skala 0..24 auf 60..660 px
+  const x=v=>60+(v/24)*600;
+  const svg=document.getElementById('boxplot');
+  function line(x1,y1,x2,y2,col,w){const l=document.createElementNS(NS,'line');l.setAttribute('x1',x1);l.setAttribute('y1',y1);l.setAttribute('x2',x2);l.setAttribute('y2',y2);l.setAttribute('stroke',col);l.setAttribute('stroke-width',w);svg.appendChild(l);return l;}
+  function txt(x,y,s,col){const t=document.createElementNS(NS,'text');t.setAttribute('x',x);t.setAttribute('y',y);t.setAttribute('fill',col);t.setAttribute('font-size','12');t.setAttribute('font-family','ui-sans-serif,sans-serif');t.setAttribute('text-anchor','middle');t.textContent=s;svg.appendChild(t);}
+  // Achse
+  line(60,105,660,105,'#b7b0a0',1);
+  for(let v=0;v<=24;v+=4){line(x(v),101,x(v),109,'#b7b0a0',1);txt(x(v),124,v,'#5c625d');}
+  let boxDrawn=false;
+  function drawBox(min,q1,med,q3,max){
+    if(boxDrawn) return;
+    boxDrawn=true;
+    const yc=60,h=34;
+    // Whisker
+    line(x(min),yc,x(q1),yc,'#2f6f8f',2);
+    line(x(q3),yc,x(max),yc,'#2f6f8f',2);
+    line(x(min),yc-10,x(min),yc+10,'#2f6f8f',2);
+    line(x(max),yc-10,x(max),yc+10,'#2f6f8f',2);
+    // Box
+    const r=document.createElementNS(NS,'rect');
+    r.setAttribute('x',x(q1));r.setAttribute('y',yc-h/2);r.setAttribute('width',x(q3)-x(q1));r.setAttribute('height',h);
+    r.setAttribute('fill','#e3eef2');r.setAttribute('stroke','#3a7d5c');r.setAttribute('stroke-width',2);svg.appendChild(r);
+    // Median
+    line(x(med),yc-h/2,x(med),yc+h/2,'#c25a3a',3);
+    // Labels
+    txt(x(min),yc-16,'Min','#2f6f8f');txt(x(q1),yc+30,'Q1','#3a7d5c');
+    txt(x(med),yc-16,'Median','#c25a3a');txt(x(q3),yc+30,'Q3','#3a7d5c');txt(x(max),yc-16,'Max','#2f6f8f');
+  }
+
+  const mark=(el,ok)=>{el.textContent=ok?'✓':'✗';el.className='verdict '+(ok?'ok':'no');};
+  const clear=el=>{el.textContent='';el.className='verdict';};
+  const near=(a,b)=>Math.abs(a-b)<0.011;
+
+  const tabs=document.querySelectorAll('.tab');
+  const panels={A:document.getElementById('panel-A'),B:document.getElementById('panel-B'),C:document.getElementById('panel-C')};
+  tabs.forEach(t=>t.addEventListener('click',()=>{tabs.forEach(x=>x.classList.remove('active'));t.classList.add('active');Object.values(panels).forEach(p=>p.classList.remove('show'));panels[t.dataset.tab].classList.add('show');}));
+
+  // A
+  const A={min:['aMin','vMin',4],q1:['aQ1','vQ1',8],med:['aMed','vMed',14],q3:['aQ3','vQ3',18],max:['aMax','vMax',22]};
+  const aHint=document.getElementById('aHint');
+  function checkA(){
+    let all=true;
+    for(const k in A){const [id,v,val]=A[k];const el=document.getElementById(id);
+      if(el.value===''){clear(document.getElementById(v));all=false;continue;}
+      const ok=+el.value===val;mark(document.getElementById(v),ok);if(!ok)all=false;}
+    aHint.textContent = all?'':'';
+    if(all) drawBox(4,8,14,18,22);
+  }
+  Object.values(A).forEach(([id])=>document.getElementById(id).addEventListener('input',checkA));
+
+  // B
+  const B={min:['bMin','vBMin',4],q1:['bQ1','vBQ1',8],med:['bMed','vBMed',14],q3:['bQ3','vBQ3',18],max:['bMax','vBMax',22]};
+  const bHint=document.getElementById('bHint');
+  function checkB(){
+    let all=true,any=false;
+    for(const k in B){const [id,v,val]=B[k];const el=document.getElementById(id);
+      if(el.value===''){clear(document.getElementById(v));all=false;continue;}
+      any=true;const ok=+el.value===val;mark(document.getElementById(v),ok);if(!ok)all=false;}
+    bHint.textContent=(any&&!all)?'Prüfe die Werte ohne Häkchen. Denk an die Positionsregel.':'';
+    if(all) drawBox(4,8,14,18,22);
+  }
+  Object.values(B).forEach(([id])=>document.getElementById(id).addEventListener('input',checkB));
+
+  // C
+  const cQ1=document.getElementById('cQ1'),cMed=document.getElementById('cMed'),cQ3=document.getElementById('cQ3'),cIQR=document.getElementById('cIQR');
+  const vCQ1=document.getElementById('vCQ1'),vCMed=document.getElementById('vCMed'),vCQ3=document.getElementById('vCQ3'),vCIQR=document.getElementById('vCIQR'),cHint=document.getElementById('cHint');
+  function checkC(){
+    cQ1.value===''?clear(vCQ1):mark(vCQ1,near(+cQ1.value,9));
+    cMed.value===''?clear(vCMed):mark(vCMed,near(+cMed.value,14.5));
+    cQ3.value===''?clear(vCQ3):mark(vCQ3,near(+cQ3.value,18.5));
+    cIQR.value===''?clear(vCIQR):mark(vCIQR,near(+cIQR.value,9.5));
+    cHint.textContent='';
+    if(cMed.value!==''&&!near(+cMed.value,14.5)) cHint.textContent='Median = Mittel der Positionen 6 und 7.';
+    else if(cIQR.value!==''&&!near(+cIQR.value,9.5)&&near(+cQ1.value,9)&&near(+cQ3.value,18.5)) cHint.textContent='IQR = Q3 − Q1.';
+  }
+  [cQ1,cMed,cQ3,cIQR].forEach(i=>i.addEventListener('input',checkC));
+
+  document.getElementById('revealAha').addEventListener('click',()=>document.getElementById('aha').classList.add('show'));
+</script>
+</body>
+</html>

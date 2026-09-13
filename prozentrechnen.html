@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prozentrechnen – Umfrage-Aufgabe</title>
+<style>
+  :root{
+    --paper:#faf8f3;
+    --ink:#1f2421;
+    --ink-soft:#5b615c;
+    --line:#d9d4c7;
+    --line-strong:#b9b2a0;
+    --fill:#3a7d5c;      /* Anteil / richtig */
+    --fill-soft:#e4efe8;
+    --rest:#eae6db;      /* Rest bis 100% */
+    --accent:#2f5d8a;    /* Zugangs-Akzent */
+    --warn:#a8562b;
+    --card:#ffffff;
+    --shadow:0 1px 2px rgba(31,36,33,.06),0 8px 24px rgba(31,36,33,.05);
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    line-height:1.55;
+    padding:clamp(1rem,4vw,3rem) 1rem 5rem;
+  }
+  .wrap{max-width:760px;margin:0 auto;}
+  .eyebrow{
+    font-family:ui-sans-serif,system-ui,sans-serif;
+    font-size:.78rem;letter-spacing:.02em;
+    color:var(--ink-soft);margin:0 0 .4rem;
+  }
+  h1{
+    font-size:clamp(1.9rem,5vw,2.7rem);
+    line-height:1.1;margin:0 0 .6rem;font-weight:600;
+  }
+  .lead{font-size:1.08rem;color:var(--ink-soft);margin:0 0 1.6rem;max-width:60ch;}
+
+  /* --- Kernaufgabe --- */
+  .core{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:14px;padding:1.4rem 1.5rem;box-shadow:var(--shadow);
+    margin-bottom:1.8rem;
+  }
+  .core h2{margin:.1rem 0 .7rem;font-size:1.15rem;}
+  .survey{
+    display:flex;align-items:baseline;gap:.5rem;flex-wrap:wrap;
+    font-size:1.15rem;margin:.2rem 0 1rem;
+  }
+  .survey b{font-variant-numeric:tabular-nums;}
+  .tasklist{margin:0;padding-left:1.2rem;color:var(--ink);}
+  .tasklist li{margin:.25rem 0;}
+
+  /* --- Anteils-Balken --- */
+  .bar-wrap{margin:1.1rem 0 .2rem;}
+  .bar{
+    height:38px;border-radius:8px;overflow:hidden;
+    display:flex;border:1px solid var(--line-strong);background:var(--rest);
+  }
+  .bar .seg{
+    background:var(--fill);height:100%;
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-family:ui-sans-serif,system-ui,sans-serif;
+    font-size:.82rem;font-weight:600;white-space:nowrap;
+    transition:width .5s cubic-bezier(.4,0,.2,1);
+  }
+  .bar-labels{
+    display:flex;justify-content:space-between;
+    font-family:ui-sans-serif,system-ui,sans-serif;
+    font-size:.72rem;color:var(--ink-soft);margin-top:.3rem;
+  }
+
+  /* --- Zugangswahl --- */
+  .pick-label{
+    font-family:ui-sans-serif,system-ui,sans-serif;
+    font-size:.85rem;color:var(--ink-soft);margin:0 0 .6rem;
+  }
+  .tabs{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.4rem;}
+  .tab{
+    flex:1 1 200px;text-align:left;cursor:pointer;
+    background:var(--card);border:1px solid var(--line);
+    border-radius:12px;padding:.85rem 1rem;
+    font-family:inherit;color:var(--ink);
+    transition:border-color .2s,box-shadow .2s,transform .1s;
+  }
+  .tab:hover{border-color:var(--line-strong);}
+  .tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .tab .tname{font-size:1.05rem;font-weight:600;display:block;}
+  .tab .tsub{
+    font-family:ui-sans-serif,system-ui,sans-serif;
+    font-size:.8rem;color:var(--ink-soft);
+  }
+  .tab.active{
+    border-color:var(--accent);
+    box-shadow:0 0 0 1px var(--accent),var(--shadow);
+  }
+  .tab.active .tname{color:var(--accent);}
+
+  .panel{display:none;animation:rise .35s ease;}
+  .panel.show{display:block;}
+  @keyframes rise{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:14px;padding:1.4rem 1.5rem;box-shadow:var(--shadow);
+    margin-bottom:1.2rem;
+  }
+  .card h3{margin:.1rem 0 .5rem;font-size:1.2rem;}
+  .card h4{
+    font-family:ui-sans-serif,system-ui,sans-serif;
+    font-size:.82rem;color:var(--ink-soft);
+    margin:1.3rem 0 .5rem;font-weight:600;
+  }
+  .defs{margin:.4rem 0;padding:0;list-style:none;}
+  .defs li{margin:.45rem 0;padding-left:0;}
+  .defs b{color:var(--accent);}
+
+  /* --- Rechenrahmen --- */
+  .calc{
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    background:var(--fill-soft);border:1px solid var(--line);
+    border-radius:10px;padding:1rem 1.1rem;margin:.6rem 0;
+    display:grid;gap:.55rem;
+  }
+  .calc-row{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
+  .calc-row label{min-width:150px;color:var(--ink-soft);font-size:.92rem;}
+  input[type=number]{
+    font-family:inherit;font-size:1rem;width:5.5rem;
+    padding:.35rem .5rem;border:1px solid var(--line-strong);
+    border-radius:7px;background:#fff;color:var(--ink);
+    text-align:center;
+  }
+  input[type=number]:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+  .verdict{
+    font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem;
+    min-width:1.4rem;font-weight:600;
+  }
+  .verdict.ok{color:var(--fill);}
+  .verdict.no{color:var(--warn);}
+  .result-line{font-size:1.05rem;}
+  .hint{
+    font-family:ui-sans-serif,system-ui,sans-serif;
+    font-size:.82rem;color:var(--warn);min-height:1.1rem;margin:.2rem 0 0;
+  }
+
+  .qlist{margin:.3rem 0;padding-left:1.2rem;}
+  .qlist li{margin:.3rem 0;}
+  .starter{
+    font-style:italic;color:var(--ink-soft);
+    border-left:3px solid var(--line-strong);padding-left:.9rem;margin:.6rem 0;
+  }
+  .impulse{
+    background:var(--fill-soft);border-radius:10px;
+    padding:.8rem 1rem;font-size:.95rem;margin:.6rem 0;
+  }
+
+  /* --- Selbstcheck --- */
+  .check{list-style:none;margin:.4rem 0;padding:0;}
+  .check li{margin:.4rem 0;}
+  .check label{
+    display:flex;gap:.6rem;align-items:flex-start;cursor:pointer;
+    font-family:ui-sans-serif,system-ui,sans-serif;font-size:.95rem;
+  }
+  .check input{margin-top:.25rem;width:1.05rem;height:1.05rem;accent-color:var(--fill);}
+  .check input:checked + span{color:var(--ink-soft);text-decoration:line-through;}
+
+  /* --- Vergleichs-Balken Karte C --- */
+  .compare{display:grid;gap:.7rem;margin:.6rem 0;}
+  .crow{display:grid;grid-template-columns:8.5rem 1fr 3.2rem;align-items:center;gap:.7rem;}
+  .crow .clab{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem;}
+  .cbar{height:26px;background:var(--rest);border-radius:6px;overflow:hidden;border:1px solid var(--line);}
+  .cbar span{display:block;height:100%;width:0;background:var(--fill);transition:width .6s cubic-bezier(.4,0,.2,1);}
+  .cval{font-family:ui-monospace,monospace;font-size:.9rem;text-align:right;color:var(--ink-soft);}
+  .reveal-btn{
+    font-family:ui-sans-serif,system-ui,sans-serif;font-size:.9rem;
+    background:var(--accent);color:#fff;border:none;border-radius:8px;
+    padding:.55rem 1rem;cursor:pointer;margin-top:.3rem;
+  }
+  .reveal-btn:hover{background:#254a6f;}
+  .aha{
+    display:none;margin-top:.8rem;font-size:.98rem;
+    background:var(--fill-soft);border-radius:10px;padding:.9rem 1.1rem;
+  }
+  .aha.show{display:block;animation:rise .35s ease;}
+
+  /* --- Lösungen für Lehrperson --- */
+  .teacher{margin-top:2.4rem;border-top:1px solid var(--line);padding-top:1.4rem;}
+  details{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:.2rem 1.2rem;box-shadow:var(--shadow);
+  }
+  summary{
+    cursor:pointer;font-family:ui-sans-serif,system-ui,sans-serif;
+    font-weight:600;padding:.9rem 0;list-style:none;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸ ";color:var(--accent);}
+  details[open] summary::before{content:"▾ ";}
+  .teacher h4{margin:1.1rem 0 .3rem;font-family:inherit;font-size:1.02rem;color:var(--ink);}
+  .teacher p,.teacher ul{margin:.3rem 0;}
+  .teacher code{
+    font-family:ui-monospace,monospace;background:var(--fill-soft);
+    padding:.1rem .35rem;border-radius:5px;font-size:.92em;
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Mathematik · Berufsmaturität · Prozentrechnen</p>
+  <h1>Wie viel Prozent sind 36 von 120?</h1>
+  <p class="lead">Grundwert, Prozentwert und Prozentsatz unterscheiden – rechnen – und das Ergebnis in einem sachlichen Satz beschreiben. Wähle deinen Zugang und leg los.</p>
+
+  <div class="core">
+    <h2>Die Kernaufgabe</h2>
+    <p class="survey">In einer Umfrage haben <b>36</b> von <b>120</b> Personen eine bestimmte Antwort gewählt.</p>
+    <ol class="tasklist">
+      <li>Berechne, wie viel Prozent diese Antwort gewählt haben.</li>
+      <li>Zeige deinen Rechenweg.</li>
+      <li>Formuliere einen sachlichen Satz, der das Ergebnis beschreibt.</li>
+    </ol>
+    <div class="bar-wrap">
+      <div class="bar"><div class="seg" id="coreSeg" style="width:0"></div></div>
+      <div class="bar-labels"><span>0 %</span><span>100 % = alle 120 Personen</span></div>
+    </div>
+  </div>
+
+  <p class="pick-label">Wähle deinen Zugang:</p>
+  <div class="tabs" role="tablist">
+    <button class="tab active" role="tab" data-tab="A">
+      <span class="tname">A · Mit Unterstützung</span>
+      <span class="tsub">Begriffe, Rechenrahmen, Leitfragen</span>
+    </button>
+    <button class="tab" role="tab" data-tab="B">
+      <span class="tname">B · Eigenständig</span>
+      <span class="tsub">Aufgabe ohne Hilfen + Selbstcheck</span>
+    </button>
+    <button class="tab" role="tab" data-tab="C">
+      <span class="tname">C · Vertiefung</span>
+      <span class="tsub">Vergleichen und begründen</span>
+    </button>
+  </div>
+
+  <!-- ZUGANG A -->
+  <section class="panel show" id="panel-A">
+    <div class="card">
+      <h3>Zugang A – Mit Unterstützung</h3>
+      <p>Die Hilfen führen dich Schritt für Schritt durch die Kernaufgabe.</p>
+
+      <h4>Die drei Begriffe</h4>
+      <ul class="defs">
+        <li><b>Grundwert (G)</b> – die Gesamtmenge, auf die man sich bezieht. Sie entspricht 100 %.</li>
+        <li><b>Prozentwert (W)</b> – der Teil dieser Menge.</li>
+        <li><b>Prozentsatz (p)</b> – gibt an, wie viele Hundertstel der Teil ausmacht, angegeben in %.</li>
+      </ul>
+
+      <h4>Rechenrahmen – trag die Werte ein</h4>
+      <div class="calc">
+        <div class="calc-row">
+          <label>Grundwert&nbsp;G =</label>
+          <input type="number" id="aG" inputmode="numeric">
+          <span class="verdict" id="vG"></span>
+        </div>
+        <div class="calc-row">
+          <label>Prozentwert&nbsp;W =</label>
+          <input type="number" id="aW" inputmode="numeric">
+          <span class="verdict" id="vW"></span>
+        </div>
+        <div class="calc-row">
+          <label>Prozentsatz&nbsp;p =</label>
+          <span>W ÷ G × 100 =</span>
+          <input type="number" id="aP" inputmode="decimal">
+          <span>%</span>
+          <span class="verdict" id="vP"></span>
+        </div>
+      </div>
+      <p class="hint" id="aHint"></p>
+
+      <h4>Leitfragen</h4>
+      <ol class="qlist">
+        <li>Welche Zahl ist die Gesamtmenge – also der Grundwert?</li>
+        <li>Welche Zahl ist der Teil – also der Prozentwert?</li>
+        <li>Welche Rechnung führt vom Teil zum Prozentsatz?</li>
+      </ol>
+
+      <h4>Satzanfang für dein Ergebnis</h4>
+      <p class="starter">«Von allen befragten Personen haben ______ % …»</p>
+
+      <h4>Selbstcheck</h4>
+      <ul class="check">
+        <li><label><input type="checkbox"><span>Ich habe Grundwert, Prozentwert und Prozentsatz richtig zugeordnet.</span></label></li>
+        <li><label><input type="checkbox"><span>Mein Rechenweg stimmt.</span></label></li>
+        <li><label><input type="checkbox"><span>Mein Satz ist verständlich.</span></label></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ZUGANG B -->
+  <section class="panel" id="panel-B">
+    <div class="card">
+      <h3>Zugang B – Eigenständig</h3>
+      <p>Bearbeite die Kernaufgabe (Punkte 1–3) ohne zusätzliche Hilfen. Nutze zum Prüfen den Selbstcheck.</p>
+
+      <h4>Ergebnis prüfen (freiwillig)</h4>
+      <div class="calc">
+        <div class="calc-row">
+          <label>Mein Prozentsatz =</label>
+          <input type="number" id="bP" inputmode="decimal">
+          <span>%</span>
+          <span class="verdict" id="vBP"></span>
+        </div>
+      </div>
+      <p class="hint" id="bHint"></p>
+
+      <h4>Selbstcheck</h4>
+      <ul class="check">
+        <li><label><input type="checkbox"><span>Ich habe Grundwert und Prozentwert korrekt bestimmt.</span></label></li>
+        <li><label><input type="checkbox"><span>Mein Rechenweg ist vollständig und nachvollziehbar.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich habe das Ergebnis in Prozent angegeben.</span></label></li>
+        <li><label><input type="checkbox"><span>Mein Satz beschreibt das Ergebnis sachlich und richtig.</span></label></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ZUGANG C -->
+  <section class="panel" id="panel-C">
+    <div class="card">
+      <h3>Zugang C – Vertiefung</h3>
+      <p>Bearbeite zuerst die Kernaufgabe. Vergleiche danach drei weitere Angaben und begründe, was auffällt.</p>
+
+      <h4>Prozentsätze der Vergleichsangaben</h4>
+      <p>Trag jeweils deinen berechneten Prozentsatz ein. Der Balken zeigt den Anteil.</p>
+      <div class="compare">
+        <div class="crow">
+          <span class="clab">18 von 60</span>
+          <div class="cbar"><span id="cb1"></span></div>
+          <span class="cval"><input type="number" id="c1" inputmode="decimal" style="width:4rem"> %</span>
+        </div>
+        <div class="crow">
+          <span class="clab">45 von 150</span>
+          <div class="cbar"><span id="cb2"></span></div>
+          <span class="cval"><input type="number" id="c2" inputmode="decimal" style="width:4rem"> %</span>
+        </div>
+        <div class="crow">
+          <span class="clab">27 von 90</span>
+          <div class="cbar"><span id="cb3"></span></div>
+          <span class="cval"><input type="number" id="c3" inputmode="decimal" style="width:4rem"> %</span>
+        </div>
+      </div>
+      <p class="hint" id="cHint"></p>
+
+      <h4>Deine Denkaufgabe</h4>
+      <ol class="qlist">
+        <li>Was fällt dir an den vier Ergebnissen auf? Formuliere es in einem Satz.</li>
+        <li><b>Begründungsfrage:</b> Warum sind 36 von 120 und 18 von 60 <em>unterschiedlich viele</em> Personen, aber <em>gleich grosse</em> Anteile?</li>
+      </ol>
+      <div class="impulse">💡 <b>Denkimpuls:</b> Vergleiche nicht die Personenzahlen, sondern das Verhältnis Teil : Grundwert.</div>
+
+      <button class="reveal-btn" id="revealAha">Anteile vergleichen</button>
+      <div class="aha" id="aha">
+        Alle vier Balken sind <b>gleich lang</b> – jeder zeigt <b>30 %</b>. Die Personenzahlen (36, 18, 45, 27) und die Grundwerte (120, 60, 150, 90) sind verschieden, doch das Verhältnis Teil : Ganzes ist überall dasselbe: 3 : 10. Der Prozentsatz misst den <b>Anteil</b>, nicht die <b>Anzahl</b>.
+      </div>
+
+      <h4>Selbstcheck</h4>
+      <ul class="check">
+        <li><label><input type="checkbox"><span>Ich habe alle vier Prozentsätze berechnet.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich habe eine Gemeinsamkeit klar benannt.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich erkläre den Unterschied zwischen Anzahl und Anteil.</span></label></li>
+        <li><label><input type="checkbox"><span>Meine Begründung ist nachvollziehbar formuliert.</span></label></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- LEHRPERSON -->
+  <div class="teacher">
+    <details>
+      <summary>Lösungen und Rechenwege – für die Lehrperson</summary>
+      <h4>Kernaufgabe (alle Zugänge)</h4>
+      <p>G = 120, W = 36</p>
+      <p><code>p = 36 ÷ 120 × 100 = 0,3 × 100 = 30 %</code></p>
+      <p>Beispielsatz: «Von allen befragten Personen haben 30 % diese Antwort gewählt.»</p>
+
+      <h4>Zugang C – Vergleichsangaben</h4>
+      <ul>
+        <li><code>18 ÷ 60 × 100 = 30 %</code></li>
+        <li><code>45 ÷ 150 × 100 = 30 %</code></li>
+        <li><code>27 ÷ 90 × 100 = 30 %</code></li>
+      </ul>
+      <p><b>Auffälligkeit:</b> Alle vier Angaben ergeben 30 %, obwohl Personenzahlen und Grundwerte verschieden sind.</p>
+      <p><b>Begründung (Erwartungshorizont):</b> Der Prozentsatz beschreibt nicht die Anzahl, sondern den Anteil – das Verhältnis von Teil zu Ganzem. 36 : 120 und 18 : 60 entsprechen beide dem Verhältnis 3 : 10 (= 30 : 100). Wird der Grundwert verdoppelt (60 → 120), verdoppelt sich auch der Teil (18 → 36); das Verhältnis bleibt gleich. Deshalb sind die absoluten Zahlen verschieden, der Anteil aber identisch.</p>
+    </details>
+  </div>
+
+</div>
+
+<script>
+  // Zugangswahl
+  const tabs = document.querySelectorAll('.tab');
+  const panels = {A:document.getElementById('panel-A'),B:document.getElementById('panel-B'),C:document.getElementById('panel-C')};
+  tabs.forEach(t=>t.addEventListener('click',()=>{
+    tabs.forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    Object.values(panels).forEach(p=>p.classList.remove('show'));
+    panels[t.dataset.tab].classList.add('show');
+  }));
+
+  const mark = (el,ok)=>{el.textContent = ok?'✓':'✗'; el.className='verdict '+(ok?'ok':'no');};
+  const clear = el=>{el.textContent='';el.className='verdict';};
+
+  // Zugang A – Rechenrahmen
+  const aG=document.getElementById('aG'), aW=document.getElementById('aW'), aP=document.getElementById('aP');
+  const vG=document.getElementById('vG'), vW=document.getElementById('vW'), vP=document.getElementById('vP');
+  const aHint=document.getElementById('aHint'), coreSeg=document.getElementById('coreSeg');
+  function checkA(){
+    const g=parseFloat(aG.value), w=parseFloat(aW.value), p=parseFloat(aP.value);
+    aG.value===''?clear(vG):mark(vG,g===120);
+    aW.value===''?clear(vW):mark(vW,w===36);
+    if(aP.value===''){clear(vP); aHint.textContent=''; coreSeg.style.width='0';}
+    else{
+      const ok=Math.abs(p-30)<0.01; mark(vP,ok);
+      if(ok){aHint.textContent=''; coreSeg.style.width='30%'; coreSeg.textContent='30 %';}
+      else{
+        coreSeg.style.width='0'; coreSeg.textContent='';
+        aHint.textContent = (aG.value&&aW.value&&g===120&&w===36)
+          ? 'Fast: rechne Prozentwert ÷ Grundwert × 100.' : 'Prüfe zuerst Grundwert und Prozentwert.';
+      }
+    }
+  }
+  [aG,aW,aP].forEach(i=>i.addEventListener('input',checkA));
+
+  // Zugang B – Ergebnisprüfung
+  const bP=document.getElementById('bP'), vBP=document.getElementById('vBP'), bHint=document.getElementById('bHint');
+  bP.addEventListener('input',()=>{
+    if(bP.value===''){clear(vBP);bHint.textContent='';return;}
+    const ok=Math.abs(parseFloat(bP.value)-30)<0.01; mark(vBP,ok);
+    bHint.textContent = ok?'':'Nicht ganz – rechne 36 ÷ 120 × 100.';
+  });
+
+  // Zugang C – Vergleich
+  const cfg=[['c1','cb1',30],['c2','cb2',30],['c3','cb3',30]];
+  const cHint=document.getElementById('cHint');
+  function checkC(){
+    let allok=true, anyfilled=false;
+    cfg.forEach(([id,bar,target])=>{
+      const el=document.getElementById(id), b=document.getElementById(bar), v=parseFloat(el.value);
+      if(el.value===''){b.style.width='0'; allok=false; return;}
+      anyfilled=true;
+      const ok=Math.abs(v-target)<0.01;
+      b.style.width = ok? target+'%' : Math.min(Math.max(v,0),100)+'%';
+      b.style.background = ok? 'var(--fill)' : 'var(--warn)';
+      if(!ok) allok=false;
+    });
+    cHint.textContent = (anyfilled && !allok) ? 'Tipp: Teil ÷ Grundwert × 100. Alle drei liegen beim gleichen Wert.' : '';
+  }
+  cfg.forEach(([id])=>document.getElementById(id).addEventListener('input',checkC));
+
+  document.getElementById('revealAha').addEventListener('click',()=>{
+    document.getElementById('aha').classList.add('show');
+    cfg.forEach(([,bar])=>{document.getElementById(bar).style.width='30%';document.getElementById(bar).style.background='var(--fill)';});
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lagemasse – Mittelwert, Median, Modus</title>
+<style>
+  :root{
+    --paper:#f7f6f2;
+    --ink:#1e2422;
+    --ink-soft:#5c625d;
+    --line:#dcd7cb;
+    --line-strong:#b7b0a0;
+    --data:#2f6f8f;      /* Datenpunkte / Balken */
+    --data-soft:#e3eef2;
+    --median:#c25a3a;    /* Median-Linie */
+    --mean:#3a7d5c;      /* Mittelwert */
+    --rest:#e9e5da;
+    --card:#ffffff;
+    --shadow:0 1px 2px rgba(30,36,34,.06),0 8px 24px rgba(30,36,34,.05);
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    line-height:1.55;padding:clamp(1rem,4vw,3rem) 1rem 5rem;
+  }
+  .wrap{max-width:780px;margin:0 auto;}
+  .eyebrow{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.78rem;color:var(--ink-soft);margin:0 0 .4rem;}
+  h1{font-size:clamp(1.8rem,5vw,2.6rem);line-height:1.1;margin:0 0 .6rem;font-weight:600;}
+  .lead{font-size:1.06rem;color:var(--ink-soft);margin:0 0 1.6rem;max-width:62ch;}
+
+  .core{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.4rem 1.5rem;box-shadow:var(--shadow);margin-bottom:1.8rem;}
+  .core h2{margin:.1rem 0 .7rem;font-size:1.15rem;}
+  .dataset{font-family:ui-monospace,monospace;font-size:1.1rem;background:var(--data-soft);border:1px solid var(--line);border-radius:9px;padding:.7rem 1rem;margin:.3rem 0 1rem;letter-spacing:.04em;}
+  .tasklist{margin:0;padding-left:1.2rem;}
+  .tasklist li{margin:.25rem 0;}
+
+  /* Datenstreifen-Visualisierung */
+  .strip-wrap{margin:1.1rem 0 .2rem;}
+  .strip{position:relative;height:70px;border:1px solid var(--line-strong);border-radius:8px;background:linear-gradient(var(--rest),var(--rest)) ;overflow:visible;}
+  .dot{position:absolute;top:50%;width:16px;height:16px;border-radius:50%;background:var(--data);transform:translate(-50%,-50%);border:2px solid #fff;box-shadow:0 1px 2px rgba(0,0,0,.2);}
+  .mline{position:absolute;top:6px;bottom:6px;width:0;border-left:2px dashed var(--median);opacity:0;transition:opacity .5s;}
+  .mlabel{position:absolute;top:-4px;transform:translateX(-50%);font-family:ui-sans-serif,sans-serif;font-size:.7rem;color:var(--median);opacity:0;transition:opacity .5s;white-space:nowrap;}
+  .strip-scale{display:flex;justify-content:space-between;font-family:ui-sans-serif,sans-serif;font-size:.7rem;color:var(--ink-soft);margin-top:.3rem;}
+
+  .pick-label{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem;color:var(--ink-soft);margin:0 0 .6rem;}
+  .tabs{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.4rem;}
+  .tab{flex:1 1 210px;text-align:left;cursor:pointer;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.85rem 1rem;font-family:inherit;color:var(--ink);transition:border-color .2s,box-shadow .2s;}
+  .tab:hover{border-color:var(--line-strong);}
+  .tab:focus-visible{outline:2px solid var(--data);outline-offset:2px;}
+  .tab .tname{font-size:1.05rem;font-weight:600;display:block;}
+  .tab .tsub{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.8rem;color:var(--ink-soft);}
+  .tab.active{border-color:var(--data);box-shadow:0 0 0 1px var(--data),var(--shadow);}
+  .tab.active .tname{color:var(--data);}
+
+  .panel{display:none;animation:rise .35s ease;}
+  .panel.show{display:block;}
+  @keyframes rise{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.4rem 1.5rem;box-shadow:var(--shadow);margin-bottom:1.2rem;}
+  .card h3{margin:.1rem 0 .5rem;font-size:1.2rem;}
+  .card h4{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.82rem;color:var(--ink-soft);margin:1.3rem 0 .5rem;font-weight:600;}
+  .defs{margin:.4rem 0;padding:0;list-style:none;}
+  .defs li{margin:.45rem 0;}
+  .defs b{color:var(--data);}
+
+  .calc{font-family:ui-monospace,monospace;background:var(--data-soft);border:1px solid var(--line);border-radius:10px;padding:1rem 1.1rem;margin:.6rem 0;display:grid;gap:.55rem;}
+  .calc-row{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
+  .calc-row label{min-width:135px;color:var(--ink-soft);font-size:.92rem;}
+  input[type=number]{font-family:inherit;font-size:1rem;width:5rem;padding:.35rem .5rem;border:1px solid var(--line-strong);border-radius:7px;background:#fff;color:var(--ink);text-align:center;}
+  input[type=number]:focus-visible{outline:2px solid var(--data);outline-offset:1px;}
+  .verdict{font-family:ui-sans-serif,sans-serif;font-size:.85rem;min-width:1.4rem;font-weight:600;}
+  .verdict.ok{color:var(--mean);}
+  .verdict.no{color:var(--median);}
+  .hint{font-family:ui-sans-serif,sans-serif;font-size:.82rem;color:var(--median);min-height:1.1rem;margin:.2rem 0 0;}
+
+  .qlist{margin:.3rem 0;padding-left:1.2rem;}
+  .qlist li{margin:.3rem 0;}
+  .starter{font-style:italic;color:var(--ink-soft);border-left:3px solid var(--line-strong);padding-left:.9rem;margin:.6rem 0;}
+  .impulse{background:var(--data-soft);border-radius:10px;padding:.8rem 1rem;font-size:.95rem;margin:.6rem 0;}
+
+  .check{list-style:none;margin:.4rem 0;padding:0;}
+  .check li{margin:.4rem 0;}
+  .check label{display:flex;gap:.6rem;align-items:flex-start;cursor:pointer;font-family:ui-sans-serif,sans-serif;font-size:.95rem;}
+  .check input{margin-top:.25rem;width:1.05rem;height:1.05rem;accent-color:var(--data);}
+  .check input:checked + span{color:var(--ink-soft);text-decoration:line-through;}
+
+  .reveal-btn{font-family:ui-sans-serif,sans-serif;font-size:.9rem;background:var(--data);color:#fff;border:none;border-radius:8px;padding:.55rem 1rem;cursor:pointer;margin-top:.3rem;}
+  .reveal-btn:hover{background:#255a75;}
+  .aha{display:none;margin-top:.8rem;font-size:.98rem;background:var(--data-soft);border-radius:10px;padding:.9rem 1.1rem;}
+  .aha.show{display:block;animation:rise .35s ease;}
+
+  .teacher{margin-top:2.4rem;border-top:1px solid var(--line);padding-top:1.4rem;}
+  details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.2rem 1.2rem;box-shadow:var(--shadow);}
+  summary{cursor:pointer;font-family:ui-sans-serif,sans-serif;font-weight:600;padding:.9rem 0;list-style:none;}
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"▸ ";color:var(--data);}
+  details[open] summary::before{content:"▾ ";}
+  .teacher h4{margin:1.1rem 0 .3rem;font-family:inherit;font-size:1.02rem;color:var(--ink);}
+  .teacher p,.teacher ul{margin:.3rem 0;}
+  .teacher code{font-family:ui-monospace,monospace;background:var(--data-soft);padding:.1rem .35rem;border-radius:5px;font-size:.92em;}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Mathematik · Statistik · Lagemasse</p>
+  <h1>Mittelwert, Median und Modus</h1>
+  <p class="lead">Aus einer geordneten Stichprobe die drei Lagemasse berechnen, sie sicher unterscheiden und beurteilen, welches Mass die Daten am ehrlichsten beschreibt. Wähle deinen Zugang.</p>
+
+  <div class="core">
+    <h2>Die Kernaufgabe</h2>
+    <p>In einem Betrieb wurde die Anzahl Krankheitstage von acht Mitarbeitenden im letzten Jahr erfasst. Die geordnete Stichprobe lautet:</p>
+    <p class="dataset">2 &nbsp; 3 &nbsp; 3 &nbsp; 4 &nbsp; 5 &nbsp; 5 &nbsp; 5 &nbsp; 8</p>
+    <ol class="tasklist">
+      <li>Berechne Mittelwert, Median und Modus.</li>
+      <li>Zeige deinen Rechenweg.</li>
+      <li>Formuliere einen sachlichen Satz, der die drei Werte im Zusammenhang beschreibt.</li>
+    </ol>
+    <div class="strip-wrap">
+      <div class="strip" id="strip"></div>
+      <div class="strip-scale"><span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span></div>
+    </div>
+    <p style="font-family:ui-sans-serif,sans-serif;font-size:.78rem;color:var(--ink-soft);margin:.5rem 0 0;">Jeder Punkt ist ein Messwert. Nutze die Zugänge, um Median und Mittelwert einzublenden.</p>
+  </div>
+
+  <p class="pick-label">Wähle deinen Zugang:</p>
+  <div class="tabs" role="tablist">
+    <button class="tab active" role="tab" data-tab="A">
+      <span class="tname">A · Mit Unterstützung</span>
+      <span class="tsub">Begriffe, Rechenrahmen, Leitfragen</span>
+    </button>
+    <button class="tab" role="tab" data-tab="B">
+      <span class="tname">B · Eigenständig</span>
+      <span class="tsub">Aufgabe ohne Hilfen + Selbstcheck</span>
+    </button>
+    <button class="tab" role="tab" data-tab="C">
+      <span class="tname">C · Vertiefung</span>
+      <span class="tsub">Ausreisser & Aussagekraft beurteilen</span>
+    </button>
+  </div>
+
+  <!-- ZUGANG A -->
+  <section class="panel show" id="panel-A">
+    <div class="card">
+      <h3>Zugang A – Mit Unterstützung</h3>
+      <p>Die Hilfen führen dich Schritt für Schritt durch die drei Lagemasse.</p>
+
+      <h4>Die drei Begriffe</h4>
+      <ul class="defs">
+        <li><b>Modus</b> – der Wert, der am häufigsten vorkommt.</li>
+        <li><b>Median</b> – der Zentralwert der geordneten Stichprobe. Bei gerader Anzahl: Mittel der beiden mittleren Werte.</li>
+        <li><b>Mittelwert</b> – Summe aller Werte geteilt durch die Anzahl der Werte.</li>
+      </ul>
+
+      <h4>Rechenrahmen – trag die Werte ein</h4>
+      <div class="calc">
+        <div class="calc-row">
+          <label>Anzahl Werte n =</label>
+          <input type="number" id="aN" inputmode="numeric">
+          <span class="verdict" id="vN"></span>
+        </div>
+        <div class="calc-row">
+          <label>Modus =</label>
+          <input type="number" id="aMo" inputmode="numeric">
+          <span class="verdict" id="vMo"></span>
+          <span style="font-size:.85rem;color:var(--ink-soft)">häufigster Wert</span>
+        </div>
+        <div class="calc-row">
+          <label>Median =</label>
+          <input type="number" id="aMe" inputmode="decimal" step="0.5">
+          <span class="verdict" id="vMe"></span>
+          <span style="font-size:.85rem;color:var(--ink-soft)">Mittel der Werte an Position 4 und 5</span>
+        </div>
+        <div class="calc-row">
+          <label>Mittelwert =</label>
+          <span style="font-size:.9rem">Summe ÷ n =</span>
+          <input type="number" id="aMean" inputmode="decimal" step="0.01">
+          <span class="verdict" id="vMean"></span>
+        </div>
+      </div>
+      <p class="hint" id="aHint"></p>
+
+      <h4>Leitfragen</h4>
+      <ol class="qlist">
+        <li>Welcher Wert steht in der Liste am häufigsten?</li>
+        <li>Die Stichprobe hat 8 Werte – welche zwei stehen genau in der Mitte?</li>
+        <li>Wie gross ist die Summe aller acht Werte, und durch welche Zahl teilst du sie?</li>
+      </ol>
+
+      <h4>Satzanfang für dein Ergebnis</h4>
+      <p class="starter">«Die Mitarbeitenden hatten im Schnitt ______ Krankheitstage; typischerweise (Median) waren es ______, am häufigsten kamen ______ Tage vor …»</p>
+
+      <h4>Selbstcheck</h4>
+      <ul class="check">
+        <li><label><input type="checkbox"><span>Ich habe Modus, Median und Mittelwert korrekt unterschieden.</span></label></li>
+        <li><label><input type="checkbox"><span>Mein Rechenweg stimmt.</span></label></li>
+        <li><label><input type="checkbox"><span>Mein Satz beschreibt alle drei Werte verständlich.</span></label></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ZUGANG B -->
+  <section class="panel" id="panel-B">
+    <div class="card">
+      <h3>Zugang B – Eigenständig</h3>
+      <p>Bearbeite die Kernaufgabe (Punkte 1–3) ohne zusätzliche Hilfen. Zum Prüfen kannst du deine Ergebnisse eintragen.</p>
+
+      <h4>Ergebnisse prüfen (freiwillig)</h4>
+      <div class="calc">
+        <div class="calc-row"><label>Modus =</label><input type="number" id="bMo" inputmode="numeric"><span class="verdict" id="vBMo"></span></div>
+        <div class="calc-row"><label>Median =</label><input type="number" id="bMe" inputmode="decimal" step="0.5"><span class="verdict" id="vBMe"></span></div>
+        <div class="calc-row"><label>Mittelwert =</label><input type="number" id="bMean" inputmode="decimal" step="0.01"><span class="verdict" id="vBMean"></span></div>
+      </div>
+      <p class="hint" id="bHint"></p>
+
+      <h4>Selbstcheck</h4>
+      <ul class="check">
+        <li><label><input type="checkbox"><span>Ich habe die Stichprobe korrekt als geordnet erkannt.</span></label></li>
+        <li><label><input type="checkbox"><span>Mein Rechenweg für den Mittelwert ist vollständig.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich habe den Median als Mittel der beiden mittleren Werte bestimmt.</span></label></li>
+        <li><label><input type="checkbox"><span>Mein Satz beschreibt die drei Lagemasse sachlich und richtig.</span></label></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ZUGANG C -->
+  <section class="panel" id="panel-C">
+    <div class="card">
+      <h3>Zugang C – Vertiefung</h3>
+      <p>Bearbeite zuerst die Kernaufgabe. Untersuche danach, wie ein einzelner Ausreisser die Lagemasse verändert.</p>
+
+      <h4>Neue Situation</h4>
+      <p>Ein Mitarbeiter fällt wegen einer Operation lange aus. Sein Wert steigt von 8 auf <b>40</b> Krankheitstage. Die Stichprobe lautet nun:</p>
+      <p class="dataset">2 &nbsp; 3 &nbsp; 3 &nbsp; 4 &nbsp; 5 &nbsp; 5 &nbsp; 5 &nbsp; 40</p>
+
+      <h4>Berechne die neuen Lagemasse</h4>
+      <div class="calc">
+        <div class="calc-row"><label>Neuer Modus =</label><input type="number" id="cMo" inputmode="numeric"><span class="verdict" id="vCMo"></span></div>
+        <div class="calc-row"><label>Neuer Median =</label><input type="number" id="cMe" inputmode="decimal" step="0.5"><span class="verdict" id="vCMe"></span></div>
+        <div class="calc-row"><label>Neuer Mittelwert =</label><input type="number" id="cMean" inputmode="decimal" step="0.01"><span class="verdict" id="vCMean"></span></div>
+      </div>
+      <p class="hint" id="cHint"></p>
+
+      <h4>Deine Denkaufgabe</h4>
+      <ol class="qlist">
+        <li>Welches der drei Lagemasse hat sich am stärksten verändert, welches gar nicht? Beschreibe es in einem Satz.</li>
+        <li><b>Begründungsfrage:</b> Warum reagiert der Mittelwert empfindlich auf den Ausreisser, der Median aber kaum?</li>
+        <li><b>Transferfrage:</b> Der Betrieb will «die typische Anzahl Krankheitstage» kommunizieren. Welches Lagemass ist dafür ehrlicher – und warum?</li>
+      </ol>
+      <div class="impulse">💡 <b>Denkimpuls:</b> Der Median zählt nur <em>Positionen</em>, der Mittelwert rechnet mit jedem einzelnen <em>Wert</em>.</div>
+
+      <button class="reveal-btn" id="revealAha">Wirkung des Ausreissers einblenden</button>
+      <div class="aha" id="aha">
+        Der <b>Modus bleibt 5</b> und der <b>Median bleibt 4,5</b> – beide hängen nur von der Reihenfolge ab, nicht von der Grösse des äussersten Werts. Der <b>Mittelwert springt von 4,375 auf 8,375</b>, weil die 40 voll in die Summe eingeht. Für eine «typische» Aussage ist deshalb der Median ehrlicher: Er lässt sich von einem einzelnen Extremwert nicht verzerren.
+      </div>
+
+      <h4>Selbstcheck</h4>
+      <ul class="check">
+        <li><label><input type="checkbox"><span>Ich habe alle drei neuen Lagemasse berechnet.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich habe benannt, welches Mass sich verändert und welches nicht.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich erkläre, warum der Mittelwert empfindlicher ist als der Median.</span></label></li>
+        <li><label><input type="checkbox"><span>Ich begründe meine Wahl des Lagemasses für die Kommunikation.</span></label></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- LEHRPERSON -->
+  <div class="teacher">
+    <details>
+      <summary>Lösungen und Rechenwege – für die Lehrperson</summary>
+      <h4>Kernaufgabe: 2 3 3 4 5 5 5 8 (n = 8)</h4>
+      <ul>
+        <li><b>Modus</b> = 5 (kommt dreimal vor).</li>
+        <li><b>Median</b>: Positionen 4 und 5 sind 4 und 5 → <code>(4 + 5) ÷ 2 = 4,5</code>.</li>
+        <li><b>Mittelwert</b>: <code>(2+3+3+4+5+5+5+8) ÷ 8 = 35 ÷ 8 = 4,375</code>.</li>
+      </ul>
+      <p>Beispielsatz: «Im Schnitt hatten die Mitarbeitenden rund 4,4 Krankheitstage; der typische Wert (Median) liegt bei 4,5, am häufigsten kamen 5 Tage vor.»</p>
+
+      <h4>Zugang C: 2 3 3 4 5 5 5 40 (n = 8)</h4>
+      <ul>
+        <li><b>Modus</b> = 5 (unverändert).</li>
+        <li><b>Median</b> = <code>(4 + 5) ÷ 2 = 4,5</code> (unverändert).</li>
+        <li><b>Mittelwert</b> = <code>(2+3+3+4+5+5+5+40) ÷ 8 = 67 ÷ 8 = 8,375</code>.</li>
+      </ul>
+      <p><b>Erwartungshorizont:</b> Modus und Median hängen nur von Häufigkeit bzw. Position ab; der Ausreisser ändert diese nicht. Der Mittelwert bezieht jeden Wert der Grösse nach ein, deshalb hebt die 40 ihn stark an (+4). Für eine «typische» Aussage ist der Median robuster und damit ehrlicher; der Mittelwert würde den Eindruck erwecken, alle hätten rund 8 Tage gefehlt, obwohl das auf niemanden ausser den Ausreisser zutrifft.</p>
+      <p style="font-size:.9rem;color:var(--ink-soft)">Anschluss an den Foliensatz: Diese Aufgabe bereitet Quartile und Boxplot vor – der Median ist Q2, und die Robustheit gegenüber Ausreissern ist genau der Grund, warum der Boxplot auf Median und Quartilen aufbaut.</p>
+    </details>
+  </div>
+
+</div>
+
+<script>
+  // Datenstreifen aufbauen
+  const data=[2,3,3,4,5,5,5,8];
+  const strip=document.getElementById('strip');
+  const scaleMax=10;
+  const seen={};
+  data.forEach(v=>{
+    seen[v]=(seen[v]||0);
+    const dot=document.createElement('div');
+    dot.className='dot';
+    dot.style.left=(v/scaleMax*100)+'%';
+    dot.style.top=(50 - seen[v]*20)+'%'; // gestapelt bei Mehrfachwerten
+    strip.appendChild(dot);
+    seen[v]++;
+  });
+  // Median- und Mittelwert-Linien (versteckt, per Zugang einblendbar)
+  function addLine(pos,color,label,id){
+    const l=document.createElement('div'); l.className='mline'; l.id=id;
+    l.style.left=(pos/scaleMax*100)+'%'; l.style.borderColor=color;
+    const t=document.createElement('div'); t.className='mlabel'; t.id=id+'lab';
+    t.style.left=(pos/scaleMax*100)+'%'; t.style.color=color; t.textContent=label;
+    strip.appendChild(l); strip.appendChild(t);
+  }
+  addLine(4.5,'var(--median)','Median 4,5','lineMe');
+  addLine(4.375,'var(--mean)','Mittelw. 4,375','lineMean');
+  function showLines(){['lineMe','lineMelab','lineMean','lineMeanlab'].forEach(i=>document.getElementById(i).style.opacity='1');}
+
+  const mark=(el,ok)=>{el.textContent=ok?'✓':'✗';el.className='verdict '+(ok?'ok':'no');};
+  const clear=el=>{el.textContent='';el.className='verdict';};
+  const near=(a,b)=>Math.abs(a-b)<0.011;
+
+  // Zugangswahl
+  const tabs=document.querySelectorAll('.tab');
+  const panels={A:document.getElementById('panel-A'),B:document.getElementById('panel-B'),C:document.getElementById('panel-C')};
+  tabs.forEach(t=>t.addEventListener('click',()=>{
+    tabs.forEach(x=>x.classList.remove('active'));t.classList.add('active');
+    Object.values(panels).forEach(p=>p.classList.remove('show'));
+    panels[t.dataset.tab].classList.add('show');
+  }));
+
+  // Zugang A
+  const aN=document.getElementById('aN'),aMo=document.getElementById('aMo'),aMe=document.getElementById('aMe'),aMean=document.getElementById('aMean');
+  const vN=document.getElementById('vN'),vMo=document.getElementById('vMo'),vMe=document.getElementById('vMe'),vMean=document.getElementById('vMean'),aHint=document.getElementById('aHint');
+  function checkA(){
+    aN.value===''?clear(vN):mark(vN,+aN.value===8);
+    aMo.value===''?clear(vMo):mark(vMo,+aMo.value===5);
+    aMe.value===''?clear(vMe):mark(vMe,near(+aMe.value,4.5));
+    if(aMean.value===''){clear(vMean);aHint.textContent='';}
+    else{
+      const ok=near(+aMean.value,4.375); mark(vMean,ok);
+      aHint.textContent=ok?'':'Tipp: Summe der acht Werte ist 35. Teile durch 8.';
+      if(ok && near(+aMe.value,4.5)) showLines();
+    }
+  }
+  [aN,aMo,aMe,aMean].forEach(i=>i.addEventListener('input',checkA));
+
+  // Zugang B
+  const bMo=document.getElementById('bMo'),bMe=document.getElementById('bMe'),bMean=document.getElementById('bMean');
+  const vBMo=document.getElementById('vBMo'),vBMe=document.getElementById('vBMe'),vBMean=document.getElementById('vBMean'),bHint=document.getElementById('bHint');
+  function checkB(){
+    bMo.value===''?clear(vBMo):mark(vBMo,+bMo.value===5);
+    bMe.value===''?clear(vBMe):mark(vBMe,near(+bMe.value,4.5));
+    bMean.value===''?clear(vBMean):mark(vBMean,near(+bMean.value,4.375));
+    const done=(+bMo.value===5)&&near(+bMe.value,4.5)&&near(+bMean.value,4.375);
+    bHint.textContent=done?'':(bMo.value||bMe.value||bMean.value?'Prüfe die Werte, die noch kein Häkchen haben.':'');
+    if(done) showLines();
+  }
+  [bMo,bMe,bMean].forEach(i=>i.addEventListener('input',checkB));
+
+  // Zugang C
+  const cMo=document.getElementById('cMo'),cMe=document.getElementById('cMe'),cMean=document.getElementById('cMean');
+  const vCMo=document.getElementById('vCMo'),vCMe=document.getElementById('vCMe'),vCMean=document.getElementById('vCMean'),cHint=document.getElementById('cHint');
+  function checkC(){
+    cMo.value===''?clear(vCMo):mark(vCMo,+cMo.value===5);
+    cMe.value===''?clear(vCMe):mark(vCMe,near(+cMe.value,4.5));
+    cMean.value===''?clear(vCMean):mark(vCMean,near(+cMean.value,8.375));
+    cHint.textContent='';
+    if(cMean.value!==''&&!near(+cMean.value,8.375)) cHint.textContent='Tipp: Neue Summe ist 67. Teile durch 8.';
+    else if(cMo.value!==''&&+cMo.value!==5) cHint.textContent='Der häufigste Wert hat sich durch den Ausreisser nicht geändert.';
+    else if(cMe.value!==''&&!near(+cMe.value,4.5)) cHint.textContent='Auch die mittleren Positionen sind gleich geblieben.';
+  }
+  [cMo,cMe,cMean].forEach(i=>i.addEventListener('input',checkC));
+
+  document.getElementById('revealAha').addEventListener('click',()=>{
+    document.getElementById('aha').classList.add('show');
+  });
+</script>
+</body>
+</html>
