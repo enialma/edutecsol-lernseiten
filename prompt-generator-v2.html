@@ -309,7 +309,7 @@ Lege jede Datei als eigenständigen Download an.`);
     const fach=state.fach.trim()||'[Fach/Kontext einsetzen]';
     const stufe=state.stufe.trim()||'[Zielstufe einsetzen]';
     const isText = state.quelle==='text';
-    const quelleName = {pptx:'Foliensatz (PPTX)',pdf:'PDF-Dokument',word:'Word-Dokument',text:''}[state.quelle];
+    const quelleName = {pptx:'PPTX-Foliensatz',pdf:'PDF',word:'Word-Datei',text:''}[state.quelle];
     const themaLeer = isText ? '- Thema: leer lassen – leite ein geeignetes Thema aus Fach und Stufe ab'
                              : '- Thema: leer lassen – wähle das geeignetste Thema selbst aus dem Material';
     const themaLine=state.thema.trim()?`- Thema: ${state.thema.trim()}`:themaLeer;
@@ -319,7 +319,7 @@ Lege jede Datei als eigenständigen Download an.`);
       : `- Material: wird als ${quelleName} mit hochgeladen`;
     const aufgabeText = isText
       ? 'Erstelle aus den Angaben oben eine differenzierte, interaktive Lernseite. Wähle – sofern oben kein Thema vorgegeben ist – ein geeignetes Thema und ein fachlich stimmiges, alltagsnahes Beispiel; weise am Ende kurz darauf hin, dass kein Material vorlag.'
-      : `Lies das hochgeladene ${quelleName} aus, wähle das didaktisch geeignetste Thema für eine differenzierte Übung (sofern oben keines vorgegeben ist) und erstelle daraus eine interaktive Lernseite. Nenne zu Beginn kurz das gewählte Thema und warum. Enthält das Material konkreten Aufgabentext oder Daten, verwende diese; stehen dort nur Bilder ohne auslesbaren Text, wähle ein fachlich stimmiges, alltagsnahes Beispiel und weise am Ende darauf hin.`;
+      : `Lies das hochgeladene Dokument (${quelleName}) aus, wähle das didaktisch geeignetste Thema für eine differenzierte Übung (sofern oben keines vorgegeben ist) und erstelle daraus eine interaktive Lernseite. Nenne zu Beginn kurz das gewählte Thema und warum. Enthält das Material konkreten Aufgabentext oder Daten, verwende diese; stehen dort nur Bilder ohne auslesbaren Text, wähle ein fachlich stimmiges, alltagsnahes Beispiel und weise am Ende darauf hin.`;
     const spr=spracheText();
     const n=+state.anzahl;
 
