@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Master-Prompt – Textvorlage</title>
+<style>
+  :root{--navy:#1E3246;--terra:#B84816;--ochre:#F1A51A;--cream:#F6EFE2;--ink:#1E3246;--ink-soft:#5b6572;--line:#e2dbcb;--card:#fff;--shadow:0 1px 2px rgba(30,50,70,.06),0 10px 30px rgba(30,50,70,.07);}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:"Arial Nova Light",Arial,ui-sans-serif,system-ui,sans-serif;line-height:1.55;padding:2rem 1rem 4rem;}
+  .wrap{max-width:820px;margin:0 auto;}
+  a.back{font-size:.9rem;color:var(--terra);text-decoration:none;font-weight:600;}
+  a.back:hover{text-decoration:underline;}
+  h1{font-size:1.7rem;margin:.6rem 0 .3rem;}
+  p.lead{color:var(--ink-soft);margin:0 0 1.4rem;}
+  .bar{display:flex;justify-content:flex-end;margin-bottom:.6rem;}
+  .copy{font:inherit;font-size:.9rem;font-weight:600;background:var(--navy);color:#fff;border:none;border-radius:9px;padding:.55rem 1.1rem;cursor:pointer;}
+  .copy:hover{background:#132335;}
+  pre{white-space:pre-wrap;word-wrap:break-word;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.83rem;line-height:1.55;background:#fff;border:1px solid var(--line);border-radius:12px;padding:1.2rem 1.3rem;box-shadow:var(--shadow);}
+  .done{color:#2f8f6f;font-weight:600;font-size:.85rem;margin-left:.6rem;opacity:0;transition:opacity .2s;}
+  .done.show{opacity:1;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← Zurück zur Übersicht</a>
+  <h1>Master-Prompt – Textvorlage</h1>
+  <p class="lead">Nur den Block «ANPASSEN» ausfüllen, den Rest unverändert lassen. Zusammen mit einem Foliensatz an Claude schicken.</p>
+  <div class="bar">
+    <button class="copy" id="copyBtn">📋 Prompt kopieren</button>
+    <span class="done" id="done">Kopiert!</span>
+  </div>
+  <pre id="prompt"># MASTER-PROMPT – Differenzierte interaktive Lernseite aus einem Foliensatz
+
+Vor dem Absenden nur den Block «ANPASSEN» ausfüllen. Alles darunter bleibt unverändert. Datei (PPTX/PDF) mit hochladen.
+
+■ ANPASSEN
+- Fach/Kontext: [z. B. Mathematik BM · Pharma-Fachrechnen · IT-Security]
+- Zielstufe: [z. B. Berufsmaturität · FaGe · Sek II]
+- Thema (optional): [leer lassen = KI wählt selbst; oder z. B. «Dosisberechnung», «Folie 12–14»]
+- Art der Kernkompetenz (optional): [Rechnen · Zuordnen/Klassifizieren · Beurteilen/Erkennen]
+- Datei: [wird hochgeladen]
+
+■ ROLLE
+Du bist Fachdidaktiker:in für das oben genannte Fach auf der genannten Zielstufe und Frontend-Entwickler:in.
+
+■ AUFGABE
+Lies den hochgeladenen Foliensatz (PPTX/PDF) aus, wähle das didaktisch geeignetste Thema für eine differenzierte Übung (sofern oben keines vorgegeben ist) und erstelle daraus eine interaktive Lernseite.
+
+■ THEMENWAHL
+Wähle einen Inhalt mit einer klaren, überprüfbaren Kompetenz – ein berechenbares Verfahren, eine eindeutige Klassifikation oder eine begründbare Beurteilung –, der sich für Selbstkontrolle mit eindeutigen Lösungen eignet und Raum für einen Aha-Moment in der Vertiefung bietet. Nenne zu Beginn kurz, welches Thema du gewählt hast und warum. Enthält der Foliensatz einen konkreten Aufgabentext oder Datensatz, verwende diesen; stehen an der Stelle nur Bilder ohne auslesbaren Text, wähle ein fachlich stimmiges, alltagsnahes Beispiel und weise am Ende darauf hin.
+
+■ KOMPETENZZIEL
+Leite aus dem gewählten Folieninhalt ein präzises Kompetenzziel ab (berechnen / unterscheiden / interpretieren).
+
+■ KERNAUFGABE FÜR ALLE
+Formuliere eine Kernaufgabe mit (1) Berechnung/Bestimmung, (2) nachvollziehbarem Rechen- oder Begründungsweg und (3) einem sachlichen Ergebnissatz. Definiere zugleich die Erfolgskriterien.
+
+■ AUSGABEFORMAT
+Erstelle eine einzige, voll funktionsfähige interaktive HTML-Seite (eine Datei, ohne externe Abhängigkeiten, offline lauffähig) mit folgendem Aufbau:
+- Visualisierung der Kernaufgabe als durchgehende Leitidee, passend zum Thema (Zahlenstrahl, Anteils-Balken, Boxplot, Zuordnungsfeld, Behälter o. Ä.). Optionale Hilfslinien/Marker erscheinen erst, wenn die Lernenden korrekt gearbeitet haben.
+- Zugangswahl per Klick (Reiter A / B / C): Die Lernenden sehen nur ihren gewählten Zugang.
+- Zugang A – Mit Unterstützung: gleiche Kernaufgabe und Erfolgskriterien; kurze Erklärung der Fachbegriffe; ein interaktiver Rechen- bzw. Zuordnungsrahmen mit Eingabefeldern oder Auswahlbuttons, die bei korrekter Eingabe ein grünes Häkchen zeigen und bei falscher einen Hinweis geben, ohne die Lösung zu verraten; drei Leitfragen; ein Satzanfang für den Ergebnissatz. Weder Rechnung noch Ergebnis vollständig nennen.
+- Zugang B – Eigenständig: gleiche Kernaufgabe ohne Hilfen; eine freiwillige Ergebnisprüfung (Eingabefelder/Auswahl mit Feedback) und eine Selbstcheck-Liste mit vier Fragen zum Abhaken.
+- Zugang C – Vertiefung: zuerst die Kernaufgabe; danach ein thematisch passender Twist, der zusätzliche Denkarbeit verlangt statt nur mehr Aufgaben (z. B. ein Ausreisser, mehrere Fälle mit gleichem Ergebnis, ein Grenzfall, ein bewusst eingebauter Fehler zum Erkennen). Ergänze eine Begründungsfrage und eine Transferfrage in den Berufskontext. Baue einen Button ein, der den Kernzusammenhang sichtbar macht (Aha-Moment).
+- Bereich «Für die Lehrperson»: ausklappbar (verborgen bis Klick), mit vollständigen Lösungen und Rechen- bzw. Begründungswegen, getrennt vom Aufgabenteil. Ergänze dort einen Satz zum didaktischen Anschluss an die nächsten Folien des Satzes.
+- PDF-Button oben auf der Seite («Als PDF herunterladen»): Er blendet für den Export alle drei Zugänge (A/B/C) und den Lehrpersonen-Bereich ein und löst den Druckdialog des Browsers aus («In PDF speichern»). Über eine eigene Druck-CSS (@media print) werden Reiter und Buttons ausgeblendet und alle Inhalte sichtbar gemacht. Baue einen Fallback ein, der die Seite in einem neuen Tab öffnet, falls der Druckdialog in einer eingebetteten Vorschau blockiert ist.
+
+■ ZUSÄTZLICHE ARBEITSBLÄTTER
+Erstelle zusätzlich zur Website ein bearbeitbares Word-Dokument (.docx) und ein druckfertiges PDF als klassisches Arbeitsblatt zum Austeilen – nicht als Abbild der Website, sondern papiergerecht: Kopf mit Fach, Thema, Kompetenzziel und Erfolgskriterien; die Kernaufgabe und alle Zugänge mit Platz für handschriftliche Lösungen und ankreuzbaren Selbstcheck-Kästchen; ein davon getrenntes Lösungsblatt für die Lehrperson mit vollständigen Wegen. Schlicht, schwarz-weiss-tauglich, gut kopierbar. Lege die Datei(en) als eigenständige Downloads an. (Nicht benötigtes Format hier streichen.)
+
+■ GESTALTUNG
+Ruhiges, altersgerechtes Design für die Zielstufe; die themenpassende Visualisierung als visuelle Leitidee; Farbwelt zum Fach passend (z. B. sachlich-technisch bei IT); responsiv bis Mobile; Tastaturbedienbarkeit und sichtbarer Fokus. Vermeide generische KI-Optik (keine cremefarbenen Hintergründe, keine Akzentstreifen).
+
+■ VORGABEN
+Schweizer Standarddeutsch · keine Fehler: rechne alle Lösungen bzw. prüfe alle Zuordnungen vor der Ausgabe selbst nach und stelle sicher, dass die Feedback-Logik der Eingabefelder exakt zu den richtigen Werten passt · Selbstcheck-Listen abhakbar. Gib mir am Ende eine kurze Notiz, welches Thema du gewählt hast und welchen Twist die Vertiefung nutzt.</pre>
+</div>
+<script>
+  document.getElementById('copyBtn').addEventListener('click',async()=>{
+    const t=document.getElementById('prompt').textContent;
+    try{await navigator.clipboard.writeText(t);}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(_){}document.body.removeChild(ta);}
+    const d=document.getElementById('done');d.classList.add('show');setTimeout(()=>d.classList.remove('show'),1600);
+  });
+</script>
+</body>
+</html>
