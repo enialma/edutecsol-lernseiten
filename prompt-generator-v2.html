@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Prompt-Generator – Differenzierte Lernseiten</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
 <style>
   :root{
     --paper:#f4f5f7;--ink:#1b1e24;--ink-soft:#565c68;--line:#d7dae1;--line-strong:#aeb4bf;
@@ -61,7 +65,7 @@
 
   <p class="eyebrow">Werkzeug · EDUTECSOL</p>
   <h1>Prompt-Generator für differenzierte Lernseiten</h1>
-  <p class="lead">Felder ausfüllen, Prompt kopieren, mit einem Foliensatz (PPTX/PDF) an Claude schicken. Neu: vier didaktische Achsen – Differenzierungsart, Sprache, Twist-Typ und Anforderungsniveau.</p>
+  <p class="lead">Felder ausfüllen, Prompt kopieren, mit deinem Material (Folien, PDF, Word) oder nur einer Beschreibung an Claude schicken. Neu: vier didaktische Achsen – Differenzierungsart, Sprache, Twist-Typ und Anforderungsniveau.</p>
 
   <div class="presets">
     <span style="font-size:.8rem;color:var(--ink-soft);align-self:center;">Schnellstart:</span>
@@ -83,9 +87,18 @@
         <label class="field"><span class="lab">Fach / Kontext</span>
           <input type="text" id="fach" placeholder="z. B. Pharma-Fachrechnen"></label>
         <label class="field"><span class="lab">Zielstufe</span>
-          <input type="text" id="stufe" placeholder="z. B. Berufsmaturität · FaGe · Sek II"></label>
-        <label class="field"><span class="lab">Thema <span class="hint">(optional – leer = KI wählt aus dem Foliensatz)</span></span>
+          <input type="text" id="stufe" placeholder="z. B. Berufsmaturität · FaGe · Sek II · Erwachsene"></label>
+        <label class="field"><span class="lab">Thema <span class="hint">(optional – leer = KI wählt aus dem Material)</span></span>
           <input type="text" id="thema" placeholder="z. B. Dosisberechnung, oder «Folie 12–14»"></label>
+        <label class="field"><span class="lab">Material / Quelle</span>
+          <div class="seg" id="quelle">
+            <button data-v="pptx" class="on">Folien (PPTX)</button>
+            <button data-v="pdf">PDF</button>
+            <button data-v="word">Word</button>
+            <button data-v="text">nur diese Beschreibung</button>
+          </div>
+          <p class="ghint" style="margin-top:.4rem;">Was hängst du an? Bei «nur diese Beschreibung» arbeitet die KI allein mit deinen Angaben – ohne Datei.</p>
+        </label>
       </div>
 
       <!-- Achse 1: Differenzierungsart -->
@@ -174,7 +187,7 @@
   </div>
 
   <div class="note">
-    <b>So geht's:</b> Prompt kopieren → neuen Claude-Chat öffnen → Prompt einfügen → Foliensatz (PPTX/PDF) dazu hochladen → abschicken. Du bekommst eine offline nutzbare HTML-Lernseite mit differenzierten Zugängen, Lösungen für die Lehrperson und PDF-Button.
+    <b>So geht's:</b> Prompt kopieren → neuen Claude-Chat öffnen → Prompt einfügen → Material dazu hochladen (oder nur die Beschreibung nutzen) → abschicken. Du bekommst eine offline nutzbare HTML-Lernseite mit differenzierten Zugängen, Lösungen für die Lehrperson und PDF-Button.
   </div>
 
 </div>
@@ -184,7 +197,7 @@
   const state={
     fach:'',stufe:'',thema:'',extra:'',
     diffart:'niveau',anzahl:'3',sprache:'standard',zweitsprache:'',twist:'auto',niveau:'anwenden',
-    web:true,word:true,pdf:true
+    web:true,word:true,pdf:true,quelle:'pptx'
   };
 
   function wireSeg(groupId,key,after){
@@ -196,6 +209,7 @@
     });
   }
   wireSeg('diffart','diffart');
+  wireSeg('quelle','quelle');
   wireSeg('anzahl','anzahl');
   wireSeg('sprache','sprache',()=>{el('zweiWrap').style.display=(state.sprache==='zweisprachig')?'block':'none';});
   wireSeg('twist','twist');
@@ -294,8 +308,18 @@ Lege jede Datei als eigenständigen Download an.`);
   function build(){
     const fach=state.fach.trim()||'[Fach/Kontext einsetzen]';
     const stufe=state.stufe.trim()||'[Zielstufe einsetzen]';
-    const themaLine=state.thema.trim()?`- Thema: ${state.thema.trim()}`:'- Thema: leer lassen – wähle das geeignetste Thema selbst aus dem Foliensatz';
+    const isText = state.quelle==='text';
+    const quelleName = {pptx:'Foliensatz (PPTX)',pdf:'PDF-Dokument',word:'Word-Dokument',text:''}[state.quelle];
+    const themaLeer = isText ? '- Thema: leer lassen – leite ein geeignetes Thema aus Fach und Stufe ab'
+                             : '- Thema: leer lassen – wähle das geeignetste Thema selbst aus dem Material';
+    const themaLine=state.thema.trim()?`- Thema: ${state.thema.trim()}`:themaLeer;
     const extraLine=state.extra.trim()?`\n- Zusatzwunsch: ${state.extra.trim()}`:'';
+    const dateiLine = isText
+      ? '- Material: keine Datei – arbeite allein mit den Angaben oben'
+      : `- Material: wird als ${quelleName} mit hochgeladen`;
+    const aufgabeText = isText
+      ? 'Erstelle aus den Angaben oben eine differenzierte, interaktive Lernseite. Wähle – sofern oben kein Thema vorgegeben ist – ein geeignetes Thema und ein fachlich stimmiges, alltagsnahes Beispiel; weise am Ende kurz darauf hin, dass kein Material vorlag.'
+      : `Lies das hochgeladene ${quelleName} aus, wähle das didaktisch geeignetste Thema für eine differenzierte Übung (sofern oben keines vorgegeben ist) und erstelle daraus eine interaktive Lernseite. Nenne zu Beginn kurz das gewählte Thema und warum. Enthält das Material konkreten Aufgabentext oder Daten, verwende diese; stehen dort nur Bilder ohne auslesbaren Text, wähle ein fachlich stimmiges, alltagsnahes Beispiel und weise am Ende darauf hin.`;
     const spr=spracheText();
     const n=+state.anzahl;
 
@@ -306,10 +330,10 @@ Du bist Fachdidaktiker:in für ${fach} auf der Stufe ${stufe} und Frontend-Entwi
 - Fach/Kontext: ${fach}
 - Zielstufe: ${stufe}
 ${themaLine}${extraLine}
-- Datei: wird als Foliensatz (PPTX/PDF) mit hochgeladen
+${dateiLine}
 
 §AUFGABE
-Lies den hochgeladenen Foliensatz aus, wähle das didaktisch geeignetste Thema für eine differenzierte Übung (sofern oben keines vorgegeben ist) und erstelle daraus eine interaktive Lernseite. Nenne zu Beginn kurz das gewählte Thema und warum. Enthält der Foliensatz konkreten Aufgabentext oder Daten, verwende diese; stehen dort nur Bilder ohne auslesbaren Text, wähle ein fachlich stimmiges, alltagsnahes Beispiel und weise am Ende darauf hin.
+${aufgabeText}
 
 §KOMPETENZZIEL & KERNAUFGABE
 Leite ein präzises Kompetenzziel ab. Formuliere eine Kernaufgabe mit (1) Berechnung/Bestimmung, (2) nachvollziehbarem Rechen-/Begründungsweg und (3) einem sachlichen Ergebnissatz. Definiere die Erfolgskriterien.
@@ -354,7 +378,7 @@ Gib am Ende eine kurze Notiz: gewähltes Thema, gewählte Differenzierungsart, g
   function applyState(){
     el('fach').value=state.fach;el('stufe').value=state.stufe;el('thema').value=state.thema;el('extra').value=state.extra;el('zweitsprache').value=state.zweitsprache;
     const setSeg=(gid,val)=>{el(gid).querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===val));};
-    setSeg('diffart',state.diffart);setSeg('anzahl',state.anzahl);setSeg('sprache',state.sprache);setSeg('twist',state.twist);setSeg('niveau',state.niveau);
+    setSeg('diffart',state.diffart);setSeg('anzahl',state.anzahl);setSeg('sprache',state.sprache);setSeg('twist',state.twist);setSeg('niveau',state.niveau);setSeg('quelle',state.quelle);
     el('formate').querySelectorAll('button').forEach(b=>b.classList.toggle('on',!!state[b.dataset.v]));
     el('zweiWrap').style.display=(state.sprache==='zweisprachig')?'block':'none';
     render();
@@ -362,7 +386,7 @@ Gib am Ende eine kurze Notiz: gewähltes Thema, gewählte Differenzierungsart, g
   document.querySelectorAll('.presets button').forEach(b=>{
     b.addEventListener('click',()=>{
       const p=b.dataset.preset;
-      if(p==='reset'){Object.assign(state,{fach:'',stufe:'',thema:'',extra:'',diffart:'niveau',anzahl:'3',sprache:'standard',zweitsprache:'',twist:'auto',niveau:'anwenden',web:true,word:true,pdf:true});}
+      if(p==='reset'){Object.assign(state,{fach:'',stufe:'',thema:'',extra:'',diffart:'niveau',anzahl:'3',sprache:'standard',zweitsprache:'',twist:'auto',niveau:'anwenden',web:true,word:true,pdf:true,quelle:'pptx'});}
       else{Object.assign(state,{thema:'',extra:'',zweitsprache:''},presets[p]);}
       applyState();
     });
