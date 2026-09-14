@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Geschichte der KI – Meilensteine richtig einordnen</title>
+<style>
+:root{
+  --bg:#f4f7fb;
+  --surface:#ffffff;
+  --surface2:#eef3f9;
+  --ink:#14233a;
+  --muted:#596b83;
+  --line:#cbd6e5;
+  --blue:#2356a8;
+  --blue2:#153f7d;
+  --cyan:#e8f6fb;
+  --green:#16734a;
+  --greenbg:#e8f7ef;
+  --red:#a23535;
+  --redbg:#fff0f0;
+  --amber:#8a5a00;
+  --amberbg:#fff7dd;
+  --focus:#7b3ff2;
+  --shadow:0 12px 30px rgba(25,48,82,.08);
+  --radius:18px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.55;
+}
+button, select, textarea, input{font:inherit}
+button, select, textarea, input[type="checkbox"]{accent-color:var(--blue)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.skip{
+  position:absolute;left:-9999px;top:0;background:#fff;padding:.75rem 1rem;z-index:999
+}
+.skip:focus{left:1rem;top:1rem}
+.wrap{width:min(1120px,calc(100% - 32px));margin:0 auto}
+header{
+  background:linear-gradient(120deg,#0f315f,#2356a8 58%,#2f78a8);
+  color:#fff;padding:28px 0 34px;
+}
+.header-row{display:flex;gap:20px;justify-content:space-between;align-items:flex-start}
+.eyebrow{font-weight:700;letter-spacing:.05em;text-transform:uppercase;font-size:.82rem;opacity:.85}
+h1{font-size:clamp(2rem,4vw,3.5rem);line-height:1.08;margin:.35rem 0 .8rem;max-width:850px}
+.lead{max-width:820px;font-size:1.08rem;margin:0;color:#eef5ff}
+.pdf-btn{
+  flex:0 0 auto;border:1px solid rgba(255,255,255,.55);background:#fff;color:#173f78;
+  border-radius:999px;padding:.75rem 1rem;font-weight:750;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.12)
+}
+main{padding:28px 0 56px}
+.card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:24px;margin-bottom:20px
+}
+.choice-note{
+  display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;background:var(--cyan);
+  border-left:5px solid #2f78a8
+}
+.choice-icon{
+  width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--blue);font-weight:900
+}
+h2{font-size:1.45rem;margin:0 0 .7rem}
+h3{font-size:1.12rem;margin:1.2rem 0 .55rem}
+p{margin:.55rem 0}
+.small{font-size:.92rem;color:var(--muted)}
+.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.criteria{margin:.4rem 0 0;padding-left:1.2rem}
+.criteria li{margin:.28rem 0}
+.visual-title{display:flex;justify-content:space-between;gap:12px;align-items:end}
+.timeline{
+  margin-top:18px;position:relative;display:grid;grid-template-columns:repeat(7,1fr);gap:8px;padding-top:34px
+}
+.timeline:before{
+  content:"";position:absolute;left:4%;right:4%;top:18px;height:4px;border-radius:4px;background:#a8b8cd
+}
+.tnode{position:relative;text-align:center;min-width:0}
+.dot{
+  width:19px;height:19px;border:4px solid #8ca0b9;background:#fff;border-radius:50%;
+  position:absolute;top:-25px;left:50%;transform:translateX(-50%);z-index:2;transition:.25s
+}
+.tnode.done .dot{border-color:var(--green);background:var(--green)}
+.tnode.done .dot:after{content:"✓";position:absolute;color:#fff;font-size:.7rem;left:2px;top:-2px;font-weight:900}
+.year{font-weight:800;font-size:.92rem}
+.tlabel{font-size:.77rem;color:var(--muted);white-space:normal}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.pill{border-radius:999px;padding:.38rem .7rem;font-weight:700;font-size:.84rem;border:1px solid var(--line);background:#fff}
+.tabs-wrap{margin:26px 0 0}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{
+  border:1px solid var(--line);background:#fff;color:var(--ink);padding:.75rem 1rem;border-radius:12px 12px 0 0;
+  cursor:pointer;font-weight:760
+}
+.tab[aria-selected="true"]{background:var(--blue);color:#fff;border-color:var(--blue)}
+.panel{display:none;border-top:4px solid var(--blue)}
+.panel.active{display:block}
+.corebox{background:var(--surface2);border-radius:14px;padding:18px;margin:14px 0}
+.milestones{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+.milestone{
+  border:1px solid var(--line);border-radius:14px;padding:16px;background:#fff;display:grid;gap:10px
+}
+.milestone strong{font-size:1.02rem}
+.meta{font-size:.83rem;color:var(--muted);font-weight:700}
+label{font-weight:700}
+select, textarea, input[type="text"]{
+  width:100%;border:1px solid #9fb0c5;background:#fff;color:var(--ink);border-radius:10px;padding:.7rem .8rem
+}
+textarea{min-height:88px;resize:vertical}
+.row-check{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+.check-btn,.primary,.secondary,.aha-btn{
+  border:0;border-radius:10px;padding:.72rem .95rem;cursor:pointer;font-weight:800
+}
+.check-btn,.primary{background:var(--blue);color:#fff}
+.secondary{background:#e5ecf5;color:#1c426f}
+.aha-btn{background:#182d4f;color:#fff}
+.feedback{min-height:1.5em;font-weight:700;font-size:.9rem}
+.ok{color:var(--green)}
+.bad{color:var(--red)}
+.info{color:var(--amber)}
+.concept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.concept{padding:14px;border-radius:12px;border:1px solid var(--line);background:#fff}
+.concept b{display:block;margin-bottom:.35rem;color:var(--blue2)}
+.guides{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.guide{background:#f8fafc;border:1px dashed #aab8ca;border-radius:12px;padding:14px}
+.selfcheck{display:grid;gap:10px;margin:.7rem 0}
+.selfcheck label{font-weight:500;display:flex;gap:10px;align-items:flex-start}
+.selfcheck input{margin-top:.35rem}
+.teacher summary{
+  cursor:pointer;font-weight:850;color:var(--blue2);font-size:1.08rem
+}
+.solution-table{width:100%;border-collapse:collapse;margin-top:12px}
+.solution-table th,.solution-table td{border-bottom:1px solid var(--line);padding:.65rem;text-align:left;vertical-align:top}
+.solution-table th{background:#f2f5fa}
+.twist{
+  border:2px solid #96a9c0;background:#f8fbff;border-radius:14px;padding:18px;margin-top:18px
+}
+.option-list{display:grid;gap:8px;margin:.8rem 0}
+.option-list label{font-weight:550;display:flex;gap:10px;align-items:flex-start}
+.reveal{display:none;margin-top:12px;padding:14px;border-radius:12px;background:var(--greenbg);border:1px solid #99cfb4}
+.reveal.show{display:block}
+.tag{
+  display:inline-block;padding:.22rem .52rem;border-radius:999px;background:#e8eef8;color:#234d82;font-size:.8rem;font-weight:800
+}
+.notice{background:var(--amberbg);border:1px solid #e5cb79;border-radius:12px;padding:14px}
+.footer-note{color:var(--muted);font-size:.9rem;margin-top:18px}
+.print-only{display:none}
+@media(max-width:760px){
+  .header-row{display:block}
+  .pdf-btn{margin-top:18px}
+  .goal-grid,.milestones,.concept-grid,.guides{grid-template-columns:1fr}
+  .timeline{grid-template-columns:repeat(4,1fr);row-gap:38px}
+  .timeline:before{display:none}
+  .dot{top:-19px}
+  .visual-title{display:block}
+}
+@media print{
+  :root{--bg:#fff}
+  body{background:#fff;font-size:10.5pt}
+  header{background:#fff!important;color:#000;padding:0 0 12px}
+  .lead,.eyebrow{color:#222}
+  .pdf-btn,.tabs,.check-btn,.primary,.secondary,.aha-btn,.no-print,.topnav{display:none!important}
+  main{padding:0}
+  .wrap{width:100%;margin:0}
+  .card{box-shadow:none;border:1px solid #bbb;break-inside:avoid;margin:0 0 12px;padding:15px}
+  .panel{display:block!important;border-top:1px solid #777}
+  .panel::before{display:block;font-weight:800;margin-bottom:8px}
+  #panel-a::before{content:"Zugang A – Mit Unterstützung"}
+  #panel-b::before{content:"Zugang B – Eigenständig"}
+  #panel-c::before{content:"Zugang C – Vertiefung"}
+  details.teacher{display:block}
+  details.teacher > *{display:block}
+  details.teacher summary{display:none}
+  .reveal{display:block!important}
+  .print-only{display:block}
+  textarea{min-height:55px}
+  .timeline{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+  <a href="index.html" class="topnav" style="display:inline-block;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.88rem;color:#B84816;text-decoration:none;font-weight:600;margin:0 0 1rem;">← Übersicht</a>
+
+<a class="skip" href="#main">Direkt zum Inhalt</a>
+
+<header>
+  <div class="wrap header-row">
+    <div>
+      <div class="eyebrow">Künstliche Intelligenz · Sekundarstufe II</div>
+      <h1>Geschichte der KI: Meilensteine richtig einordnen</h1>
+      <p class="lead">Nicht nur Jahreszahlen kennen: Entscheidend ist, <strong>nach welchem Prinzip</strong> ein KI-System arbeitet.</p>
+    </div>
+    <button class="pdf-btn" id="pdfBtn" type="button">Als PDF herunterladen</button>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <section class="card choice-note" aria-labelledby="wahl">
+    <div class="choice-icon" aria-hidden="true">i</div>
+    <div>
+      <h2 id="wahl">Gewähltes Thema</h2>
+      <p><strong>Von regel- und suchbasierten Systemen zu neuronalen Netzen und transformerbasierten Sprachmodellen.</strong></p>
+      <p class="small">Warum dieses Thema? Die Zuordnung ist anhand klarer Funktionsmerkmale überprüfbar. Gleichzeitig zeigt die Vertiefung, dass die KI-Geschichte keine Reihe sauber getrennter Schubladen ist.</p>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="ziel">
+    <div class="goal-grid">
+      <div>
+        <h2 id="ziel">Kompetenzziel</h2>
+        <p>Die Lernenden können ausgewählte Meilensteine der KI-Geschichte anhand ihres <strong>primären Funktionsprinzips</strong> drei Ansätzen zuordnen, ihre Zuordnung mit einem Merkmal begründen und die Entwicklung sachlich interpretieren.</p>
+      </div>
+      <div>
+        <h2>Erfolgskriterien</h2>
+        <ul class="criteria">
+          <li>Ich ordne alle sieben Meilensteine dem passenden Ansatz zu.</li>
+          <li>Ich begründe mindestens zwei Zuordnungen mit einem Funktionsmerkmal.</li>
+          <li>Ich unterscheide explizite Regeln/Suche von Lernen über Netzwerkgewichte.</li>
+          <li>Mein Ergebnissatz beschreibt die Entwicklung ohne zu behaupten, ältere Ansätze seien vollständig verschwunden.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="leitidee">
+    <div class="visual-title">
+      <div>
+        <h2 id="leitidee">Visuelle Leitidee: Zeitstrahl</h2>
+        <p class="small">Die Marker werden grün, sobald du den jeweiligen Meilenstein in deinem gewählten Zugang korrekt eingeordnet hast.</p>
+      </div>
+      <span class="tag">1950er → heute</span>
+    </div>
+
+    <div class="timeline" aria-label="Zeitstrahl mit sieben KI-Meilensteinen">
+      <div class="tnode" data-node="perceptron"><span class="dot" aria-hidden="true"></span><div class="year">1957</div><div class="tlabel">Perceptron</div></div>
+      <div class="tnode" data-node="eliza"><span class="dot" aria-hidden="true"></span><div class="year">1960er</div><div class="tlabel">ELIZA</div></div>
+      <div class="tnode" data-node="mycin"><span class="dot" aria-hidden="true"></span><div class="year">1970er</div><div class="tlabel">MYCIN</div></div>
+      <div class="tnode" data-node="deepblue"><span class="dot" aria-hidden="true"></span><div class="year">1997</div><div class="tlabel">Deep Blue</div></div>
+      <div class="tnode" data-node="alexnet"><span class="dot" aria-hidden="true"></span><div class="year">2012</div><div class="tlabel">AlexNet</div></div>
+      <div class="tnode" data-node="transformer"><span class="dot" aria-hidden="true"></span><div class="year">2017</div><div class="tlabel">Transformer</div></div>
+      <div class="tnode" data-node="chatgpt"><span class="dot" aria-hidden="true"></span><div class="year">2022</div><div class="tlabel">ChatGPT</div></div>
+    </div>
+
+    <div class="legend" aria-label="Drei Ansätze">
+      <span class="pill">1 · Regeln, Muster & Suche</span>
+      <span class="pill">2 · Neuronale Netze & Lernen</span>
+      <span class="pill">3 · Transformer & generative Sprachmodelle</span>
+    </div>
+  </section>
+
+  <section class="tabs-wrap" aria-labelledby="zugang-heading">
+    <h2 id="zugang-heading" class="small">Wähle deinen Zugang</h2>
+    <div class="tabs" role="tablist" aria-label="Zugang wählen">
+      <button class="tab" id="tab-a" role="tab" aria-selected="true" aria-controls="panel-a" tabindex="0">A · Mit Unterstützung</button>
+      <button class="tab" id="tab-b" role="tab" aria-selected="false" aria-controls="panel-b" tabindex="-1">B · Eigenständig</button>
+      <button class="tab" id="tab-c" role="tab" aria-selected="false" aria-controls="panel-c" tabindex="-1">C · Vertiefung</button>
+    </div>
+
+    <section id="panel-a" class="panel card active" role="tabpanel" aria-labelledby="tab-a">
+      <h2>Zugang A – Mit Unterstützung</h2>
+      <div class="corebox">
+        <h3>Kernaufgabe für alle</h3>
+        <p><strong>1.</strong> Ordne jeden Meilenstein dem Ansatz zu, der sein Funktionsprinzip am besten beschreibt.</p>
+        <p><strong>2.</strong> Begründe zwei deiner Zuordnungen mit einem Merkmal des Systems.</p>
+        <p><strong>3.</strong> Formuliere einen sachlichen Ergebnissatz dazu, wie sich KI-Ansätze im Lauf der Geschichte entwickelt haben.</p>
+      </div>
+
+      <h3>Fachbegriffe kurz erklärt</h3>
+      <div class="concept-grid">
+        <div class="concept"><b>Regeln, Muster & Suche</b>Menschen legen Regeln, Muster oder Suchverfahren explizit fest. Das System «lernt» diese Regeln nicht automatisch aus grossen Datenmengen.</div>
+        <div class="concept"><b>Neuronale Netze & Lernen</b>Das System passt Gewichte anhand von Beispielen oder Rückmeldungen an und lernt dadurch Muster aus Daten.</div>
+        <div class="concept"><b>Transformer & generative Sprachmodelle</b>Transformer verarbeiten Zusammenhänge in Sequenzen mit Attention. Darauf basierende Sprachmodelle können neue Texte erzeugen.</div>
+      </div>
+
+      <h3>Interaktiver Zuordnungsrahmen</h3>
+      <div id="cards-a" class="milestones"></div>
+
+      <h3>Drei Leitfragen</h3>
+      <div class="guides">
+        <div class="guide">1. Sind die entscheidenden Regeln oder Suchschritte von Menschen vorgegeben?</div>
+        <div class="guide">2. Lernt das System Muster, indem es Gewichte eines neuronalen Netzes anpasst?</div>
+        <div class="guide">3. Geht es um eine Transformer-Architektur oder ein darauf aufgebautes generatives Sprachmodell?</div>
+      </div>
+
+      <h3>Begründung und Ergebnissatz</h3>
+      <label for="a-reason">Begründe zwei Zuordnungen:</label>
+      <textarea id="a-reason" placeholder="Ich ordne … zu, weil …"></textarea>
+      <label for="a-sentence">Satzanfang:</label>
+      <textarea id="a-sentence" placeholder="Die Geschichte der KI zeigt, dass …"></textarea>
+    </section>
+
+    <section id="panel-b" class="panel card" role="tabpanel" aria-labelledby="tab-b">
+      <h2>Zugang B – Eigenständig</h2>
+      <div class="corebox">
+        <h3>Kernaufgabe für alle</h3>
+        <p><strong>1.</strong> Ordne jeden Meilenstein dem Ansatz zu, der sein Funktionsprinzip am besten beschreibt.</p>
+        <p><strong>2.</strong> Begründe zwei deiner Zuordnungen mit einem Merkmal des Systems.</p>
+        <p><strong>3.</strong> Formuliere einen sachlichen Ergebnissatz dazu, wie sich KI-Ansätze im Lauf der Geschichte entwickelt haben.</p>
+      </div>
+      <div id="cards-b" class="milestones"></div>
+      <p><button class="primary" id="check-b" type="button">Ergebnis freiwillig prüfen</button></p>
+      <div id="feedback-b" class="feedback" role="status" aria-live="polite"></div>
+
+      <h3>Begründung</h3>
+      <textarea aria-label="Begründung Zugang B" placeholder="Begründe zwei Zuordnungen anhand der Funktionsprinzipien."></textarea>
+      <h3>Ergebnissatz</h3>
+      <textarea aria-label="Ergebnissatz Zugang B" placeholder="Formuliere einen sachlichen Ergebnissatz."></textarea>
+
+      <h3>Selbstcheck</h3>
+      <div class="selfcheck">
+        <label><input type="checkbox"> Ich habe alle sieben Meilensteine zugeordnet.</label>
+        <label><input type="checkbox"> Meine Begründungen nennen Merkmale und nicht nur Jahreszahlen.</label>
+        <label><input type="checkbox"> Ich kann Regeln/Suche von gelerntem Verhalten unterscheiden.</label>
+        <label><input type="checkbox"> Mein Ergebnissatz vermeidet die Aussage, dass ältere Ansätze komplett verschwunden sind.</label>
+      </div>
+    </section>
+
+    <section id="panel-c" class="panel card" role="tabpanel" aria-labelledby="tab-c">
+      <h2>Zugang C – Vertiefung</h2>
+      <div class="corebox">
+        <h3>Zuerst: Kernaufgabe für alle</h3>
+        <p><strong>1.</strong> Ordne jeden Meilenstein dem Ansatz zu, der sein Funktionsprinzip am besten beschreibt.</p>
+        <p><strong>2.</strong> Begründe zwei deiner Zuordnungen mit einem Merkmal des Systems.</p>
+        <p><strong>3.</strong> Formuliere einen sachlichen Ergebnissatz dazu, wie sich KI-Ansätze im Lauf der Geschichte entwickelt haben.</p>
+      </div>
+      <div id="cards-c" class="milestones"></div>
+      <p><button class="primary" id="check-c" type="button">Kernaufgabe prüfen</button></p>
+      <div id="feedback-c" class="feedback" role="status" aria-live="polite"></div>
+
+      <div class="twist">
+        <h3>Twist: AlphaGo passt nicht sauber in eine Schublade</h3>
+        <p><strong>AlphaGo</strong> besiegte 2016 Lee Sedol im Go. Welche Verfahren spielten dabei eine wesentliche Rolle? Wähle alle passenden Aussagen.</p>
+        <div class="option-list" id="alpha-options">
+          <label><input type="checkbox" value="deep"> Tiefe neuronale Netze</label>
+          <label><input type="checkbox" value="search"> Suchverfahren / Vorausplanung</label>
+          <label><input type="checkbox" value="rl"> Reinforcement Learning (Lernen durch Rückmeldung)</label>
+          <label><input type="checkbox" value="transformer"> Transformer-Sprachmodell</label>
+        </div>
+        <button class="secondary" id="alpha-check" type="button">Auswahl prüfen</button>
+        <div id="alpha-feedback" class="feedback" role="status" aria-live="polite"></div>
+
+        <h3>Begründungsfrage</h3>
+        <label for="c-reason">Warum widerspricht AlphaGo der Vorstellung, dass jede Epoche genau einen KI-Ansatz besitzt?</label>
+        <textarea id="c-reason"></textarea>
+
+        <h3>Transfer in den Berufskontext</h3>
+        <label for="c-transfer">Ein heutiges betriebliches KI-System kombiniert z. B. Regeln, Suche und ein Sprachmodell. Warum ist es riskant, seine Fähigkeiten nur nach dem Etikett «generative KI» zu beurteilen?</label>
+        <textarea id="c-transfer"></textarea>
+
+        <p><button class="aha-btn" id="aha" type="button">Aha-Moment sichtbar machen</button></p>
+        <div id="aha-box" class="reveal">
+          <strong>Aha:</strong> KI-Geschichte ist keine Treppe, bei der jede neue Stufe die alte ersetzt. Viele Systeme sind <strong>hybrid</strong>: Sie verbinden Verfahren aus verschiedenen Entwicklungslinien. AlphaGo kombinierte tiefe neuronale Netze, Reinforcement Learning und Suchverfahren. Deshalb sind Epochen und Kategorien nützliche Modelle – aber keine undurchlässigen Schubladen.
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <details class="card teacher" id="teacher">
+    <summary>Für die Lehrperson</summary>
+    <div>
+      <h2>Vollständige Lösungen</h2>
+      <table class="solution-table">
+        <thead><tr><th>Meilenstein</th><th>Zuordnung</th><th>Begründung</th></tr></thead>
+        <tbody>
+          <tr><td>Perceptron (1957)</td><td>2 · Neuronale Netze & Lernen</td><td>Ein frühes neuronales Netz passt Gewichte anhand von Beispielen an und bildet einen lernenden Klassifikator.</td></tr>
+          <tr><td>ELIZA (Mitte 1960er)</td><td>1 · Regeln, Muster & Suche</td><td>ELIZA erzeugte Antworten mit vorgegebenen Mustern und Regeln; es lernte kein Sprachmodell aus grossen Datenmengen.</td></tr>
+          <tr><td>MYCIN (1970er)</td><td>1 · Regeln, Muster & Suche</td><td>Das Expertensystem nutzte explizite Wenn-dann-Regeln, um medizinische Empfehlungen abzuleiten.</td></tr>
+          <tr><td>Deep Blue (1997)</td><td>1 · Regeln, Muster & Suche</td><td>Deep Blue bewertete sehr viele Schachstellungen mit massiver Rechenleistung, Suchverfahren und Heuristiken; es war kein heutiges lernendes Sprachmodell.</td></tr>
+          <tr><td>AlexNet (2012)</td><td>2 · Neuronale Netze & Lernen</td><td>Das tiefe Convolutional Neural Network lernte Bildmerkmale aus grossen Mengen beschrifteter Bilder.</td></tr>
+          <tr><td>Transformer (2017)</td><td>3 · Transformer & generative Sprachmodelle</td><td>Die Transformer-Architektur nutzt Attention und wurde zur technischen Grundlage vieler späterer grosser Sprachmodelle.</td></tr>
+          <tr><td>ChatGPT (2022)</td><td>3 · Transformer & generative Sprachmodelle</td><td>ChatGPT ist ein dialogorientiertes generatives Sprachmodell, das auf der GPT-/Transformer-Linie basiert.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Mögliche Begründungen</h3>
+      <p>«Deep Blue gehört zu Regeln, Muster & Suche, weil das System Schachstellungen systematisch durchsucht und mit Heuristiken bewertet.»</p>
+      <p>«AlexNet gehört zu neuronalen Netzen & Lernen, weil das Netz seine Gewichte beim Training mit vielen Bildbeispielen anpasst.»</p>
+
+      <h3>Möglicher Ergebnissatz</h3>
+      <p>«Die Geschichte der KI zeigt eine zunehmende Bedeutung lernender, datengetriebener und später transformerbasierter Verfahren; regel- und suchbasierte Methoden verschwanden jedoch nicht, sondern werden teilweise weiterhin genutzt oder mit neueren Ansätzen kombiniert.»</p>
+
+      <h3>Lösung Vertiefung</h3>
+      <p><strong>AlphaGo:</strong> korrekt sind <em>tiefe neuronale Netze</em>, <em>Suchverfahren / Vorausplanung</em> und <em>Reinforcement Learning</em>. <em>Transformer-Sprachmodell</em> ist falsch. Der didaktische Kern ist die Einsicht, dass historische Entwicklungslinien sich überlagern.</p>
+
+      <h3>Didaktischer Anschluss</h3>
+      <p>Als nächster Schritt bietet sich der Übergang von der historischen Einordnung zu den Funktionsprinzipien von Machine Learning, Deep Learning, Reinforcement Learning und Transformer-Modellen an; so wird aus der Zeitleiste ein Verständnis dafür, <em>warum</em> heutige Systeme unterschiedlich arbeiten.</p>
+
+      <h3>Quellenbasis der recherchierten Ersatzgrundlage</h3>
+      <p class="small">Stanford AI100: «A Short History of AI» · IBM: «The history of artificial intelligence» und «Deep Blue» · Google Research: «Attention Is All You Need» · Google DeepMind: AlphaGo · OpenAI: «Introducing ChatGPT» (30.11.2022). Der ursprünglich erwähnte Foliensatz lag nicht vor; deshalb wurde kein Folien-Aufgabentext oder Folien-Datensatz übernommen.</p>
+    </div>
+  </details>
+
+  <p class="footer-note">Hinweis: Diese Lernseite wurde ohne externen Foliensatz aus öffentlich dokumentierten KI-Meilensteinen erstellt. Sie funktioniert vollständig offline; externe Bibliotheken werden nicht benötigt.</p>
+</main>
+
+<script>
+const approaches = [
+  {v:"", t:"Bitte auswählen"},
+  {v:"rules", t:"1 · Regeln, Muster & Suche"},
+  {v:"neural", t:"2 · Neuronale Netze & Lernen"},
+  {v:"transformer", t:"3 · Transformer & generative Sprachmodelle"}
+];
+
+const data = [
+  {id:"perceptron", name:"Perceptron", when:"1957", desc:"Ein früher lernender Klassifikator passt Gewichte seiner Eingaben anhand von Beispielen an.", answer:"neural",
+   hint:"Achte darauf, ob Gewichte aus Beispielen angepasst werden."},
+  {id:"eliza", name:"ELIZA", when:"Mitte 1960er", desc:"Der frühe Chatbot reagiert auf Texteingaben mit vorgegebenen Mustern und Umformungsregeln.", answer:"rules",
+   hint:"Frage dich: Lernt das System aus Daten – oder folgen Antworten vorbereiteten Mustern?"},
+  {id:"mycin", name:"MYCIN", when:"1970er", desc:"Ein medizinisches Expertensystem leitet Empfehlungen aus vielen expliziten Wenn-dann-Regeln ab.", answer:"rules",
+   hint:"Achte auf die explizit formulierten Wenn-dann-Regeln."},
+  {id:"deepblue", name:"Deep Blue", when:"1997", desc:"Der Schachcomputer durchsucht sehr viele mögliche Stellungen und bewertet sie mit Heuristiken.", answer:"rules",
+   hint:"Entscheidend ist hier die systematische Suche in einem Lösungsraum."},
+  {id:"alexnet", name:"AlexNet", when:"2012", desc:"Ein tiefes neuronales Netz lernt aus einer grossen Sammlung beschrifteter Bilder, Objekte zu klassifizieren.", answer:"neural",
+   hint:"Achte auf «tiefes neuronales Netz» und Lernen aus Trainingsdaten."},
+  {id:"transformer", name:"Transformer", when:"2017", desc:"Eine neue Netzwerkarchitektur verarbeitet Zusammenhänge in Sequenzen mit Attention statt klassischer Rekurrenz.", answer:"transformer",
+   hint:"Der Name der Architektur ist selbst der wichtigste Hinweis."},
+  {id:"chatgpt", name:"ChatGPT", when:"2022", desc:"Ein dialogorientiertes generatives Sprachmodell erzeugt Antworten auf Basis der GPT-/Transformer-Linie.", answer:"transformer",
+   hint:"Achte auf «generatives Sprachmodell» und die GPT-/Transformer-Linie."}
+];
+
+function optionsHTML(){
+  return approaches.map(a => `<option value="${a.v}">${a.t}</option>`).join("");
+}
+
+function buildCards(containerId, mode){
+  const box=document.getElementById(containerId);
+  box.innerHTML=data.map(d=>`
+    <article class="milestone" data-card="${d.id}">
+      <div><strong>${d.name}</strong> <span class="meta">· ${d.when}</span></div>
+      <div>${d.desc}</div>
+      <label for="${mode}-${d.id}">Primärer Ansatz</label>
+      <div class="row-check">
+        <select id="${mode}-${d.id}" data-id="${d.id}" data-mode="${mode}">
+          ${optionsHTML()}
+        </select>
+        ${mode==="a" ? `<button class="check-btn" type="button" data-check="${d.id}" aria-label="${d.name} prüfen">Prüfen</button>` : ""}
+      </div>
+      <div class="feedback" id="fb-${mode}-${d.id}" role="status" aria-live="polite"></div>
+    </article>
+  `).join("");
+}
+
+buildCards("cards-a","a");
+buildCards("cards-b","b");
+buildCards("cards-c","c");
+
+function setNode(id, correct){
+  const n=document.querySelector(`.tnode[data-node="${id}"]`);
+  if(n) n.classList.toggle("done", !!correct);
+}
+
+function feedback(mode,id,correct,empty=false){
+  const d=data.find(x=>x.id===id);
+  const el=document.getElementById(`fb-${mode}-${id}`);
+  if(empty){ el.textContent="Wähle zuerst einen Ansatz."; el.className="feedback info"; return; }
+  if(correct){
+    el.textContent="✓ Korrekt.";
+    el.className="feedback ok";
+  }else{
+    el.textContent= mode==="a" ? `Noch nicht. Hinweis: ${d.hint}` : "Noch nicht korrekt.";
+    el.className="feedback bad";
+  }
+}
+
+document.querySelectorAll("[data-check]").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    const id=btn.dataset.check;
+    const sel=document.getElementById(`a-${id}`);
+    const val=sel.value;
+    const d=data.find(x=>x.id===id);
+    if(!val){feedback("a",id,false,true);setNode(id,false);return;}
+    const ok=val===d.answer;
+    feedback("a",id,ok);
+    setNode(id,ok);
+  });
+});
+
+function checkAll(mode, summaryId){
+  let correct=0, chosen=0;
+  data.forEach(d=>{
+    const sel=document.getElementById(`${mode}-${d.id}`);
+    if(sel.value) chosen++;
+    const ok=sel.value===d.answer;
+    feedback(mode,d.id,ok,!sel.value);
+    setNode(d.id,ok);
+    if(ok) correct++;
+  });
+  const out=document.getElementById(summaryId);
+  if(correct===data.length){
+    out.textContent="✓ Alle sieben Zuordnungen sind korrekt.";
+    out.className="feedback ok";
+  } else if(chosen<data.length){
+    out.textContent=`${chosen} von ${data.length} bearbeitet. ${correct} davon korrekt.`;
+    out.className="feedback info";
+  } else {
+    out.textContent=`${correct} von ${data.length} sind korrekt. Prüfe die markierten Karten nochmals.`;
+    out.className="feedback bad";
+  }
+}
+document.getElementById("check-b").addEventListener("click",()=>checkAll("b","feedback-b"));
+document.getElementById("check-c").addEventListener("click",()=>checkAll("c","feedback-c"));
+
+const tabs=[...document.querySelectorAll(".tab")];
+tabs.forEach((tab,i)=>{
+  tab.addEventListener("click",()=>activateTab(i));
+  tab.addEventListener("keydown",e=>{
+    if(e.key==="ArrowRight"){e.preventDefault();activateTab((i+1)%tabs.length);tabs[(i+1)%tabs.length].focus();}
+    if(e.key==="ArrowLeft"){e.preventDefault();activateTab((i-1+tabs.length)%tabs.length);tabs[(i-1+tabs.length)%tabs.length].focus();}
+  });
+});
+function activateTab(index){
+  tabs.forEach((t,i)=>{
+    const active=i===index;
+    t.setAttribute("aria-selected",active?"true":"false");
+    t.tabIndex=active?0:-1;
+    document.getElementById(t.getAttribute("aria-controls")).classList.toggle("active",active);
+  });
+  document.querySelectorAll(".tnode").forEach(n=>n.classList.remove("done"));
+}
+
+document.getElementById("alpha-check").addEventListener("click",()=>{
+  const selected=[...document.querySelectorAll("#alpha-options input:checked")].map(x=>x.value).sort();
+  const right=["deep","rl","search"].sort();
+  const ok=JSON.stringify(selected)===JSON.stringify(right);
+  const out=document.getElementById("alpha-feedback");
+  if(ok){out.textContent="✓ Korrekt: AlphaGo verbindet mehrere Verfahren.";out.className="feedback ok";}
+  else{out.textContent="Noch nicht. Prüfe, ob AlphaGo Sprache erzeugt – und ob Spielen nur mit einem einzigen Verfahren möglich war.";out.className="feedback bad";}
+});
+
+document.getElementById("aha").addEventListener("click",()=>{
+  const b=document.getElementById("aha-box");
+  b.classList.add("show");
+  b.scrollIntoView({behavior:"smooth",block:"nearest"});
+});
+
+function openPrintableCopy(){
+  try{
+    const source='<!doctype html>\n'+document.documentElement.outerHTML;
+    const blob=new Blob([source],{type:"text/html"});
+    const url=URL.createObjectURL(blob);
+    const w=window.open(url,"_blank");
+    if(w){
+      w.addEventListener("load",()=>setTimeout(()=>w.print(),350),{once:true});
+      setTimeout(()=>URL.revokeObjectURL(url),60000);
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+document.getElementById("pdfBtn").addEventListener("click",()=>{
+  document.getElementById("teacher").open=true;
+  try{
+    if(window.self!==window.top){
+      if(!openPrintableCopy()) window.print();
+    }else{
+      window.print();
+    }
+  }catch(e){
+    openPrintableCopy();
+  }
+});
+</script>
+</body>
+</html>
