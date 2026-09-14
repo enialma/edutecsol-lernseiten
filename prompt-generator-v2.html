@@ -140,7 +140,19 @@
           <button data-v="anwenden" class="on">anwenden</button>
           <button data-v="beurteilen">beurteilen</button>
         </div>
-        <label class="field" style="margin-top:.9rem;"><span class="lab">Zusatzwunsch <span class="hint">(optional – frei)</span></span>
+      </div>
+
+      <!-- Achse 5: Ausgabeformate -->
+      <div class="group">
+        <span class="glab">Ausgabeformat(e)</span>
+        <p class="ghint">Was soll entstehen? Mehrfachauswahl möglich – mindestens eines.</p>
+        <div class="seg" id="formate">
+          <button data-v="web" class="on">🖥 Interaktive Website</button>
+          <button data-v="word" class="on">📄 Word (.docx)</button>
+          <button data-v="pdf" class="on">🖨 PDF</button>
+        </div>
+        <p class="ghint" style="margin-top:.5rem;">Website = zum Üben am Gerät mit Selbstkontrolle. Word = bearbeitbares Arbeitsblatt. PDF = druckfertig. Word/PDF je als getrenntes Aufgaben- und Lösungsblatt.</p>
+        <label class="field" style="margin-top:.7rem;"><span class="lab">Zusatzwunsch <span class="hint">(optional – frei)</span></span>
           <textarea id="extra" placeholder="z. B. besonders alltagsnahes Beispiel, glatte Zahlen"></textarea></label>
       </div>
     </div>
@@ -169,7 +181,8 @@
   const el=id=>document.getElementById(id);
   const state={
     fach:'',stufe:'',thema:'',extra:'',
-    diffart:'niveau',anzahl:'3',sprache:'standard',zweitsprache:'',twist:'auto',niveau:'anwenden'
+    diffart:'niveau',anzahl:'3',sprache:'standard',zweitsprache:'',twist:'auto',niveau:'anwenden',
+    web:true,word:true,pdf:true
   };
 
   function wireSeg(groupId,key,after){
@@ -185,6 +198,15 @@
   wireSeg('sprache','sprache',()=>{el('zweiWrap').style.display=(state.sprache==='zweisprachig')?'block':'none';});
   wireSeg('twist','twist');
   wireSeg('niveau','niveau');
+  // Formate: Mehrfach-Umschalter (web/word/pdf unabhängig), aber mindestens eines aktiv
+  el('formate').querySelectorAll('button').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const k=b.dataset.v;
+      const wouldBeEmpty = state[k] && !( ['web','word','pdf'].filter(x=>x!==k).some(x=>state[x]) );
+      if(wouldBeEmpty) return; // nicht alle abschalten
+      state[k]=!state[k];b.classList.toggle('on',state[k]);render();
+    });
+  });
   ['fach','stufe','thema','extra','zweitsprache'].forEach(k=>el(k).addEventListener('input',()=>{state[k]=el(k).value;render();}));
 
   // ---- Textbausteine je Achse ----
@@ -237,6 +259,35 @@
     };
     return map[state.niveau];
   }
+  function ausgabeText(){
+    const blocks=[];
+    // Website-Block nur wenn gewählt
+    if(state.web){
+      blocks.push(`§AUSGABEFORMAT – INTERAKTIVE WEBSITE
+Eine einzige, voll funktionsfähige HTML-Seite (eine Datei, ohne externe Abhängigkeiten, offline lauffähig):
+- Zugangswahl per Klick (Reiter): die Lernenden sehen nur ihren gewählten Zugang.
+- Visualisierung der Kernaufgabe als durchgehende Leitidee, passend zum Thema. Jedes Eingabefeld ist sichtbar beschriftet, damit klar ist, wohin es gehört; optionale Hilfslinien/Marker erscheinen erst nach korrekter Eingabe.
+- Interaktive Selbstkontrolle: Eingabefelder/Auswahlbuttons zeigen bei korrekter Eingabe ein grünes Häkchen, bei falscher einen Hinweis, ohne die Lösung zu verraten.
+- Bereich «Für die Lehrperson»: ausklappbar (verborgen bis Klick), mit vollständigen Lösungen und Wegen, getrennt vom Aufgabenteil; ein Satz zum didaktischen Anschluss an die nächsten Folien.
+- PDF-Button oben («Als PDF herunterladen»): blendet für den Export alle Zugänge und den Lehrpersonen-Bereich ein und löst den Druckdialog aus; eigene @media-print-CSS blendet Reiter/Buttons aus; Fallback, der die Seite in einem neuen Tab öffnet, falls der Druckdialog blockiert ist.`);
+    }
+    // Word/PDF-Arbeitsblatt
+    const docs=[];
+    if(state.word) docs.push('ein bearbeitbares Word-Dokument (.docx)');
+    if(state.pdf) docs.push('ein druckfertiges PDF');
+    if(docs.length){
+      const list=docs.join(' und ');
+      const bezug=state.web?'zusätzlich zur Website ':'';
+      blocks.push(`§AUSGABEFORMAT – ARBEITSBLATT
+Erstelle ${bezug}${list} als klassisches Arbeitsblatt zum Austeilen – papiergerecht gestaltet, nicht als Bildschirm-Abbild:
+- Kopf mit Fach, Thema, Kompetenzziel und Erfolgskriterien.
+- Die Kernaufgabe sowie alle Zugänge (nach der gewählten Differenzierung) mit ausreichend Platz für handschriftliche Lösungen; Selbstcheck-Listen als ankreuzbare Kästchen.
+- Ein davon getrenntes Lösungsblatt für die Lehrperson mit vollständigen Rechen-/Begründungswegen (eigene Seite oder klar abgetrennter Abschnitt).
+- Schlicht und gut kopierbar (schwarz-weiss-tauglich). Interaktive Elemente entfallen; wo die Website Feedback gäbe, steht hier Platz zum Rechnen.
+Lege jede Datei als eigenständigen Download an.`);
+    }
+    return blocks.join('\n\n');
+  }
 
   function build(){
     const fach=state.fach.trim()||'[Fach/Kontext einsetzen]';
@@ -264,26 +315,22 @@ ${niveauText()}
 
 §DIFFERENZIERUNG
 ${diffartText()}
-- Zugangswahl per Klick (Reiter): die Lernenden sehen nur ihren gewählten Zugang.
-- Erster/einfachster Zugang «Mit Unterstützung»: kurze Erklärung der Fachbegriffe; interaktiver Rechen- bzw. Zuordnungsrahmen mit Eingabefeldern/Auswahlbuttons, die bei korrekter Eingabe ein grünes Häkchen zeigen und bei falscher einen Hinweis geben, ohne die Lösung zu verraten; drei Leitfragen; ein Satzanfang für den Ergebnissatz. Weder Rechnung noch Ergebnis vollständig nennen.
-- Mittlerer Zugang «Eigenständig»: gleiche Kernaufgabe ohne Hilfen; freiwillige Ergebnisprüfung mit Feedback; Selbstcheck-Liste mit vier abhakbaren Fragen.
+- Die Lernenden bearbeiten nur ihren gewählten Zugang (auf der Website per Reiter-Klick, im Arbeitsblatt als klar getrennte Abschnitte).
+- Erster/einfachster Zugang «Mit Unterstützung»: kurze Erklärung der Fachbegriffe; ein Rechen- bzw. Zuordnungsrahmen zum Ausfüllen (auf der Website interaktiv mit grünem Häkchen bei korrekter und einem Hinweis bei falscher Eingabe, ohne die Lösung zu verraten; im Arbeitsblatt mit Platz zum Eintragen); drei Leitfragen; ein Satzanfang für den Ergebnissatz. Weder Rechnung noch Ergebnis vollständig nennen.
+- Mittlerer Zugang «Eigenständig»: gleiche Kernaufgabe ohne Hilfen; Möglichkeit zur Ergebnisprüfung; Selbstcheck-Liste mit vier abhakbaren Fragen.
 - ${twistText()}
 ${spr?('\n§'+spr+'\n'):''}
-§AUSGABEFORMAT
-Eine einzige, voll funktionsfähige HTML-Seite (eine Datei, ohne externe Abhängigkeiten, offline lauffähig):
-- Visualisierung der Kernaufgabe als durchgehende Leitidee, passend zum Thema. Jedes Eingabefeld ist sichtbar beschriftet, damit klar ist, wohin es gehört; optionale Hilfslinien/Marker erscheinen erst nach korrekter Eingabe.
-- Bereich «Für die Lehrperson»: ausklappbar (verborgen bis Klick), mit vollständigen Lösungen und Wegen, getrennt vom Aufgabenteil; ein Satz zum didaktischen Anschluss an die nächsten Folien.
-- PDF-Button oben («Als PDF herunterladen»): blendet für den Export alle Zugänge und den Lehrpersonen-Bereich ein und löst den Druckdialog aus; eigene @media-print-CSS blendet Reiter/Buttons aus; Fallback, der die Seite in einem neuen Tab öffnet, falls der Druckdialog blockiert ist.
+${ausgabeText()}
 
 §GESTALTUNG
-Ruhiges, altersgerechtes Design für die Zielstufe; themenpassende Visualisierung als Leitidee; Farbwelt zum Fach passend; responsiv bis Mobile; Tastaturbedienbarkeit und sichtbarer Fokus. Keine generische KI-Optik (keine cremefarbenen Hintergründe, keine Akzentstreifen).
+Ruhiges, altersgerechtes Design für die Zielstufe; themenpassende Visualisierung als Leitidee. Für die Website: responsiv bis Mobile, Tastaturbedienbarkeit, sichtbarer Fokus. Für Arbeitsblätter: klare Druckstruktur, gut kopierbar. Keine generische KI-Optik (keine cremefarbenen Hintergründe, keine Akzentstreifen).
 
 §QUALITÄTSPRÜFUNG VOR DER AUSGABE
-- Rechne alle Lösungen selbst nach; die Feedback-Logik jedes Eingabefelds muss exakt zu den richtigen Werten passen.
-- Prüfe, dass jedes Eingabefeld sichtbar beschriftet ist und klar ist, welche Eingabe welche Visualisierung auslöst.
+- Rechne alle Lösungen selbst nach; auf der Website muss die Feedback-Logik jedes Eingabefelds exakt zu den richtigen Werten passen, im Arbeitsblatt müssen die Lösungen auf dem Lehrpersonen-Blatt korrekt sein.
+- Prüfe, dass jede Aufgabe klar zeigt, was wo einzutragen ist (auf der Website: welche Eingabe welche Visualisierung auslöst).
 - Kontrolliere alle Texte (auch Selbstchecks) auf Tipp- und Flüchtigkeitsfehler.
 - Schweizer Standarddeutsch; Selbstcheck-Listen abhakbar.
-Gib am Ende eine kurze Notiz: gewähltes Thema, gewählte Differenzierungsart und genutzter Twist.`;
+Gib am Ende eine kurze Notiz: gewähltes Thema, gewählte Differenzierungsart, genutzter Twist und erzeugte Ausgabeformate.`;
   }
 
   function render(){
@@ -306,13 +353,14 @@ Gib am Ende eine kurze Notiz: gewähltes Thema, gewählte Differenzierungsart un
     el('fach').value=state.fach;el('stufe').value=state.stufe;el('thema').value=state.thema;el('extra').value=state.extra;el('zweitsprache').value=state.zweitsprache;
     const setSeg=(gid,val)=>{el(gid).querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===val));};
     setSeg('diffart',state.diffart);setSeg('anzahl',state.anzahl);setSeg('sprache',state.sprache);setSeg('twist',state.twist);setSeg('niveau',state.niveau);
+    el('formate').querySelectorAll('button').forEach(b=>b.classList.toggle('on',!!state[b.dataset.v]));
     el('zweiWrap').style.display=(state.sprache==='zweisprachig')?'block':'none';
     render();
   }
   document.querySelectorAll('.presets button').forEach(b=>{
     b.addEventListener('click',()=>{
       const p=b.dataset.preset;
-      if(p==='reset'){Object.assign(state,{fach:'',stufe:'',thema:'',extra:'',diffart:'niveau',anzahl:'3',sprache:'standard',zweitsprache:'',twist:'auto',niveau:'anwenden'});}
+      if(p==='reset'){Object.assign(state,{fach:'',stufe:'',thema:'',extra:'',diffart:'niveau',anzahl:'3',sprache:'standard',zweitsprache:'',twist:'auto',niveau:'anwenden',web:true,word:true,pdf:true});}
       else{Object.assign(state,{thema:'',extra:'',zweitsprache:''},presets[p]);}
       applyState();
     });
