@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pflegedokumentation: Beobachtung, Aussage oder Interpretation?</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<style>
+:root{--ink:#17324a;--muted:#596a78;--line:#cfd8df;--panel:#f6f8fa;--good:#1f7a4d;--bad:#a13b3b;--focus:#214e74;--white:#fff;--blue:#eaf2f8;--deep:#203848}
+*{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#1e2b33;background:#fff;line-height:1.48}
+header{background:#eef4f8;border-bottom:1px solid var(--line);padding:22px 20px}
+.wrap{max-width:1060px;margin:0 auto}.eyebrow{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:#526878;font-weight:700}
+h1{font-size:clamp(1.65rem,3vw,2.4rem);line-height:1.12;margin:.35rem 0 .45rem;color:var(--deep)}
+.lead{max-width:850px;color:#425563;margin:0}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+button,.tab{font:inherit;border-radius:8px;border:1px solid #8aa0b0;background:#fff;color:#18384e;padding:10px 14px;cursor:pointer;font-weight:700}
+button:hover,.tab:hover{background:#edf4f8}button:focus-visible,.tab:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid #7aa8c7;outline-offset:2px}
+button.primary{background:#244f6d;color:#fff;border-color:#244f6d}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{border:1px solid var(--line);border-radius:12px;padding:18px;background:#fff}.soft{background:var(--panel)}
+main{padding:24px 20px 50px}.section-title{margin:0 0 10px;color:var(--deep)}.meta{font-size:.94rem;color:var(--muted)}
+.criteria{margin:.4rem 0 0;padding-left:1.25rem}.case{font-size:1.02rem;border-left:4px solid #7a9bb2;padding-left:16px}
+.term{border-bottom:1px dotted #4e748c;cursor:help}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:26px 0 14px}.tab[aria-selected="true"]{background:#244f6d;color:#fff;border-color:#244f6d}.panel[hidden]{display:none}.panel{border:1px solid var(--line);border-radius:12px;padding:20px;background:#fff}
+.badge{display:inline-block;font-size:.8rem;font-weight:700;padding:4px 9px;border-radius:999px;background:#edf2f5;color:#425563}.taskbox{background:#f5f8fa;border:1px solid #d5dfe6;padding:15px;border-radius:10px;margin:14px 0}.taskbox strong{color:#17324a}
+.row{display:grid;grid-template-columns:minmax(230px,1fr) minmax(210px,.65fr);gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #e6ecef}.row:last-child{border-bottom:0}label{font-weight:700}select,input[type=text],textarea{width:100%;font:inherit;border:1px solid #9cafbc;border-radius:7px;padding:10px;background:#fff}textarea{min-height:120px;resize:vertical}.feedback{font-size:.9rem;margin-top:6px;min-height:1.3em}.ok{color:var(--good);font-weight:700}.no{color:var(--bad);font-weight:700}.hint{color:#526878}.checklist label{display:block;font-weight:400;margin:8px 0}.checklist input{margin-right:8px}.questions{display:grid;gap:12px}.qcard{border:1px solid #dbe3e8;border-radius:9px;padding:13px;background:#fbfcfd}.qcard label{display:block;margin-bottom:8px}.qcard button{margin-top:8px}.trail{margin:14px 0 18px;border:1px solid #cfd8df;border-radius:10px;padding:14px;background:#fbfcfd}.trail h3{margin:0 0 8px;color:#203848}.trail-list{display:grid;gap:7px}.trail-item{display:grid;grid-template-columns:26px 1fr auto;gap:8px;align-items:center;color:#75838d}.trail-dot{width:18px;height:18px;border:2px solid #9eacb5;border-radius:50%;display:inline-block}.trail-item.unlocked{color:#1e2b33}.trail-item.unlocked .trail-dot{background:#1f7a4d;border-color:#1f7a4d}.trail-tag{font-size:.78rem;font-weight:700;padding:2px 7px;border-radius:999px;background:#eef2f4;color:#566773;visibility:hidden}.trail-item.unlocked .trail-tag{visibility:visible}
+details{border:1px solid var(--line);border-radius:10px;margin-top:18px;background:#fff}summary{cursor:pointer;font-weight:700;padding:13px 15px;color:#1d4056}.details-body{padding:0 15px 15px}.glossary dl{margin:0}.glossary dt{font-weight:700;margin-top:10px}.glossary dd{margin:2px 0 0 0;color:#4b5d69}.teacher{margin-top:28px}.teacher .details-body{background:#f8fafb}.callout{border:1px solid #b9c9d4;background:#edf4f8;border-radius:10px;padding:14px}.aha{margin-top:14px;padding:14px;border:1px dashed #6e93aa;border-radius:10px;background:#f7fafc}.aha[hidden]{display:none}.small{font-size:.9rem}.footer{margin-top:32px;border-top:1px solid var(--line);padding-top:16px;color:#657782;font-size:.88rem}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}.row{grid-template-columns:1fr}.panel{padding:15px}.tabs{position:sticky;top:0;background:#fff;padding:8px 0;z-index:3}}
+@media print{header{background:#fff;padding:0 0 12mm;border-bottom:1px solid #777}.toolbar,.tabs,.screen-only,button{display:none!important}main{padding:0}.wrap{max-width:none}.panel[hidden]{display:block!important}.panel{border:0;padding:0;margin:0 0 12mm}.panel::before{display:block;font-size:18pt;font-weight:700;color:#000;margin:8mm 0 3mm}.panel[data-panel="A"]::before{content:"Zugang A - Mit Unterstützung"}.panel[data-panel="B"]::before{content:"Zugang B - Eigenständig"}.panel[data-panel="C"]::before{content:"Zugang C - Vertiefung"}details{border:0}details>.details-body{display:block!important;padding:0}summary{display:none}.teacher{page-break-before:always}.card,.taskbox,.qcard,.callout,.aha{break-inside:avoid;background:#fff!important;border-color:#777}.term{border:0}textarea{min-height:50mm}.footer{display:none}}
+.print-all .panel[hidden]{display:block!important}.print-all details>.details-body{display:block!important}
+@media print{.topnav{display:none!important}}
+</style>
+</head>
+<body>
+  <a href="index.html" class="topnav" style="display:inline-block;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.88rem;color:#B84816;text-decoration:none;font-weight:600;margin:0 0 1rem;">← Übersicht</a>
+
+<header>
+<div class="wrap">
+<div class="eyebrow">Pflege · Differenzierte Lernaufgabe</div>
+<h1>Beobachtung, Aussage oder Interpretation?</h1>
+<p class="lead"><strong>Kompetenzziel:</strong> Du kannst in einer Pflegesituation beobachtbare Tatsachen und Aussagen der Klientin von Interpretationen unterscheiden, deine Zuordnung begründen und daraus einen kurzen, sachlichen Eintrag für die <span class="term" title="Sachliche, nachvollziehbare Aufzeichnung relevanter Beobachtungen, Aussagen und Handlungen.">Pflegedokumentation</span> formulieren.</p>
+<div class="toolbar"><button class="primary" type="button" onclick="printAll()">Als PDF herunterladen</button><button type="button" onclick="document.getElementById('glossar').open=true;document.getElementById('glossar').scrollIntoView({behavior:'smooth'})">Glossar öffnen</button></div>
+</div>
+</header>
+<main><div class="wrap">
+<section class="grid2">
+<div class="card">
+<h2 class="section-title">Pflegesituation</h2>
+<p class="case">Frau Meier, 82 Jahre, sitzt beim Frühstück am Tisch. Sie sagt: «Mir ist heute etwas schwindlig.» Beim Aufstehen hält sie sich am Tisch fest und setzt sich wieder hin. Sie trinkt etwa eine halbe Tasse Tee. Im Gespräch ist sie wach und antwortet auf Fragen passend.</p>
+</div>
+<div class="card soft">
+<h2 class="section-title">Kernauftrag für alle</h2>
+<ol class="criteria"><li>Bestimme, welche Informationen <span class="term" title="Direkt wahrnehmbare, beschreibbare Tatsache.">Beobachtungen</span> und welche <span class="term" title="Etwas, das die Klientin selbst sagt oder berichtet.">Aussagen der Klientin</span> sind.</li><li>Begründe mindestens eine Zuordnung nachvollziehbar.</li><li>Verfasse einen kurzen, <span class="term" title="Neutral, konkret und ohne unbelegte Deutung.">sachlichen</span> Eintrag für die Pflegedokumentation.</li></ol>
+<p class="meta"><strong>Erfolgskriterien:</strong> richtige Zuordnung · nachvollziehbare Begründung · relevante Angaben vollständig · neutrale Formulierungen ohne unbelegte Interpretation.</p>
+</div>
+</section>
+
+<nav class="tabs" aria-label="Zugang wählen">
+<button class="tab" id="tabA" aria-controls="panelA" aria-selected="true" onclick="showTab('A')">A · Mit Unterstützung</button>
+<button class="tab" id="tabB" aria-controls="panelB" aria-selected="false" onclick="showTab('B')">B · Eigenständig</button>
+<button class="tab" id="tabC" aria-controls="panelC" aria-selected="false" onclick="showTab('C')">C · Vertiefung</button>
+</nav>
+
+<section id="panelA" class="panel" data-panel="A" role="tabpanel" aria-labelledby="tabA">
+<span class="badge">A · Mit Unterstützung</span><h2>Schritt für Schritt zur sachlichen Dokumentation</h2>
+<div class="callout"><strong>Kurz erklärt:</strong> Eine <span class="term" title="Direkt wahrnehmbare, beschreibbare Tatsache.">Beobachtung</span> kannst du sehen, hören oder konkret beschreiben. Eine <span class="term" title="Etwas, das die Klientin selbst sagt oder berichtet.">Aussage</span> stammt von der Klientin. Eine <span class="term" title="Deutung oder Schlussfolgerung, die über das direkt Wahrnehmbare hinausgeht.">Interpretation</span> ist eine Deutung und darf nicht wie eine beobachtete Tatsache erscheinen.</div>
+<div class="taskbox"><strong>1. Zuordnen.</strong> Wähle bei jeder Information die passende Kategorie. Nach jeder Auswahl erhältst du Rückmeldung. In der <strong>Dokumentationsspur</strong> erscheint nach einer korrekten Zuordnung ein grüner Marker mit der Kategorie.</div>
+<div class="trail" aria-label="Dokumentationsspur"><h3>Dokumentationsspur · vom Fall zur sachlichen Dokumentation</h3><div class="trail-list">
+<div class="trail-item" data-for="a1"><span class="trail-dot" aria-hidden="true"></span><span>Schwindel-Angabe</span><span class="trail-tag">noch offen</span></div>
+<div class="trail-item" data-for="a2"><span class="trail-dot" aria-hidden="true"></span><span>Festhalten am Tisch</span><span class="trail-tag">noch offen</span></div>
+<div class="trail-item" data-for="a3"><span class="trail-dot" aria-hidden="true"></span><span>Wieder hinsetzen</span><span class="trail-tag">noch offen</span></div>
+<div class="trail-item" data-for="a4"><span class="trail-dot" aria-hidden="true"></span><span>Trinkmenge</span><span class="trail-tag">noch offen</span></div>
+<div class="trail-item" data-for="a5"><span class="trail-dot" aria-hidden="true"></span><span>Wach im Gespräch</span><span class="trail-tag">noch offen</span></div>
+<div class="trail-item" data-for="a6"><span class="trail-dot" aria-hidden="true"></span><span>Antwortet passend</span><span class="trail-tag">noch offen</span></div>
+</div></div>
+<div id="classifyA">
+<div class="row"><label for="a1">«Mir ist heute etwas schwindlig.»</label><div><select id="a1" data-answer="aussage" onchange="checkSelect(this)"><option value="">Bitte wählen</option><option value="beobachtung">Beobachtung</option><option value="aussage">Aussage der Klientin</option><option value="interpretation">Interpretation</option></select><div class="feedback" aria-live="polite"></div></div></div>
+<div class="row"><label for="a2">Beim Aufstehen hält sie sich am Tisch fest.</label><div><select id="a2" data-answer="beobachtung" onchange="checkSelect(this)"><option value="">Bitte wählen</option><option value="beobachtung">Beobachtung</option><option value="aussage">Aussage der Klientin</option><option value="interpretation">Interpretation</option></select><div class="feedback" aria-live="polite"></div></div></div>
+<div class="row"><label for="a3">Sie setzt sich wieder hin.</label><div><select id="a3" data-answer="beobachtung" onchange="checkSelect(this)"><option value="">Bitte wählen</option><option value="beobachtung">Beobachtung</option><option value="aussage">Aussage der Klientin</option><option value="interpretation">Interpretation</option></select><div class="feedback" aria-live="polite"></div></div></div>
+<div class="row"><label for="a4">Sie trinkt etwa eine halbe Tasse Tee.</label><div><select id="a4" data-answer="beobachtung" onchange="checkSelect(this)"><option value="">Bitte wählen</option><option value="beobachtung">Beobachtung</option><option value="aussage">Aussage der Klientin</option><option value="interpretation">Interpretation</option></select><div class="feedback" aria-live="polite"></div></div></div>
+<div class="row"><label for="a5">Im Gespräch ist sie wach.</label><div><select id="a5" data-answer="beobachtung" onchange="checkSelect(this)"><option value="">Bitte wählen</option><option value="beobachtung">Beobachtung</option><option value="aussage">Aussage der Klientin</option><option value="interpretation">Interpretation</option></select><div class="feedback" aria-live="polite"></div></div></div>
+<div class="row"><label for="a6">Sie antwortet auf Fragen passend.</label><div><select id="a6" data-answer="beobachtung" onchange="checkSelect(this)"><option value="">Bitte wählen</option><option value="beobachtung">Beobachtung</option><option value="aussage">Aussage der Klientin</option><option value="interpretation">Interpretation</option></select><div class="feedback" aria-live="polite"></div></div></div>
+</div>
+<div class="taskbox"><strong>2. Drei Leitfragen.</strong> Sie helfen dir, ohne die Lösung vorwegzunehmen.</div>
+<div class="questions">
+<div class="qcard"><label for="q1">Leitfrage 1: Welche Formulierung gibt wieder, was Frau Meier selbst berichtet?</label><select id="q1" data-answer="schwindlig" onchange="checkSelect(this)"><option value="">Bitte wählen</option><option value="tee">Sie trinkt etwa eine halbe Tasse Tee.</option><option value="schwindlig">«Mir ist heute etwas schwindlig.»</option><option value="tisch">Sie hält sich am Tisch fest.</option></select><div class="feedback" aria-live="polite"></div></div>
+<div class="qcard"><label for="q2">Leitfrage 2: Woran erkennst du eine Beobachtung?</label><select id="q2" data-answer="wahrnehmbar" onchange="checkSelect(this)"><option value="">Bitte wählen</option><option value="vermutung">Sie erklärt, was vermutlich die Ursache ist.</option><option value="wahrnehmbar">Sie beschreibt etwas direkt Wahrnehmbares oder konkret Feststellbares.</option><option value="bewertung">Sie bewertet die Person.</option></select><div class="feedback" aria-live="polite"></div></div>
+<div class="qcard"><label for="q3">Leitfrage 3: Welche Formulierung wäre als sachliche Dokumentation problematisch?</label><select id="q3" data-answer="sturz" onchange="checkSelect(this)"><option value="">Bitte wählen</option><option value="sturz">Frau Meier ist heute sturzgefährdet.</option><option value="festhalten">Beim Aufstehen hält sie sich am Tisch fest.</option><option value="zitat">Sie sagt: «Mir ist heute etwas schwindlig.»</option></select><div class="feedback" aria-live="polite"></div></div>
+</div>
+<div class="taskbox"><strong>3. Begründung.</strong><label for="reasonA"> Begründe eine deiner Zuordnungen in 1-2 Sätzen.</label><textarea id="reasonA" placeholder="Beispielstruktur: Diese Information ist eine ..., weil ..." oninput="textPresence(this,'reasonFeedback')"></textarea><div id="reasonFeedback" class="feedback hint" aria-live="polite">Noch keine Begründung eingegeben.</div></div>
+<div class="taskbox"><strong>4. Dokumentation.</strong><label for="docA"> Satzanfang: «Beim Frühstück ...»</label><textarea id="docA" placeholder="Beim Frühstück ..."></textarea><button type="button" onclick="checkDoc('docA','docAFeedback')">Struktur prüfen</button><div id="docAFeedback" class="feedback hint" aria-live="polite">Der Check prüft, ob zentrale Fakten vorkommen und ob typische Deutungswörter vermieden werden. Die fachliche Endkontrolle bleibt bei dir bzw. der Lehrperson.</div></div>
+</section>
+
+<section id="panelB" class="panel" data-panel="B" role="tabpanel" aria-labelledby="tabB" hidden>
+<span class="badge">B · Eigenständig</span><h2>Die gleiche Kernaufgabe ohne Hilfen</h2>
+<div class="taskbox"><strong>Auftrag:</strong> Bestimme Beobachtungen und Aussagen der Klientin. Begründe mindestens eine Zuordnung. Verfasse anschliessend einen kurzen, sachlichen Eintrag für die Pflegedokumentation.</div>
+<label for="classB"><strong>Deine Zuordnung und Begründung</strong></label><textarea id="classB" placeholder="Liste die Informationen als Beobachtung bzw. Aussage der Klientin auf und begründe mindestens eine Zuordnung." oninput="textPresence(this,'classBFeedback')"></textarea><div id="classBFeedback" class="feedback hint" aria-live="polite"></div>
+<label for="docB"><strong>Dein Dokumentationseintrag</strong></label><textarea id="docB" placeholder="Schreibe hier deinen Eintrag."></textarea>
+<div class="toolbar"><button type="button" onclick="checkDoc('docB','docBFeedback')">Ergebnis prüfen</button><button type="button" onclick="document.getElementById('compareB').hidden=!document.getElementById('compareB').hidden">Mit Lösungserwartung vergleichen</button></div><div id="docBFeedback" class="feedback hint" aria-live="polite"></div>
+<div id="compareB" class="callout" hidden><strong>Lösungserwartung:</strong> Der Eintrag enthält die wörtliche Schwindel-Aussage sowie die beobachteten Handlungen und Zustände, ohne daraus eine Diagnose, Ursache oder Gefährdung abzuleiten.</div>
+<div class="taskbox checklist"><strong>Selbstcheck</strong><label><input type="checkbox"> Ich habe Aussage und Beobachtung unterschieden.</label><label><input type="checkbox"> Ich habe mindestens eine Zuordnung begründet.</label><label><input type="checkbox"> Mein Eintrag enthält die relevanten Angaben aus dem Fall.</label><label><input type="checkbox"> Ich habe keine unbelegte Interpretation als Tatsache formuliert.</label></div>
+</section>
+
+<section id="panelC" class="panel" data-panel="C" role="tabpanel" aria-labelledby="tabC" hidden>
+<span class="badge">C · Vertiefung</span><h2>Wenn aus Beobachtung plötzlich Deutung wird</h2>
+<div class="taskbox"><strong>Bearbeite zuerst denselben Kernauftrag wie alle.</strong> Nutze danach den Twist.</div>
+<label for="classC"><strong>Deine Zuordnung und Begründung zum Kernauftrag</strong></label><textarea id="classC" placeholder="Ordne die Informationen als Beobachtung bzw. Aussage zu und begründe mindestens eine Zuordnung." oninput="textPresence(this,'classCFeedback')"></textarea><div id="classCFeedback" class="feedback hint" aria-live="polite"></div>
+<label for="docC"><strong>Dein sachlicher Dokumentationseintrag</strong></label><textarea id="docC" placeholder="Schreibe hier deinen Eintrag."></textarea>
+<div class="taskbox"><strong>Twist:</strong> Ein Kollege ergänzt den Satz: <em>«Frau Meier ist heute sturzgefährdet.»</em><p>Bestimme: Ist dieser Satz Beobachtung, Aussage oder Interpretation? Begründe deine Entscheidung und formuliere eine sachlichere Alternative, die nur auf den vorhandenen Informationen basiert.</p>
+<label for="cClass">Kategorie</label><select id="cClass" data-answer="interpretation" onchange="checkSelect(this)"><option value="">Bitte wählen</option><option value="beobachtung">Beobachtung</option><option value="aussage">Aussage der Klientin</option><option value="interpretation">Interpretation</option></select><div class="feedback" aria-live="polite"></div>
+<label for="cReason">Begründung</label><textarea id="cReason" placeholder="Begründe, warum der Satz über die direkt vorliegenden Informationen hinausgeht." oninput="textPresence(this,'cReasonFeedback')"></textarea><div id="cReasonFeedback" class="feedback hint" aria-live="polite"></div>
+<label for="cRewrite">Sachlichere Alternative</label><textarea id="cRewrite" placeholder="Formuliere nur mit beobachtbaren Angaben bzw. der wörtlichen Aussage." oninput="textPresence(this,'cRewriteFeedback')"></textarea><div id="cRewriteFeedback" class="feedback hint" aria-live="polite"></div></div>
+<div class="taskbox"><strong>Begründungsfrage:</strong><label for="cWhy"> Warum ist die Trennung zwischen Beobachtung und Interpretation für eine nachvollziehbare Pflegedokumentation wichtig?</label><textarea id="cWhy" oninput="textPresence(this,'cWhyFeedback')"></textarea><div id="cWhyFeedback" class="feedback hint" aria-live="polite"></div></div>
+<div class="taskbox"><strong>Transfer in den Beruf:</strong><label for="cTransfer"> Welche Schwierigkeit könnte in einer Übergabe entstehen, wenn Interpretationen wie gesicherte Beobachtungen dokumentiert werden?</label><textarea id="cTransfer" oninput="textPresence(this,'cTransferFeedback')"></textarea><div id="cTransferFeedback" class="feedback hint" aria-live="polite"></div></div>
+<button class="primary" type="button" onclick="document.getElementById('aha').hidden=false;this.setAttribute('aria-expanded','true')" aria-expanded="false">Aha-Moment sichtbar machen</button>
+<div id="aha" class="aha" hidden><strong>Kernzusammenhang:</strong> Eine nachvollziehbare Dokumentation trennt <strong>direkt Beobachtetes</strong>, <strong>wörtlich Berichtetes</strong> und <strong>Interpretationen</strong>. So bleibt für andere Fachpersonen erkennbar, worauf eine spätere Einschätzung tatsächlich beruht.</div>
+</section>
+
+<details id="glossar" class="glossary"><summary>Glossar: Fachbegriffe einfach erklärt</summary><div class="details-body"><dl><dt>Beobachtung</dt><dd>Etwas, das direkt wahrgenommen oder konkret festgestellt wird.</dd><dt>Aussage der Klientin</dt><dd>Etwas, das die Klientin selbst sagt oder berichtet. Wenn möglich wird es als Zitat oder klar als Aussage gekennzeichnet.</dd><dt>Interpretation</dt><dd>Eine Deutung oder Schlussfolgerung, die über das direkt Beobachtete oder Berichtete hinausgeht.</dd><dt>Pflegedokumentation</dt><dd>Nachvollziehbare Aufzeichnung relevanter Beobachtungen, Aussagen und pflegerischer Handlungen.</dd><dt>sachlich</dt><dd>Neutral, konkret und ohne unbelegte Wertung oder Vermutung formuliert.</dd><dt>Begründung</dt><dd>Erklärung, warum eine Zuordnung oder Formulierung fachlich passt.</dd></dl></div></details>
+
+<details class="teacher"><summary>Für die Lehrperson · Lösungen und Hinweise</summary><div class="details-body">
+<h2>Lösungserwartung</h2>
+<p><strong>Zuordnung:</strong> «Mir ist heute etwas schwindlig.» = Aussage der Klientin. Alle übrigen Angaben aus dem Fall beschreiben beobachtbare Handlungen bzw. Zustände: am Tisch sitzen, sich beim Aufstehen festhalten, sich wieder hinsetzen, etwa eine halbe Tasse Tee trinken, wach sein und passend antworten.</p>
+<p><strong>Mögliche Begründung:</strong> Die Schwindel-Angabe stammt direkt von Frau Meier und wird deshalb als Aussage gekennzeichnet. Das Festhalten am Tisch ist dagegen direkt beobachtbares Verhalten.</p>
+<p><strong>Möglicher sachlicher Dokumentationseintrag:</strong> Beim Frühstück sagt Frau Meier: «Mir ist heute etwas schwindlig.» Beim Aufstehen hält sie sich am Tisch fest und setzt sich wieder hin. Sie trinkt etwa eine halbe Tasse Tee. Im Gespräch ist sie wach und antwortet auf Fragen passend.</p>
+<p><strong>Twist C:</strong> «Frau Meier ist heute sturzgefährdet.» ist in dieser Aufgabe eine Interpretation, weil der Satz eine fachliche Schlussfolgerung formuliert, die nicht als direkte Beobachtung oder Aussage im Fall gegeben ist. Eine sachlichere Fassung bleibt bei den Daten, z. B.: «Beim Aufstehen hält sich Frau Meier am Tisch fest und setzt sich wieder hin. Sie sagt: ‹Mir ist heute etwas schwindlig.›»</p>
+<p><strong>Hinweis zur freien Texteingabe:</strong> Die automatische Website-Prüfung kann bei Freitext nur einen transparenten Strukturcheck durchführen. Die endgültige fachliche Bewertung bleibt Aufgabe der Lehrperson.</p>
+<p><strong>Didaktischer Anschluss an die nächsten Folien:</strong> An diesem Beispiel lässt sich anschliessend zeigen, wie ein bereits vorhandener Fall mit demselben fachlichen Kern in unterschiedlich stark unterstützte und zugleich interaktive HTML-Zugänge überführt werden kann.</p>
+</div></details>
+<div class="footer">Erstellt als Offline-Lernseite. Es lag kein zusätzliches Material vor; Grundlage sind ausschliesslich die Angaben im Auftrag.</div>
+</div></main>
+<script>
+function showTab(id){['A','B','C'].forEach(x=>{document.getElementById('panel'+x).hidden=x!==id;document.getElementById('tab'+x).setAttribute('aria-selected',x===id?'true':'false')});document.getElementById('panel'+id).focus?.()}
+function checkSelect(el){const fb=el.parentElement.querySelector('.feedback');if(!el.value){fb.textContent='Bitte wähle eine Antwort.';fb.className='feedback hint';updateTrail(el,false);return}if(el.value===el.dataset.answer){fb.textContent='✓ Passt.';fb.className='feedback ok';updateTrail(el,true)}else{fb.textContent='Noch nicht. Prüfe: Ist es direkt wahrnehmbar, wörtlich berichtet oder bereits eine Deutung?';fb.className='feedback no';updateTrail(el,false)}}
+function updateTrail(el,good){const item=document.querySelector('.trail-item[data-for="'+el.id+'"]');if(!item)return;const tag=item.querySelector('.trail-tag');if(good){item.classList.add('unlocked');tag.textContent=el.dataset.answer==='aussage'?'Aussage':'Beobachtung'}else{item.classList.remove('unlocked');tag.textContent='noch offen'}}
+function textPresence(el,fbId){const fb=document.getElementById(fbId);const n=el.value.trim().length;if(n>=25){fb.textContent='✓ Du hast eine nachvollziehbare Textgrundlage formuliert. Prüfe nun Fachlichkeit und Sachlichkeit.';fb.className='feedback ok'}else if(n>0){fb.textContent='Ergänze deine Begründung noch etwas.';fb.className='feedback hint'}else{fb.textContent='Noch keine Eingabe.';fb.className='feedback hint'}}
+function norm(s){return s.toLowerCase().replace(/[ä]/g,'ae').replace(/[ö]/g,'oe').replace(/[ü]/g,'ue').replace(/[«»„“”]/g,'').replace(/\s+/g,' ')}
+function checkDoc(id,fbId){const t=norm(document.getElementById(id).value);const fb=document.getElementById(fbId);if(t.trim().length<55){fb.textContent='Noch zu knapp. Nimm die relevanten Angaben aus dem Fall auf.';fb.className='feedback no';return}const groups=[['schwindlig'],['tisch','fest'],['setzt','hin'],['halbe','tasse','tee'],['wach'],['antwort']];let missing=groups.filter(g=>!g.every(k=>t.includes(k))).length;const red=['sturzgefaehrdet','wahrscheinlich','verwirrt','dehydriert','unsicher','wirkt'];const foundRed=red.some(k=>t.includes(k));if(missing===0 && !foundRed){fb.textContent='✓ Strukturcheck bestanden: Die zentralen Fallangaben sind enthalten, und es wurde keine typische unbelegte Deutung erkannt. Lies den Eintrag jetzt nochmals auf Sachlichkeit.';fb.className='feedback ok'}else if(foundRed){fb.textContent='Prüfe deine Formulierung: Ein Begriff klingt nach Deutung oder Schlussfolgerung. Bleibe möglichst bei Beobachtung und wörtlicher Aussage.';fb.className='feedback no'}else{fb.textContent='Noch fehlen zentrale Fallangaben. Vergleiche deinen Eintrag nochmals mit der Pflegesituation.';fb.className='feedback no'}}
+function printAll(){document.body.classList.add('print-all');document.querySelectorAll('details').forEach(d=>d.open=true);let restored=false;const restore=()=>{if(restored)return;restored=true;document.body.classList.remove('print-all')};window.addEventListener('afterprint',restore,{once:true});try{window.print();setTimeout(restore,1800)}catch(e){const w=window.open(location.href,'_blank');if(w){w.addEventListener('load',()=>{w.document.body.classList.add('print-all');w.document.querySelectorAll('details').forEach(d=>d.open=true);setTimeout(()=>w.print(),400)})}else{alert('Der Druckdialog konnte nicht geöffnet werden. Öffne die Seite in einem neuen Tab und wähle dort Drucken / Als PDF sichern.')}restore()}}
+</script>
+</body></html>

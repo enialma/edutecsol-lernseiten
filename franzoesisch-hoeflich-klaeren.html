@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Französisch im Betrieb – Hilfe erbitten und Missverständnisse klären</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<style>
+:root{
+  --bg:#f4f7fa;
+  --surface:#ffffff;
+  --surface-2:#eef3f7;
+  --text:#17222d;
+  --muted:#5c6b78;
+  --line:#ccd6df;
+  --primary:#244b67;
+  --primary-2:#17384f;
+  --accent:#bb4d18;
+  --ok:#18794e;
+  --ok-bg:#e8f5ee;
+  --warn:#9a5a00;
+  --warn-bg:#fff5df;
+  --danger:#a33a2b;
+  --focus:#0b6fad;
+  --radius:16px;
+  --shadow:0 10px 30px rgba(20,42,58,.08);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.55;
+}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible,[role="tab"]:focus-visible{
+  outline:3px solid var(--focus);
+  outline-offset:3px;
+}
+.wrap{max-width:1100px;margin:0 auto;padding:24px}
+.topbar{
+  display:flex;gap:16px;justify-content:space-between;align-items:flex-start;
+  margin-bottom:18px;
+}
+.titleblock h1{font-size:clamp(1.65rem,3vw,2.5rem);line-height:1.15;margin:.15rem 0 .4rem}
+.eyebrow{font-size:.8rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.subtitle{color:var(--muted);max-width:780px;margin:0}
+.print-btn,.secondary-btn,.check-btn,.aha-btn{
+  border:0;border-radius:12px;padding:.72rem 1rem;font-weight:750;
+}
+.print-btn{background:var(--primary);color:#fff;white-space:nowrap}
+.print-btn:hover,.aha-btn:hover{background:var(--primary-2)}
+.card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:22px;margin:18px 0;
+}
+.card h2,.card h3{margin-top:0}
+.topic-note{
+  display:grid;grid-template-columns:1fr 1fr;gap:16px
+}
+.topic-note .mini{background:var(--surface-2);border-radius:12px;padding:15px}
+.topic-note strong{display:block;margin-bottom:4px}
+.competence{border-left:5px solid var(--primary)}
+.success-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px
+}
+.success-item{
+  border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff
+}
+.scenario{
+  display:grid;grid-template-columns:1.15fr .85fr;gap:18px;align-items:stretch
+}
+.scenario-box{
+  border:1px solid var(--line);border-radius:14px;padding:18px;background:#fff
+}
+.scenario h2{margin-bottom:8px}
+.scenario ol{margin:8px 0 0;padding-left:1.25rem}
+.flow{
+  display:flex;flex-direction:column;gap:9px;justify-content:center
+}
+.flow-step{
+  border:1px dashed #a9b8c4;border-radius:12px;padding:11px 13px;background:#f8fafc;
+  display:flex;align-items:center;gap:10px
+}
+.flow-step span:first-child{
+  width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+  background:var(--primary);color:white;font-weight:800;flex:0 0 auto
+}
+.tabs{
+  display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 0
+}
+.tab{
+  border:1px solid var(--line);background:#fff;color:var(--text);
+  border-radius:12px 12px 0 0;padding:.8rem 1rem;font-weight:800
+}
+.tab[aria-selected="true"]{background:var(--primary);color:white;border-color:var(--primary)}
+.panel{display:none}
+.panel.active{display:block}
+.badge{
+  display:inline-block;padding:.24rem .6rem;border-radius:999px;
+  background:var(--surface-2);font-size:.84rem;font-weight:800;color:var(--primary)
+}
+.definition-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0
+}
+.definition{
+  background:var(--surface-2);border-radius:12px;padding:12px
+}
+.frame{
+  display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px
+}
+.input-row{
+  border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff;
+  display:grid;grid-template-columns:1fr auto;gap:7px 12px;align-items:center
+}
+.input-row label{font-weight:750;grid-column:1 / -1}
+.input-row input{width:100%;border:1px solid #9fb0be;border-radius:9px;padding:.68rem .75rem}
+.feedback{grid-column:1 / -1;font-size:.9rem;color:var(--muted);min-height:1.35em}
+.status{
+  width:30px;height:30px;display:grid;place-items:center;border-radius:50%;
+  border:1px solid var(--line);font-weight:900;color:transparent
+}
+.input-row.correct{border-color:#8fc7aa;background:#fbfffd}
+.input-row.correct .status{background:var(--ok-bg);border-color:#8fc7aa;color:var(--ok)}
+.input-row.correct .feedback{color:var(--ok)}
+.input-row.wrong{border-color:#e3b29e;background:#fffdfb}
+.input-row.wrong .feedback{color:var(--danger)}
+.guidepath{
+  margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px
+}
+.guide{
+  border:1px solid var(--line);border-radius:12px;padding:12px;background:#f8fafc;color:#7b8791
+}
+.guide.unlocked{border-color:#8fc7aa;background:var(--ok-bg);color:var(--text)}
+.guide .lock{font-size:.8rem;font-weight:800}
+.question-list li{margin:.45rem 0}
+.sentence-starter{
+  border:1px solid var(--line);border-radius:12px;padding:14px;background:#f9fbfc;margin-top:12px
+}
+.textarea-wrap textarea{
+  width:100%;min-height:135px;resize:vertical;border:1px solid #9fb0be;border-radius:12px;padding:12px
+}
+.check-btn{background:var(--accent);color:white;margin-top:10px}
+.secondary-btn{background:#e4ebf0;color:var(--text);margin-top:10px}
+.result-feedback{
+  margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--surface-2);color:var(--muted)
+}
+.result-feedback.ok{background:var(--ok-bg);color:var(--ok)}
+.result-feedback.warn{background:var(--warn-bg);color:var(--warn)}
+.selfcheck{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px
+}
+.checkline{
+  border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff
+}
+.checkline label{display:flex;gap:9px;align-items:flex-start}
+.choice-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.choice{
+  border:1px solid var(--line);background:#fff;border-radius:12px;padding:12px;text-align:left
+}
+.choice.correct{border-color:#80c59f;background:var(--ok-bg)}
+.choice.wrong{border-color:#dea391;background:#fff7f3}
+.twist{
+  border:1px solid #9fb7c8;border-radius:14px;padding:16px;background:#f3f8fb;margin-top:16px
+}
+.aha-btn{background:var(--primary);color:#fff;margin-top:12px}
+.aha-box{
+  display:none;margin-top:12px;border-radius:12px;padding:14px;background:#eaf2f7;border:1px solid #b9cedc
+}
+.aha-box.show{display:block}
+details.teacher{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:0;overflow:hidden;margin:24px 0}
+details.teacher summary{
+  list-style:none;padding:18px 22px;font-weight:850;cursor:pointer;background:#e8eef3
+}
+details.teacher summary::-webkit-details-marker{display:none}
+.teacher-body{padding:22px}
+.solution{
+  border-left:4px solid var(--ok);padding:12px 14px;background:#f5fbf8;margin:12px 0
+}
+.meta-note{
+  font-size:.92rem;color:var(--muted);border-top:1px solid var(--line);padding-top:16px;margin-top:24px
+}
+.small{font-size:.9rem;color:var(--muted)}
+.print-only{display:none}
+hr{border:0;border-top:1px solid var(--line);margin:22px 0}
+
+@media(max-width:760px){
+  .wrap{padding:14px}
+  .topbar{flex-direction:column}
+  .topic-note,.scenario,.frame,.definition-grid,.success-grid,.selfcheck,.choice-grid,.guidepath{grid-template-columns:1fr}
+  .print-btn{width:100%}
+  .tab{flex:1 1 30%;border-radius:10px}
+}
+
+@media print{
+  @page{size:A4;margin:14mm}
+  body{background:#fff;font-size:10.5pt}
+  .wrap{max-width:none;padding:0}
+  .print-btn,.tabs,.check-btn,.secondary-btn,.aha-btn{display:none!important}
+  .card,details.teacher{
+    box-shadow:none;border:1px solid #bbb;break-inside:avoid;margin:10px 0
+  }
+  .panel{display:block!important}
+  .panel::before{
+    display:block;font-weight:900;font-size:13pt;margin:12px 0 6px
+  }
+  #panel-a::before{content:"Zugang A – Mit Unterstützung"}
+  #panel-b::before{content:"Zugang B – Eigenständig"}
+  #panel-c::before{content:"Zugang C – Vertiefung"}
+  details.teacher{display:block}
+  details.teacher > summary{display:none}
+  .teacher-body{display:block!important}
+  .aha-box{display:block!important}
+  .print-only{display:block}
+  input,textarea{
+    border:1px solid #999!important;background:#fff!important;color:#000!important;
+  }
+  .status,.feedback{display:none!important}
+}
+@media print{.topnav{display:none!important}}
+</style>
+</head>
+<body>
+  <a href="index.html" class="topnav" style="display:inline-block;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.88rem;color:#B84816;text-decoration:none;font-weight:600;margin:0 0 1rem;">← Übersicht</a>
+
+<main class="wrap">
+  <header class="topbar">
+    <div class="titleblock">
+      <div class="eyebrow">Französisch · Berufsmaturität · Wortschatz anwenden</div>
+      <h1>Im Betrieb höflich um Hilfe bitten und Missverständnisse klären</h1>
+      <p class="subtitle">Gewähltes Thema: berufliche Kommunikation bei einer unklaren Anweisung. Es eignet sich besonders gut, weil das Material dazu Wortschatz, konkrete Redemittel und einen authentischen Betriebskontext kombiniert.</p>
+    </div>
+    <button class="print-btn" id="printBtn" type="button">Als PDF herunterladen</button>
+  </header>
+
+  <section class="card topic-note" aria-label="Didaktische Einordnung">
+    <div class="mini">
+      <strong>Kompetenzziel</strong>
+      Die Lernenden können in einer betrieblichen Situation passende französische Wörter und Höflichkeitsformeln auswählen, mit dem passenden Register um Hilfe bzw. Klärung bitten, ihre Wahl nachvollziehbar begründen und die vereinbarte Handlung in einem sachlichen französischen Ergebnissatz zusammenfassen.
+    </div>
+    <div class="mini">
+      <strong>Anforderungsniveau: Anwenden</strong>
+      Nicht bloss Wortpaare wiedergeben: Die Ausdrücke müssen in einer sinnvollen beruflichen Situation passend eingesetzt und begründet werden.
+    </div>
+  </section>
+
+  <section class="card competence">
+    <h2>Erfolgskriterien</h2>
+    <div class="success-grid">
+      <div class="success-item">✓ Ich wähle passende Wörter aus dem Themenfeld Hilfe, Klärung und Arbeitsauftrag.</div>
+      <div class="success-item">✓ Ich verwende bei der Berufsbildnerin / beim Berufsbildner ein passendes höfliches Register.</div>
+      <div class="success-item">✓ Ich begründe mindestens eine sprachliche Entscheidung nachvollziehbar.</div>
+      <div class="success-item">✓ Ich formuliere einen klaren französischen Ergebnissatz, der den nächsten Arbeitsschritt zusammenfasst.</div>
+    </div>
+  </section>
+
+  <section class="card scenario">
+    <div class="scenario-box">
+      <span class="badge">Kernaufgabe für A, B und C</span>
+      <h2>Situation im Betrieb</h2>
+      <p>Du bist <strong>apprenti(e) de commerce en première année</strong>. Deine Berufsbildnerin bzw. dein Berufsbildner hat dir eine Anweisung zu einem <strong>dossier</strong> gegeben. Beim Arbeiten mit dem <strong>logiciel</strong> bist du unsicher, ob du die Anweisung richtig verstanden hast.</p>
+      <ol>
+        <li><strong>Bestimme</strong> passende französische Wörter und Redemittel für diese Situation.</li>
+        <li><strong>Begründe</strong>, warum deine Formulierungen und dein Register zur angesprochenen Person passen.</li>
+        <li><strong>Formuliere</strong> einen sachlichen französischen Ergebnissatz, der den nächsten Arbeitsschritt zusammenfasst.</li>
+      </ol>
+    </div>
+    <div class="flow" aria-label="Leitidee der Kernaufgabe">
+      <div class="flow-step"><span>1</span><div><strong>Problem erkennen</strong><br><span class="small">Was ist unklar?</span></div></div>
+      <div class="flow-step"><span>2</span><div><strong>Höflich klären</strong><br><span class="small">Wie fragst du passend nach?</span></div></div>
+      <div class="flow-step"><span>3</span><div><strong>Handlung sichern</strong><br><span class="small">Was machst du als Nächstes?</span></div></div>
+    </div>
+  </section>
+
+  <nav class="tabs" role="tablist" aria-label="Zugang wählen">
+    <button class="tab" id="tab-a" role="tab" aria-controls="panel-a" aria-selected="true" tabindex="0">A – Mit Unterstützung</button>
+    <button class="tab" id="tab-b" role="tab" aria-controls="panel-b" aria-selected="false" tabindex="-1">B – Eigenständig</button>
+    <button class="tab" id="tab-c" role="tab" aria-controls="panel-c" aria-selected="false" tabindex="-1">C – Vertiefung</button>
+  </nav>
+
+  <section class="card panel active" id="panel-a" role="tabpanel" aria-labelledby="tab-a">
+    <span class="badge">Mehr Unterstützung</span>
+    <h2>Zugang A – Mit Unterstützung</h2>
+    <p>Du bearbeitest dieselbe Kernaufgabe wie alle anderen. Hier bekommst du sprachliche Orientierung und einen Zuordnungsrahmen.</p>
+
+    <h3>Kurze Begriffsklärung</h3>
+    <div class="definition-grid">
+      <div class="definition"><strong>Register</strong><br>Die sprachliche Form, die zur Beziehung passt – z. B. <em>tu</em> oder <em>vous</em>.</div>
+      <div class="definition"><strong>Höflichkeitsformel</strong><br>Eine Formulierung, mit der du eine Bitte respektvoll ausdrückst.</div>
+      <div class="definition"><strong>Clarification</strong><br>Eine Klärung: Du fragst nach, wenn etwas nicht eindeutig ist.</div>
+      <div class="definition"><strong>Instruction</strong><br>Eine Anweisung, die beschreibt, was zu tun ist.</div>
+    </div>
+
+    <h3>1. Zuordnungsrahmen</h3>
+    <p class="small">Trage die französischen Ausdrücke ein. Nach jeder Eingabe erhältst du Rückmeldung. Die Lösung wird bei einem Fehler nicht angezeigt.</p>
+
+    <div class="frame">
+      <div class="input-row" data-answer="le logiciel">
+        <label for="a1">Software → Französisch</label>
+        <input id="a1" autocomplete="off" spellcheck="false" placeholder="Französischer Ausdruck">
+        <span class="status" aria-hidden="true">✓</span>
+        <div class="feedback" aria-live="polite"></div>
+      </div>
+
+      <div class="input-row" data-answer="le dossier">
+        <label for="a2">Dossier / Ordner → Französisch</label>
+        <input id="a2" autocomplete="off" spellcheck="false" placeholder="Französischer Ausdruck">
+        <span class="status" aria-hidden="true">✓</span>
+        <div class="feedback" aria-live="polite"></div>
+      </div>
+
+      <div class="input-row" data-answer="clarifier">
+        <label for="a3">klären → Französisch</label>
+        <input id="a3" autocomplete="off" spellcheck="false" placeholder="Verb im Infinitiv">
+        <span class="status" aria-hidden="true">✓</span>
+        <div class="feedback" aria-live="polite"></div>
+      </div>
+
+      <div class="input-row" data-answer="vérifier">
+        <label for="a4">überprüfen → Französisch</label>
+        <input id="a4" autocomplete="off" spellcheck="false" placeholder="Verb im Infinitiv">
+        <span class="status" aria-hidden="true">✓</span>
+        <div class="feedback" aria-live="polite"></div>
+      </div>
+
+      <div class="input-row" data-answer="envoyer">
+        <label for="a5">senden / schicken → Französisch</label>
+        <input id="a5" autocomplete="off" spellcheck="false" placeholder="Verb im Infinitiv">
+        <span class="status" aria-hidden="true">✓</span>
+        <div class="feedback" aria-live="polite"></div>
+      </div>
+
+      <div class="input-row" data-answer="pourriez-vous m'aider">
+        <label for="a6">«Könnten Sie mir helfen?» → Französisch</label>
+        <input id="a6" autocomplete="off" spellcheck="false" placeholder="Höfliche Frage">
+        <span class="status" aria-hidden="true">✓</span>
+        <div class="feedback" aria-live="polite"></div>
+      </div>
+
+      <div class="input-row" data-answer="si je comprends bien">
+        <label for="a7">«Wenn ich richtig verstehe …» → Französisch</label>
+        <input id="a7" autocomplete="off" spellcheck="false" placeholder="Redemittel zur Klärung">
+        <span class="status" aria-hidden="true">✓</span>
+        <div class="feedback" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <div class="guidepath" aria-label="Fortschritt">
+      <div class="guide" id="guide1"><div class="lock">🔒 wird nach passenden Problemwörtern sichtbar</div><strong>Problem benennen</strong></div>
+      <div class="guide" id="guide2"><div class="lock">🔒 wird nach passenden Klärungsformen sichtbar</div><strong>Höflich klären</strong></div>
+      <div class="guide" id="guide3"><div class="lock">🔒 wird nach passenden Handlungsverben sichtbar</div><strong>Nächsten Schritt sichern</strong></div>
+    </div>
+
+    <h3>2. Drei Leitfragen</h3>
+    <ol class="question-list">
+      <li>Wen sprichst du an – und spricht das eher für <em>tu</em> oder <em>vous</em>?</li>
+      <li>Welche Formulierung macht deutlich, dass du eine Anweisung noch nicht sicher verstanden hast?</li>
+      <li>Welche zwei Verben brauchst du, um den nächsten Arbeitsschritt präzise zusammenzufassen?</li>
+    </ol>
+
+    <div class="sentence-starter">
+      <strong>Satzanfang für deinen Ergebnissatz:</strong><br>
+      <em>Pour résumer, …</em>
+    </div>
+  </section>
+
+  <section class="card panel" id="panel-b" role="tabpanel" aria-labelledby="tab-b">
+    <span class="badge">Ohne zusätzliche Hilfen</span>
+    <h2>Zugang B – Eigenständig</h2>
+    <p>Bearbeite die Kernaufgabe selbstständig. Formuliere zuerst deine Lösung und prüfe sie danach freiwillig mit der Ergebnisprüfung.</p>
+
+    <div class="textarea-wrap">
+      <label for="bText"><strong>Deine französische Lösung</strong> – Bitte / Klärung + abschliessender Ergebnissatz</label>
+      <textarea id="bText" placeholder="Écris ta réponse ici …"></textarea>
+      <button class="check-btn" type="button" id="checkB">Ergebnis prüfen</button>
+      <div class="result-feedback" id="feedbackB" aria-live="polite">Die automatische Prüfung kontrolliert, ob zentrale sprachliche Funktionen vorkommen. Sie ersetzt keine vollständige Grammatikprüfung.</div>
+    </div>
+
+    <h3>Selbstcheck</h3>
+    <div class="selfcheck">
+      <div class="checkline"><label><input type="checkbox"> Ich benenne das Problem bzw. die Unklarheit verständlich.</label></div>
+      <div class="checkline"><label><input type="checkbox"> Ich verwende gegenüber der Berufsbildnerin / dem Berufsbildner ein passendes höfliches Register.</label></div>
+      <div class="checkline"><label><input type="checkbox"> Ich begründe mindestens eine sprachliche Entscheidung.</label></div>
+      <div class="checkline"><label><input type="checkbox"> Mein Ergebnissatz fasst den nächsten Arbeitsschritt klar zusammen.</label></div>
+    </div>
+  </section>
+
+  <section class="card panel" id="panel-c" role="tabpanel" aria-labelledby="tab-c">
+    <span class="badge">Zusätzliche Denkarbeit</span>
+    <h2>Zugang C – Vertiefung</h2>
+    <p>Bearbeite zuerst dieselbe Kernaufgabe wie in Zugang B. Danach untersuchst du, wie sich dieselbe Bitte je nach Beziehung zur angesprochenen Person verändert.</p>
+
+    <div class="textarea-wrap">
+      <label for="cText"><strong>Deine Lösung zur Kernaufgabe</strong></label>
+      <textarea id="cText" placeholder="Écris ta réponse ici …"></textarea>
+      <button class="check-btn" type="button" id="checkC">Kernlösung prüfen</button>
+      <div class="result-feedback" id="feedbackC" aria-live="polite">Die automatische Prüfung kontrolliert zentrale sprachliche Funktionen, nicht die gesamte Grammatik.</div>
+    </div>
+
+    <div class="twist">
+      <h3>Twist: gleiche Absicht – anderes Register</h3>
+      <p>Du brauchst Hilfe. Welche Form passt besser zur jeweiligen Beziehung?</p>
+
+      <p><strong>a) Berufsbildnerin / Berufsbildner</strong></p>
+      <div class="choice-grid" data-choice-group="formal">
+        <button class="choice" type="button" data-correct="false">Pourrais-tu m'aider?</button>
+        <button class="choice" type="button" data-correct="true">Pourriez-vous m'aider?</button>
+      </div>
+      <div class="result-feedback" id="formalFeedback" aria-live="polite">Wähle eine Form und begründe danach deine Entscheidung.</div>
+
+      <p><strong>b) Kollegin / Kollege, mit der/dem du per Du bist</strong></p>
+      <div class="choice-grid" data-choice-group="informal">
+        <button class="choice" type="button" data-correct="true">Pourrais-tu m'aider?</button>
+        <button class="choice" type="button" data-correct="false">Pourriez-vous m'aider?</button>
+      </div>
+      <div class="result-feedback" id="informalFeedback" aria-live="polite">Wähle die passendere Form.</div>
+
+      <p><strong>Begründungsfrage:</strong> Was verändert sich sprachlich, obwohl die kommunikative Absicht «um Hilfe bitten» gleich bleibt?</p>
+      <textarea aria-label="Begründung zum Registerwechsel" placeholder="Begründe auf Deutsch oder Französisch …"></textarea>
+
+      <p><strong>Transfer in den Beruf:</strong> Du bist im Kontakt mit einer Kundin oder einem Kunden und verstehst eine Anweisung nicht. Welche Formulierung und welches Register würdest du wählen – und warum?</p>
+      <textarea aria-label="Transferfrage Berufskontext" placeholder="Deine Transferantwort …"></textarea>
+
+      <button class="aha-btn" id="ahaBtn" type="button" aria-expanded="false" aria-controls="ahaBox">Aha-Moment sichtbar machen</button>
+      <div class="aha-box" id="ahaBox">
+        <strong>Aha:</strong> Der Wortschatz allein entscheidet noch nicht, ob eine Äusserung beruflich passt. Die <strong>kommunikative Absicht</strong> bleibt gleich, aber Anrede und Verbform ändern sich mit der Beziehung: <em>tu</em> → <em>Pourrais-tu …?</em>, <em>vous</em> → <em>Pourriez-vous …?</em>. Professionelle Sprachhandlung bedeutet also: Wortschatz <strong>und</strong> Register passend kombinieren.
+      </div>
+    </div>
+  </section>
+
+  <details class="teacher">
+    <summary>Für die Lehrperson – Lösungen anzeigen</summary>
+    <div class="teacher-body">
+      <h2>Vollständige Lösungen und Lösungswege</h2>
+
+      <h3>Zugang A – Zuordnungsrahmen</h3>
+      <div class="solution">
+        Software → <strong>le logiciel</strong><br>
+        Dossier / Ordner → <strong>le dossier</strong><br>
+        klären → <strong>clarifier</strong><br>
+        überprüfen → <strong>vérifier</strong><br>
+        senden / schicken → <strong>envoyer</strong><br>
+        «Könnten Sie mir helfen?» → <strong>Pourriez-vous m'aider?</strong><br>
+        «Wenn ich richtig verstehe …» → <strong>Si je comprends bien …</strong>
+      </div>
+
+      <h3>Möglicher Lösungsweg zur Kernaufgabe</h3>
+      <div class="solution">
+        <p><strong>1. Bestimmung:</strong> Für die Situation werden Wörter aus dem Feld Arbeitsauftrag/Klärung benötigt: <em>le logiciel, le dossier, clarifier, vérifier, envoyer</em>. Gegenüber der Berufsbildnerin / dem Berufsbildner ist die <em>vous</em>-Form die naheliegende professionelle Wahl.</p>
+        <p><strong>2. Begründung:</strong> <em>Pourriez-vous m'aider?</em> ist als höfliche Bitte passend. Mit <em>Si je comprends bien …</em> kann die lernende Person die eigene Interpretation der Anweisung überprüfen, ohne vorschnell zu behaupten, sie habe alles verstanden.</p>
+        <p><strong>3. Musterlösung:</strong><br>
+        <em>Je n'ai pas compris l'instruction. Pourriez-vous m'aider à clarifier la situation? Si je comprends bien, je vérifie le dossier et je l'envoie. Pour résumer, je vérifie le dossier avant de l'envoyer.</em></p>
+      </div>
+
+      <h3>Zugang B – Ergebnisprüfung</h3>
+      <p>Eine vollständige Antwort sollte vier Funktionen enthalten: (1) Problem/Unklarheit benennen, (2) höflich um Hilfe oder Klärung bitten, (3) einen Arbeitsbegriff bzw. eine konkrete Handlung aus dem Material verwenden, (4) den nächsten Schritt zusammenfassen. Die Website prüft diese Funktionen über Schlüsselmerkmale; die grammatische Qualität bleibt eine Lehrpersonen- bzw. Peer-Review-Aufgabe.</p>
+
+      <h3>Zugang C – Twist</h3>
+      <div class="solution">
+        Berufsbildnerin / Berufsbildner: <strong>Pourriez-vous m'aider?</strong><br>
+        Kollegin / Kollege per Du: <strong>Pourrais-tu m'aider?</strong><br><br>
+        <strong>Kernzusammenhang:</strong> Die kommunikative Absicht bleibt gleich; Personbezug und Register verändern die Formulierung.
+      </div>
+
+      <h3>Didaktischer Anschluss</h3>
+      <p>Als Anschluss an die nächsten Folien eignet sich der Übergang von der kontrollierten Wortschatzanwendung zu kurzen Rollenspielen oder Mini-Dialogen, in denen dieselben Redemittel in wechselnden beruflichen Rollen eingesetzt werden.</p>
+    </div>
+  </details>
+
+  <footer class="meta-note">
+    <strong>Notiz zur Erstellung:</strong> Thema: «Im Betrieb höflich um Hilfe bitten und Missverständnisse klären». Differenzierungsart: Niveau / Umfang der Unterstützung. Twist: Registerwechsel <em>tu ↔ vous</em> bei gleicher kommunikativer Absicht. Ausgabeformat: eine offline lauffähige HTML-Datei mit interaktiver Selbstkontrolle sowie druckoptimierter PDF-Ansicht über den Browserdialog.
+  </footer>
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+  const panels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
+
+  function activateTab(tab){
+    tabs.forEach(t => {
+      const active = t === tab;
+      t.setAttribute('aria-selected', String(active));
+      t.tabIndex = active ? 0 : -1;
+    });
+    panels.forEach(p => p.classList.toggle('active', p.id === tab.getAttribute('aria-controls')));
+  }
+
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => activateTab(tab));
+    tab.addEventListener('keydown', e => {
+      if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key)) return;
+      e.preventDefault();
+      let targetIndex = index;
+      if(e.key === 'ArrowRight') targetIndex = (index + 1) % tabs.length;
+      if(e.key === 'ArrowLeft') targetIndex = (index - 1 + tabs.length) % tabs.length;
+      if(e.key === 'Home') targetIndex = 0;
+      if(e.key === 'End') targetIndex = tabs.length - 1;
+      activateTab(tabs[targetIndex]);
+      tabs[targetIndex].focus();
+    });
+  });
+
+  function normalize(s){
+    return s.toLowerCase()
+      .replace(/[’`´]/g,"'")
+      .replace(/[?!.,;:…]/g,"")
+      .replace(/\s+/g," ")
+      .trim();
+  }
+  function fold(s){
+    return normalize(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  }
+
+  const aRows = Array.from(document.querySelectorAll('#panel-a .input-row'));
+  aRows.forEach(row => {
+    const input = row.querySelector('input');
+    const feedback = row.querySelector('.feedback');
+    const answer = row.dataset.answer;
+    function check(){
+      const value = input.value;
+      row.classList.remove('correct','wrong');
+      if(!value.trim()){
+        feedback.textContent = '';
+        updateGuides();
+        return;
+      }
+      if(normalize(value) === normalize(answer)){
+        row.classList.add('correct');
+        feedback.textContent = 'Korrekt.';
+      } else {
+        row.classList.add('wrong');
+        if(fold(value) === fold(answer)){
+          feedback.textContent = 'Fast richtig – prüfe Akzente oder Schreibzeichen.';
+        } else {
+          const id = input.id;
+          if(['a1','a2'].includes(id)) feedback.textContent = 'Noch nicht. Prüfe Nomen und Artikel in deiner Vociliste.';
+          else if(['a3','a4','a5'].includes(id)) feedback.textContent = 'Noch nicht. Gesucht ist das passende Verb im Infinitiv.';
+          else if(id === 'a6') feedback.textContent = 'Noch nicht. Achte auf die höfliche vous-Form.';
+          else feedback.textContent = 'Noch nicht. Gesucht ist ein Redemittel zum Absichern des Verständnisses.';
+        }
+      }
+      updateGuides();
+    }
+    input.addEventListener('input', check);
+    input.addEventListener('blur', check);
+  });
+
+  function isCorrect(id){
+    const row = document.getElementById(id).closest('.input-row');
+    return row.classList.contains('correct');
+  }
+  function unlock(guideId, ok, message){
+    const g = document.getElementById(guideId);
+    g.classList.toggle('unlocked', ok);
+    if(ok) g.querySelector('.lock').textContent = message;
+  }
+  function updateGuides(){
+    unlock('guide1', isCorrect('a1') && isCorrect('a2'), '✓ Problemwortschatz erkannt');
+    unlock('guide2', isCorrect('a3') && isCorrect('a6') && isCorrect('a7'), '✓ Klärung sprachlich vorbereitet');
+    unlock('guide3', isCorrect('a4') && isCorrect('a5'), '✓ Handlungsschritte verfügbar');
+  }
+
+  function analyseSolution(text, feedbackEl){
+    const n = fold(text);
+    const hasProblem = /je n'ai pas compris|probleme|malentendu|instruction/.test(n);
+    const hasPolite = /pourriez-vous|si vous avez le temps/.test(n);
+    const hasClarify = /clarifier|si je comprends bien|qu'est-ce que vous voulez dire|c'est-a-dire|repeter|expliquer/.test(n);
+    const hasAction = /verifier|envoyer|saisir|dossier|logiciel/.test(n);
+    const hasSummary = /pour resumer/.test(n);
+
+    const missing = [];
+    if(!hasProblem) missing.push('eine erkennbare Unklarheit bzw. das Problem');
+    if(!hasPolite) missing.push('eine höfliche vous-Form');
+    if(!hasClarify) missing.push('eine Klärungsfunktion');
+    if(!hasAction) missing.push('einen konkreten Arbeitsbezug');
+    if(!hasSummary) missing.push('einen klar markierten Ergebnissatz');
+
+    feedbackEl.classList.remove('ok','warn');
+    if(missing.length === 0){
+      feedbackEl.classList.add('ok');
+      feedbackEl.textContent = '✓ Die fünf zentralen Funktionen sind erkennbar. Prüfe jetzt noch Satzbau, Verbformen und Rechtschreibung.';
+    } else {
+      feedbackEl.classList.add('warn');
+      feedbackEl.textContent = 'Noch nicht vollständig. Prüfe besonders: ' + missing.join('; ') + '.';
+    }
+  }
+
+  document.getElementById('checkB').addEventListener('click', () => {
+    analyseSolution(document.getElementById('bText').value, document.getElementById('feedbackB'));
+  });
+  document.getElementById('checkC').addEventListener('click', () => {
+    analyseSolution(document.getElementById('cText').value, document.getElementById('feedbackC'));
+  });
+
+  document.querySelectorAll('[data-choice-group]').forEach(group => {
+    const feedbackId = group.dataset.choiceGroup === 'formal' ? 'formalFeedback' : 'informalFeedback';
+    const feedback = document.getElementById(feedbackId);
+    group.querySelectorAll('.choice').forEach(btn => {
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('.choice').forEach(b => b.classList.remove('correct','wrong'));
+        if(btn.dataset.correct === 'true'){
+          btn.classList.add('correct');
+          feedback.className = 'result-feedback ok';
+          feedback.textContent = '✓ Passend gewählt. Begründe jetzt, was diese Form über die Beziehung ausdrückt.';
+        } else {
+          btn.classList.add('wrong');
+          feedback.className = 'result-feedback warn';
+          feedback.textContent = 'Noch nicht passend. Denke an die Beziehung zur angesprochenen Person und an tu/vous.';
+        }
+      });
+    });
+  });
+
+  const ahaBtn = document.getElementById('ahaBtn');
+  const ahaBox = document.getElementById('ahaBox');
+  ahaBtn.addEventListener('click', () => {
+    const show = !ahaBox.classList.contains('show');
+    ahaBox.classList.toggle('show', show);
+    ahaBtn.setAttribute('aria-expanded', String(show));
+    ahaBtn.textContent = show ? 'Aha-Moment ausblenden' : 'Aha-Moment sichtbar machen';
+  });
+
+  const printBtn = document.getElementById('printBtn');
+  printBtn.addEventListener('click', () => {
+    const teacher = document.querySelector('details.teacher');
+    const wasOpen = teacher.open;
+    teacher.open = true;
+    document.body.classList.add('printing-all');
+
+    try{
+      if(typeof window.print === 'function'){
+        window.print();
+      } else {
+        throw new Error('print unavailable');
+      }
+    } catch(err){
+      const w = window.open(window.location.href, '_blank');
+      if(w){
+        w.addEventListener('load', () => {
+          const d = w.document.querySelector('details.teacher');
+          if(d) d.open = true;
+          w.print();
+        });
+      } else {
+        alert('Der Druckdialog konnte nicht geöffnet werden. Öffne diese Seite in einem neuen Tab und drucke sie dort als PDF.');
+      }
+    } finally {
+      setTimeout(() => {
+        teacher.open = wasOpen;
+        document.body.classList.remove('printing-all');
+      }, 600);
+    }
+  });
+})();
+</script>
+</body>
+</html>
