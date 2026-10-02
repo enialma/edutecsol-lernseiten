@@ -30,7 +30,7 @@ export default function DatenschutzPage() {
 
           <h2>1. Verantwortliche Stelle</h2>
           <p>
-            EDUTECSOL GmbH, Schweiz · <a href="mailto:info@edutecsol.ch">info@edutecsol.ch</a><br />
+            EDUTECSOL GmbH · Alte Landstrasse 152b · 6314 Unterägeri · Schweiz<br /><a href="mailto:info@edutecsol.ch">info@edutecsol.ch</a><br />
             Es gilt das Schweizer Datenschutzgesetz (DSG). Für Nutzerinnen und Nutzer aus der EU gelten zusätzlich die Grundsätze der DSGVO.
           </p>
 
