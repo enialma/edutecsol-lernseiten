@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { getPage } from "@/lib/pages";
+import { withPrintCss } from "@/lib/print";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +12,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   if (!page) return new Response("Nicht gefunden.", { status: 404 });
   const download = new URL(req.url).searchParams.get("download") === "1";
   const slug = page.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "lernseite";
-  return new Response(page.html, {
+  return new Response(withPrintCss(page.html), {
     headers: {
       "Content-Type": "text/html; charset=utf-8",
       "Cache-Control": "private, no-store",
