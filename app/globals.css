@@ -59,5 +59,13 @@ tr:last-child td{border-bottom:none}
 .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0 1rem}
 .table-wrap{overflow-x:auto}
 .small-note{font-size:.78rem;color:var(--ink-soft)}
+.seg{display:flex;flex-wrap:wrap;gap:.35rem}
+.seg button{font:inherit;font-size:.85rem;padding:.4rem .8rem;border:1px solid var(--line);border-radius:20px;background:#fff;color:var(--ink);cursor:pointer}
+.seg button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.seg button:disabled{opacity:.6;cursor:default}
+.log{background:#1E3246;color:#dfe6ee;border-radius:10px;padding:.9rem 1rem;font-size:.82rem;line-height:1.5;white-space:pre-wrap;margin-top:1rem;max-height:220px;overflow:auto}
+.preview{width:100%;height:75vh;min-height:520px;border:1px solid var(--line);border-radius:14px;background:#fff;box-shadow:var(--shadow)}
+textarea{min-height:90px;resize:vertical}
+input[type=file]{padding:.45rem;background:#fff}
 footer{background:var(--navy);color:#c3ccd6;padding:1.6rem 0;font-size:.85rem}
 footer a{color:var(--ochre);text-decoration:none}

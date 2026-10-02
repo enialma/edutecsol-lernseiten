@@ -11,6 +11,8 @@ export default async function Topbar() {
         <nav>
           <Link href="/">Beispiele</Link>
           {u && <Link href="/app">Mein Bereich</Link>}
+          {u && <Link href="/app/erzeugen">Erzeugen</Link>}
+          {u && <Link href="/app/seiten">Sammlung</Link>}
           {u?.role === "admin" && <Link href="/admin/benutzer">Benutzer</Link>}
           {u ? (
             <>

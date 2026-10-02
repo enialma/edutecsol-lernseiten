@@ -22,10 +22,33 @@ const SCHEMA = `CREATE TABLE IF NOT EXISTS users (
   last_login_via TEXT
 )`;
 
+const SCHEMA_PAGES = `CREATE TABLE IF NOT EXISTS pages (
+  id            SERIAL PRIMARY KEY,
+  user_id       INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title         TEXT NOT NULL,
+  fach          TEXT,
+  stufe         TEXT,
+  thema         TEXT,
+  params        JSONB NOT NULL DEFAULT '{}'::jsonb,
+  material_name TEXT,
+  provider      TEXT NOT NULL,
+  model         TEXT,
+  input_tokens  INTEGER NOT NULL DEFAULT 0,
+  output_tokens INTEGER NOT NULL DEFAULT 0,
+  duration_ms   INTEGER,
+  html          TEXT NOT NULL,
+  notiz         TEXT,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+)`;
+
 let readyPromise: Promise<void> | null = null;
 export function ready(): Promise<void> {
   if (!readyPromise) {
-    readyPromise = db().query(SCHEMA).then(() => undefined).catch((e) => {
+    readyPromise = (async () => {
+      const sql = db();
+      await sql.query(SCHEMA);
+      await sql.query(SCHEMA_PAGES);
+    })().catch((e) => {
       readyPromise = null;
       throw e;
     });

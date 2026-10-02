@@ -23,18 +23,18 @@ export default async function AppHome() {
               <p>Prompt zusammenstellen und mit eigenem Material an Claude schicken.</p>
               <span className="foot">Öffnen →</span>
             </Link>
-            <div className="tile soon">
-              <span className="badge new">in Arbeit</span>
+            <Link className="tile" href="/app/erzeugen" style={{ background: "var(--navy)", color: "#fff", borderColor: "var(--navy)" }}>
+              <span className="badge new">neu</span>
               <h3>Lernseite direkt erzeugen</h3>
-              <p>Material hochladen, Achsen wählen, fertige HTML-Lernseite erhalten – ohne Medienbruch.</p>
-              <span className="foot">bald</span>
-            </div>
-            <div className="tile soon">
-              <span className="badge">geplant</span>
+              <p style={{ color: "#c3ccd6" }}>Material hochladen, Achsen wählen, fertige HTML-Lernseite erhalten – ohne Medienbruch.</p>
+              <span className="foot" style={{ color: "var(--ochre)" }}>Starten →</span>
+            </Link>
+            <Link className="tile" href="/app/seiten">
+              <span className="badge">verfügbar</span>
               <h3>Meine Sammlung</h3>
-              <p>Erzeugte Lernseiten ablegen, nach Fach und Stufe filtern, mit Kolleginnen und Kollegen teilen.</p>
-              <span className="foot">später</span>
-            </div>
+              <p>Erzeugte Lernseiten öffnen, herunterladen, in Moodle laden.</p>
+              <span className="foot">Öffnen →</span>
+            </Link>
             <div className="tile soon">
               <span className="badge">geplant</span>
               <h3>Nach Moodle exportieren</h3>
