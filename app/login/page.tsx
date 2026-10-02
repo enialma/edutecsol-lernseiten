@@ -8,6 +8,8 @@ const ERRORS: Record<string, string> = {
   CredentialsSignin: "E-Mail oder Passwort stimmt nicht.",
   Configuration: "Login ist noch nicht fertig konfiguriert.",
   AccessDenied: "Zugriff verweigert.",
+  OAuthCallbackError: "Microsoft hat die Anmeldung abgelehnt. Meist stimmt das Client-Secret in der Konfiguration nicht.",
+  OAuthSignin: "Die Weiterleitung zu Microsoft konnte nicht gestartet werden.",
 };
 
 export default async function LoginPage({
@@ -51,7 +53,12 @@ export default async function LoginPage({
             <p className="kicker">Geschützter Bereich</p>
             <h1>Anmelden</h1>
             <p className="lead">Zugang für freigeschaltete Lehrpersonen und Schulen.</p>
-            {error && <div className="msg err">{ERRORS[error] ?? "Anmeldung fehlgeschlagen."}</div>}
+            {error && (
+              <div className="msg err">
+                {ERRORS[error] ?? "Anmeldung fehlgeschlagen."}
+                <div className="small-note" style={{ marginTop: ".3rem" }}>Fehlercode: {error}</div>
+              </div>
+            )}
             <form action={msSignIn}>
               <button className="btn ms block" disabled={!msReady} title={msReady ? "" : "Microsoft-Login noch nicht konfiguriert"}>
                 <svg width="18" height="18" viewBox="0 0 21 21" aria-hidden="true">
