@@ -28,13 +28,24 @@ const PRINT_CSS = `
   input[type="text"], input[type="number"], textarea, select { border: none !important; border-bottom: 1px solid #333 !important; background: #fff !important; box-shadow: none !important; }
   input[type="checkbox"], input[type="radio"] { -webkit-appearance: checkbox; appearance: auto; }
   .feedback, .hint, .ok, .check-ok, .correct { color: #111 !important; }
-  /* Keine Rahmen, keine Farbflächen – nur Text, Grafiken und Tabellen */
-  *:not(td):not(th):not(input):not(textarea):not(table) { border: 0 !important; outline: 0 !important; border-radius: 0 !important; }
-  header, .hero, .card, .box, section, article, aside, div { background: transparent !important; color: #111 !important; }
-  header, .hero { padding: 0 0 .6rem !important; margin: 0 0 1rem !important; }
-  .card, .box, section, article { padding: 0 !important; margin: 0 0 1rem !important; }
+  /* CI-Farben: Navy #1E3246, Terra #B84816, Ocker #F1A51A, Creme #F6EFE2 */
+  h1, h2, h3, h4 { color: #1E3246 !important; }
+  h1 { font-size: 20pt !important; border-bottom: 2pt solid #B84816 !important; padding-bottom: 4pt !important; }
+  h2 { font-size: 15pt !important; margin-top: 14pt !important; }
+  h3 { font-size: 12.5pt !important; }
+  header, .hero { background: transparent !important; color: #1E3246 !important; padding: 0 0 .6rem !important; margin: 0 0 1rem !important; border: 0 !important; box-shadow: none !important; }
+  .card, .box, section, article, aside, [role="tabpanel"], .panel, .tab-panel, .zugang, details {
+    background: transparent !important; color: #111 !important;
+    border: 1pt solid #1E3246 !important; border-radius: 4pt !important; padding: 8pt 10pt !important; margin: 0 0 10pt !important;
+  }
+  [role="tabpanel"] > .card, .panel > .card, section > section, section > .card { border-color: #cdc4ad !important; }
+  details.lehrperson, .lehrperson, .teacher { border-color: #B84816 !important; }
+  details > summary { color: #B84816 !important; }
+  blockquote, .hinweis, .tipp, .info { border-left: 3pt solid #F1A51A !important; border-top: 0 !important; border-right: 0 !important; border-bottom: 0 !important; padding-left: 8pt !important; background: transparent !important; }
   table { border-collapse: collapse !important; }
-  td, th { border: 1px solid #bbb !important; padding: .25rem .5rem !important; }
+  td, th { border: 1pt solid #1E3246 !important; padding: .25rem .5rem !important; }
+  th { background: #F6EFE2 !important; color: #1E3246 !important; }
+  a { color: #B84816 !important; text-decoration: none !important; }
   svg { max-width: 100% !important; height: auto !important; }
   img { max-width: 100% !important; }
 }
