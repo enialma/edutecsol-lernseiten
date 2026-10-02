@@ -24,7 +24,7 @@ function unhideAll(root: HTMLElement) {
 }
 
 function paperize(root: HTMLElement) {
-  for (const sel of ["script", "style", "noscript", "button", "nav", "[role=tablist]", "template", "iframe", "video", "audio", "link", "meta"]) {
+  for (const sel of ["script", "style", "noscript", "head", "title", "meta", "link", "button", "nav", "[role=tablist]", "template", "iframe", "video", "audio", "link", "meta"]) {
     root.querySelectorAll(sel).forEach((e) => e.remove());
   }
   root.querySelectorAll("a").forEach((a) => { const h = a.getAttribute("href") ?? ""; if (/^[←«]/.test(a.text.trim()) || /index\.html$/.test(h) || h === "/" ) a.remove(); });
@@ -83,7 +83,7 @@ function decode(s: string) {
 }
 
 // ---------- Block-Walker ----------
-const BLOCK = new Set(["p", "div", "section", "article", "aside", "header", "footer", "main", "ul", "ol", "li", "table", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "pre", "hr", "details", "summary", "figure", "figcaption", "form", "fieldset", "legend", "label", "dl", "dt", "dd", "tr", "thead", "tbody", "tfoot"]);
+const BLOCK = new Set(["html", "body", "head", "p", "div", "section", "article", "aside", "header", "footer", "main", "ul", "ol", "li", "table", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "pre", "hr", "details", "summary", "figure", "figcaption", "form", "fieldset", "legend", "label", "dl", "dt", "dd", "tr", "thead", "tbody", "tfoot"]);
 
 type Ctx = { blocks: (Paragraph | Table)[]; firstPanel: boolean; depth: number; lists: { n: number } };
 
@@ -218,8 +218,14 @@ function walk(el: HTMLElement, ctx: Ctx, fmt: Fmt = {}, listKind: "bullet" | "nu
 
 // ---------- Dokument ----------
 export async function lernseiteToDocx(html: string, meta: DocxMeta): Promise<Buffer> {
-  const doc = parse(html, { blockTextElements: { script: true, style: true, noscript: true, pre: true } });
-  const body = doc.querySelector("body") ?? doc;
+  // Vorab bereinigen: Doctype weg, Script/Style per Regex entfernen (der Parser stolpert sonst über deren Inhalt)
+  const cleaned = html
+    .replace(/^[\s\S]*?<html/i, "<html")
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<head[\s\S]*?<\/head>/i, "");
+  const doc = parse(cleaned, { blockTextElements: { pre: true } });
+  const body = doc.querySelector("body") ?? doc.querySelector("html") ?? doc;
   unhideAll(body);
   paperize(body);
   // Erste h1 entfernen – der Titel kommt aus dem Kopf
