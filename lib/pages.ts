@@ -92,8 +92,9 @@ export async function getPageByToken(token: string): Promise<PageFull | null> {
   return (rows[0] as PageFull) ?? null;
 }
 
+// $2 muss in jedem Fall referenziert werden, sonst meldet Postgres «could not determine data type of parameter».
 function canEdit(isAdmin: boolean) {
-  return isAdmin ? "TRUE" : "p.user_id = $2";
+  return isAdmin ? "$2::int IS NOT NULL" : "p.user_id = $2";
 }
 
 export async function setShare(id: number, userId: number, isAdmin: boolean, on: boolean): Promise<string | null> {
