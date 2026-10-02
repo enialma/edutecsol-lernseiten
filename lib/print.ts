@@ -4,7 +4,7 @@
 export const PRINT_MARKER = "<!-- lernwege-print -->";
 
 const PRINT_CSS = `
-@page { size: A4 landscape; margin: 12mm 14mm; }
+@page { size: A4 portrait; margin: 14mm 16mm; }
 @media print {
   html, body { background: #fff !important; color: #111 !important; font-size: 11pt !important; line-height: 1.4 !important; }
   * { box-shadow: none !important; text-shadow: none !important; animation: none !important; transition: none !important; }

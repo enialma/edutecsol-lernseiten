@@ -117,7 +117,7 @@ AUSGABE-VERTRAG (zwingend):
 - Die Datei ist in sich geschlossen: alles CSS und JavaScript inline, keine externen Abhängigkeiten, offline lauffähig.
 - Sprache: Schweizer Standarddeutsch (kein ß).
 - Setze im <head> ein <title> mit dem Thema und ein <meta name="description"> mit einer Zeile zur Kernaufgabe.
-- Struktur für den Druck: jeder Zugang ist ein eigenes Element mit role="tabpanel"; der Lehrpersonen-Bereich ist ein <details class="lehrperson">. Der PDF-Button öffnet vor window.print() alle Zugänge und alle <details> und setzt sie danach zurück. Druck-CSS: @page { size: A4 landscape; margin: 12mm }, Bedienelemente ausgeblendet, jeder Zugang beginnt auf einer neuen Seite, keine farbigen Hintergrundflächen, keine Seitenumbrüche innerhalb von Aufgaben oder Grafiken.
+- Struktur für den Druck: jeder Zugang ist ein eigenes Element mit role="tabpanel"; der Lehrpersonen-Bereich ist ein <details class="lehrperson">. Der PDF-Button öffnet vor window.print() alle Zugänge und alle <details> und setzt sie danach zurück. Druck-CSS: @page { size: A4 portrait; margin: 14mm }, Bedienelemente ausgeblendet, jeder Zugang beginnt auf einer neuen Seite, keine farbigen Hintergrundflächen, keine Seitenumbrüche innerhalb von Aufgaben oder Grafiken.
 - Die abschliessende Notiz (gewähltes Thema, Differenzierungsart, Twist) gehört in einen HTML-Kommentar direkt vor </html>: <!-- NOTIZ: ... -->`;
 }
 
