@@ -28,9 +28,13 @@ const PRINT_CSS = `
   input[type="text"], input[type="number"], textarea, select { border: none !important; border-bottom: 1px solid #333 !important; background: #fff !important; box-shadow: none !important; }
   input[type="checkbox"], input[type="radio"] { -webkit-appearance: checkbox; appearance: auto; }
   .feedback, .hint, .ok, .check-ok, .correct { color: #111 !important; }
-  /* Farbflächen dezent */
-  header, .hero { background: #fff !important; color: #111 !important; border-bottom: 2px solid #333; }
-  .card, .box, section { background: #fff !important; border-color: #999 !important; }
+  /* Keine Rahmen, keine Farbflächen – nur Text, Grafiken und Tabellen */
+  *:not(td):not(th):not(input):not(textarea):not(table) { border: 0 !important; outline: 0 !important; border-radius: 0 !important; }
+  header, .hero, .card, .box, section, article, aside, div { background: transparent !important; color: #111 !important; }
+  header, .hero { padding: 0 0 .6rem !important; margin: 0 0 1rem !important; }
+  .card, .box, section, article { padding: 0 !important; margin: 0 0 1rem !important; }
+  table { border-collapse: collapse !important; }
+  td, th { border: 1px solid #bbb !important; padding: .25rem .5rem !important; }
   svg { max-width: 100% !important; height: auto !important; }
   img { max-width: 100% !important; }
 }
