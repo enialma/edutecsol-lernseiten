@@ -48,6 +48,9 @@ export function ready(): Promise<void> {
       const sql = db();
       await sql.query(SCHEMA);
       await sql.query(SCHEMA_PAGES);
+      await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS share_token TEXT UNIQUE`);
+      await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS pool BOOLEAN NOT NULL DEFAULT FALSE`);
+      await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS copied_from INTEGER`);
     })().catch((e) => {
       readyPromise = null;
       throw e;

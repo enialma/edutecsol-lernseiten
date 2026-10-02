@@ -1,41 +1,89 @@
 import Link from "next/link";
 import { auth } from "@/auth";
-import { listPages } from "@/lib/pages";
+import { filterValues, listPages, type ListMode } from "@/lib/pages";
 import Topbar from "../../Topbar";
 
 export const dynamic = "force-dynamic";
 
-export default async function SeitenPage({ searchParams }: { searchParams: Promise<{ alle?: string }> }) {
+type SP = { modus?: string; fach?: string; stufe?: string; q?: string };
+
+export default async function SeitenPage({ searchParams }: { searchParams: Promise<SP> }) {
   const session = await auth();
-  const { alle } = await searchParams;
+  const sp = await searchParams;
   const isAdmin = session?.user?.role === "admin";
-  const showAll = isAdmin && alle === "1";
-  const pages = await listPages(Number(session!.user.id), showAll);
+  const userId = Number(session!.user.id);
+  const mode: ListMode = sp.modus === "pool" ? "pool" : sp.modus === "alle" && isAdmin ? "all" : "mine";
+  const filter = { fach: sp.fach || undefined, stufe: sp.stufe || undefined, q: sp.q?.trim() || undefined };
+  const [pages, values] = await Promise.all([listPages(userId, mode, filter), filterValues(userId, mode)]);
+  const hasFilter = !!(filter.fach || filter.stufe || filter.q);
+  const tab = (m: string, label: string) => (
+    <Link className={`btn small ${mode === m ? "" : "ghost"}`} href={`/app/seiten?modus=${m}`}>{label}</Link>
+  );
+
   return (
     <>
       <Topbar />
       <main>
         <div className="wrap">
           <p className="kicker">Mein Bereich</p>
-          <h1>Meine Sammlung</h1>
-          <p className="lead">Alle erzeugten Lernseiten. Öffnen, herunterladen, in Moodle laden.</p>
-          <div className="row" style={{ marginBottom: "1rem" }}>
-            <Link className="btn terra" href="/app/erzeugen">+ Neue Lernseite</Link>
-            {isAdmin && (
-              <Link className="btn ghost" href={showAll ? "/app/seiten" : "/app/seiten?alle=1"}>{showAll ? "Nur meine" : "Alle Benutzer"}</Link>
-            )}
+          <h1>{mode === "pool" ? "Gemeinsamer Pool" : mode === "all" ? "Alle Lernseiten" : "Meine Sammlung"}</h1>
+          <p className="lead">
+            {mode === "pool"
+              ? "Lernseiten, die Kolleginnen und Kollegen für alle freigegeben haben. Öffnen, ansehen, in die eigene Sammlung kopieren."
+              : "Alle erzeugten Lernseiten. Öffnen, herunterladen, per Link oder QR-Code an Lernende geben."}
+          </p>
+
+          <div className="row" style={{ marginBottom: "1rem", alignItems: "center" }}>
+            {tab("mine", "Meine")}
+            {tab("pool", "Pool")}
+            {isAdmin && tab("alle", "Alle Benutzer")}
+            <span style={{ flex: 1 }} />
+            <Link className="btn terra small" href="/app/erzeugen">+ Neue Lernseite</Link>
           </div>
+
+          <form method="get" className="card" style={{ padding: ".8rem 1rem", marginBottom: "1rem" }}>
+            <input type="hidden" name="modus" value={sp.modus ?? "mine"} />
+            <div className="row" style={{ alignItems: "flex-end" }}>
+              <div style={{ flex: "1 1 160px" }}>
+                <label style={{ margin: "0 0 .2rem" }}>Fach</label>
+                <select name="fach" defaultValue={filter.fach ?? ""}>
+                  <option value="">alle</option>
+                  {values.fach.map((v) => <option key={v} value={v}>{v}</option>)}
+                </select>
+              </div>
+              <div style={{ flex: "1 1 160px" }}>
+                <label style={{ margin: "0 0 .2rem" }}>Stufe</label>
+                <select name="stufe" defaultValue={filter.stufe ?? ""}>
+                  <option value="">alle</option>
+                  {values.stufe.map((v) => <option key={v} value={v}>{v}</option>)}
+                </select>
+              </div>
+              <div style={{ flex: "2 1 200px" }}>
+                <label style={{ margin: "0 0 .2rem" }}>Suche</label>
+                <input name="q" defaultValue={filter.q ?? ""} placeholder="Titel oder Thema" />
+              </div>
+              <button className="btn small">Filtern</button>
+              {hasFilter && <Link className="btn small ghost" href={`/app/seiten?modus=${sp.modus ?? "mine"}`}>Zurücksetzen</Link>}
+            </div>
+          </form>
+
           {pages.length === 0 ? (
-            <div className="card">Noch keine Lernseite. <Link href="/app/erzeugen">Jetzt die erste erzeugen.</Link></div>
+            <div className="card">
+              {mode === "pool" ? "Im Pool liegt noch keine Lernseite." : hasFilter ? "Keine Treffer." : <>Noch keine Lernseite. <Link href="/app/erzeugen">Jetzt die erste erzeugen.</Link></>}
+            </div>
           ) : (
             <div className="grid">
               {pages.map((p) => (
                 <Link className="tile" href={`/app/seiten/${p.id}`} key={p.id}>
-                  <span className="badge">{p.fach}{p.stufe ? ` · ${p.stufe}` : ""}</span>
+                  <span className="row" style={{ gap: ".3rem" }}>
+                    <span className="badge">{p.fach}{p.stufe ? ` · ${p.stufe}` : ""}</span>
+                    {p.share_token && <span className="badge ok">Link</span>}
+                    {p.pool && <span className="badge new">Pool</span>}
+                  </span>
                   <h3>{p.title}</h3>
                   <p>
                     {p.created_at} · {p.provider === "claude" ? "Claude" : "Infomaniak"}
-                    {showAll && p.owner_email ? ` · ${p.owner_email}` : ""}
+                    {mode !== "mine" ? ` · ${p.owner_name || p.owner_email}` : ""}
                   </p>
                   <span className="foot">Öffnen →</span>
                 </Link>
