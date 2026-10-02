@@ -45,6 +45,7 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
             <a className="btn terra" href={`/app/seiten/${page.id}/html`} target="_blank" rel="noopener">In neuem Tab öffnen</a>
             <a className="btn" href={`/app/seiten/${page.id}/html?download=1`} download={`${slug}.html`}>HTML herunterladen</a>
             <a className="btn" href={`/app/seiten/${page.id}/docx`}>Word (Arbeitsblatt)</a>
+            <a className="btn" href={`/app/seiten/${page.id}/scorm`}>SCORM für Moodle</a>
             {!own && (
               <form action={copyAction}>
                 <input type="hidden" name="id" value={page.id} />
@@ -109,6 +110,31 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
               </div>
             </div>
           )}
+
+          <details className="card" style={{ marginBottom: "1rem" }}>
+            <summary style={{ cursor: "pointer", fontWeight: 600 }}>So kommt die Lernseite in Moodle</summary>
+            <div className="grid" style={{ marginTop: ".8rem" }}>
+              <div>
+                <h3 style={{ margin: "0 0 .3rem" }}>Variante A · SCORM-Paket</h3>
+                <p className="small-note">Moodle zeichnet auf, wer die Seite geöffnet hat (Status «abgeschlossen»). Funktioniert in jedem Moodle, auch ohne Internetzugang zu lernwege.</p>
+                <ol style={{ paddingLeft: "1.2rem", margin: ".3rem 0 0", fontSize: ".9rem" }}>
+                  <li>Oben <b>SCORM für Moodle</b> klicken, Zip speichern.</li>
+                  <li>Im Moodle-Kurs: Bearbeiten einschalten → Aktivität hinzufügen → <b>Lernpaket (SCORM)</b>.</li>
+                  <li>Zip in das Feld «Paketdatei» ziehen, Name vergeben, speichern.</li>
+                  <li>Empfehlung unter «Darstellung»: Paket anzeigen = <b>Neues Fenster</b>, Navigation ausblenden.</li>
+                </ol>
+              </div>
+              <div>
+                <h3 style={{ margin: "0 0 .3rem" }}>Variante B · Freigabelink</h3>
+                <p className="small-note">Schneller, immer die aktuelle Version. Moodle zeichnet keinen Abschluss auf.</p>
+                <ol style={{ paddingLeft: "1.2rem", margin: ".3rem 0 0", fontSize: ".9rem" }}>
+                  <li>Freigabelink erstellen (Karte oben) und kopieren.</li>
+                  <li>Im Moodle-Kurs: Aktivität hinzufügen → <b>Link/URL</b>, Adresse einfügen.</li>
+                  <li>Darstellung «Einbetten» zeigt die Seite direkt im Kurs.</li>
+                </ol>
+              </div>
+            </div>
+          </details>
 
           <iframe className="preview" src={`/app/seiten/${page.id}/html`} title={page.title} />
 
