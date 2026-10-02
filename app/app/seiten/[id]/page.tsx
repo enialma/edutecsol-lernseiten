@@ -29,6 +29,7 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
           <div className="row" style={{ marginBottom: "1rem" }}>
             <a className="btn terra" href={`/app/seiten/${page.id}/html`} target="_blank" rel="noopener">In neuem Tab öffnen</a>
             <a className="btn" href={`/app/seiten/${page.id}/html?download=1`} download={`${slug}.html`}>HTML herunterladen</a>
+            <a className="btn" href={`/app/seiten/${page.id}/docx`}>Word (Arbeitsblatt)</a>
             <form action={deletePageAction}>
               <input type="hidden" name="id" value={page.id} />
               <button className="btn ghost" style={{ color: "var(--err)" }}>Löschen</button>
