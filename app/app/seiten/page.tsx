@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { auth } from "@/auth";
 import { filterValues, listPages, type ListMode } from "@/lib/pages";
+import { BEISPIELE, missingBeispiele } from "@/lib/beispiele";
 import Topbar from "../../Topbar";
+import { importBeispieleAction } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +17,8 @@ export default async function SeitenPage({ searchParams }: { searchParams: Promi
   const mode: ListMode = sp.modus === "pool" ? "pool" : sp.modus === "alle" && isAdmin ? "all" : "mine";
   const filter = { fach: sp.fach || undefined, stufe: sp.stufe || undefined, q: sp.q?.trim() || undefined };
   const [pages, values] = await Promise.all([listPages(userId, mode, filter), filterValues(userId, mode)]);
-  const hasFilter = !!(filter.fach || filter.stufe || filter.q);
+  const missing = isAdmin && mode === "pool" ? (await missingBeispiele()).length : 0;
+  const hasFilter =!!(filter.fach || filter.stufe || filter.q);
   const tab = (m: string, label: string) => (
     <Link className={`btn small ${mode === m ? "" : "ghost"}`} href={`/app/seiten?modus=${m}`}>{label}</Link>
   );
@@ -67,6 +70,13 @@ export default async function SeitenPage({ searchParams }: { searchParams: Promi
             </div>
           </form>
 
+          {missing > 0 && (
+            <form action={importBeispieleAction} className="card row" style={{ padding: ".8rem 1rem", marginBottom: "1rem", alignItems: "center" }}>
+              <span style={{ flex: "1 1 240px" }}>{missing} der {BEISPIELE.length} Beispielseiten von der Startseite fehlen noch im Pool.</span>
+              <button className="btn small">Beispielseiten übernehmen</button>
+            </form>
+          )}
+
           {pages.length === 0 ? (
             <div className="card">
               {mode === "pool" ? "Im Pool liegt noch keine Lernseite." : hasFilter ? "Keine Treffer." : <>Noch keine Lernseite. <Link href="/app/erzeugen">Jetzt die erste erzeugen.</Link></>}
@@ -82,7 +92,7 @@ export default async function SeitenPage({ searchParams }: { searchParams: Promi
                   </span>
                   <h3>{p.title}</h3>
                   <p>
-                    {p.created_at} · {p.provider === "claude" ? "Claude" : "Infomaniak"}
+                    {p.created_at} · {p.provider === "claude" ? "Claude" : p.provider === "beispiel" ? "Beispielseite" : "Infomaniak"}
                     {mode !== "mine" ? ` · ${p.owner_name || p.owner_email}` : ""}
                   </p>
                   <span className="foot">Öffnen →</span>

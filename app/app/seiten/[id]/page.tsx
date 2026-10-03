@@ -152,7 +152,7 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
                 <tr><th>Twist</th><td>{p.twist ? TWIST_LABELS[p.twist] : "–"}</td></tr>
                 <tr><th>Niveau</th><td>{p.niveau ? NIVEAU_LABELS[p.niveau] : "–"}</td></tr>
                 {p.extra && <tr><th>Zusatzwunsch</th><td>{p.extra}</td></tr>}
-                <tr><th>Modell</th><td>{page.provider} · {page.model}</td></tr>
+                <tr><th>Modell</th><td>{page.provider === "beispiel" ? "Beispielseite von der Startseite" : `${page.provider} · ${page.model}`}</td></tr>
                 <tr><th>Tokens</th><td>{page.input_tokens.toLocaleString("de-CH")} ein / {page.output_tokens.toLocaleString("de-CH")} aus{page.duration_ms ? ` · ${Math.round(page.duration_ms / 1000)} s` : ""}</td></tr>
                 <tr><th>Grösse</th><td>{Math.round(page.html_bytes / 1024)} KB</td></tr>
                 {page.copied_from && <tr><th>Kopie</th><td>aus Pool-Seite #{page.copied_from}</td></tr>}

@@ -1,7 +1,9 @@
 "use server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { auth } from "@/auth";
+import { importBeispiele } from "@/lib/beispiele";
 import { deletePage, duplicatePage, setPool, setShare, updateTitle } from "@/lib/pages";
 
 async function who() {
@@ -37,6 +39,14 @@ export async function renameAction(fd: FormData) {
   const title = String(fd.get("title") ?? "").trim();
   if (title) await updateTitle(id, userId, isAdmin, title);
   revalidatePath(`/app/seiten/${id}`);
+}
+
+export async function importBeispieleAction() {
+  const { userId, isAdmin } = await who();
+  if (!isAdmin) throw new Error("Nur für Admins.");
+  const h = await headers();
+  await importBeispiele(userId, `${h.get("x-forwarded-proto") ?? "https"}://${h.get("x-forwarded-host") ?? h.get("host")}`);
+  revalidatePath("/app/seiten");
 }
 
 export async function copyAction(fd: FormData) {
