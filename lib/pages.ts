@@ -126,9 +126,21 @@ export async function deletePage(id: number, userId: number, isAdmin: boolean) {
   await q(`DELETE FROM pages p WHERE p.id = $1 AND (${canEdit(isAdmin)})`, [id, userId]);
 }
 
-export async function usageByUser(): Promise<{ email: string; pages: number; input_tokens: number; output_tokens: number }[]> {
+export type Usage = {
+  email: string; name: string | null; pages: number; pages_month: number; claude: number; infomaniak: number;
+  input_tokens: number; output_tokens: number; last_page: string | null;
+};
+
+/** Erzeugte Seiten und Tokens pro Person – Kopien aus dem Pool zählen nicht, gelöschte Seiten fehlen. */
+export async function usageByUser(): Promise<Usage[]> {
   return (await q(
-    `SELECT u.email, COUNT(p.id)::int AS pages, COALESCE(SUM(p.input_tokens),0)::int AS input_tokens, COALESCE(SUM(p.output_tokens),0)::int AS output_tokens
-     FROM users u LEFT JOIN pages p ON p.user_id = u.id GROUP BY u.email ORDER BY pages DESC, u.email`
+    `SELECT u.email, u.name, COUNT(p.id)::int AS pages,
+       COUNT(p.id) FILTER (WHERE p.created_at >= date_trunc('month', NOW()))::int AS pages_month,
+       COUNT(p.id) FILTER (WHERE p.provider = 'claude')::int AS claude,
+       COUNT(p.id) FILTER (WHERE p.provider = 'infomaniak')::int AS infomaniak,
+       COALESCE(SUM(p.input_tokens),0)::int AS input_tokens, COALESCE(SUM(p.output_tokens),0)::int AS output_tokens,
+       to_char(MAX(p.created_at), 'DD.MM.YYYY') AS last_page
+     FROM users u LEFT JOIN pages p ON p.user_id = u.id AND p.copied_from IS NULL
+     GROUP BY u.email, u.name ORDER BY pages DESC, u.email`
   )) as never;
 }

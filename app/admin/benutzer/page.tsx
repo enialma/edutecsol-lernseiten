@@ -1,3 +1,4 @@
+import { usageByUser } from "@/lib/pages";
 import { listUsers } from "@/lib/users";
 import Topbar from "../../Topbar";
 import { createUserAction, deleteUserAction, setPasswordAction, toggleActiveAction } from "./actions";
@@ -5,7 +6,9 @@ import { createUserAction, deleteUserAction, setPasswordAction, toggleActiveActi
 export const dynamic = "force-dynamic";
 
 export default async function BenutzerPage() {
-  const users = await listUsers();
+  const [users, usage] = await Promise.all([listUsers(), usageByUser()]);
+  const total = usage.reduce((t, u) => ({ pages: t.pages + u.pages, input_tokens: t.input_tokens + u.input_tokens, output_tokens: t.output_tokens + u.output_tokens }), { pages: 0, input_tokens: 0, output_tokens: 0 });
+  const nf = (n: number) => n.toLocaleString("de-CH");
   return (
     <>
       <Topbar />
@@ -82,6 +85,32 @@ export default async function BenutzerPage() {
                 {users.length === 0 && (
                   <tr><td colSpan={7}>Noch keine Benutzer. Admins aus ADMIN_EMAILS werden beim ersten Login automatisch angelegt.</td></tr>
                 )}
+              </tbody>
+            </table>
+          </div>
+
+          <h2>Nutzung</h2>
+          <p className="small-note">
+            Mit KI erzeugte Lernseiten pro Person ({total.pages} Seiten, {nf(total.input_tokens)} Eingabe- und{" "}
+            {nf(total.output_tokens)} Ausgabe-Tokens). Kopien aus dem Pool zählen nicht, gelöschte Seiten fehlen.
+          </p>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr><th>E-Mail</th><th>Seiten</th><th>Diesen Monat</th><th>Claude / Infomaniak</th><th>Tokens Eingabe</th><th>Tokens Ausgabe</th><th>Letzte Seite</th></tr>
+              </thead>
+              <tbody>
+                {usage.map((u) => (
+                  <tr key={u.email}>
+                    <td>{u.email}{u.name && <div className="small-note">{u.name}</div>}</td>
+                    <td>{u.pages}</td>
+                    <td>{u.pages_month}</td>
+                    <td>{u.claude} / {u.infomaniak}</td>
+                    <td>{nf(u.input_tokens)}</td>
+                    <td>{nf(u.output_tokens)}</td>
+                    <td>{u.last_page ?? "–"}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

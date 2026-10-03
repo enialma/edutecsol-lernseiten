@@ -23,6 +23,16 @@ function unhideAll(root: HTMLElement) {
   }
 }
 
+/** Label, das zum Eingabefeld gehört, es aber nicht umschliesst (for=id oder direkt davor). */
+function labelFor(root: HTMLElement, el: HTMLElement): HTMLElement | null {
+  if (el.closest("label")) return null;
+  const id = el.getAttribute("id");
+  const byFor = id ? root.querySelectorAll("label").find((l) => l.getAttribute("for") === id) : undefined;
+  if (byFor) return byFor;
+  const prev = el.previousElementSibling;
+  return prev && (prev.tagName ?? "").toLowerCase() === "label" && !prev.getAttribute("for") ? prev : null;
+}
+
 function paperize(root: HTMLElement) {
   for (const sel of ["script", "style", "noscript", "head", "title", "meta", "link", "button", "nav", "[role=tablist]", "template", "iframe", "video", "audio", "link", "meta"]) {
     root.querySelectorAll(sel).forEach((e) => e.remove());
@@ -32,10 +42,16 @@ function paperize(root: HTMLElement) {
   for (const el of root.querySelectorAll("input")) {
     const t = (el.getAttribute("type") ?? "text").toLowerCase();
     if (["hidden", "submit", "button", "reset"].includes(t)) { el.remove(); continue; }
-    if (t === "checkbox") el.replaceWith(...parse("<span>☐ </span>").childNodes);
-    else if (t === "radio") el.replaceWith(...parse("<span>○ </span>").childNodes);
+    const box = t === "checkbox" ? "☐ " : t === "radio" ? "○ " : null;
+    // Getrenntes <label for> + Eingabefeld auf eine Zeile ziehen (Label: ______ bzw. ☐ Label)
+    const own = labelFor(root, el);
+    if (own) {
+      if (box) own.insertAdjacentHTML("afterbegin", `<span>${box}</span>`);
+      else own.insertAdjacentHTML("beforeend", `<span>${/[:?]\s*$/.test(own.text) ? " " : ": "}${LINE}</span>`);
+      el.remove();
+    } else if (box) el.replaceWith(...parse(`<span>${box}</span>`).childNodes);
     else {
-      const label = el.getAttribute("placeholder") || el.getAttribute("aria-label") || "";
+      const label = el.closest("label") ? "" : el.getAttribute("placeholder") || el.getAttribute("aria-label") || "";
       el.replaceWith(...parse(`<span>${label ? label + ": " : ""}${LINE}</span>`).childNodes);
     }
   }
