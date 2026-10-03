@@ -15,6 +15,8 @@ export type User = {
   organisation: string | null;
   institution_id: number | null;
   institution: string | null;
+  pending: boolean;
+  has_subscription: boolean;
   notes: string | null;
   valid_until: string | null;
   created_at: string;
@@ -28,7 +30,8 @@ const COLS = `id, email, name, role, active, organisation, notes, institution_id
   to_char(valid_until, 'YYYY-MM-DD') AS valid_until,
   to_char(created_at, 'YYYY-MM-DD HH24:MI') AS created_at,
   to_char(last_login_at, 'YYYY-MM-DD HH24:MI') AS last_login_at,
-  last_login_via, (password_hash IS NOT NULL) AS has_password`;
+  last_login_via, (password_hash IS NOT NULL) AS has_password, pending,
+  (stripe_subscription_id IS NOT NULL) AS has_subscription`;
 
 export function normEmail(e: string) {
   return e.trim().toLowerCase();

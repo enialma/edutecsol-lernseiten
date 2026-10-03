@@ -4,7 +4,7 @@ import { auth, signIn } from "@/auth";
 import Topbar from "../Topbar";
 
 const ERRORS: Record<string, string> = {
-  NotAllowed: "Diese E-Mail-Adresse ist nicht freigeschaltet. Bitte bei EDUTECSOL melden.",
+  NotAllowed: "Diese E-Mail-Adresse ist nicht freigeschaltet oder der Zugang ist abgelaufen. Unter «Zugang» kannst du ihn kaufen oder verlängern.",
   CredentialsSignin: "E-Mail oder Passwort stimmt nicht.",
   Configuration: "Login ist noch nicht fertig konfiguriert.",
   AccessDenied: "Zugriff verweigert.",
@@ -81,7 +81,7 @@ export default async function LoginPage({
               </div>
             </form>
             <p className="small-note" style={{ marginTop: "1.4rem" }}>
-              Noch keinen Zugang? <a href="mailto:info@edutecsol.ch">info@edutecsol.ch</a>
+              Noch keinen Zugang? <a href="/zugang">Zugang für Lehrpersonen und Schulen</a>
             </p>
           </div>
         </div>

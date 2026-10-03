@@ -1,10 +1,24 @@
 import Link from "next/link";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { billingOf } from "@/lib/billing";
+import { createPortal } from "@/lib/stripe";
 import Topbar from "../Topbar";
 
 export default async function AppHome() {
   const session = await auth();
   const name = session?.user?.name || session?.user?.email;
+  const billing = await billingOf(Number(session!.user.id));
+
+  const portal = async () => {
+    "use server";
+    const s = await auth();
+    const b = await billingOf(Number(s!.user.id));
+    if (!b.customerId) return;
+    const h = await headers();
+    redirect(await createPortal(b.customerId, `${h.get("x-forwarded-proto") ?? "https"}://${h.get("x-forwarded-host") ?? h.get("host")}`));
+  };
   return (
     <>
       <Topbar />
@@ -35,13 +49,15 @@ export default async function AppHome() {
               <p>Erzeugte Lernseiten öffnen, herunterladen, in Moodle laden.</p>
               <span className="foot">Öffnen →</span>
             </Link>
-            <div className="tile soon">
-              <span className="badge">geplant</span>
-              <h3>Nach Moodle exportieren</h3>
-              <p>Lernseite als SCORM-Paket oder direkt in einen Moodle-Kurs legen.</p>
-              <span className="foot">später</span>
-            </div>
           </div>
+          {billing.customerId && (
+            <form action={portal} className="card row" style={{ marginTop: "1rem", alignItems: "center" }}>
+              <span style={{ flex: "1 1 240px" }}>
+                {billing.hasSubscription ? "Dein Abo läuft und verlängert sich automatisch." : `Dein Abo ist beendet. Der Zugang gilt noch bis ${billing.validUntil ?? "zum Ablauf"}.`}
+              </span>
+              <button className="btn small ghost">Abo verwalten</button>
+            </form>
+          )}
         </div>
       </main>
     </>
