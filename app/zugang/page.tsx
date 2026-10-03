@@ -18,7 +18,7 @@ async function buy(fd: FormData) {
   const fail = (m: string) => redirect(`/zugang?fehler=${encodeURIComponent(m)}`);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) fail("Bitte eine gültige E-Mail-Adresse angeben.");
   if (password && password.length < 8) fail("Das Passwort braucht mindestens 8 Zeichen.");
-  if (fd.get("agb") !== "1") fail("Bitte die Bedingungen bestätigen.");
+  if (fd.get("agb") !== "1") fail("Bitte die AGB bestätigen.");
   let url: string;
   try {
     const { userId, customerId } = await prepareSignup(email, name, password);
@@ -61,6 +61,7 @@ export default async function ZugangPage({ searchParams }: { searchParams: Promi
             <div className="card">
               <p className="kicker">Einzelperson</p>
               <h2 style={{ marginTop: 0 }}>CHF 8 pro Monat oder CHF 60 pro Jahr</h2>
+              <p className="small-note" style={{ marginTop: "-.4rem" }}>Preise inklusive Mehrwertsteuer.</p>
               <ul>
                 <li>Pro Monat {LIMITS.claude} Lernseiten mit Claude und {LIMITS.infomaniak} mit Infomaniak (Schweiz)</li>
                 <li>Eigene Sammlung, Freigabelink mit QR-Code, gemeinsamer Pool</li>
@@ -86,7 +87,7 @@ export default async function ZugangPage({ searchParams }: { searchParams: Promi
                   </p>
                   <label style={{ display: "flex", gap: ".5rem", alignItems: "flex-start", fontWeight: 400 }}>
                     <input type="checkbox" name="agb" value="1" required style={{ width: "auto", marginTop: ".25rem" }} />
-                    <span>Ich habe die <Link href="/datenschutz">Datenschutzerklärung</Link> gelesen und bin mit dem Abo einverstanden.</span>
+                    <span>Ich akzeptiere die <Link href="/agb">AGB</Link> und habe die <Link href="/datenschutz">Datenschutzerklärung</Link> gelesen.</span>
                   </label>
                   <div style={{ marginTop: "1rem" }}><button className="btn terra">Weiter zur Bezahlung</button></div>
                   <p className="small-note" style={{ marginTop: ".6rem" }}>Die Zahlung läuft über Stripe. Wir sehen und speichern keine Kartendaten.</p>

@@ -129,7 +129,7 @@ export default function DatenschutzPage() {
           <h2>9. Änderungen</h2>
           <p>Diese Seite wird angepasst, wenn neue Funktionen oder Dienstleister dazukommen. Das Datum oben zeigt den Stand.</p>
 
-          <p style={{ marginTop: "2rem" }}><Link href="/">← Zur Startseite</Link></p>
+          <p style={{ marginTop: "2rem" }}><Link href="/">← Zur Startseite</Link> · <Link href="/agb">AGB</Link></p>
         </div>
       </main>
     </>

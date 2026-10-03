@@ -10,6 +10,7 @@ export default async function Topbar() {
         <Link className="brand" href="/">EDUTECSOL · Lernwege</Link>
         <nav>
           <Link href="/">Beispiele</Link>
+          {!u && <Link href="/zugang">Zugang &amp; Preise</Link>}
           <Link href="/datenschutz">Datenschutz</Link>
           {u && <Link href="/app">Mein Bereich</Link>}
           {u && <Link href="/app/erzeugen">Erzeugen</Link>}

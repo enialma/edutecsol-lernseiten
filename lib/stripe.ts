@@ -36,6 +36,8 @@ export async function createCheckout(a: { userId: number; email: string; plan: P
     locale: "de",
     allow_promotion_codes: "true",
   };
+  // Schweizer MWST: in Stripe angelegter Steuersatz (inklusive), erscheint auf den Rechnungen
+  if (process.env.STRIPE_TAX_RATE) p["subscription_data[default_tax_rates][0]"] = process.env.STRIPE_TAX_RATE;
   if (a.customerId) p.customer = a.customerId;
   else p.customer_email = a.email;
   return (await call("POST", "checkout/sessions", p)).url as string;
