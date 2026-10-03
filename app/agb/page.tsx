@@ -4,7 +4,7 @@ import Topbar from "../Topbar";
 
 const STAND = "3. Oktober 2026";
 // MWST-Nummer der EDUTECSOL GmbH (Format CHE-123.456.789 MWST); leer = wird nicht angezeigt
-const MWST_NR = "";
+const MWST_NR = "CHE-484.488.885 MWST";
 
 export const metadata = { title: "AGB – EDUTECSOL Lernwege" };
 
