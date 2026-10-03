@@ -88,9 +88,10 @@ export default function DatenschutzPage() {
             An die KI-Anbieter geht ausschliesslich der Text des Materials und die didaktischen Einstellungen. Keine Kontodaten, keine E-Mail-Adresse der Lehrperson.
           </p>
 
-          <h2>5. Freigabelinks und Pool</h2>
+          <h2>5. Freigabelinks, Schule und Pool</h2>
           <ul>
             <li>Ein <b>Freigabelink</b> macht eine Lernseite ohne Login erreichbar. Die Adresse ist nicht erratbar und für Suchmaschinen gesperrt, aber jede Person mit dem Link kann die Seite öffnen. Der Link lässt sich jederzeit zurückziehen.</li>
+            <li>Mit der Sichtbarkeit <b>Meine Schule</b> sehen nur angemeldete Lehrpersonen derselben Institution die Seite mit Name der Autorin oder des Autors und können sie kopieren.</li>
             <li>Im <b>gemeinsamen Pool</b> sehen alle angemeldeten Lehrpersonen die Seite mit Name der Autorin oder des Autors und können sie kopieren. Das ist freiwillig und jederzeit widerrufbar.</li>
           </ul>
 

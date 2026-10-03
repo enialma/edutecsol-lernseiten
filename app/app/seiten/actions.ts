@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { auth } from "@/auth";
 import { importBeispiele } from "@/lib/beispiele";
-import { deletePage, duplicatePage, setPool, setShare, updateTitle } from "@/lib/pages";
+import { deletePage, duplicatePage, setShare, setVisibility, updateTitle } from "@/lib/pages";
 
 async function who() {
   const s = await auth();
@@ -25,10 +25,11 @@ export async function shareAction(fd: FormData) {
   revalidatePath(`/app/seiten/${id}`);
 }
 
-export async function poolAction(fd: FormData) {
+export async function visibilityAction(fd: FormData) {
   const { userId, isAdmin } = await who();
   const id = Number(fd.get("id"));
-  await setPool(id, userId, isAdmin, fd.get("on") === "1");
+  const v = fd.get("v");
+  await setVisibility(id, userId, isAdmin, v === "all" ? "all" : v === "school" ? "school" : "private");
   revalidatePath(`/app/seiten/${id}`);
   revalidatePath("/app/seiten");
 }

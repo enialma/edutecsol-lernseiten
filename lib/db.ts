@@ -51,6 +51,20 @@ export function ready(): Promise<void> {
       await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS share_token TEXT UNIQUE`);
       await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS pool BOOLEAN NOT NULL DEFAULT FALSE`);
       await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS copied_from INTEGER`);
+      // Institutionen: Lernseiten lassen sich nur für die eigene Schule freigeben (pages.school)
+      await sql.query(`CREATE TABLE IF NOT EXISTS institutions (
+        id         SERIAL PRIMARY KEY,
+        name       TEXT NOT NULL UNIQUE,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )`);
+      await sql.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS institution_id INTEGER REFERENCES institutions(id) ON DELETE SET NULL`);
+      await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS school BOOLEAN NOT NULL DEFAULT FALSE`);
+      // Einmalig: bisherige Freitext-Einträge «Schule / Organisation» als Institutionen übernehmen
+      const has = await sql.query(`SELECT 1 FROM institutions LIMIT 1`);
+      if (has.length === 0) {
+        await sql.query(`INSERT INTO institutions (name) SELECT DISTINCT btrim(organisation) FROM users WHERE btrim(COALESCE(organisation,'')) <> '' ON CONFLICT DO NOTHING`);
+        await sql.query(`UPDATE users u SET institution_id = i.id FROM institutions i WHERE u.institution_id IS NULL AND btrim(u.organisation) = i.name`);
+      }
       await sql.query(`CREATE TABLE IF NOT EXISTS moodle_links (
         user_id    INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
         base_url   TEXT NOT NULL,

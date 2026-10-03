@@ -25,17 +25,21 @@ export type PageMeta = {
   html_bytes: number;
   share_token: string | null;
   pool: boolean;
+  school: boolean;
   copied_from: number | null;
   owner_email: string;
   owner_name: string | null;
+  owner_institution: string | null;
 };
 export type PageFull = PageMeta & { html: string };
 
 const META = `p.id, p.user_id, p.title, p.fach, p.stufe, p.thema, p.params, p.material_name, p.provider, p.model,
-  p.input_tokens, p.output_tokens, p.duration_ms, p.notiz, p.share_token, p.pool, p.copied_from,
+  p.input_tokens, p.output_tokens, p.duration_ms, p.notiz, p.share_token, p.pool, p.school, p.copied_from,
   to_char(p.created_at, 'DD.MM.YYYY HH24:MI') AS created_at, length(p.html) AS html_bytes,
-  u.email AS owner_email, u.name AS owner_name`;
-const FROM = `FROM pages p JOIN users u ON u.id = p.user_id`;
+  u.email AS owner_email, u.name AS owner_name, i.name AS owner_institution`;
+const FROM = `FROM pages p JOIN users u ON u.id = p.user_id LEFT JOIN institutions i ON i.id = u.institution_id`;
+// Für die eigene Schule freigegeben: Autorin und betrachtende Person gehören zur selben Institution ($n = userId)
+const sameSchool = (n: number) => `(p.school = TRUE AND u.institution_id IS NOT NULL AND u.institution_id = (SELECT institution_id FROM users WHERE id = $${n}))`;
 
 export async function createPage(input: {
   userId: number; title: string; fach?: string; stufe?: string; thema?: string; params: unknown;
@@ -52,7 +56,7 @@ export async function createPage(input: {
   return Number(rows[0].id);
 }
 
-export type ListMode = "mine" | "pool" | "all";
+export type ListMode = "mine" | "school" | "pool" | "all";
 export type ListFilter = { fach?: string; stufe?: string; q?: string };
 
 export async function listPages(userId: number, mode: ListMode, f: ListFilter = {}): Promise<PageMeta[]> {
@@ -60,6 +64,7 @@ export async function listPages(userId: number, mode: ListMode, f: ListFilter = 
   const params: unknown[] = [];
   const add = (sql: string, v: unknown) => { params.push(v); where.push(sql.replace("?", `$${params.length}`)); };
   if (mode === "mine") add("p.user_id = ?", userId);
+  if (mode === "school") { params.push(userId); where.push(sameSchool(params.length)); }
   if (mode === "pool") where.push("p.pool = TRUE");
   if (f.fach) add("p.fach = ?", f.fach);
   if (f.stufe) add("p.stufe = ?", f.stufe);
@@ -70,17 +75,17 @@ export async function listPages(userId: number, mode: ListMode, f: ListFilter = 
 
 /** Werte für Filter-Dropdowns (eigene + Pool). */
 export async function filterValues(userId: number, mode: ListMode): Promise<{ fach: string[]; stufe: string[] }> {
-  const cond = mode === "mine" ? "p.user_id = $1" : mode === "pool" ? "p.pool = TRUE AND $1 = $1" : "$1 = $1";
-  const rows = await q(`SELECT DISTINCT p.fach, p.stufe FROM pages p WHERE ${cond}`, [userId]);
+  const cond = mode === "mine" ? "p.user_id = $1" : mode === "school" ? sameSchool(1) : mode === "pool" ? "p.pool = TRUE AND $1::int IS NOT NULL" : "$1::int IS NOT NULL";
+  const rows = await q(`SELECT DISTINCT p.fach, p.stufe FROM pages p JOIN users u ON u.id = p.user_id WHERE ${cond}`, [userId]);
   const fach = [...new Set(rows.map((r) => r.fach as string).filter(Boolean))].sort();
   const stufe = [...new Set(rows.map((r) => r.stufe as string).filter(Boolean))].sort();
   return { fach, stufe };
 }
 
-/** Zugriff: eigene Seite, Admin oder Pool-Seite. */
+/** Zugriff: eigene Seite, Admin, Pool-Seite oder für die eigene Schule freigegeben. */
 export async function getPage(id: number, userId: number, isAdmin: boolean): Promise<PageFull | null> {
   const rows = await q(
-    `SELECT ${META}, p.html ${FROM} WHERE p.id = $1 AND ($2 OR p.user_id = $3 OR p.pool = TRUE)`,
+    `SELECT ${META}, p.html ${FROM} WHERE p.id = $1 AND ($2 OR p.user_id = $3 OR p.pool = TRUE OR ${sameSchool(3)})`,
     [id, isAdmin, userId]
   );
   return (rows[0] as PageFull) ?? null;
@@ -111,7 +116,14 @@ export async function updateTitle(id: number, userId: number, isAdmin: boolean, 
   await q(`UPDATE pages p SET title = $3 WHERE p.id = $1 AND (${canEdit(isAdmin)})`, [id, userId, title]);
 }
 
-/** Pool-Seite in die eigene Sammlung kopieren. */
+export type Visibility = "private" | "school" | "all";
+
+/** Sichtbarkeit für Kolleginnen und Kollegen: nur ich, eigene Schule oder alle (Pool). */
+export async function setVisibility(id: number, userId: number, isAdmin: boolean, v: Visibility) {
+  await q(`UPDATE pages p SET pool = $3, school = $4 WHERE p.id = $1 AND (${canEdit(isAdmin)})`, [id, userId, v === "all", v === "school"]);
+}
+
+/** Freigegebene Seite (Schule oder Pool) in die eigene Sammlung kopieren. */
 export async function duplicatePage(id: number, userId: number, isAdmin: boolean): Promise<number | null> {
   const src = await getPage(id, userId, isAdmin);
   if (!src) return null;

@@ -13,6 +13,8 @@ export type User = {
   role: "user" | "admin";
   active: boolean;
   organisation: string | null;
+  institution_id: number | null;
+  institution: string | null;
   notes: string | null;
   valid_until: string | null;
   created_at: string;
@@ -21,7 +23,8 @@ export type User = {
   has_password: boolean;
 };
 
-const COLS = `id, email, name, role, active, organisation, notes,
+const COLS = `id, email, name, role, active, organisation, notes, institution_id,
+  (SELECT i.name FROM institutions i WHERE i.id = users.institution_id) AS institution,
   to_char(valid_until, 'YYYY-MM-DD') AS valid_until,
   to_char(created_at, 'YYYY-MM-DD HH24:MI') AS created_at,
   to_char(last_login_at, 'YYYY-MM-DD HH24:MI') AS last_login_at,
@@ -82,14 +85,14 @@ export async function verifyPassword(email: string, password: string): Promise<U
 }
 
 export async function createUser(input: {
-  email: string; name?: string; role?: "user" | "admin"; organisation?: string;
+  email: string; name?: string; role?: "user" | "admin"; institutionId?: number | null;
   notes?: string; valid_until?: string; password?: string;
 }) {
   const hash = input.password ? await bcrypt.hash(input.password, 10) : null;
   await q(
-    `INSERT INTO users (email, name, role, organisation, notes, valid_until, password_hash)
+    `INSERT INTO users (email, name, role, institution_id, notes, valid_until, password_hash)
      VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-    [normEmail(input.email), input.name || null, input.role ?? "user", input.organisation || null,
+    [normEmail(input.email), input.name || null, input.role ?? "user", input.institutionId ?? null,
      input.notes || null, input.valid_until || null, hash]
   );
 }
@@ -101,6 +104,37 @@ export async function setActive(id: number, active: boolean) {
 export async function setPassword(id: number, password: string) {
   const hash = await bcrypt.hash(password, 10);
   await q(`UPDATE users SET password_hash = $2 WHERE id = $1`, [id, hash]);
+}
+
+export async function setInstitution(id: number, institutionId: number | null) {
+  await q(`UPDATE users SET institution_id = $2 WHERE id = $1`, [id, institutionId]);
+}
+
+// ---------- Institutionen ----------
+export type Institution = { id: number; name: string; users: number };
+
+export async function listInstitutions(): Promise<Institution[]> {
+  return (await q(
+    `SELECT i.id, i.name, COUNT(u.id)::int AS users FROM institutions i LEFT JOIN users u ON u.institution_id = i.id GROUP BY i.id, i.name ORDER BY i.name`
+  )) as Institution[];
+}
+
+export async function getInstitutionOf(userId: number): Promise<string | null> {
+  const rows = await q(`SELECT i.name FROM users u JOIN institutions i ON i.id = u.institution_id WHERE u.id = $1`, [userId]);
+  return (rows[0]?.name as string) ?? null;
+}
+
+export async function createInstitution(name: string) {
+  await q(`INSERT INTO institutions (name) VALUES ($1) ON CONFLICT DO NOTHING`, [name]);
+}
+
+export async function renameInstitution(id: number, name: string) {
+  await q(`UPDATE institutions SET name = $2 WHERE id = $1`, [id, name]);
+}
+
+/** Löschen löst die Zuordnung der Konten; für die Schule freigegebene Seiten sieht danach nur noch die Autorin. */
+export async function deleteInstitution(id: number) {
+  await q(`DELETE FROM institutions WHERE id = $1`, [id]);
 }
 
 export async function deleteUser(id: number) {

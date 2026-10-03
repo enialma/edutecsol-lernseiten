@@ -6,7 +6,7 @@ import { auth } from "@/auth";
 import { getPage } from "@/lib/pages";
 import { DIFFART_LABELS, NIVEAU_LABELS, SPRACHE_LABELS, TWIST_LABELS, type GenParams } from "@/lib/prompt";
 import Topbar from "../../../Topbar";
-import { copyAction, deletePageAction, poolAction, renameAction, shareAction } from "../actions";
+import { copyAction, deletePageAction, renameAction, shareAction, visibilityAction } from "../actions";
 import { getMoodleBase } from "@/lib/moodle";
 import CopyButton from "./CopyButton";
 import MoodleCard from "./MoodleCard";
@@ -22,6 +22,7 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
   if (!page) notFound();
   const own = page.user_id === userId;
   const canEdit = own || isAdmin;
+  const visibility = page.pool ? "all" : page.school && page.owner_institution ? "school" : "private";
   const moodleBase = canEdit ? await getMoodleBase(userId) : null;
   const p = page.params as Partial<GenParams>;
   const slug = page.title.toLowerCase().replace(/[^a-z0-9äöü]+/g, "-").replace(/^-|-$/g, "") || "lernseite";
@@ -36,7 +37,7 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
       <Topbar />
       <main>
         <div className="wrap">
-          <p className="kicker"><Link href={own ? "/app/seiten" : "/app/seiten?modus=pool"}>← {own ? "Meine Sammlung" : "Gemeinsamer Pool"}</Link></p>
+          <p className="kicker"><Link href={own ? "/app/seiten" : page.pool ? "/app/seiten?modus=pool" : "/app/seiten?modus=schule"}>← {own ? "Meine Sammlung" : page.pool ? "Gemeinsamer Pool" : "Meine Schule"}</Link></p>
           <h1>{page.title}</h1>
           <p className="lead">
             {page.fach}{page.stufe ? ` · ${page.stufe}` : ""} · erzeugt am {page.created_at}
@@ -95,14 +96,19 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
 
               <div className="card">
                 <p className="kicker">Für Kolleginnen und Kollegen</p>
-                <h3 style={{ margin: "0 0 .4rem" }}>Gemeinsamer Pool</h3>
+                <h3 style={{ margin: "0 0 .4rem" }}>Sichtbarkeit</h3>
                 <p className="small-note">
-                  {page.pool ? "Diese Seite liegt im Pool. Alle angemeldeten Lehrpersonen können sie ansehen und kopieren." : "Nur du siehst diese Seite. Im Pool können andere Lehrpersonen sie ansehen und in ihre Sammlung kopieren."}
+                  {visibility === "all"
+                    ? "Diese Seite liegt im Pool. Alle angemeldeten Lehrpersonen können sie ansehen und kopieren."
+                    : visibility === "school"
+                    ? `Nur Lehrpersonen von «${page.owner_institution}» können diese Seite ansehen und kopieren.`
+                    : "Nur du siehst diese Seite."}
                 </p>
-                <form action={poolAction}>
+                <form action={visibilityAction} className="row">
                   <input type="hidden" name="id" value={page.id} />
-                  <input type="hidden" name="on" value={page.pool ? "0" : "1"} />
-                  <button className={`btn small ${page.pool ? "ghost" : ""}`}>{page.pool ? "Aus dem Pool nehmen" : "In den Pool stellen"}</button>
+                  <button name="v" value="private" className={`btn small ${visibility === "private" ? "" : "ghost"}`}>Nur ich</button>
+                  {page.owner_institution && <button name="v" value="school" className={`btn small ${visibility === "school" ? "" : "ghost"}`}>Meine Schule</button>}
+                  <button name="v" value="all" className={`btn small ${visibility === "all" ? "" : "ghost"}`}>Alle (Pool)</button>
                 </form>
                 <h3 style={{ margin: "1.2rem 0 .4rem" }}>Titel</h3>
                 <form action={renameAction} className="row">
@@ -155,7 +161,7 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
                 <tr><th>Modell</th><td>{page.provider === "beispiel" ? "Beispielseite von der Startseite" : `${page.provider} · ${page.model}`}</td></tr>
                 <tr><th>Tokens</th><td>{page.input_tokens.toLocaleString("de-CH")} ein / {page.output_tokens.toLocaleString("de-CH")} aus{page.duration_ms ? ` · ${Math.round(page.duration_ms / 1000)} s` : ""}</td></tr>
                 <tr><th>Grösse</th><td>{Math.round(page.html_bytes / 1024)} KB</td></tr>
-                {page.copied_from && <tr><th>Kopie</th><td>aus Pool-Seite #{page.copied_from}</td></tr>}
+                {page.copied_from && <tr><th>Kopie</th><td>aus freigegebener Seite #{page.copied_from}</td></tr>}
                 {page.notiz && <tr><th>Notiz der KI</th><td>{page.notiz}</td></tr>}
               </tbody>
             </table>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "@/auth";
 import { filterValues, listPages, type ListMode } from "@/lib/pages";
+import { getInstitutionOf } from "@/lib/users";
 import { BEISPIELE, missingBeispiele } from "@/lib/beispiele";
 import Topbar from "../../Topbar";
 import { importBeispieleAction } from "./actions";
@@ -14,13 +15,14 @@ export default async function SeitenPage({ searchParams }: { searchParams: Promi
   const sp = await searchParams;
   const isAdmin = session?.user?.role === "admin";
   const userId = Number(session!.user.id);
-  const mode: ListMode = sp.modus === "pool" ? "pool" : sp.modus === "alle" && isAdmin ? "all" : "mine";
+  const institution = await getInstitutionOf(userId);
+  const mode: ListMode = sp.modus === "schule" && institution ? "school" : sp.modus === "pool" ? "pool" : sp.modus === "alle" && isAdmin ? "all" : "mine";
   const filter = { fach: sp.fach || undefined, stufe: sp.stufe || undefined, q: sp.q?.trim() || undefined };
   const [pages, values] = await Promise.all([listPages(userId, mode, filter), filterValues(userId, mode)]);
   const missing = isAdmin && mode === "pool" ? (await missingBeispiele()).length : 0;
   const hasFilter =!!(filter.fach || filter.stufe || filter.q);
   const tab = (m: string, label: string) => (
-    <Link className={`btn small ${mode === m ? "" : "ghost"}`} href={`/app/seiten?modus=${m}`}>{label}</Link>
+    <Link className={`btn small ${(sp.modus ?? "mine") === m ? "" : "ghost"}`} href={`/app/seiten?modus=${m}`}>{label}</Link>
   );
 
   return (
@@ -29,15 +31,18 @@ export default async function SeitenPage({ searchParams }: { searchParams: Promi
       <main>
         <div className="wrap">
           <p className="kicker">Mein Bereich</p>
-          <h1>{mode === "pool" ? "Gemeinsamer Pool" : mode === "all" ? "Alle Lernseiten" : "Meine Sammlung"}</h1>
+          <h1>{mode === "school" ? institution : mode === "pool" ? "Gemeinsamer Pool" : mode === "all" ? "Alle Lernseiten" : "Meine Sammlung"}</h1>
           <p className="lead">
-            {mode === "pool"
+            {mode === "school"
+              ? "Lernseiten, die Kolleginnen und Kollegen nur für eure Schule freigegeben haben. Öffnen, ansehen, in die eigene Sammlung kopieren."
+              : mode === "pool"
               ? "Lernseiten, die Kolleginnen und Kollegen für alle freigegeben haben. Öffnen, ansehen, in die eigene Sammlung kopieren."
               : "Alle erzeugten Lernseiten. Öffnen, herunterladen, per Link oder QR-Code an Lernende geben."}
           </p>
 
           <div className="row" style={{ marginBottom: "1rem", alignItems: "center" }}>
             {tab("mine", "Meine")}
+            {institution && tab("schule", "Meine Schule")}
             {tab("pool", "Pool")}
             {isAdmin && tab("alle", "Alle Benutzer")}
             <span style={{ flex: 1 }} />
@@ -79,7 +84,7 @@ export default async function SeitenPage({ searchParams }: { searchParams: Promi
 
           {pages.length === 0 ? (
             <div className="card">
-              {mode === "pool" ? "Im Pool liegt noch keine Lernseite." : hasFilter ? "Keine Treffer." : <>Noch keine Lernseite. <Link href="/app/erzeugen">Jetzt die erste erzeugen.</Link></>}
+              {mode === "school" ? "Für eure Schule ist noch keine Lernseite freigegeben." : mode === "pool" ? "Im Pool liegt noch keine Lernseite." : hasFilter ? "Keine Treffer." : <>Noch keine Lernseite. <Link href="/app/erzeugen">Jetzt die erste erzeugen.</Link></>}
             </div>
           ) : (
             <div className="grid">
@@ -88,6 +93,7 @@ export default async function SeitenPage({ searchParams }: { searchParams: Promi
                   <span className="row" style={{ gap: ".3rem" }}>
                     <span className="badge">{p.fach}{p.stufe ? ` · ${p.stufe}` : ""}</span>
                     {p.share_token && <span className="badge ok">Link</span>}
+                    {p.school && <span className="badge new">Schule</span>}
                     {p.pool && <span className="badge new">Pool</span>}
                   </span>
                   <h3>{p.title}</h3>

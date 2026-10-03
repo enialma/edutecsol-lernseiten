@@ -1,12 +1,15 @@
 import { usageByUser } from "@/lib/pages";
-import { listUsers } from "@/lib/users";
+import { listInstitutions, listUsers } from "@/lib/users";
 import Topbar from "../../Topbar";
-import { createUserAction, deleteUserAction, setPasswordAction, toggleActiveAction } from "./actions";
+import {
+  createInstitutionAction, createUserAction, deleteInstitutionAction, deleteUserAction, renameInstitutionAction,
+  setInstitutionAction, setPasswordAction, toggleActiveAction,
+} from "./actions";
 
 export const dynamic = "force-dynamic";
 
 export default async function BenutzerPage() {
-  const [users, usage] = await Promise.all([listUsers(), usageByUser()]);
+  const [users, usage, institutions] = await Promise.all([listUsers(), usageByUser(), listInstitutions()]);
   const total = usage.reduce((t, u) => ({ pages: t.pages + u.pages, input_tokens: t.input_tokens + u.input_tokens, output_tokens: t.output_tokens + u.output_tokens }), { pages: 0, input_tokens: 0, output_tokens: 0 });
   const nf = (n: number) => n.toLocaleString("de-CH");
   return (
@@ -27,7 +30,13 @@ export default async function BenutzerPage() {
               <div className="form-grid">
                 <div><label>E-Mail *</label><input name="email" type="email" required /></div>
                 <div><label>Name</label><input name="name" /></div>
-                <div><label>Schule / Organisation</label><input name="organisation" /></div>
+                <div>
+                  <label>Institution</label>
+                  <select name="institution_id" defaultValue="">
+                    <option value="">keine</option>
+                    {institutions.map((i) => <option key={i.id} value={i.id}>{i.name}</option>)}
+                  </select>
+                </div>
                 <div><label>Gültig bis (optional)</label><input name="valid_until" type="date" /></div>
                 <div>
                   <label>Rolle</label>
@@ -48,13 +57,23 @@ export default async function BenutzerPage() {
           <div className="table-wrap">
             <table>
               <thead>
-                <tr><th>E-Mail</th><th>Name / Schule</th><th>Rolle</th><th>Status</th><th>Login</th><th>Letzter Login</th><th>Aktionen</th></tr>
+                <tr><th>E-Mail</th><th>Name</th><th>Institution</th><th>Rolle</th><th>Status</th><th>Login</th><th>Letzter Login</th><th>Aktionen</th></tr>
               </thead>
               <tbody>
                 {users.map((u) => (
                   <tr key={u.id}>
                     <td>{u.email}{u.notes && <div className="small-note">{u.notes}</div>}</td>
-                    <td>{u.name}<div className="small-note">{u.organisation}</div></td>
+                    <td>{u.name}</td>
+                    <td>
+                      <form action={setInstitutionAction} className="row">
+                        <input type="hidden" name="id" value={u.id} />
+                        <select name="institution_id" defaultValue={u.institution_id ?? ""} style={{ width: 170, padding: ".35rem .5rem", fontSize: ".8rem" }}>
+                          <option value="">keine</option>
+                          {institutions.map((i) => <option key={i.id} value={i.id}>{i.name}</option>)}
+                        </select>
+                        <button className="btn small ghost">Setzen</button>
+                      </form>
+                    </td>
                     <td>{u.role === "admin" ? "Admin" : "Lehrperson"}</td>
                     <td>
                       <span className={`badge ${u.active ? "ok" : "off"}`}>{u.active ? "aktiv" : "gesperrt"}</span>
@@ -83,11 +102,47 @@ export default async function BenutzerPage() {
                   </tr>
                 ))}
                 {users.length === 0 && (
-                  <tr><td colSpan={7}>Noch keine Benutzer. Admins aus ADMIN_EMAILS werden beim ersten Login automatisch angelegt.</td></tr>
+                  <tr><td colSpan={8}>Noch keine Benutzer. Admins aus ADMIN_EMAILS werden beim ersten Login automatisch angelegt.</td></tr>
                 )}
               </tbody>
             </table>
           </div>
+
+          <h2>Institutionen ({institutions.length})</h2>
+          <p className="small-note">
+            Lehrpersonen derselben Institution können Lernseiten nur untereinander freigeben («Meine Schule»). Wird eine
+            Institution gelöscht, bleiben die Konten bestehen; für die Schule freigegebene Seiten sieht dann nur noch die Autorin.
+          </p>
+          <div className="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Konten</th><th>Aktionen</th></tr></thead>
+              <tbody>
+                {institutions.map((i) => (
+                  <tr key={i.id}>
+                    <td>
+                      <form action={renameInstitutionAction} className="row">
+                        <input type="hidden" name="id" value={i.id} />
+                        <input name="name" defaultValue={i.name} style={{ flex: "1 1 220px", padding: ".35rem .5rem", fontSize: ".85rem" }} />
+                        <button className="btn small ghost">Umbenennen</button>
+                      </form>
+                    </td>
+                    <td>{i.users}</td>
+                    <td>
+                      <form action={deleteInstitutionAction}>
+                        <input type="hidden" name="id" value={i.id} />
+                        <button className="btn small ghost" style={{ color: "var(--err)" }}>Löschen</button>
+                      </form>
+                    </td>
+                  </tr>
+                ))}
+                {institutions.length === 0 && <tr><td colSpan={3}>Noch keine Institution angelegt.</td></tr>}
+              </tbody>
+            </table>
+          </div>
+          <form action={createInstitutionAction} className="row" style={{ marginTop: ".8rem", alignItems: "center" }}>
+            <input name="name" placeholder="Name der neuen Institution" required style={{ flex: "1 1 240px" }} />
+            <button className="btn small">Institution anlegen</button>
+          </form>
 
           <h2>Nutzung</h2>
           <p className="small-note">

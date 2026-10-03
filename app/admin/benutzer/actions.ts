@@ -1,7 +1,7 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
-import { createUser, deleteUser, setActive, setPassword } from "@/lib/users";
+import { createInstitution, createUser, deleteInstitution, deleteUser, renameInstitution, setActive, setInstitution, setPassword } from "@/lib/users";
 
 async function requireAdmin() {
   const s = await auth();
@@ -18,7 +18,7 @@ export async function createUserAction(fd: FormData) {
     await createUser({
       email,
       name: str(fd, "name"),
-      organisation: str(fd, "organisation"),
+      institutionId: Number(fd.get("institution_id")) || null,
       notes: str(fd, "notes"),
       role: str(fd, "role") === "admin" ? "admin" : "user",
       valid_until: str(fd, "valid_until") || undefined,
@@ -27,6 +27,36 @@ export async function createUserAction(fd: FormData) {
   } catch (e) {
     console.error("createUser fehlgeschlagen", e);
   }
+  revalidatePath("/admin/benutzer");
+}
+
+export async function setInstitutionAction(fd: FormData) {
+  await requireAdmin();
+  await setInstitution(Number(fd.get("id")), Number(fd.get("institution_id")) || null);
+  revalidatePath("/admin/benutzer");
+}
+
+export async function createInstitutionAction(fd: FormData) {
+  await requireAdmin();
+  const name = str(fd, "name");
+  if (name) await createInstitution(name);
+  revalidatePath("/admin/benutzer");
+}
+
+export async function renameInstitutionAction(fd: FormData) {
+  await requireAdmin();
+  const name = str(fd, "name");
+  try {
+    if (name) await renameInstitution(Number(fd.get("id")), name);
+  } catch (e) {
+    console.error("renameInstitution fehlgeschlagen", e); // z. B. Name schon vergeben
+  }
+  revalidatePath("/admin/benutzer");
+}
+
+export async function deleteInstitutionAction(fd: FormData) {
+  await requireAdmin();
+  await deleteInstitution(Number(fd.get("id")));
   revalidatePath("/admin/benutzer");
 }
 
