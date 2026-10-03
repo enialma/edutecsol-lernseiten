@@ -51,6 +51,12 @@ export function ready(): Promise<void> {
       await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS share_token TEXT UNIQUE`);
       await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS pool BOOLEAN NOT NULL DEFAULT FALSE`);
       await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS copied_from INTEGER`);
+      await sql.query(`CREATE TABLE IF NOT EXISTS moodle_links (
+        user_id    INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+        base_url   TEXT NOT NULL,
+        token_enc  TEXT NOT NULL,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )`);
     })().catch((e) => {
       readyPromise = null;
       throw e;

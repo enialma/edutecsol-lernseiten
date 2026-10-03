@@ -7,7 +7,9 @@ import { getPage } from "@/lib/pages";
 import { DIFFART_LABELS, NIVEAU_LABELS, SPRACHE_LABELS, TWIST_LABELS, type GenParams } from "@/lib/prompt";
 import Topbar from "../../../Topbar";
 import { copyAction, deletePageAction, poolAction, renameAction, shareAction } from "../actions";
+import { getMoodleBase } from "@/lib/moodle";
 import CopyButton from "./CopyButton";
+import MoodleCard from "./MoodleCard";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +22,7 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
   if (!page) notFound();
   const own = page.user_id === userId;
   const canEdit = own || isAdmin;
+  const moodleBase = canEdit ? await getMoodleBase(userId) : null;
   const p = page.params as Partial<GenParams>;
   const slug = page.title.toLowerCase().replace(/[^a-z0-9äöü]+/g, "-").replace(/^-|-$/g, "") || "lernseite";
 
@@ -111,8 +114,10 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
             </div>
           )}
 
+          {canEdit && <MoodleCard pageId={page.id} title={page.title} connectedBase={moodleBase} />}
+
           <details className="card" style={{ marginBottom: "1rem" }}>
-            <summary style={{ cursor: "pointer", fontWeight: 600 }}>So kommt die Lernseite in Moodle</summary>
+            <summary style={{ cursor: "pointer", fontWeight: 600 }}>Lernseite von Hand in Moodle einfügen</summary>
             <div className="grid" style={{ marginTop: ".8rem" }}>
               <div>
                 <h3 style={{ margin: "0 0 .3rem" }}>Variante A · SCORM-Paket</h3>

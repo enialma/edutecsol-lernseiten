@@ -3,7 +3,7 @@ import Topbar from "../Topbar";
 
 export const metadata = { title: "Datenschutz – Lernwege EDUTECSOL" };
 
-const STAND = "2. Oktober 2026";
+const STAND = "3. Oktober 2026";
 
 export default function DatenschutzPage() {
   return (
@@ -47,6 +47,11 @@ export default function DatenschutzPage() {
                 <td><b>Erzeugte Lernseiten</b><br /><span className="small-note">HTML-Datei, gewählte didaktische Einstellungen, Fach, Stufe, Thema, Name der hochgeladenen Datei, verwendeter KI-Anbieter, Tokenzahl, Dauer</span></td>
                 <td>Sammlung der Lehrperson, Download, Freigabe, Kostenkontrolle</td>
                 <td>Bis die Lehrperson sie löscht</td>
+              </tr>
+              <tr>
+                <td><b>Moodle-Verbindung</b> (freiwillig)<br /><span className="small-note">Adresse des Moodle und persönlicher Webservice-Token der Lehrperson, der Token verschlüsselt (AES-256)</span></td>
+                <td>Lernseite auf Knopfdruck als Link in einen eigenen Moodle-Kurs legen</td>
+                <td>Bis die Lehrperson die Verbindung trennt oder das Konto gelöscht wird</td>
               </tr>
               <tr>
                 <td><b>Sitzungs-Cookie</b><br /><span className="small-note">Verschlüsseltes Login-Token, dazu ein CSRF-Schutz-Cookie</span></td>
