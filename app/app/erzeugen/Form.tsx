@@ -2,7 +2,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
-type ProviderOpt = { id: string; label: string; model: string };
+type ProviderOpt = { id: string; label: string; model: string; used: number; limit: number | null };
 type Preset = { id: string; label: string; fach?: string; stufe?: string; diffart?: string; anzahl?: number; sprache?: string; twist?: string; niveau?: string };
 
 const DIFFART = [["niveau", "nach Niveau (Hilfe)"], ["lerntyp", "nach Lerntyp"], ["interesse", "nach Berufsfeld"], ["sozialform", "nach Sozialform"]];
@@ -21,7 +21,7 @@ export default function Form({ providers, presets }: { providers: ProviderOpt[];
   const [s, setS] = useState<State>({
     fach: "", stufe: "", thema: "", extra: "", material: "",
     diffart: "niveau", anzahl: 3, sprache: "standard", zweitsprache: "", twist: "auto", niveau: "anwenden",
-    provider: providers[0].id,
+    provider: (providers.find((p) => p.limit === null || p.used < p.limit) ?? providers[0]).id,
   });
   const [busy, setBusy] = useState(false);
   const [log, setLog] = useState<string[]>([]);
@@ -71,6 +71,9 @@ export default function Form({ providers, presets }: { providers: ProviderOpt[];
       setBusy(false);
     }
   }
+
+  const current = providers.find((p) => p.id === s.provider) ?? providers[0];
+  const exhausted = current.limit !== null && current.used >= current.limit;
 
   const Seg = ({ k, opts }: { k: keyof State; opts: string[][] }) => (
     <div className="seg">
@@ -122,8 +125,15 @@ export default function Form({ providers, presets }: { providers: ProviderOpt[];
         ))}
       </div>
 
+      {current.limit !== null && (
+        <p className="small-note" style={{ marginTop: ".5rem", color: exhausted ? "var(--err)" : undefined }}>
+          Diesen Monat {current.used} von {current.limit} Lernseiten mit {current.label} erzeugt.
+          {exhausted ? " Das Kontingent ist aufgebraucht und wird am Monatsersten zurückgesetzt." : ""}
+        </p>
+      )}
+
       <div style={{ marginTop: "1.3rem", display: "flex", gap: ".8rem", alignItems: "center", flexWrap: "wrap" }}>
-        <button className="btn terra" disabled={busy}>{busy ? "Wird erzeugt …" : "Lernseite erzeugen"}</button>
+        <button className="btn terra" disabled={busy || exhausted}>{busy ? "Wird erzeugt …" : "Lernseite erzeugen"}</button>
         {busy && <span className="small-note">Bitte Fenster offen lassen. Dauer ein bis drei Minuten.</span>}
       </div>
 

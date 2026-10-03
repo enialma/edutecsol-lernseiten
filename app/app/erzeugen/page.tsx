@@ -1,15 +1,21 @@
 import { availableProviders, CLAUDE_MODEL, INFOMANIAK_MODEL, PROVIDER_LABELS } from "@/lib/ai";
+import { auth } from "@/auth";
 import { PRESETS } from "@/lib/prompt";
+import { quotaFor } from "@/lib/quota";
 import Topbar from "../../Topbar";
 import Form from "./Form";
 
 export const dynamic = "force-dynamic";
 
-export default function ErzeugenPage() {
+export default async function ErzeugenPage() {
+  const session = await auth();
+  const quota = await quotaFor(Number(session!.user.id), session!.user.role === "admin");
   const providers = availableProviders().map((p) => ({
     id: p,
     label: PROVIDER_LABELS[p],
     model: p === "claude" ? CLAUDE_MODEL : INFOMANIAK_MODEL,
+    used: quota[p].used,
+    limit: quota[p].limit,
   }));
   const presets = Object.entries(PRESETS).map(([id, p]) => ({ id, ...p }));
   return (

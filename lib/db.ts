@@ -65,6 +65,20 @@ export function ready(): Promise<void> {
         await sql.query(`INSERT INTO institutions (name) SELECT DISTINCT btrim(organisation) FROM users WHERE btrim(COALESCE(organisation,'')) <> '' ON CONFLICT DO NOTHING`);
         await sql.query(`UPDATE users u SET institution_id = i.id FROM institutions i WHERE u.institution_id IS NULL AND btrim(u.organisation) = i.name`);
       }
+      // Protokoll der KI-Erzeugungen für Kontingent und Nutzung; einmalig aus den bestehenden Seiten befüllt
+      await sql.query(`CREATE TABLE IF NOT EXISTS generations (
+        id            SERIAL PRIMARY KEY,
+        user_id       INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        provider      TEXT NOT NULL,
+        model         TEXT,
+        input_tokens  INTEGER NOT NULL DEFAULT 0,
+        output_tokens INTEGER NOT NULL DEFAULT 0,
+        ok            BOOLEAN NOT NULL DEFAULT TRUE,
+        created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )`);
+      await sql.query(`INSERT INTO generations (user_id, provider, model, input_tokens, output_tokens, created_at)
+        SELECT user_id, provider, model, input_tokens, output_tokens, created_at FROM pages
+        WHERE copied_from IS NULL AND provider <> 'beispiel' AND NOT EXISTS (SELECT 1 FROM generations)`);
       await sql.query(`CREATE TABLE IF NOT EXISTS moodle_links (
         user_id    INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
         base_url   TEXT NOT NULL,

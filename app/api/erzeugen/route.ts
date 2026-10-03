@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { availableProviders, generate, type Provider } from "@/lib/ai";
 import { extractFromFile, type Extracted } from "@/lib/extract";
 import { createPage } from "@/lib/pages";
+import { LIMITS, logGeneration, quotaFor } from "@/lib/quota";
 import { extractHtml, systemPrompt, titleFromHtml, userPrompt, type GenParams } from "@/lib/prompt";
 
 export const runtime = "nodejs";
@@ -22,6 +23,12 @@ export async function POST(req: Request) {
   const fd = await req.formData();
   const provider = pick<Provider>(fd.get("provider"), availableProviders(), availableProviders()[0]);
   if (!provider) return new Response("Kein KI-Anbieter konfiguriert.", { status: 503 });
+
+  const quota = (await quotaFor(userId, session.user.role === "admin"))[provider];
+  if (quota.limit !== null && quota.used >= quota.limit) {
+    const other = provider === "claude" && availableProviders().includes("infomaniak") ? " Mit Infomaniak kannst du weiter erzeugen." : "";
+    return new Response(`Dein Monatskontingent von ${LIMITS[provider]} Lernseiten mit ${provider === "claude" ? "Claude" : "Infomaniak"} ist aufgebraucht. Am Monatsersten wird es zurückgesetzt.${other}`, { status: 429 });
+  }
 
   const params: GenParams = {
     fach: String(fd.get("fach") ?? "").trim(),
@@ -45,6 +52,7 @@ export async function POST(req: Request) {
     async start(controller) {
       const send = (s: string) => controller.enqueue(enc.encode(s));
       const t0 = Date.now();
+      let spent: { provider: string; model?: string | null; inputTokens: number; outputTokens: number } | null = null;
       try {
         let material: Extracted | null = null;
         if (file instanceof File && file.size > 0) {
@@ -71,6 +79,7 @@ export async function POST(req: Request) {
           signal: req.signal,
         });
 
+        spent = result;
         if (result.stopReason === "refusal") throw new Error("Das Modell hat die Anfrage abgelehnt.");
         const html = extractHtml(result.text);
         if (!/<html[\s>]/i.test(html) || !/<\/html>/i.test(html)) {
@@ -83,11 +92,15 @@ export async function POST(req: Request) {
           materialName: material?.name || null, provider: result.provider, model: result.model,
           inputTokens: result.inputTokens, outputTokens: result.outputTokens, durationMs: Date.now() - t0, html, notiz,
         });
+        await logGeneration({ userId, ...result, ok: true });
+        spent = null;
         send(`▸ Fertig: «${title}» (${Math.round((Date.now() - t0) / 1000)} s, ${result.outputTokens.toLocaleString("de-CH")} Tokens).\n`);
         send(`@@DONE ${JSON.stringify({ id, title })}\n`);
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
         console.error("erzeugen fehlgeschlagen", e);
+        // Kosten sind angefallen, die Seite ist aber unbrauchbar: protokollieren, ohne das Kontingent zu belasten
+        if (spent) await logGeneration({ userId, ...spent, ok: false }).catch(() => {});
         send(`@@ERROR ${msg}\n`);
       } finally {
         controller.close();

@@ -1,4 +1,4 @@
-import { usageByUser } from "@/lib/pages";
+import { LIMITS, usageByUser } from "@/lib/quota";
 import { listInstitutions, listUsers } from "@/lib/users";
 import Topbar from "../../Topbar";
 import {
@@ -147,19 +147,22 @@ export default async function BenutzerPage() {
           <h2>Nutzung</h2>
           <p className="small-note">
             Mit KI erzeugte Lernseiten pro Person ({total.pages} Seiten, {nf(total.input_tokens)} Eingabe- und{" "}
-            {nf(total.output_tokens)} Ausgabe-Tokens). Kopien aus dem Pool zählen nicht, gelöschte Seiten fehlen.
+            {nf(total.output_tokens)} Ausgabe-Tokens). Gelöschte Seiten zählen weiter mit; die Tokens enthalten auch
+            misslungene Versuche. Monatskontingent pro Person: {LIMITS.claude} mit Claude, {LIMITS.infomaniak} mit
+            Infomaniak (Admins ohne Limit).
           </p>
           <div className="table-wrap">
             <table>
               <thead>
-                <tr><th>E-Mail</th><th>Seiten</th><th>Diesen Monat</th><th>Claude / Infomaniak</th><th>Tokens Eingabe</th><th>Tokens Ausgabe</th><th>Letzte Seite</th></tr>
+                <tr><th>E-Mail</th><th>Institution</th><th>Seiten</th><th>Diesen Monat Claude / Infomaniak</th><th>Total Claude / Infomaniak</th><th>Tokens Eingabe</th><th>Tokens Ausgabe</th><th>Letzte Seite</th></tr>
               </thead>
               <tbody>
                 {usage.map((u) => (
                   <tr key={u.email}>
                     <td>{u.email}{u.name && <div className="small-note">{u.name}</div>}</td>
+                    <td>{u.institution ?? "–"}</td>
                     <td>{u.pages}</td>
-                    <td>{u.pages_month}</td>
+                    <td>{u.claude_month} / {u.infomaniak_month}</td>
                     <td>{u.claude} / {u.infomaniak}</td>
                     <td>{nf(u.input_tokens)}</td>
                     <td>{nf(u.output_tokens)}</td>

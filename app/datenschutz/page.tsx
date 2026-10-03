@@ -49,6 +49,11 @@ export default function DatenschutzPage() {
                 <td>Bis die Lehrperson sie löscht</td>
               </tr>
               <tr>
+                <td><b>Erzeugungsprotokoll</b><br /><span className="small-note">Pro KI-Erzeugung: Zeitpunkt, KI-Anbieter, Modell, Tokenzahl. Kein Inhalt, kein Material</span></td>
+                <td>Monatskontingent pro Person, Kostenkontrolle, Abrechnung</td>
+                <td>Bis zur Löschung des Kontos, auch wenn die Lernseite gelöscht wird</td>
+              </tr>
+              <tr>
                 <td><b>Moodle-Verbindung</b> (freiwillig)<br /><span className="small-note">Adresse des Moodle und persönlicher Webservice-Token der Lehrperson, der Token verschlüsselt (AES-256)</span></td>
                 <td>Lernseite auf Knopfdruck als Link in einen eigenen Moodle-Kurs legen</td>
                 <td>Bis die Lehrperson die Verbindung trennt oder das Konto gelöscht wird</td>

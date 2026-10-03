@@ -143,22 +143,3 @@ export async function importedBeispiele(): Promise<string[]> {
   const rows = await q(`SELECT material_name FROM pages WHERE provider = 'beispiel' AND copied_from IS NULL`);
   return rows.map((r) => r.material_name as string);
 }
-
-export type Usage = {
-  email: string; name: string | null; pages: number; pages_month: number; claude: number; infomaniak: number;
-  input_tokens: number; output_tokens: number; last_page: string | null;
-};
-
-/** Erzeugte Seiten und Tokens pro Person – Kopien aus dem Pool zählen nicht, gelöschte Seiten fehlen. */
-export async function usageByUser(): Promise<Usage[]> {
-  return (await q(
-    `SELECT u.email, u.name, COUNT(p.id)::int AS pages,
-       COUNT(p.id) FILTER (WHERE p.created_at >= date_trunc('month', NOW()))::int AS pages_month,
-       COUNT(p.id) FILTER (WHERE p.provider = 'claude')::int AS claude,
-       COUNT(p.id) FILTER (WHERE p.provider = 'infomaniak')::int AS infomaniak,
-       COALESCE(SUM(p.input_tokens),0)::int AS input_tokens, COALESCE(SUM(p.output_tokens),0)::int AS output_tokens,
-       to_char(MAX(p.created_at), 'DD.MM.YYYY') AS last_page
-     FROM users u LEFT JOIN pages p ON p.user_id = u.id AND p.copied_from IS NULL AND p.provider <> 'beispiel'
-     GROUP BY u.email, u.name ORDER BY pages DESC, u.email`
-  )) as never;
-}
