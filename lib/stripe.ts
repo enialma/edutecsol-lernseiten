@@ -35,6 +35,8 @@ export async function createCheckout(a: { userId: number; email: string; plan: P
     cancel_url: `${a.origin}/zugang?status=abgebrochen`,
     locale: "de",
     allow_promotion_codes: "true",
+    // EDUTECSOL bleibt Verkäuferin und weist die MWST selbst aus (sonst übernimmt Stripe «Managed Payments» Verkauf und Steuern)
+    "managed_payments[enabled]": "false",
   };
   // Schweizer MWST: in Stripe angelegter Steuersatz (inklusive), erscheint auf den Rechnungen
   if (process.env.STRIPE_TAX_RATE) p["subscription_data[default_tax_rates][0]"] = process.env.STRIPE_TAX_RATE;
