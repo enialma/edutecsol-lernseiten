@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Lernwege – EDUTECSOL",
-  description: "Differenzierte, interaktive Lernseiten für die Schweizer Berufsbildung",
+  description: "Differenzierte, interaktive Lernseiten für Schweizer Schulen",
   icons: { icon: "/favicon-32.png", apple: "/apple-touch-icon.png" },
 };
 
