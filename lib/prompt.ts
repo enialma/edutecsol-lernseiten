@@ -109,7 +109,7 @@ function niveauText(p: GenParams): string {
 
 /** System-Prompt: Rolle + Ausgabe-Vertrag (stabil, cachebar). */
 export function systemPrompt(): string {
-  return `Du erstellst differenzierte, interaktive Lernseiten für die Schweizer Berufsbildung.
+  return `Du erstellst differenzierte, interaktive Lernseiten für Schweizer Schulen, passend zur angegebenen Stufe.
 
 AUSGABE-VERTRAG (zwingend):
 - Antworte ausschliesslich mit einer einzigen, vollständigen HTML-Datei: beginne mit <!DOCTYPE html> und ende mit </html>.
