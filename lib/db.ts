@@ -65,10 +65,12 @@ export function ready(): Promise<void> {
         await sql.query(`INSERT INTO institutions (name) SELECT DISTINCT btrim(organisation) FROM users WHERE btrim(COALESCE(organisation,'')) <> '' ON CONFLICT DO NOTHING`);
         await sql.query(`UPDATE users u SET institution_id = i.id FROM institutions i WHERE u.institution_id IS NULL AND btrim(u.organisation) = i.name`);
       }
-      // Abo für Einzelpersonen (Stripe): vorgemerkte Konten sind bis zur ersten Zahlung inaktiv
+      // Abo für Einzelpersonen: vorgemerkte Konten sind bis zur ersten Zahlung inaktiv
       await sql.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS pending BOOLEAN NOT NULL DEFAULT FALSE`);
       await sql.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT`);
       await sql.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT`);
+      // Zahlungsanbieter ist seit 04.10.2026 Payrexx; die stripe_-Spalten bleiben ungenutzt stehen
+      await sql.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS payrexx_subscription_id TEXT`);
       // Protokoll der KI-Erzeugungen für Kontingent und Nutzung; einmalig aus den bestehenden Seiten befüllt
       await sql.query(`CREATE TABLE IF NOT EXISTS generations (
         id            SERIAL PRIMARY KEY,

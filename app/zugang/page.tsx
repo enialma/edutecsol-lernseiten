@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { prepareSignup } from "@/lib/billing";
 import { LIMITS } from "@/lib/quota";
-import { createCheckout, stripeReady } from "@/lib/stripe";
+import { createCheckout, payrexxReady } from "@/lib/payrexx";
 import Topbar from "../Topbar";
 
 export const dynamic = "force-dynamic";
@@ -21,20 +21,20 @@ async function buy(fd: FormData) {
   if (fd.get("agb") !== "1") fail("Bitte die AGB bestätigen.");
   let url: string;
   try {
-    const { userId, customerId } = await prepareSignup(email, name, password);
+    const { userId } = await prepareSignup(email, name, password);
     const h = await headers();
     const origin = `${h.get("x-forwarded-proto") ?? "https"}://${h.get("x-forwarded-host") ?? h.get("host")}`;
-    url = await createCheckout({ userId, email, plan, origin, customerId });
+    url = await createCheckout({ userId, email, plan, origin });
   } catch (e) {
     console.error("Zugang kaufen fehlgeschlagen", e);
-    return fail(e instanceof Error && !e.message.startsWith("Stripe") ? e.message : "Die Bezahlseite konnte nicht geöffnet werden. Bitte später erneut versuchen.");
+    return fail(e instanceof Error && !e.message.startsWith("Payrexx") ? e.message : "Die Bezahlseite konnte nicht geöffnet werden. Bitte später erneut versuchen.");
   }
   redirect(url);
 }
 
 export default async function ZugangPage({ searchParams }: { searchParams: Promise<{ status?: string; fehler?: string }> }) {
   const { status, fehler } = await searchParams;
-  const ready = stripeReady();
+  const ready = payrexxReady();
 
   return (
     <>
@@ -90,7 +90,7 @@ export default async function ZugangPage({ searchParams }: { searchParams: Promi
                     <span>Ich akzeptiere die <Link href="/agb">AGB</Link> und habe die <Link href="/datenschutz">Datenschutzerklärung</Link> gelesen.</span>
                   </label>
                   <div style={{ marginTop: "1rem" }}><button className="btn terra">Weiter zur Bezahlung</button></div>
-                  <p className="small-note" style={{ marginTop: ".6rem" }}>Die Zahlung läuft über Stripe. Wir sehen und speichern keine Kartendaten.</p>
+                  <p className="small-note" style={{ marginTop: ".6rem" }}>Die Zahlung läuft über Payrexx (Schweiz) – mit TWINT, PostFinance oder Karte. Wir sehen und speichern keine Kartendaten.</p>
                 </form>
               ) : (
                 <p className="small-note">

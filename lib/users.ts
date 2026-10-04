@@ -31,7 +31,7 @@ const COLS = `id, email, name, role, active, organisation, notes, institution_id
   to_char(created_at, 'YYYY-MM-DD HH24:MI') AS created_at,
   to_char(last_login_at, 'YYYY-MM-DD HH24:MI') AS last_login_at,
   last_login_via, (password_hash IS NOT NULL) AS has_password, pending,
-  (stripe_subscription_id IS NOT NULL) AS has_subscription`;
+  (payrexx_subscription_id IS NOT NULL) AS has_subscription`;
 
 export function normEmail(e: string) {
   return e.trim().toLowerCase();

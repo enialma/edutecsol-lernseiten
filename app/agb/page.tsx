@@ -2,7 +2,7 @@ import Link from "next/link";
 import { LIMITS } from "@/lib/quota";
 import Topbar from "../Topbar";
 
-const STAND = "3. Oktober 2026";
+const STAND = "4. Oktober 2026";
 // MWST-Nummer der EDUTECSOL GmbH (Format CHE-123.456.789 MWST); leer = wird nicht angezeigt
 const MWST_NR = "CHE-484.488.885 MWST";
 
@@ -50,14 +50,14 @@ export default function AgbPage() {
           <h2>4. Preise und Zahlung</h2>
           <ul>
             <li>Monatsabo: CHF 8 pro Monat. Jahresabo: CHF 60 pro Jahr. Beide Preise verstehen sich inklusive Schweizer Mehrwertsteuer.</li>
-            <li>Die Zahlung erfolgt im Voraus für die jeweilige Laufzeit über den Zahlungsdienstleister Stripe. EDUTECSOL erhält und speichert keine Kartendaten.</li>
+            <li>Die Zahlung erfolgt im Voraus für die jeweilige Laufzeit über den Schweizer Zahlungsdienstleister Payrexx (TWINT, PostFinance, Kreditkarte). EDUTECSOL erhält und speichert keine Kartendaten.</li>
             <li>Preisänderungen werden mindestens 30 Tage im Voraus per E-Mail angekündigt und gelten frühestens ab der nächsten Laufzeit. Sie können vorher kündigen.</li>
           </ul>
 
           <h2>5. Laufzeit, Verlängerung und Kündigung</h2>
           <ul>
             <li>Das Abo verlängert sich automatisch um die gewählte Laufzeit (einen Monat oder ein Jahr), wenn es nicht vorher gekündigt wird.</li>
-            <li>Sie können jederzeit auf das Ende der bezahlten Laufzeit kündigen: im geschützten Bereich unter «Abo verwalten» oder per E-Mail an <a href="mailto:info@edutecsol.ch">info@edutecsol.ch</a>. Der Zugang bleibt bis zum Ende der bezahlten Laufzeit bestehen.</li>
+            <li>Sie können jederzeit auf das Ende der bezahlten Laufzeit kündigen: im geschützten Bereich unter «Abo kündigen» oder per E-Mail an <a href="mailto:info@edutecsol.ch">info@edutecsol.ch</a>. Der Zugang bleibt bis zum Ende der bezahlten Laufzeit bestehen.</li>
             <li>Bereits bezahlte Beträge werden bei einer Kündigung nicht anteilig zurückerstattet.</li>
             <li>Ein gesetzliches Widerrufsrecht für Online-Käufe besteht nach Schweizer Recht nicht. Aus Kulanz erstatten wir den Betrag vollständig zurück, wenn Sie innert 14 Tagen nach dem ersten Abschluss per E-Mail vom Vertrag zurücktreten.</li>
             <li>Kann eine Verlängerung nicht abgebucht werden, endet der Zugang nach Ablauf der bezahlten Laufzeit.</li>

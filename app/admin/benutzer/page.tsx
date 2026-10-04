@@ -77,7 +77,7 @@ export default async function BenutzerPage() {
                     <td>{u.role === "admin" ? "Admin" : "Lehrperson"}</td>
                     <td>
                       <span className={`badge ${u.active ? "ok" : "off"}`}>{u.active ? "aktiv" : u.pending ? "Zahlung offen" : "gesperrt"}</span>
-                      {u.has_subscription && <div className="small-note">Abo (Stripe)</div>}
+                      {u.has_subscription && <div className="small-note">Abo (Payrexx)</div>}
                       {u.valid_until && <div className="small-note">bis {u.valid_until}</div>}
                     </td>
                     <td>{u.has_password ? "M365 + Passwort" : "M365"}</td>

@@ -1,23 +1,30 @@
 import Link from "next/link";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { billingOf } from "@/lib/billing";
-import { createPortal } from "@/lib/stripe";
+import { billingOf, clearSubscription } from "@/lib/billing";
+import { cancelSubscription } from "@/lib/payrexx";
 import Topbar from "../Topbar";
 
-export default async function AppHome() {
+export default async function AppHome({ searchParams }: { searchParams: Promise<{ abo?: string }> }) {
+  const { abo } = await searchParams;
   const session = await auth();
   const name = session?.user?.name || session?.user?.email;
   const billing = await billingOf(Number(session!.user.id));
 
-  const portal = async () => {
+  const cancel = async () => {
     "use server";
     const s = await auth();
     const b = await billingOf(Number(s!.user.id));
-    if (!b.customerId) return;
-    const h = await headers();
-    redirect(await createPortal(b.customerId, `${h.get("x-forwarded-proto") ?? "https"}://${h.get("x-forwarded-host") ?? h.get("host")}`));
+    if (!b.subscriptionId) return;
+    let result = "gekuendigt";
+    try {
+      await cancelSubscription(b.subscriptionId);
+      await clearSubscription(b.subscriptionId);
+    } catch (e) {
+      console.error("Abo kündigen fehlgeschlagen", e);
+      result = "fehler";
+    }
+    redirect(`/app?abo=${result}`);
   };
   return (
     <>
@@ -50,14 +57,29 @@ export default async function AppHome() {
               <span className="foot">Öffnen →</span>
             </Link>
           </div>
-          {billing.customerId && (
-            <form action={portal} className="card row" style={{ marginTop: "1rem", alignItems: "center" }}>
-              <span style={{ flex: "1 1 240px" }}>
-                {billing.hasSubscription ? "Dein Abo läuft und verlängert sich automatisch." : `Dein Abo ist beendet. Der Zugang gilt noch bis ${billing.validUntil ?? "zum Ablauf"}.`}
-              </span>
-              <button className="btn small ghost">Abo verwalten</button>
-            </form>
+          {abo === "gekuendigt" && <div className="msg ok" style={{ marginTop: "1rem" }}>Dein Abo ist gekündigt. Es wird nichts mehr abgebucht.</div>}
+          {abo === "fehler" && (
+            <div className="msg err" style={{ marginTop: "1rem" }}>
+              Die Kündigung hat nicht geklappt. Bitte schreib an <a href="mailto:info@edutecsol.ch">info@edutecsol.ch</a>, wir kündigen für dich.
+            </div>
           )}
+          {billing.subscriptionId ? (
+            <div className="card" style={{ marginTop: "1rem" }}>
+              <p style={{ marginTop: 0 }}>Dein Abo läuft und verlängert sich automatisch{billing.validUntil ? ` (bezahlt bis ${billing.validUntil})` : ""}.</p>
+              <details>
+                <summary>Abo kündigen</summary>
+                <form action={cancel}>
+                  <p className="small-note">Es wird nicht mehr abgebucht. Dein Zugang bleibt bis zum Ende der bezahlten Laufzeit bestehen.</p>
+                  <button className="btn small ghost">Jetzt kündigen</button>
+                </form>
+              </details>
+            </div>
+          ) : billing.validUntil ? (
+            <div className="card row" style={{ marginTop: "1rem", alignItems: "center" }}>
+              <span style={{ flex: "1 1 240px" }}>Dein Zugang gilt bis {billing.validUntil} und verlängert sich nicht automatisch.</span>
+              <Link className="btn small ghost" href="/zugang">Abo abschliessen</Link>
+            </div>
+          ) : null}
         </div>
       </main>
     </>
