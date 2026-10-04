@@ -66,6 +66,16 @@
   .how{background:#fff;border:1px solid var(--line);border-radius:14px;padding:1.3rem 1.4rem;box-shadow:var(--shadow);margin-top:1rem;}
   .how ol{margin:.4rem 0 0;padding-left:1.3rem;}
   .how li{margin:.35rem 0;}
+
+  /* Beschreibung und Funktionen */
+  .about{max-width:70ch;margin:0 0 1.2rem;}
+  .feat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.1rem 1.2rem;box-shadow:var(--shadow);}
+  .feat h3{font-size:1.05rem;margin:0 0 .4rem;font-weight:600;}
+  .feat ul{margin:0;padding-left:1.15rem;font-size:.92rem;color:var(--ink-soft);}
+  .feat li{margin:.3rem 0;}
+  .feat li b{color:var(--ink);font-weight:600;}
+  .feat .foot{display:inline-block;margin-top:.7rem;font-size:.85rem;color:var(--terra);font-weight:600;text-decoration:none;}
+  .feat .foot:hover{text-decoration:underline;}
 </style>
 </head>
 <body>
@@ -74,11 +84,12 @@
   <div class="wrap">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1rem"><p class="brand" style="margin:0">EDUTECSOL · Digitale Schulentwicklung</p><span style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center"><a href="/zugang" style="font-size:.85rem;font-weight:600;color:#fff;border:1px solid rgba(255,255,255,.45);border-radius:9px;padding:.45rem .95rem;text-decoration:none">Zugang &amp; Preise</a><a href="/app" style="font-size:.85rem;font-weight:600;color:#fff;background:var(--terra);border-radius:9px;padding:.45rem .95rem;text-decoration:none">Anmelden · Mein Bereich</a></span></div>
     <h1>Differenzierte, interaktive Lernseiten</h1>
-    <p>Aus Dokumenten, Unterrichtsmaterialien oder einer kurzen Themenbeschreibung entsteht eine Übung mit mehreren Zugängen: Selbstkontrolle für die Lernenden, Lösungen für die Lehrperson, offline nutzbar und als PDF exportierbar. Ein Generator mit Beispielen – und die Werkzeuge, um selbst weitere zu bauen.</p>
+    <p>Aus deinem Unterrichtsmaterial oder einer kurzen Themenbeschreibung entsteht eine Lernseite mit drei Zugängen (A/B/C): mit Selbstkontrolle für die Lernenden und Lösungen für die Lehrperson. Probier es kostenlos mit dem Prompt-Generator und den Beispielen aus, oder lass die Lernseite im geschützten Bereich direkt erzeugen, teile sie per Link oder QR-Code und exportiere sie als Word-Arbeitsblatt oder für Moodle.</p>
     <div class="hero-tags">
       <span class="tag">A/B/C-Differenzierung</span>
       <span class="tag">Selbstkontrolle</span>
       <span class="tag">Offline &amp; druckbar</span>
+      <span class="tag">Word &amp; Moodle</span>
       <span class="tag">Schweizer Berufsbildung</span>
     </div>
   </div>
@@ -93,6 +104,48 @@
 
 <main>
   <div class="wrap">
+
+    <!-- Beschreibung und Funktionen -->
+    <div class="sec-head">
+      <p class="kicker">Was ist Lernwege?</p>
+      <h2>Beschreibung und Funktionen</h2>
+    </div>
+    <p class="about">Lernwege ist eine Plattform der EDUTECSOL GmbH für Lehrpersonen der Berufsbildung und der Sekundarstufe II. Sie macht aus vorhandenem Unterrichtsmaterial interaktive Übungen, die dasselbe Thema auf drei Wegen anbieten: A mit Unterstützung, B als Standard, C als Vertiefung. Die Lernenden wählen ihren Zugang, kontrollieren sich selbst und erhalten sofort Rückmeldung. Jede Lernseite ist eine einzelne Datei, die im Browser, im Moodle und auf Papier funktioniert.</p>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+      <div class="feat">
+        <span class="badge tool">kostenlos, ohne Konto</span>
+        <h3>Ausprobieren und selbst bauen</h3>
+        <ul>
+          <li><b>Prompt-Generator:</b> Fach, Stufe und vier didaktische Achsen wählen (Differenzierungsart, Sprache, Twist-Typ, Niveau), Prompt kopieren und im eigenen KI-Chat verwenden</li>
+          <li><b>Schnellstart-Vorlagen</b> für Mathematik BM, Pharma, IT-Security und DaZ</li>
+          <li><b>Beispielseiten</b> aus sechs Fachbereichen zum Ansehen und Einsetzen</li>
+          <li><b>Master-Prompt</b> als Textvorlage zum Anpassen</li>
+        </ul>
+        <a class="foot" href="prompt-generator-v2.html">Zum Prompt-Generator →</a>
+      </div>
+      <div class="feat">
+        <span class="badge new">mit Zugang</span>
+        <h3>Lernseiten direkt erzeugen</h3>
+        <ul>
+          <li><b>Material hochladen</b> (PDF, Word, PowerPoint oder Text) oder Thema beschreiben, die fertige Lernseite entsteht in wenigen Minuten</li>
+          <li><b>KI nach Wahl:</b> Claude oder Infomaniak mit Verarbeitung in der Schweiz</li>
+          <li><b>Eigene Sammlung</b> mit Suche und Filter nach Fach und Stufe</li>
+          <li><b>Monatliches Kontingent</b> an Lernseiten, im Abo enthalten</li>
+        </ul>
+        <a class="foot" href="/zugang">Zugang &amp; Preise →</a>
+      </div>
+      <div class="feat">
+        <span class="badge new">mit Zugang</span>
+        <h3>Teilen und exportieren</h3>
+        <ul>
+          <li><b>Freigabelink mit QR-Code:</b> Lernende öffnen die Seite ohne Konto</li>
+          <li><b>Teilen im Kollegium:</b> nur für mich, für meine Schule oder im gemeinsamen Pool</li>
+          <li><b>Word-Arbeitsblatt</b> und <b>PDF</b> im A4-Hochformat zum Drucken</li>
+          <li><b>Moodle:</b> als SCORM-Lernpaket oder direkt in einen Kurs legen</li>
+        </ul>
+        <a class="foot" href="/zugang">Zugang &amp; Preise →</a>
+      </div>
+    </div>
 
     <!-- Werkzeuge -->
     <div class="sec-head">
