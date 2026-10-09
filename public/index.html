@@ -76,6 +76,9 @@
   .feat li b{color:var(--ink);font-weight:600;}
   .feat .foot{display:inline-block;margin-top:.7rem;font-size:.85rem;color:var(--terra);font-weight:600;text-decoration:none;}
   .feat .foot:hover{text-decoration:underline;}
+  .more{font-size:.92rem;color:var(--ink-soft);margin:.9rem 0 0;}
+  .more a{color:var(--terra);font-weight:600;text-decoration:none;}
+  .more a:hover{text-decoration:underline;}
 
   /* Sprungleiste */
   .subnav{position:sticky;top:0;z-index:20;background:rgba(246,239,226,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(6px);}
@@ -199,66 +202,30 @@
         <p>Material hochladen, Achsen wählen, fertige Lernseite erhalten – ohne Umweg über einen Chat. Mit Sammlung, Freigabelink, Word- und Moodle-Export.</p>
         <span class="foot">Zugang &amp; Preise →</span>
       </a>
-      <a class="tile" href="prompt-generator.html">
-        <span class="badge tool">schlank</span>
-        <div class="top"><span class="ic" style="background:#e9eef3;color:var(--navy)">▤</span><h3>Generator (Basis)</h3></div>
-        <p>Die einfache Fassung mit den Grundfeldern – schnell, wenn du meist A/B/C nach Niveau nutzt.</p>
-        <span class="foot">Öffnen →</span>
-      </a>
-      <a class="tile" href="master-prompt.html">
-        <span class="badge tool">Vorlage</span>
-        <div class="top"><span class="ic" style="background:#e9eef3;color:var(--navy)">✎</span><h3>Prompt-Textvorlage</h3></div>
-        <p>Der Master-Prompt als Textdatei zum manuellen Ausfüllen und Ablegen.</p>
-        <span class="foot">Öffnen →</span>
-      </a>
     </div>
+
+    <p class="more">Ausserdem: <a href="prompt-generator.html">Generator (Basis)</a> · <a href="master-prompt.html">Prompt-Textvorlage</a></p>
+
+    <!-- So funktioniert es -->
+    <div class="sec-head" id="so-funktioniert-es">
+      <p class="kicker">Und so entsteht eine neue Seite</p>
+      <h2>In vier Schritten</h2>
+    </div>
+    <div class="how">
+      <ol>
+        <li>Im <b>Prompt-Generator</b> Fach, Stufe und die didaktischen Achsen wählen.</li>
+        <li>Prompt kopieren, einen neuen Claude-Chat öffnen und einfügen.</li>
+        <li>Das <b>Material</b> (Dokument, PDF, Foliensatz) oder eine kurze <b>Themenbeschreibung</b> dazugeben und abschicken.</li>
+        <li>Die fertige HTML-Datei herunterladen – offline nutzbar, ins Moodle ladbar, als PDF druckbar.</li>
+      </ol>
+    </div>
+
 
     <!-- Beispiele: Lernseiten -->
     <div class="sec-head" id="beispiele-lernseiten" style="margin-top:3.4rem;padding-top:2rem;border-top:2px solid var(--line-strong)">
       <p class="kicker">Beispiele · Teil 1</p>
       <h2>Lernseiten aus dem Generator</h2>
-      <p>Fertige interaktive Übungen aus sechs Fachbereichen. Jede zeigt, was ein Prompt aus dem Generator zusammen mit eigenem Material ergibt.</p>
-    </div>
-
-    <!-- Mathematik / Statistik -->
-    <div class="sec-head">
-      <p class="kicker">Mathematik &amp; Statistik · Berufsmaturität</p>
-      <h2>Rechnen und Daten</h2>
-      <p>Verfahren üben mit Selbstkontrolle und einem Aha-Moment in der Vertiefung.</p>
-    </div>
-    <div class="grid">
-      <a class="tile" href="statistik-lagemasse.html">
-        <div class="top"><span class="ic" style="background:var(--cream)">📊</span><h3>Lagemasse</h3></div>
-        <p>Mittelwert, Median, Modus. Vertiefung: Wie ein Ausreisser die Masse verschiebt.</p>
-        <span class="foot">Öffnen →</span>
-      </a>
-      <a class="tile" href="statistik-quartile-boxplot.html">
-        <div class="top"><span class="ic" style="background:var(--cream)">📦</span><h3>Quartile &amp; Boxplot</h3></div>
-        <p>Fünf-Punkte-Zusammenfassung mit gezeichnetem Boxplot. Vertiefung: IQR &amp; Robustheit.</p>
-        <span class="foot">Öffnen →</span>
-      </a>
-      <a class="tile" href="statistik-variablentypen.html">
-        <div class="top"><span class="ic" style="background:var(--cream)">🏷️</span><h3>Variablentypen</h3></div>
-        <p>Nominal, ordinal, diskret, stetig zuordnen. Vertiefung: Grenzfälle wie die Postleitzahl.</p>
-        <span class="foot">Öffnen →</span>
-      </a>
-      <a class="tile" href="degressive-abschreibung.html">
-        <div class="top"><span class="ic" style="background:var(--cream)">📉</span><h3>Degressive Abschreibung</h3></div>
-        <p>Buchwertverlauf über drei Jahre. Vertiefung: Vergleich mit der linearen Methode.</p>
-        <span class="foot">Öffnen →</span>
-      </a>
-      <a class="tile" href="prozentrechnen.html">
-        <div class="top"><span class="ic" style="background:var(--cream)">％</span><h3>Prozentrechnen</h3></div>
-        <p>Grundwert, Prozentwert, Prozentsatz. Vertiefung: gleicher Anteil trotz anderer Zahlen.</p>
-        <span class="foot">Öffnen →</span>
-      </a>
-    </div>
-
-    <!-- Pharma -->
-    <div class="sec-head">
-      <p class="kicker">Medizinisches Rechnen · Pharma-Assistentinnen</p>
-      <h2>Fachrechnen in der Apotheke</h2>
-      <p>Berufstypische Aufgaben – mit der im Lehrmittel geforderten Plausibilitätsprüfung.</p>
+      <p>Drei Beispiele zum Ausprobieren, alle 14 auf der Übersichtsseite. Jedes zeigt, was ein Prompt aus dem Generator zusammen mit eigenem Material ergibt.</p>
     </div>
     <div class="grid">
       <a class="tile" href="dosisberechnung-pharma.html">
@@ -266,81 +233,21 @@
         <p>Von mg/kg zur ml-Menge. Vertiefung: Dosierungsfehler erkennen, bevor sie zum Kunden gelangen.</p>
         <span class="foot">Öffnen →</span>
       </a>
-      <a class="tile" href="dichte-pharma.html">
-        <div class="top"><span class="ic" style="background:var(--cream)">⚗️</span><h3>Rechnen mit der Dichte</h3></div>
-        <p>Masse, Volumen, Dichte. Vertiefung: Passt die Einwaage in die Flasche? Faustregel entdecken.</p>
-        <span class="foot">Öffnen →</span>
-      </a>
-      <a class="tile" href="verduennungen-pharma.html">
-        <div class="top"><span class="ic" style="background:var(--cream)">🧪</span><h3>Verdünnungen</h3></div>
-        <p>C₁·V₁ = C₂·V₂. Vertiefung: typische Denkfehler beim Verdünnen entlarven.</p>
-        <span class="foot">Öffnen →</span>
-      </a>
-    </div>
-
-    <!-- IT -->
-    <div class="sec-head">
-      <p class="kicker">IT-Security · Sek II &amp; Berufsbildung</p>
-      <h2>Persönliche Sicherheit</h2>
-      <p>Erkennen und beurteilen statt rechnen – dieselbe Differenzierungslogik, anderer Aufgabentyp.</p>
-    </div>
-    <div class="grid">
-      <a class="tile" href="it-security-malware.html">
-        <div class="top"><span class="ic" style="background:var(--cream)">🛡️</span><h3>Malware &amp; Sicherheit</h3></div>
-        <p>Malware-Arten zuordnen, Szenarien einschätzen. Vertiefung: eine Phishing-Mail entlarven.</p>
-        <span class="foot">Öffnen →</span>
-      </a>
-    </div>
-
-    <!-- KI -->
-    <div class="sec-head">
-      <p class="kicker">Künstliche Intelligenz · Sekundarstufe II</p>
-      <h2>KI verstehen und einordnen</h2>
-      <p>Nicht Jahreszahlen auswendig lernen, sondern das Prinzip hinter einem KI-System erkennen.</p>
-    </div>
-    <div class="grid">
-      <a class="tile" href="ki-geschichte.html">
-        <div class="top"><span class="ic" style="background:var(--cream)">🧠</span><h3>Geschichte der KI</h3></div>
-        <p>Meilensteine der KI richtig einordnen. Vertiefung: nach welchem Prinzip ein System arbeitet.</p>
-        <span class="foot">Öffnen →</span>
-      </a>
-    </div>
-
-    <!-- Fremdsprachen -->
-    <div class="sec-head">
-      <p class="kicker">Fremdsprachen · Berufsbildung</p>
-      <h2>Französisch im Betrieb</h2>
-      <p>Dasselbe Thema in mehreren Formaten – differenzierte Lernseite und ein Vokabelspiel mit Levels.</p>
-    </div>
-    <div class="grid">
-      <a class="tile" href="franzoesisch-hoeflich-klaeren.html">
-        <div class="top"><span class="ic" style="background:var(--cream)">🇫🇷</span><h3>Höflich um Hilfe bitten</h3></div>
-        <p>Redemittel für den Berufsalltag: klären, nachfragen, sich entschuldigen. Mit drei Zugängen.</p>
-        <span class="foot">Öffnen →</span>
-      </a>
-      <a class="tile" href="franzoesisch-bm-variante.html">
-        <div class="top"><span class="ic" style="background:var(--cream)">🎓</span><h3>Berufsmaturität – Variante</h3></div>
-        <p>Dasselbe Thema, zugeschnitten auf die BM. Zeigt, wie ein Prompt für verschiedene Stufen anpasst.</p>
-        <span class="foot">Öffnen →</span>
-      </a>
       <a class="tile" href="franzoesisch-voci-game.html">
         <div class="top"><span class="ic" style="background:var(--cream)">🎮</span><h3>Voci-Mission (Spiel)</h3></div>
         <p>Vokabeltraining in vier Levels: erkennen → erinnern → schreiben → anwenden. Mit Punkten und Serie.</p>
         <span class="foot">Öffnen →</span>
       </a>
-    </div>
-
-    <!-- Pflege -->
-    <div class="sec-head">
-      <p class="kicker">Pflege · Berufsbildung</p>
-      <h2>Fachsprache in der Pflege</h2>
-      <p>Präzise dokumentieren – eine Kernkompetenz im Pflegealltag.</p>
-    </div>
-    <div class="grid">
       <a class="tile" href="pflegedokumentation.html">
         <div class="top"><span class="ic" style="background:var(--cream)">🩺</span><h3>Pflegedokumentation</h3></div>
         <p>Beobachtung, Aussage oder Interpretation? Formulierungen sicher unterscheiden und korrekt dokumentieren.</p>
         <span class="foot">Öffnen →</span>
+      </a>
+      <a class="tile tool-tile" href="lernseiten-beispiele.html">
+        <span class="badge new">14 Beispiele</span>
+        <div class="top"><span class="ic" style="background:var(--ochre);color:var(--navy)">▦</span><h3>Alle Lernseiten-Beispiele</h3></div>
+        <p>Mathematik, Pharma, IT-Sicherheit, KI, Französisch und Pflege: alle Beispielseiten nach Fachbereich.</p>
+        <span class="foot">Übersicht öffnen →</span>
       </a>
     </div>
 
@@ -369,27 +276,8 @@
         <p>«Die Prüfung fällt aus!» mit Bild im Klassenchat. Behauptung, Quelle, Kontext und Belege prüfen, bevor man weiterleitet.</p>
         <span class="foot">Ansehen →</span>
       </a>
-      <a class="tile tool-tile" href="bild-generator.html">
-        <span class="badge new">Werkzeug</span>
-        <div class="top"><span class="ic" style="background:var(--ochre);color:var(--navy)">🖼️</span><h3>Eigenes Bild-Rezept bauen</h3></div>
-        <p>Lernziel, Motiv, Bildaufbau und Anforderungen eintragen, Prompt und Arbeitsauftrag erhalten.</p>
-        <span class="foot">Zum Bildprompt-Generator →</span>
-      </a>
     </div>
-
-    <!-- So funktioniert es -->
-    <div class="sec-head" id="so-funktioniert-es">
-      <p class="kicker">Und so entsteht eine neue Seite</p>
-      <h2>In vier Schritten</h2>
-    </div>
-    <div class="how">
-      <ol>
-        <li>Im <b>Prompt-Generator</b> Fach, Stufe und die didaktischen Achsen wählen.</li>
-        <li>Prompt kopieren, einen neuen Claude-Chat öffnen und einfügen.</li>
-        <li>Das <b>Material</b> (Dokument, PDF, Foliensatz) oder eine kurze <b>Themenbeschreibung</b> dazugeben und abschicken.</li>
-        <li>Die fertige HTML-Datei herunterladen – offline nutzbar, ins Moodle ladbar, als PDF druckbar.</li>
-      </ol>
-    </div>
+    <p class="more">Eigenes Bild-Rezept bauen: <a href="bild-generator.html">Bildprompt-Generator</a> · <a href="bild-beispiele.html">Alle Bild-Beispiele mit Prompt und Arbeitsauftrag</a></p>
 
   </div>
 </main>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lernseiten-Beispiele – Lernwege</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+  :root{
+    --navy:#1E3246;--terra:#B84816;--ochre:#F1A51A;--cream:#F6EFE2;
+    --ink:#1E3246;--ink-soft:#5b6572;--line:#e2dbcb;--line-strong:#cdc4ad;
+    --card:#ffffff;--shadow:0 1px 2px rgba(30,50,70,.06),0 10px 30px rgba(30,50,70,.07);
+  }
+  *{box-sizing:border-box;}html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:"Arial Nova Light",Arial,ui-sans-serif,system-ui,sans-serif;line-height:1.55;}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 1.1rem;}
+
+  /* Hero */
+  header{background:var(--navy);color:#fff;padding:clamp(2.4rem,7vw,4.5rem) 0 clamp(2rem,6vw,3.5rem);}
+  .brand{font-size:.82rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ochre);margin:0 0 1rem;font-weight:600;}
+  header h1{font-size:clamp(2rem,6vw,3.2rem);line-height:1.08;margin:0 0 .8rem;font-weight:600;max-width:20ch;}
+  header p{font-size:clamp(1.05rem,2.4vw,1.25rem);color:#cdd6df;margin:0 0 1.8rem;max-width:60ch;}
+  .hero-tags{display:flex;gap:.6rem;flex-wrap:wrap;}
+  .tag{font-size:.85rem;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:.35rem .9rem;}
+
+  /* Prinzip-Band */
+  .principle{background:var(--terra);color:#fff;padding:1.2rem 0;}
+  .principle .wrap{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+  .principle .big{font-size:1.15rem;font-weight:600;}
+  .principle .small{color:#ffe4d6;font-size:.95rem;}
+
+  main{padding:clamp(2.2rem,6vw,3.5rem) 0 4rem;}
+  .sec-head{margin:2.6rem 0 1.1rem;}
+  .sec-head:first-child{margin-top:0;}
+  .sec-head h2{font-size:1.4rem;margin:0 0 .3rem;}
+  .sec-head p{margin:0;color:var(--ink-soft);font-size:.98rem;max-width:66ch;}
+  .kicker{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--terra);font-weight:600;margin:0 0 .3rem;}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;}
+  a.tile{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.1rem 1.2rem;box-shadow:var(--shadow);transition:transform .12s,border-color .2s,box-shadow .2s;}
+  a.tile:hover{transform:translateY(-2px);border-color:var(--ochre);box-shadow:0 4px 10px rgba(30,50,70,.08),0 16px 36px rgba(30,50,70,.1);}
+  a.tile:focus-visible{outline:2px solid var(--terra);outline-offset:2px;}
+  .tile .top{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;}
+  .tile .ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;flex:none;}
+  .tile h3{font-size:1.05rem;margin:0;font-weight:600;line-height:1.2;}
+  .tile p{margin:.1rem 0 .7rem;font-size:.9rem;color:var(--ink-soft);flex:1;}
+  .tile .foot{font-size:.82rem;color:var(--terra);font-weight:600;display:flex;align-items:center;gap:.3rem;}
+  .badge{align-self:flex-start;font-size:.72rem;font-weight:600;border-radius:20px;padding:.15rem .6rem;margin-bottom:.5rem;}
+  .badge.tool{background:#e9eef3;color:var(--navy);}
+  .badge.new{background:var(--ochre);color:var(--navy);}
+
+  /* Werkzeug-Tiles hervorheben */
+  a.tile.tool-tile{background:var(--navy);color:#fff;border-color:var(--navy);}
+  a.tile.tool-tile p{color:#c3ccd6;}
+  a.tile.tool-tile .foot{color:var(--ochre);}
+  a.tile.tool-tile:hover{border-color:var(--ochre);}
+
+  footer{background:var(--navy);color:#c3ccd6;padding:2rem 0;font-size:.9rem;}
+  footer .wrap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:center;}
+  footer a{color:var(--ochre);text-decoration:none;}
+  footer a:hover{text-decoration:underline;}
+
+  .how{background:#fff;border:1px solid var(--line);border-radius:14px;padding:1.3rem 1.4rem;box-shadow:var(--shadow);margin-top:1rem;}
+  .how ol{margin:.4rem 0 0;padding-left:1.3rem;}
+  .how li{margin:.35rem 0;}
+
+  /* Beschreibung und Funktionen */
+  .about{max-width:70ch;margin:0 0 1.2rem;}
+  .feat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.1rem 1.2rem;box-shadow:var(--shadow);}
+  .feat h3{font-size:1.05rem;margin:0 0 .4rem;font-weight:600;}
+  .feat ul{margin:0;padding-left:1.15rem;font-size:.92rem;color:var(--ink-soft);}
+  .feat li{margin:.3rem 0;}
+  .feat li b{color:var(--ink);font-weight:600;}
+  .feat .foot{display:inline-block;margin-top:.7rem;font-size:.85rem;color:var(--terra);font-weight:600;text-decoration:none;}
+  .feat .foot:hover{text-decoration:underline;}
+  .more{font-size:.92rem;color:var(--ink-soft);margin:.9rem 0 0;}
+  .more a{color:var(--terra);font-weight:600;text-decoration:none;}
+  .more a:hover{text-decoration:underline;}
+
+  /* Sprungleiste */
+  .subnav{position:sticky;top:0;z-index:20;background:rgba(246,239,226,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(6px);}
+  .subnav .wrap{display:flex;gap:.3rem;align-items:center;overflow-x:auto;padding-top:.5rem;padding-bottom:.5rem;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .subnav .wrap::-webkit-scrollbar{display:none;}
+  .subnav a{flex:none;font-size:.88rem;font-weight:600;color:var(--navy);text-decoration:none;padding:.45rem .85rem;border-radius:9px;white-space:nowrap;}
+  .subnav a:hover{background:#fff;color:var(--terra);}
+  .subnav a.is-active{background:var(--navy);color:#fff;}
+  .subnav a.up{margin-left:auto;color:var(--ink-soft);}
+  .subnav a.cta{background:var(--terra);color:#fff;}
+  .subnav a.cta:hover{background:#9a3a10;}
+  .sec-head[id],.how[id],.anchor{scroll-margin-top:4.2rem;}
+</style>
+<style>
+  body{padding:clamp(1rem,4vw,3rem) 0 5rem;}
+  a.back{display:inline-block;font-size:.88rem;color:var(--terra);text-decoration:none;font-weight:600;margin-bottom:1rem;}
+  a.back:hover{text-decoration:underline;}
+  h1{font-size:clamp(1.7rem,5vw,2.4rem);line-height:1.12;margin:0 0 .5rem;font-weight:600;}
+  .lead{font-size:1.04rem;color:var(--ink-soft);margin:0 0 1.2rem;max-width:66ch;}
+  .toc{display:flex;gap:.5rem;flex-wrap:wrap;margin:0 0 .4rem;}
+  .toc a{font-size:.85rem;border:1px solid var(--line-strong);background:#fff;color:var(--ink);border-radius:9px;padding:.4rem .8rem;text-decoration:none;}
+  .toc a:hover{border-color:var(--terra);color:var(--terra);}
+  .toc a.cta{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:600;}
+  .sec-head[id]{scroll-margin-top:1rem;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← Übersicht</a>
+  <p class="kicker">Beispiele · Lernseiten</p>
+  <h1>14 Lernseiten aus sechs Fachbereichen</h1>
+  <p class="lead">Jede Seite ist mit dem Prompt-Generator und eigenem Material entstanden: drei Zugänge (A/B/C), Selbstkontrolle, Lösungen für die Lehrperson. Öffnen, ausprobieren, als Vorlage für das eigene Fach nehmen.</p>
+  <div class="toc"><a href="#mathe">Rechnen und Daten</a><a href="#pharma">Apotheke</a><a href="#it">IT-Sicherheit</a><a href="#ki">KI</a><a href="#sprachen">Französisch</a><a href="#pflege">Pflege</a><a class="cta" href="prompt-generator-v2.html">Prompt-Generator öffnen →</a></div>
+
+    <!-- Mathematik / Statistik -->
+    <div class="sec-head" id="mathe">
+      <p class="kicker">Mathematik &amp; Statistik · Berufsmaturität</p>
+      <h2>Rechnen und Daten</h2>
+      <p>Verfahren üben mit Selbstkontrolle und einem Aha-Moment in der Vertiefung.</p>
+    </div>
+    <div class="grid">
+      <a class="tile" href="statistik-lagemasse.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">📊</span><h3>Lagemasse</h3></div>
+        <p>Mittelwert, Median, Modus. Vertiefung: Wie ein Ausreisser die Masse verschiebt.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+      <a class="tile" href="statistik-quartile-boxplot.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">📦</span><h3>Quartile &amp; Boxplot</h3></div>
+        <p>Fünf-Punkte-Zusammenfassung mit gezeichnetem Boxplot. Vertiefung: IQR &amp; Robustheit.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+      <a class="tile" href="statistik-variablentypen.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">🏷️</span><h3>Variablentypen</h3></div>
+        <p>Nominal, ordinal, diskret, stetig zuordnen. Vertiefung: Grenzfälle wie die Postleitzahl.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+      <a class="tile" href="degressive-abschreibung.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">📉</span><h3>Degressive Abschreibung</h3></div>
+        <p>Buchwertverlauf über drei Jahre. Vertiefung: Vergleich mit der linearen Methode.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+      <a class="tile" href="prozentrechnen.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">％</span><h3>Prozentrechnen</h3></div>
+        <p>Grundwert, Prozentwert, Prozentsatz. Vertiefung: gleicher Anteil trotz anderer Zahlen.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+    </div>
+
+    <!-- Pharma -->
+    <div class="sec-head" id="pharma">
+      <p class="kicker">Medizinisches Rechnen · Pharma-Assistentinnen</p>
+      <h2>Fachrechnen in der Apotheke</h2>
+      <p>Berufstypische Aufgaben – mit der im Lehrmittel geforderten Plausibilitätsprüfung.</p>
+    </div>
+    <div class="grid">
+      <a class="tile" href="dosisberechnung-pharma.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">💊</span><h3>Dosisberechnung</h3></div>
+        <p>Von mg/kg zur ml-Menge. Vertiefung: Dosierungsfehler erkennen, bevor sie zum Kunden gelangen.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+      <a class="tile" href="dichte-pharma.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">⚗️</span><h3>Rechnen mit der Dichte</h3></div>
+        <p>Masse, Volumen, Dichte. Vertiefung: Passt die Einwaage in die Flasche? Faustregel entdecken.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+      <a class="tile" href="verduennungen-pharma.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">🧪</span><h3>Verdünnungen</h3></div>
+        <p>C₁·V₁ = C₂·V₂. Vertiefung: typische Denkfehler beim Verdünnen entlarven.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+    </div>
+
+    <!-- IT -->
+    <div class="sec-head" id="it">
+      <p class="kicker">IT-Security · Sek II &amp; Berufsbildung</p>
+      <h2>Persönliche Sicherheit</h2>
+      <p>Erkennen und beurteilen statt rechnen – dieselbe Differenzierungslogik, anderer Aufgabentyp.</p>
+    </div>
+    <div class="grid">
+      <a class="tile" href="it-security-malware.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">🛡️</span><h3>Malware &amp; Sicherheit</h3></div>
+        <p>Malware-Arten zuordnen, Szenarien einschätzen. Vertiefung: eine Phishing-Mail entlarven.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+    </div>
+
+    <!-- KI -->
+    <div class="sec-head" id="ki">
+      <p class="kicker">Künstliche Intelligenz · Sekundarstufe II</p>
+      <h2>KI verstehen und einordnen</h2>
+      <p>Nicht Jahreszahlen auswendig lernen, sondern das Prinzip hinter einem KI-System erkennen.</p>
+    </div>
+    <div class="grid">
+      <a class="tile" href="ki-geschichte.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">🧠</span><h3>Geschichte der KI</h3></div>
+        <p>Meilensteine der KI richtig einordnen. Vertiefung: nach welchem Prinzip ein System arbeitet.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+    </div>
+
+    <!-- Fremdsprachen -->
+    <div class="sec-head" id="sprachen">
+      <p class="kicker">Fremdsprachen · Berufsbildung</p>
+      <h2>Französisch im Betrieb</h2>
+      <p>Dasselbe Thema in mehreren Formaten – differenzierte Lernseite und ein Vokabelspiel mit Levels.</p>
+    </div>
+    <div class="grid">
+      <a class="tile" href="franzoesisch-hoeflich-klaeren.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">🇫🇷</span><h3>Höflich um Hilfe bitten</h3></div>
+        <p>Redemittel für den Berufsalltag: klären, nachfragen, sich entschuldigen. Mit drei Zugängen.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+      <a class="tile" href="franzoesisch-bm-variante.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">🎓</span><h3>Berufsmaturität – Variante</h3></div>
+        <p>Dasselbe Thema, zugeschnitten auf die BM. Zeigt, wie ein Prompt für verschiedene Stufen anpasst.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+      <a class="tile" href="franzoesisch-voci-game.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">🎮</span><h3>Voci-Mission (Spiel)</h3></div>
+        <p>Vokabeltraining in vier Levels: erkennen → erinnern → schreiben → anwenden. Mit Punkten und Serie.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+    </div>
+
+    <!-- Pflege -->
+    <div class="sec-head" id="pflege">
+      <p class="kicker">Pflege · Berufsbildung</p>
+      <h2>Fachsprache in der Pflege</h2>
+      <p>Präzise dokumentieren – eine Kernkompetenz im Pflegealltag.</p>
+    </div>
+    <div class="grid">
+      <a class="tile" href="pflegedokumentation.html">
+        <div class="top"><span class="ic" style="background:var(--cream)">🩺</span><h3>Pflegedokumentation</h3></div>
+        <p>Beobachtung, Aussage oder Interpretation? Formulierungen sicher unterscheiden und korrekt dokumentieren.</p>
+        <span class="foot">Öffnen →</span>
+      </a>
+    </div>
+
+
+</div>
+</body>
+</html>
