@@ -76,6 +76,17 @@
   .feat li b{color:var(--ink);font-weight:600;}
   .feat .foot{display:inline-block;margin-top:.7rem;font-size:.85rem;color:var(--terra);font-weight:600;text-decoration:none;}
   .feat .foot:hover{text-decoration:underline;}
+
+  /* Sprungleiste */
+  .subnav{position:sticky;top:0;z-index:20;background:rgba(246,239,226,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(6px);}
+  .subnav .wrap{display:flex;gap:.3rem;align-items:center;overflow-x:auto;padding-top:.5rem;padding-bottom:.5rem;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .subnav .wrap::-webkit-scrollbar{display:none;}
+  .subnav a{flex:none;font-size:.88rem;font-weight:600;color:var(--navy);text-decoration:none;padding:.45rem .85rem;border-radius:9px;white-space:nowrap;}
+  .subnav a:hover{background:#fff;color:var(--terra);}
+  .subnav a.is-active{background:var(--navy);color:#fff;}
+  .subnav a.cta{margin-left:auto;background:var(--terra);color:#fff;}
+  .subnav a.cta:hover{background:#9a3a10;}
+  .sec-head[id],.how[id],.anchor{scroll-margin-top:4.2rem;}
 </style>
 </head>
 <body>
@@ -102,11 +113,22 @@
   </div>
 </div>
 
+<nav class="subnav" aria-label="Seitenabschnitte">
+  <div class="wrap">
+    <a href="#was-ist-lernwege">Was ist Lernwege</a>
+    <a href="#werkzeuge">Werkzeuge</a>
+    <a href="#beispiele-lernseiten">Beispiele: Lernseiten</a>
+    <a href="#beispiele-bilder">Beispiele: Bilder</a>
+    <a href="#so-funktioniert-es">So entsteht eine Seite</a>
+    <a class="cta" href="/zugang">Zugang &amp; Preise</a>
+  </div>
+</nav>
+
 <main>
   <div class="wrap">
 
     <!-- Beschreibung und Funktionen -->
-    <div class="sec-head">
+    <div class="sec-head" id="was-ist-lernwege">
       <p class="kicker">Was ist Lernwege?</p>
       <h2>Beschreibung und Funktionen</h2>
     </div>
@@ -150,7 +172,7 @@
     </div>
 
     <!-- Werkzeuge -->
-    <div class="sec-head">
+    <div class="sec-head" id="werkzeuge">
       <p class="kicker">Prompt-Generator</p>
       <h2>Selbst Lernseiten erzeugen</h2>
       <p>Der Generator baut den passenden Prompt. Diesen mit deinem Material oder einer Themenbeschreibung an Claude schicken – fertig ist die interaktive Übung. Der Bildprompt-Generator macht dasselbe für Bilder, die eine Lernaufgabe tragen. Die Beispiele unten zeigen, was dabei herauskommt.</p>
@@ -353,7 +375,7 @@
     </div>
 
     <!-- So funktioniert es -->
-    <div class="sec-head">
+    <div class="sec-head" id="so-funktioniert-es">
       <p class="kicker">Und so entsteht eine neue Seite</p>
       <h2>In vier Schritten</h2>
     </div>
@@ -375,6 +397,19 @@
     <span><a href="/zugang">Zugang &amp; Preise</a> · <a href="/agb">AGB</a> · <a href="/datenschutz">Datenschutz</a> · <a href="mailto:info@edutecsol.ch">info@edutecsol.ch</a></span>
   </div>
 </footer>
+
+<script>
+(function(){
+  const links=[...document.querySelectorAll('.subnav a[href^="#"]')];
+  const targets=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  if(!targets.length||!('IntersectionObserver' in window))return;
+  const setActive=id=>links.forEach(a=>a.classList.toggle('is-active',a.getAttribute('href')==='#'+id));
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting) setActive(e.target.id); });
+  },{rootMargin:'-20% 0px -70% 0px'});
+  targets.forEach(t=>io.observe(t));
+})();
+</script>
 
 </body>
 </html>
