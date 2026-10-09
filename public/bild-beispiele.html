@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bild-Beispiele – Bilder für Lernaufgaben</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<style>
+  :root{
+    --navy:#1E3246;--terra:#B84816;--ochre:#F1A51A;--cream:#F6EFE2;
+    --ink:#1E3246;--ink-soft:#5b6572;--line:#e2dbcb;--line-strong:#cdc4ad;
+    --card:#ffffff;--shadow:0 1px 2px rgba(30,50,70,.06),0 10px 30px rgba(30,50,70,.07);
+  }
+  *{box-sizing:border-box;}html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:"Arial Nova Light",Arial,ui-sans-serif,system-ui,sans-serif;line-height:1.55;padding:clamp(1rem,4vw,3rem) 1rem 5rem;}
+  .wrap{max-width:1000px;margin:0 auto;}
+  a.back{display:inline-block;font-size:.88rem;color:var(--terra);text-decoration:none;font-weight:600;margin-bottom:1rem;}
+  a.back:hover{text-decoration:underline;}
+  .kicker{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--terra);font-weight:600;margin:0 0 .3rem;}
+  h1{font-size:clamp(1.7rem,5vw,2.4rem);line-height:1.12;margin:0 0 .5rem;font-weight:600;}
+  .lead{font-size:1.04rem;color:var(--ink-soft);margin:0 0 1.2rem;max-width:66ch;}
+  .toc{display:flex;gap:.5rem;flex-wrap:wrap;margin:0 0 2rem;}
+  .toc a{font-size:.85rem;border:1px solid var(--line-strong);background:#fff;color:var(--ink);border-radius:9px;padding:.4rem .8rem;text-decoration:none;}
+  .toc a:hover{border-color:var(--terra);color:var(--terra);}
+  .toc a.cta{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:600;}
+  .ex{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);margin:0 0 1.6rem;overflow:hidden;}
+  .ex img{display:block;width:100%;height:auto;}
+  .ex .body{padding:1.3rem 1.4rem 1.5rem;}
+  .ex .meta{display:flex;gap:.5rem;flex-wrap:wrap;margin:0 0 .6rem;}
+  .ex .tag{font-size:.75rem;font-weight:600;border-radius:20px;padding:.18rem .65rem;background:#e9eef3;color:var(--navy);}
+  .ex .tag.einsatz{background:var(--ochre);}
+  .ex h2{font-size:1.35rem;margin:0 0 .4rem;}
+  .ex .ziel{font-size:.98rem;margin:0 0 1rem;}
+  .ex .ziel b{color:var(--terra);}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:start;}
+  @media(max-width:760px){.cols{grid-template-columns:1fr;}}
+  .cols h3{font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 .4rem;}
+  pre.prompt{white-space:pre-wrap;word-wrap:break-word;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.8rem;line-height:1.5;background:#1e2430;color:#e8ebf0;border-radius:12px;padding:1rem 1.1rem;margin:0;}
+  .task{background:var(--cream);border-left:4px solid var(--ochre);border-radius:0 10px 10px 0;padding:.7rem .9rem;margin:0 0 .8rem;font-size:.92rem;}
+  .check{font-size:.88rem;color:var(--ink-soft);margin:0;padding-left:1.1rem;}
+  .check li{margin:.25rem 0;}
+  .check li b{color:var(--ink);}
+  .label{font-size:.8rem;color:var(--ink-soft);margin:.9rem 0 0;}
+  .actions{margin-top:.8rem;}
+  .btn{font:inherit;font-size:.85rem;font-weight:600;border:none;border-radius:9px;padding:.5rem .9rem;cursor:pointer;background:var(--navy);color:#fff;}
+  .btn:hover{background:#132335;}
+  .copied{color:#2f8f6f;font-size:.85rem;font-weight:600;margin-left:.5rem;opacity:0;transition:opacity .2s;}
+  .copied.show{opacity:1;}
+  .note{font-size:.85rem;color:var(--ink-soft);background:#fff;border:1px solid var(--line);border-radius:10px;padding:.8rem 1rem;margin-top:1.5rem;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← Übersicht</a>
+
+  <p class="kicker">Beispiele · Bilder für Lernaufgaben</p>
+  <h1>Drei Bilder, drei Lernaufgaben</h1>
+  <p class="lead">Jedes Beispiel zeigt den Weg vom Lernziel über den Prompt zum Bild und zur Aufgabe. Die Bilder sind KI-generiert und fiktiv. Prompt kopieren, im eigenen Bildwerkzeug einsetzen, Ergebnis prüfen. Eigene Rezepte baust du im Bildprompt-Generator.</p>
+  <div class="toc">
+    <a href="#backstube">Backstube</a>
+    <a href="#pflege">Pflege: Blutdruck</a>
+    <a href="#wasserschaden">Chat-Nachricht prüfen</a>
+    <a class="cta" href="bild-generator.html">Bildprompt-Generator öffnen →</a>
+  </div>
+
+  <!-- Beispiel 1 -->
+  <article class="ex" id="backstube">
+    <img src="bilder/backstube.jpg" alt="KI-generierte Illustration einer fiktiven Backstube: eine Person knetet Teig, eine nimmt Brote aus dem Ofen, eine verpackt Backwaren" loading="lazy">
+    <div class="body">
+      <div class="meta"><span class="tag einsatz">Beschreiben</span><span class="tag">Berufsbildung · Sek II</span><span class="tag">Sprechanlass</span></div>
+      <h2>Arbeitsabläufe in der Backstube</h2>
+      <p class="ziel"><b>Die Lernenden sollen mit dem Bild</b> Tätigkeiten beschreiben, Beobachtungen von Vermutungen unterscheiden und ihre Einschätzung begründen.</p>
+      <div class="cols">
+        <div>
+          <h3>Bildprompt</h3>
+          <pre class="prompt">Erstelle eine illustrative Szene einer fiktiven Backstube als Gesprächsanlass für Lernende der Sekundarstufe II. Zeige drei erwachsene, fiktive Personen bei unterschiedlichen Arbeitsschritten: Teig vorbereiten, Backwaren aus dem Ofen nehmen und fertige Produkte verpacken.
+
+Die Arbeitsbereiche sollen klar unterscheidbar sein. Werkzeuge und Gegenstände sollen gut sichtbar sein. Stil: sachliche, detailreiche Illustration, nicht als dokumentarisches Foto gestaltet. Format 16:9.
+
+Keine Schrift, keine Logos, keine realen Personen.</pre>
+          <div class="actions"><button class="btn" type="button" data-copy>Prompt kopieren</button><span class="copied">Kopiert!</span></div>
+        </div>
+        <div>
+          <h3>Arbeitsauftrag</h3>
+          <p class="task">«Beschreibe drei Tätigkeiten, die du im Bild erkennst. Formuliere anschliessend zwei Vermutungen über den Arbeitsablauf. Kennzeichne, was du beobachtest und was du nur vermutest.»</p>
+          <h3>Was am Ergebnis zu prüfen war</h3>
+          <ul class="check">
+            <li><b>Fachlich:</b> Reihenfolge der Arbeitsschritte, Werkzeuge, Hygiene (Haare, Schmuck, Kleidung).</li>
+            <li><b>Didaktisch:</b> Drei klar getrennte Bereiche, die Aufgabe lässt sich bearbeiten.</li>
+            <li><b>Darstellung:</b> Illustrationsstil wie bestellt, keine Schrift, keine Logos.</li>
+          </ul>
+          <p class="label">Kennzeichnung: KI-generierte Illustration, erstellt mit ChatGPT, Oktober 2026; fiktive Szene.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Beispiel 2 -->
+  <article class="ex" id="pflege">
+    <img src="bilder/pflege-blutdruck.jpg" alt="KI-generiertes Bild einer fiktiven Pflegesituation: Pflegefachperson misst bei einer älteren Person im Pflegebett den Blutdruck, daneben Pflegewagen mit Handschuhbox und Desinfektionsspender" loading="lazy">
+    <div class="body">
+      <div class="meta"><span class="tag einsatz">Beschreiben · Prüfen</span><span class="tag">Pflege HF</span><span class="tag">Fachliche Prüfung</span></div>
+      <h2>Blutdruckmessung im Pflegezimmer</h2>
+      <p class="ziel"><b>Die Studierenden sollen mit dem Bild</b> eine Pflegehandlung beschreiben, die vorbereitenden Hygienemassnahmen erkennen und Beobachtung von Interpretation unterscheiden.</p>
+      <div class="cols">
+        <div>
+          <h3>Bildprompt</h3>
+          <pre class="prompt">Sachliche Illustration einer fiktiven Pflegesituation: Eine erwachsene, fiktive Pflegefachperson misst bei einer älteren, fiktiven Person im Pflegebett den Blutdruck.
+
+Wichtige sichtbare Details:
+– Blutdruckmanschette am Oberarm
+– Händedesinfektionsspender am Bettende
+– Pflegewagen mit Handschuhbox
+– Nachttisch mit Wasserglas
+
+Bildaufbau: Halbtotale auf Augenhöhe, beide Personen und die Hände gut erkennbar.
+
+Licht und Farben: Ruhiges Zimmer, helles Tageslicht, dezente Farben.
+
+Weitere Anforderungen: Keine Schrift, keine Logos, keine realen Personen.</pre>
+          <div class="actions"><button class="btn" type="button" data-copy>Prompt kopieren</button><span class="copied">Kopiert!</span></div>
+        </div>
+        <div>
+          <h3>Arbeitsauftrag</h3>
+          <p class="task">«Beschreibe die Pflegehandlung und die sichtbaren Hygienemassnahmen. Was muss vor dieser Handlung geschehen sein, was danach? Kennzeichne, was du beobachtest und was du nur vermutest.»</p>
+          <h3>Was am Ergebnis zu prüfen war</h3>
+          <ul class="check">
+            <li><b>Darstellung:</b> Bestellt war eine Illustration, geliefert wurde ein fotorealistisches Bild. Deshalb unbedingt kennzeichnen.</li>
+            <li><b>Fachlich:</b> Manuelle Manschette mit Stethoskop, Einweghandschuhe beim Messen, Manschettensitz und Armlage. Mit einer Fachperson gegenprüfen.</li>
+            <li><b>Didaktisch:</b> Spender, Pflegewagen und Nachttisch sind sichtbar, die Aufgabe lässt sich bearbeiten. Die fachlichen Unschärfen werden selbst zur Prüfaufgabe.</li>
+          </ul>
+          <p class="label">Kennzeichnung: KI-generiertes Bild, erstellt mit ChatGPT, Oktober 2026; fiktive Szene, fiktive Personen.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Beispiel 3 -->
+  <article class="ex" id="wasserschaden">
+    <img src="bilder/wasserschaden-schulzimmer.jpg" alt="KI-generiertes Bild eines leeren Schulzimmers mit Wasserpfützen am Boden, mit Plastikplanen abgedeckten Pulten, Putzeimern und einem Wasserfleck an der Decke" loading="lazy">
+    <div class="body">
+      <div class="meta"><span class="tag einsatz">Kritisch prüfen</span><span class="tag">Sek II · alle Fächer</span><span class="tag">Übungsszenario</span></div>
+      <h2>Chat-Nachricht: «Die Prüfung von morgen fällt aus»</h2>
+      <p class="ziel"><b>Die Lernenden sollen mit dem Bild</b> eine Nachricht mit Bild prüfen, bevor sie sie weiterleiten: Behauptung, Quelle, Kontext und Belege, statt nur «echt oder fake» zu raten.</p>
+      <div class="cols">
+        <div>
+          <h3>Bildprompt</h3>
+          <pre class="prompt">Fotorealistische Darstellung eines fiktiven Schulzimmers nach einem Wasserschaden, leer, ohne Personen.
+
+Wichtige sichtbare Details:
+– Wasserpfützen auf dem Linoleumboden, die das Fensterlicht spiegeln
+– Mehrere Schulpulte und Stühle, mit durchsichtigen Plastikplanen abgedeckt
+– Zwei Putzeimer und ein Wischmopp in der Mitte des Raums
+– Ein dunkler Wasserfleck an der Decke, darunter ein abgehängtes Deckenpaneel
+– Ein Whiteboard an der Stirnwand, leer, ohne Schrift
+
+Bildaufbau: Weite Ansicht auf Augenhöhe von der Zimmertür aus, der ganze Raum sichtbar.
+
+Licht und Farben: Graues Tageslicht durch die Fenster, gedämpfte Farben, leicht feuchte, kühle Stimmung.
+
+Weitere Anforderungen: Keine Schrift, keine Plakate, keine Logos, keine realen Personen, kein erkennbares Schulgebäude, keine Ortshinweise. Seitenverhältnis 16:9.</pre>
+          <div class="actions"><button class="btn" type="button" data-copy>Prompt kopieren</button><span class="copied">Kopiert!</span></div>
+        </div>
+        <div>
+          <h3>Arbeitsauftrag</h3>
+          <p class="task">«Du erhältst dieses Bild im Klassenchat mit der Nachricht ‹Wasserschaden im Trakt B: Die Semesterprüfung von morgen fällt aus!! Weiterleiten!›. Bevor du weiterleitest: Welche drei Dinge prüfst du? Nenne konkrete Schritte, kein Urteil.»</p>
+          <h3>Was am Ergebnis zu prüfen war</h3>
+          <ul class="check">
+            <li><b>Verwendung:</b> Fotorealistisch ist hier Absicht, das Bild soll wie ein Chat-Foto wirken. Nur als gekennzeichnetes Übungsszenario einsetzen und im Unterricht auflösen.</li>
+            <li><b>Darstellung:</b> Kein Ortshinweis, kein erkennbares Gebäude, leeres Whiteboard: Der Prompt hat gehalten.</li>
+            <li><b>Didaktisch:</b> Auflösung entlang der vier Prüfschritte: Behauptung klären, Quelle prüfen, Kontext prüfen, Belege suchen.</li>
+          </ul>
+          <p class="label">Kennzeichnung: KI-generiertes Bild, erstellt mit ChatGPT, Oktober 2026; fiktive Szene, Übungsmaterial.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <div class="note">
+    <b>Prompts anpassen:</b> Alle drei Prompts folgen dem Rezept Stil, Motiv, Handlung, Umgebung, Details, Bildaufbau, Anforderungen. Im <a href="bild-generator.html" style="color:var(--terra);font-weight:600">Bildprompt-Generator</a> sind sie als Schnellstart hinterlegt und lassen sich auf das eigene Fach umbauen.
+  </div>
+</div>
+
+<script>
+document.querySelectorAll("[data-copy]").forEach(b=>b.addEventListener("click",()=>{
+  const pre=b.closest(".cols > div").querySelector("pre.prompt");
+  const done=()=>{const c=b.nextElementSibling;c.classList.add("show");setTimeout(()=>c.classList.remove("show"),2000);};
+  navigator.clipboard.writeText(pre.textContent).then(done).catch(()=>{const r=document.createRange();r.selectNodeContents(pre);const s=getSelection();s.removeAllRanges();s.addRange(r);done();});
+}));
+</script>
+</body>
+</html>
