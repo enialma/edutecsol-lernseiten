@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bildprompt-Generator – Bilder für Lernaufgaben</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<style>
+  :root{
+    --navy:#1E3246;--terra:#B84816;--ochre:#F1A51A;--cream:#F6EFE2;
+    --ink:#1E3246;--ink-soft:#5b6572;--line:#e2dbcb;--line-strong:#cdc4ad;
+    --card:#ffffff;--shadow:0 1px 2px rgba(30,50,70,.06),0 10px 30px rgba(30,50,70,.07);
+    --ok:#2f8f6f;--ok-soft:#dff3ea;--warn:#9A6A00;--warn-soft:#fbf0d5;--bad:#b8321a;--bad-soft:#f6dcd5;
+  }
+  *{box-sizing:border-box;}html{-webkit-text-size-adjust:100%;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:"Arial Nova Light",Arial,ui-sans-serif,system-ui,sans-serif;line-height:1.55;padding:clamp(1rem,4vw,3rem) 1rem 5rem;}
+  .wrap{max-width:1000px;margin:0 auto;}
+  a.back{display:inline-block;font-size:.88rem;color:var(--terra);text-decoration:none;font-weight:600;margin-bottom:1rem;}
+  a.back:hover{text-decoration:underline;}
+  .kicker{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--terra);font-weight:600;margin:0 0 .3rem;}
+  h1{font-size:clamp(1.7rem,5vw,2.4rem);line-height:1.12;margin:0 0 .5rem;font-weight:600;}
+  .lead{font-size:1.04rem;color:var(--ink-soft);margin:0 0 1rem;max-width:66ch;}
+  .flow{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin:0 0 1.6rem;font-size:.85rem;}
+  .flow b{background:var(--navy);color:#fff;border-radius:20px;padding:.3rem .8rem;font-weight:600;}
+  .flow .arrow{color:var(--ink-soft);}
+  .layout{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:start;}
+  @media(max-width:820px){.layout{grid-template-columns:1fr;}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.3rem 1.4rem;box-shadow:var(--shadow);}
+  .card h2{margin:.1rem 0 .3rem;font-size:1.1rem;}
+  .card .sub{font-size:.82rem;color:var(--ink-soft);margin:0 0 1rem;}
+  .group{margin:0 0 1.1rem;padding:0 0 1.1rem;border-bottom:1px solid var(--line);}
+  .group:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0;}
+  .group>.glab{display:flex;align-items:center;gap:.5rem;font-size:.95rem;font-weight:600;margin-bottom:.15rem;}
+  .group>.glab .n{width:24px;height:24px;border-radius:50%;background:var(--ochre);color:var(--navy);font-size:.8rem;display:inline-flex;align-items:center;justify-content:center;flex:none;}
+  .group>.ghint{font-size:.8rem;color:var(--ink-soft);margin:0 0 .6rem;}
+  label.field{display:block;margin:0 0 .8rem;}
+  label.field .lab{display:block;font-size:.85rem;font-weight:600;margin-bottom:.3rem;}
+  label.field .hint{font-weight:400;color:var(--ink-soft);font-size:.78rem;}
+  input[type=text],textarea,select{width:100%;font:inherit;font-size:.95rem;padding:.55rem .7rem;border:1px solid var(--line-strong);border-radius:9px;background:#fff;color:var(--ink);}
+  input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--terra);outline-offset:1px;border-color:var(--terra);}
+  textarea{resize:vertical;min-height:2.5rem;}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;}
+  @media(max-width:560px){.row{grid-template-columns:1fr;}}
+  .seg{display:flex;gap:.4rem;flex-wrap:wrap;}
+  .seg button{font:inherit;font-size:.83rem;border:1px solid var(--line-strong);background:#fff;color:var(--ink);border-radius:9px;padding:.4rem .7rem;cursor:pointer;}
+  .seg button:hover{border-color:var(--terra);}
+  .seg button.on{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .checks{display:flex;gap:.4rem .9rem;flex-wrap:wrap;margin:.2rem 0 .9rem;}
+  .checks label{display:inline-flex;align-items:center;gap:.35rem;font-size:.85rem;margin:0;cursor:pointer;}
+  .checks input{width:auto;margin:0;accent-color:var(--terra);}
+  .presets{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1.1rem;align-items:center;}
+  .presets .lbl{font-size:.8rem;color:var(--ink-soft);}
+  .presets button{font:inherit;font-size:.8rem;border:1px dashed var(--line-strong);background:#fff;color:var(--ink-soft);border-radius:9px;padding:.35rem .7rem;cursor:pointer;}
+  .presets button:hover{border-color:var(--terra);color:var(--terra);}
+  .presets button[aria-pressed=true]{border-style:solid;border-color:var(--terra);color:var(--terra);font-weight:600;}
+  .out .block{margin:0 0 1.2rem;padding:0 0 1.2rem;border-bottom:1px solid var(--line);}
+  .out .block:last-of-type{border-bottom:none;padding-bottom:0;margin-bottom:0;}
+  .out h3{font-size:.95rem;margin:0 0 .5rem;display:flex;align-items:center;gap:.5rem;}
+  .out h3 .tag{font-size:.7rem;font-weight:600;background:var(--ochre);color:var(--navy);border-radius:20px;padding:.1rem .55rem;}
+  pre.prompt{white-space:pre-wrap;word-wrap:break-word;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.82rem;line-height:1.5;background:#1e2430;color:#e8ebf0;border-radius:12px;padding:1.1rem 1.2rem;max-height:60vh;overflow:auto;margin:0;}
+  .actions{display:flex;gap:.6rem;margin-top:.8rem;flex-wrap:wrap;align-items:center;}
+  .btn{font:inherit;font-size:.9rem;font-weight:600;border:none;border-radius:9px;padding:.6rem 1.1rem;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem;box-shadow:var(--shadow);}
+  .btn.primary{background:var(--navy);color:#fff;}.btn.primary:hover{background:#132335;}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line-strong);}.btn.ghost:hover{border-color:var(--terra);}
+  .copied{color:var(--ok);font-size:.85rem;font-weight:600;opacity:0;transition:opacity .2s;}
+  .copied.show{opacity:1;}
+  .meta{font-size:.8rem;color:var(--ink-soft);margin:.6rem 0 0;}
+  .task{background:var(--cream);border-left:4px solid var(--ochre);border-radius:0 10px 10px 0;padding:.7rem .9rem;margin:0;font-size:.92rem;}
+  .recipe{margin:0;padding:0;list-style:none;font-size:.92rem;}
+  .recipe li{padding:.45rem .7rem;border:1px solid var(--line);border-radius:9px;margin-bottom:.4rem;background:#fff;}
+  .recipe li b{color:var(--terra);font-weight:600;}
+  .recipe li .empty{color:var(--ink-soft);font-style:italic;}
+  ul.checklist{list-style:none;margin:0;padding:0;font-size:.88rem;}
+  ul.checklist li{display:flex;gap:.6rem;align-items:flex-start;padding:.45rem .6rem;border-radius:9px;margin-bottom:.35rem;}
+  ul.checklist li.ok{background:var(--ok-soft);}
+  ul.checklist li.warn{background:var(--warn-soft);}
+  ul.checklist li.bad{background:var(--bad-soft);}
+  .pill{font-size:.7rem;font-weight:700;border-radius:20px;padding:.1rem .5rem;flex:none;margin-top:.15rem;text-transform:uppercase;letter-spacing:.04em;}
+  li.ok .pill{background:var(--ok);color:#fff;}li.warn .pill{background:var(--warn);color:#fff;}li.bad .pill{background:var(--bad);color:#fff;}
+  ol.qs{margin:0;padding-left:1.2rem;font-size:.9rem;}
+  ol.qs li{margin:.3rem 0;}
+  .fix{display:flex;flex-direction:column;gap:.4rem;}
+  .fix button{font:inherit;font-size:.85rem;text-align:left;border:1px solid var(--line-strong);background:#fff;color:var(--ink);border-radius:9px;padding:.5rem .75rem;cursor:pointer;}
+  .fix button:hover{border-color:var(--terra);}
+  .motto{font-size:.92rem;color:var(--ink-soft);font-style:italic;margin:1.2rem 0 0;padding-top:1rem;border-top:1px solid var(--line);}
+  .note{font-size:.82rem;color:var(--ink-soft);margin-top:1.4rem;background:#fff;border:1px solid var(--line);border-radius:10px;padding:.8rem 1rem;}
+  .sr{position:absolute;left:-9999px;top:0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← Übersicht</a>
+
+  <p class="kicker">Werkzeug · EDUTECSOL</p>
+  <h1>Bildprompt-Generator für Lernaufgaben</h1>
+  <p class="lead">Erst die Lernaufgabe klären, dann das Bild beschreiben, danach das Ergebnis prüfen. Der Generator baut aus deinen Angaben einen Bildprompt für ChatGPT, Firefly, Canva oder ein anderes Bildwerkzeug, schlägt einen Arbeitsauftrag vor, zeigt typische Stolpersteine und füllt deine Vier-Satz-Planung.</p>
+  <div class="flow"><b>Planung</b><span class="arrow">→</span><b>Bild beschreiben</b><span class="arrow">→</span><b>Prompt</b><span class="arrow">→</span><b>Prüfen</b><span class="arrow">→</span><b>Nachbessern</b></div>
+
+  <div class="presets" role="group" aria-label="Beispiele">
+    <span class="lbl">Schnellstart:</span>
+    <button data-preset="backstube">Backstube</button>
+    <button data-preset="bahnhof">Bahnhof (Schreibanlass)</button>
+    <button data-preset="verkauf">Kundensituation</button>
+    <button data-preset="platz">Platz beschreiben</button>
+    <button data-preset="umschlag">Umschlag deuten</button>
+    <button data-preset="tische">Arbeitstische vergleichen</button>
+    <button data-preset="ablauf">Bildfolge Ablauf</button>
+    <button data-preset="leer">Zurücksetzen</button>
+  </div>
+
+  <div class="layout">
+
+    <!-- Eingabe -->
+    <form class="card" id="form" autocomplete="off">
+      <h2>1 · Anpassen</h2>
+      <p class="sub">Was sollen die Lernenden mit dem Bild tun? Das Lernziel steuert, welche Bildmerkmale wichtig sind.</p>
+
+      <div class="group">
+        <span class="glab"><span class="n">1</span>Planung</span>
+        <label class="field"><span class="lab">Einsatz im Unterricht</span>
+          <div class="seg" id="einsatz" role="group" aria-label="Einsatz">
+            <button type="button" data-e="beschreiben">Beschreiben</button>
+            <button type="button" data-e="interpretieren">Interpretieren</button>
+            <button type="button" data-e="vergleichen">Vergleichen</button>
+            <button type="button" data-e="ablauf">Ablauf ordnen</button>
+            <button type="button" data-e="pruefen">Kritisch prüfen</button>
+            <button type="button" data-e="konzept">Konzeptbild</button>
+          </div>
+        </label>
+        <div class="row">
+          <label class="field"><span class="lab">Unterrichtsthema</span>
+            <input type="text" id="thema" placeholder="z. B. Arbeitsabläufe im Beruf"></label>
+          <label class="field"><span class="lab">Die Lernenden sollen mit dem Bild …</span>
+            <input type="text" id="ziel" placeholder="… Beobachtungen von Vermutungen unterscheiden"></label>
+        </div>
+      </div>
+
+      <div class="group">
+        <span class="glab"><span class="n">2</span>Bild beschreiben</span>
+        <p class="ghint">Was soll sichtbar sein? Nicht jedes Bild braucht alle Angaben.</p>
+        <label class="field"><span class="lab">Darstellungsstil</span>
+          <select id="stil">
+            <option>Sachliche Illustration</option>
+            <option>Detailreiche Illustration</option>
+            <option>Atmosphärische Illustration</option>
+            <option>Flächige Illustration mit klaren Konturen</option>
+            <option>Reduzierte Editorial-Illustration</option>
+            <option>Sachliche technische Illustration</option>
+            <option>Aquarell-Illustration</option>
+            <option>Fotorealistische Darstellung</option>
+          </select></label>
+        <div class="row">
+          <label class="field"><span class="lab">Motiv <span class="hint">Wer oder was ist zu sehen?</span></span>
+            <input type="text" id="motiv" placeholder="eine erwachsene, fiktive Person"></label>
+          <label class="field"><span class="lab">Handlung <span class="hint">Was passiert?</span></span>
+            <input type="text" id="handlung" placeholder="formt einen Brotlaib"></label>
+        </div>
+        <label class="field"><span class="lab">Umgebung <span class="hint">Wo findet die Szene statt?</span></span>
+          <input type="text" id="umgebung" placeholder="an einem Arbeitstisch in einer fiktiven Backstube"></label>
+        <label class="field"><span class="lab">Wichtige sichtbare Details <span class="hint">eines pro Zeile, möglichst nicht mehr als fünf</span></span>
+          <textarea id="details" rows="3"></textarea></label>
+        <div class="row">
+          <label class="field"><span class="lab">Perspektive / Ausschnitt</span>
+            <select id="persp">
+              <option value="">– offen lassen –</option>
+              <option>Seitliche Nahaufnahme</option>
+              <option>Seitliche Ansicht auf Arbeitshöhe</option>
+              <option>Halbtotale auf Augenhöhe</option>
+              <option>Weite Ansicht auf Augenhöhe</option>
+              <option>Draufsicht</option>
+              <option>Drei gleich grosse Bildfelder nebeneinander</option>
+              <option>Zwei gleich grosse Bildfelder nebeneinander</option>
+            </select></label>
+          <label class="field"><span class="lab">Platzierung <span class="hint">optional</span></span>
+            <input type="text" id="platz" placeholder="Hauptmotiv rechts, links freie Fläche für Titel"></label>
+        </div>
+        <label class="field"><span class="lab">Licht und Farben</span>
+          <input type="text" id="licht" placeholder="helles, weiches Tageslicht; dezente Farben; ruhiger Hintergrund"></label>
+      </div>
+
+      <div class="group">
+        <span class="glab"><span class="n">3</span>Anforderungen</span>
+        <label class="field"><span class="lab">Muss für die Aufgabe unbedingt sichtbar sein</span>
+          <input type="text" id="muss" placeholder="Hände, Teig und Werkzeuge vollständig sichtbar"></label>
+        <div class="checks" role="group" aria-label="Ausschlüsse">
+          <label><input type="checkbox" data-x="keine Schrift" checked>keine Schrift</label>
+          <label><input type="checkbox" data-x="keine Logos" checked>keine Logos</label>
+          <label><input type="checkbox" data-x="keine realen Personen" checked>keine realen Personen</label>
+          <label><input type="checkbox" data-x="keine Sprechblasen">keine Sprechblasen</label>
+          <label><input type="checkbox" data-x="keine stereotypen Darstellungen">keine Stereotype</label>
+        </div>
+        <div class="row">
+          <label class="field"><span class="lab">Seitenverhältnis <span class="hint">im Tool einstellen</span></span>
+            <select id="format"><option>16:9 (Folie)</option><option>4:3</option><option>1:1</option><option>3:4 (Arbeitsblatt hoch)</option></select></label>
+          <label class="field"><span class="lab">Bildwerkzeug <span class="hint">für die Kennzeichnung</span></span>
+            <select id="tool">
+              <option>ChatGPT</option>
+              <option>Adobe Firefly</option>
+              <option>Canva</option>
+              <option>Gemini</option>
+              <option>Copilot</option>
+              <option value="">anderes Tool</option>
+            </select></label>
+        </div>
+      </div>
+
+      <div class="group">
+        <span class="glab"><span class="n">4</span>Mein Bilder-Rezept</span>
+        <p class="ghint">Die Vier-Satz-Vorlage für deine Unterrichtsplanung. Thema und Lernziel kommen von oben, die zwei Sätze hier ergänzt du.</p>
+        <label class="field"><span class="lab">Dafür brauche ich eine Darstellung, die …</span>
+          <input type="text" id="braucht" placeholder="… eine fiktive Arbeitssituation mit gut sichtbaren Werkzeugen zeigt"></label>
+        <label class="field"><span class="lab">Vor dem Einsatz prüfe ich, …</span>
+          <input type="text" id="pruefe" placeholder="… ob Tätigkeit und Werkzeuge fachlich stimmen"></label>
+      </div>
+    </form>
+
+    <!-- Ausgabe -->
+    <aside class="card out" aria-live="polite">
+      <h2>2 · Fertiger Prompt</h2>
+      <p class="sub">Prompt kopieren und ins Bildwerkzeug einfügen. Mit «Alles kopieren» kommen Planung, Arbeitsauftrag und Kennzeichnung mit.</p>
+
+      <div class="block">
+        <h3>Bildprompt</h3>
+        <pre class="prompt" id="prompt"></pre>
+        <div class="actions">
+          <button class="btn primary" id="copy" type="button">📋 Prompt kopieren</button>
+          <button class="btn ghost" id="copyAll" type="button">Alles kopieren</button>
+          <span class="copied" id="toast" role="status"></span>
+        </div>
+        <p class="meta" id="formatNote"></p>
+      </div>
+
+      <div class="block">
+        <h3>Passender Arbeitsauftrag</h3>
+        <p class="task" id="task"></p>
+      </div>
+
+      <div class="block">
+        <h3>Mein Bilder-Rezept <span class="tag">Planung</span></h3>
+        <ul class="recipe" id="recipe"></ul>
+      </div>
+
+      <div class="block">
+        <h3>Stolperstein-Check</h3>
+        <ul class="checklist" id="checks"></ul>
+      </div>
+
+      <div class="block">
+        <h3>Nach dem Generieren prüfen</h3>
+        <ol class="qs">
+          <li><b>Fachlich:</b> Stimmen Gegenstände, Abläufe und Zusammenhänge?</li>
+          <li><b>Didaktisch:</b> Können die Lernenden damit die geplante Aufgabe bearbeiten?</li>
+          <li><b>Darstellung:</b> Was ist unklar, ablenkend oder stereotyp?</li>
+          <li><b>Verwendung:</b> Ist das Bild als KI-generiert und fiktiv gekennzeichnet?</li>
+        </ol>
+      </div>
+
+      <div class="block">
+        <h3>Nachbessern, eine Sache nach der anderen</h3>
+        <div class="fix" id="fix">
+          <button type="button">Vereinfache nur den Hintergrund. Behalte Hauptmotiv, Perspektive und Farbpalette bei.</button>
+          <button type="button">Zeige die Szene aus grösserer Entfernung, sodass die vollständigen Körperhaltungen sichtbar sind. Behalte den Stil bei.</button>
+          <button type="button">Zeige Hände und Werkzeug vollständig. Behalte den Illustrationsstil bei.</button>
+          <button type="button">Entferne alle Schrift im Bild. Behalte die übrige Szene möglichst unverändert bei.</button>
+          <button type="button">Verschiebe das Hauptmotiv in die rechte Bildhälfte. Lasse links eine ruhige, helle Fläche für einen Titel frei.</button>
+        </div>
+        <p class="meta">Klick kopiert den Änderungsauftrag. Ob Details erhalten bleiben, hängt vom Tool ab: Ergebnis erneut prüfen.</p>
+      </div>
+
+      <div class="block">
+        <h3>Kennzeichnung fürs Material</h3>
+        <p class="task" id="label"></p>
+      </div>
+
+      <p class="motto">«Ein guter Bildprompt beschreibt nicht nur ein Thema. Er beschreibt das Bild, das du für deine Lernaufgabe brauchst.»</p>
+    </aside>
+  </div>
+
+  <div class="note">
+    <b>Vor dem Hochladen eigener Bilder:</b> Dieser Generator beschreibt neue, fiktive Bilder. Wer vorhandene Fotos, Skizzen oder Lernendenarbeiten in ein KI-Tool lädt, klärt vorher Personenbezug, Nutzungsrechte und die schulischen Vorgaben. Schulische Vorgaben und die Freigabe des Tools gehen vor.
+  </div>
+</div>
+
+<textarea class="sr" id="clip" aria-hidden="true" tabindex="-1"></textarea>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const F=["thema","ziel","stil","motiv","handlung","umgebung","details","persp","platz","licht","muss","format","tool","braucht","pruefe"];
+let einsatz="beschreiben";
+
+const TASKS={
+  beschreiben:"Beschreibe drei Tätigkeiten oder Gegenstände, die du im Bild erkennst. Formuliere anschliessend zwei Vermutungen. Kennzeichne, was du beobachtest und was du nur vermutest.",
+  interpretieren:"Formuliere drei mögliche Erklärungen für die Situation. Nenne zu jeder Erklärung ein Bilddetail, auf das du dich beziehst.",
+  vergleichen:"Vergleiche die beiden Darstellungen. Welche eignet sich für welchen Zweck? Begründe deine Einschätzung mit sichtbaren Details.",
+  ablauf:"Beschreibe die Schritte mit «zuerst», «anschliessend» und «danach». Welche Zwischenschritte fehlen?",
+  pruefen:"Du erhältst dieses Bild mit einer Nachricht. Bevor du es weiterleitest: Welche drei Dinge prüfst du? (Behauptung, Quelle, Kontext, unabhängige Belege)",
+  konzept:"Welche Vorstellung vermittelt dieses Bild? Was zeigt es – und was lässt es weg?"
+};
+
+const BASE={stil:"Sachliche Illustration",persp:"",platz:"",format:"16:9 (Folie)",tool:"ChatGPT",x:["keine Schrift","keine Logos","keine realen Personen"]};
+const PRESETS={
+  backstube:{e:"beschreiben",thema:"Arbeitsabläufe im Beruf",ziel:"Tätigkeiten beschreiben und Beobachtungen von Vermutungen unterscheiden",stil:"Sachliche Illustration",motiv:"Eine erwachsene, fiktive Person",handlung:"formt einen Brotlaib",umgebung:"an einem Arbeitstisch in einer fiktiven Backstube",details:"eine Teigkarte, eine Schüssel und etwas Mehl auf dem Tisch\nim Hintergrund ein Backofen und ein Regal mit wenigen Broten",persp:"Seitliche Nahaufnahme",licht:"helles, weiches Tageslicht; dezente Farben; ruhiger Hintergrund",muss:"Hände, Teig und Werkzeuge vollständig sichtbar",braucht:"eine fiktive Arbeitssituation mit gut sichtbaren Händen und Werkzeugen zeigt",pruefe:"ob Tätigkeit und Werkzeuge fachlich stimmen"},
+  bahnhof:{e:"interpretieren",thema:"Erzählen / Schreibanlass",ziel:"eine Geschichte beginnen und Beobachtung von Deutung trennen",stil:"Atmosphärische Illustration",motiv:"Eine erwachsene, fiktive Person",handlung:"steht auf einem fast leeren Bahnsteig und blickt auf einen unbeschrifteten Brief",umgebung:"in einem kleinen Bahnhof am frühen Morgen",details:"neben ihr ein geschlossener roter Koffer\nin der Ferne nähert sich ein Zug\nleichter Nebel",persp:"Weite Ansicht auf Augenhöhe",platz:"Person und Koffer im rechten Bilddrittel, links der leere Bahnsteig",licht:"kühles Morgenlicht, Blau- und Grautöne; der rote Koffer als einziger kräftiger Farbakzent",muss:"Brief, Koffer und Zug erkennbar",braucht:"offen bleibt und mehrere Deutungen zulässt",pruefe:"ob das Bild keine Deutung schon vorwegnimmt"},
+  verkauf:{e:"interpretieren",thema:"Kundenkommunikation",ziel:"Beobachtungen und Interpretationen unterscheiden",stil:"Reduzierte Editorial-Illustration",motiv:"Eine erwachsene Kundin und ein erwachsener Verkäufer, beide fiktiv,",handlung:"stehen sich gegenüber; die Kundin mit verschränkten Armen, der Verkäufer mit leicht geöffneten Händen",umgebung:"an einem Verkaufstresen in einem Elektronikgeschäft",details:"zwischen beiden eine neutrale, ungeöffnete Produktverpackung\nzurückhaltende, nicht überzeichnete Gesichtsausdrücke\nim Hintergrund wenige Regale mit unbeschrifteten Produkten",persp:"Halbtotale auf Augenhöhe",licht:"helles, neutrales Licht; gedeckte Farben",muss:"Hände und Körperhaltungen gut sichtbar",x:["keine Schrift","keine Logos","keine realen Personen","keine Sprechblasen","keine stereotypen Darstellungen"],braucht:"eine fiktive Verkaufsszene mit mehreren möglichen Deutungen zeigt",pruefe:"ob die Darstellung verständlich ist und keine Personen oder Gruppen stereotyp abwertet"},
+  platz:{e:"beschreiben",thema:"Sprache: Ortsangaben",ziel:"eine Szene mit links, rechts, in der Mitte, vor und hinter beschreiben",stil:"Detailreiche Illustration",motiv:"Ein öffentlicher Platz",handlung:"mit drei klar getrennten Bereichen",umgebung:"in einer fiktiven Schweizer Kleinstadt",details:"links sitzt eine erwachsene Person auf einer Bank unter einem Baum\nin der Mitte gehen zwei erwachsene Personen über den Platz\nrechts fährt eine erwachsene Person auf einem Veloweg\nGebäude und ein Brunnen im Hintergrund",persp:"Weite Ansicht auf Augenhöhe",platz:"die drei Bereiche deutlich voneinander getrennt",licht:"helle Tageslichtstimmung, natürliche Farben",muss:"alle Tätigkeiten gut erkennbar",braucht:"klar getrennte Bereiche mit wenigen, gut erkennbaren Tätigkeiten zeigt",pruefe:"ob sich alle Ortsangaben eindeutig zuordnen lassen"},
+  umschlag:{e:"interpretieren",thema:"Deutungen begründen",ziel:"unterschiedliche Deutungen derselben Situation entwickeln und mit Details belegen",stil:"Atmosphärische Illustration",motiv:"Zwei erwachsene, fiktive Personen",handlung:"an einer geöffneten Haustür; eine reicht der anderen einen geschlossenen Umschlag",umgebung:"in einem neutralen Eingangsbereich",details:"beide Gesichtsausdrücke zurückhaltend\nder Inhalt des Umschlags ist nicht sichtbar",persp:"Halbtotale auf Augenhöhe",licht:"weiches Abendlicht, gedeckte Farben",muss:"beide Personen, ihre Hände und der Umschlag gut erkennbar; keine eindeutige Erklärung der Situation",x:["keine Schrift","keine Logos","keine realen Personen","keine Sprechblasen"],braucht:"keine eindeutige Erklärung der Situation liefert",pruefe:"ob Mimik und Gesten wirklich mehrdeutig geblieben sind"},
+  tische:{e:"vergleichen",thema:"Arbeitsorganisation",ziel:"zwei Arbeitsplatzanordnungen vergleichen und begründet beurteilen",stil:"Sachliche Illustration",motiv:"Zwei Arbeitstische ohne Personen",handlung:"mit denselben Gegenständen in unterschiedlicher Anordnung",umgebung:"auf weissem Hintergrund",details:"auf beiden Tischen: ein Laptop, ein Notizbuch, ein Stift, eine Wasserflasche, drei lose Blätter\nlinks ungeordnet verteilt\nrechts klar getrennt, vor dem Laptop eine freie Arbeitsfläche",persp:"Zwei gleich grosse Bildfelder nebeneinander",platz:"beide aus derselben Draufsicht",licht:"gleiche Farben und gleiche Gegenstandsgrössen",muss:"identische Gegenstände in beiden Feldern, keine zusätzlichen Gegenstände",x:["keine Schrift","keine Logos"],braucht:"dieselben Gegenstände in zwei Anordnungen zeigt",pruefe:"ob in beiden Feldern wirklich dieselben Gegenstände liegen"},
+  ablauf:{e:"ablauf",thema:"Arbeitsabläufe versprachlichen",ziel:"Schritte ordnen und mit Konnektoren beschreiben",stil:"Sachliche Illustration",motiv:"Zwei erwachsene Hände",handlung:"bei drei Arbeitsschritten der Brotherstellung",umgebung:"auf weissem Hintergrund",details:"links: Mehl wird in einer Schüssel abgewogen\nMitte: Teig wird auf einer Arbeitsfläche geknetet\nrechts: ein einzelner Brotlaib wird geformt",persp:"Drei gleich grosse Bildfelder nebeneinander",platz:"in allen Feldern dieselbe seitliche Perspektive, klare Abstände",licht:"derselbe einfache Stil und dieselbe dezente Farbpalette in allen Feldern",muss:"jeweils nur die Hände und die für den Schritt nötigen Gegenstände",x:["keine Schrift","keine Logos"],braucht:"drei klar unterscheidbare Schritte in derselben Perspektive zeigt",pruefe:"ob die Reihenfolge der Schritte fachlich stimmt"},
+  leer:{e:"beschreiben"}
+};
+
+function val(id){return ($(id).value||"").trim();}
+function cap(s){return s? s.charAt(0).toUpperCase()+s.slice(1):s;}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function excl(){return [...document.querySelectorAll("[data-x]")].filter(c=>c.checked).map(c=>c.dataset.x);}
+
+function buildPrompt(){
+  const stil=val("stil"),motiv=val("motiv"),hand=val("handlung"),umg=val("umgebung");
+  const det=val("details").split("\n").map(s=>s.trim()).filter(Boolean);
+  const p=[];
+  let first=stil;
+  const scene=[motiv?motiv.charAt(0).toLowerCase()+motiv.slice(1):"",hand,umg].filter(Boolean).join(" ");
+  if(scene) first+=": "+scene;
+  p.push(first.replace(/[.\s]+$/,"")+".");
+  if(det.length) p.push("Wichtige sichtbare Details:\n"+det.map(d=>"– "+cap(d)).join("\n"));
+  const ba=[val("persp"),val("platz")].filter(Boolean).join(". ");
+  if(ba) p.push("Bildaufbau: "+cap(ba)+".");
+  if(val("licht")) p.push("Licht und Farben: "+cap(val("licht"))+".");
+  const req=[];
+  if(val("muss")) req.push(cap(val("muss"))+".");
+  const ex=excl();
+  if(ex.length) req.push(cap(ex.join(", "))+".");
+  if(req.length) p.push("Weitere Anforderungen: "+req.join(" "));
+  return p.join("\n\n");
+}
+
+const VAGUE=/\b(schön\w*|motivierend\w*|spannend\w*|professionell\w*|inklusiv\w*|kompetenzorientiert\w*|ansprechend\w*|modern\w*|übersichtlich\w*|toll\w*|stimmungsvoll\w*|wunderschön\w*)\b/i;
+const STYLES=/(fotorealistisch|comic|aquarell|skizze|3d|cartoon|ölgemälde|pixel)/gi;
+const PRIVACY=/(schüler|klassenfoto|klasse \d|meine klasse|lernende[nr]? .*foto|foto von|porträt von|name[n]? )/i;
+
+function check(){
+  const out=[];
+  const motiv=val("motiv"),hand=val("handlung");
+  const all=[val("motiv"),val("handlung"),val("umgebung"),val("details"),val("licht"),val("muss"),val("platz")].join(" ");
+  const det=val("details").split("\n").filter(s=>s.trim());
+  if(!val("ziel")) out.push(["bad","Fehlt","Keine Lernaufgabe geplant. Ergänze «Die Lernenden sollen mit dem Bild …», sonst bestellst du nur ein schönes Bild."]);
+  else out.push(["ok","Ok","Lernziel formuliert: Es steuert, welche Details sichtbar sein müssen."]);
+  if(!motiv||!hand) out.push(["bad","Fehlt","Nur ein Thema statt einer Szene. Motiv und Handlung machen das Bild konkret."]);
+  else out.push(["ok","Ok","Motiv und Handlung sind beschrieben."]);
+  if(!val("persp")) out.push(["warn","Prüfen","Perspektive und Ausschnitt offen. Das Bild zeigt vielleicht die ganze Szene statt des entscheidenden Details."]);
+  else out.push(["ok","Ok","Bildaufbau festgelegt."]);
+  if(det.length>5) out.push(["warn","Prüfen",`Zu viel in einem Bild (${det.length} Details). Lieber aufteilen: ein Bild pro Aufgabe.`]);
+  const m=all.match(VAGUE);
+  if(m) out.push(["warn","Prüfen",`«${m[0]}» beschreibt eine Absicht, kein sichtbares Merkmal. Übersetze es in Gegenstände, Anordnung oder Farben.`]);
+  const st=[...new Set((all.match(STYLES)||[]).map(s=>s.toLowerCase()))];
+  if(st.length>1) out.push(["warn","Prüfen",`Widersprüchliche Stilwünsche (${st.join(", ")}). Entscheide dich für einen Hauptstil.`]);
+  if(PRIVACY.test(all)||PRIVACY.test(val("thema"))) out.push(["bad","Stopp","Hinweis auf echte Schüler:innen oder Fotos. Keine identifizierbaren Personen verwenden; vorher Rechtsgrundlage und schulische Vorgaben klären."]);
+  if(!excl().includes("keine realen Personen") && !/ohne personen|keine personen|hände/i.test(all)) out.push(["warn","Prüfen","«keine realen Personen» ist nicht angehakt. Für Unterrichtsmaterial fiktive Personen verwenden."]);
+  if(/fotorealistisch/i.test(val("stil"))) out.push(["warn","Prüfen","Fotorealistisch wirkt wie ein Dokument. Kennzeichne das Bild deutlich als KI-generiert und fiktiv."]);
+  if(!val("pruefe")) out.push(["warn","Prüfen","«Vor dem Einsatz prüfe ich …» ist leer. Ein Prompt formuliert Anforderungen, er ersetzt keine Prüfung des Ergebnisses."]);
+  return out;
+}
+
+function recipeLines(){
+  return [
+    ["Mein Unterrichtsthema ist",val("thema")],
+    ["Die Lernenden sollen mit dem Bild",val("ziel")],
+    ["Dafür brauche ich eine Darstellung, die",val("braucht")],
+    ["Vor dem Einsatz prüfe ich,",val("pruefe")]
+  ];
+}
+function recipeText(){
+  return recipeLines().map(([a,b])=>a+" "+(b||"…")+(b&&!/[.!?]$/.test(b)?".":"")).join("\n");
+}
+function labelText(){
+  const d=new Date().toLocaleDateString("de-CH");
+  const t=val("tool")||"[Tool]";
+  return `KI-generierte Illustration, erstellt mit ${t}, ${d}; fiktive Szene.`;
+}
+
+function render(){
+  const prompt=buildPrompt();
+  $("prompt").textContent=prompt||"Wähle einen Schnellstart oder fülle die Felder aus.";
+  $("formatNote").textContent="Seitenverhältnis "+val("format").split(" ")[0]+" in den Einstellungen des Tools wählen, nicht nur im Prompt.";
+  $("task").textContent="«"+TASKS[einsatz]+"»";
+  $("recipe").innerHTML=recipeLines().map(([a,b])=>`<li><b>${a}</b> ${b?esc(b):'<span class="empty">… (oben ausfüllen)</span>'}</li>`).join("");
+  $("checks").innerHTML=check().map(([c,p,t])=>`<li class="${c}"><span class="pill">${p}</span><span>${esc(t)}</span></li>`).join("");
+  $("label").textContent=labelText();
+  document.querySelectorAll("#einsatz button").forEach(b=>b.classList.toggle("on",b.dataset.e===einsatz));
+}
+
+function load(key){
+  const p=Object.assign({},BASE,PRESETS[key]); einsatz=p.e;
+  F.forEach(f=>{ $(f).value=p[f]!==undefined?p[f]:""; });
+  document.querySelectorAll("[data-x]").forEach(c=>c.checked=p.x.includes(c.dataset.x));
+  document.querySelectorAll("[data-preset]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.preset===key));
+  render();
+}
+
+let tt;
+function flash(msg){ $("toast").textContent=msg; $("toast").classList.add("show"); clearTimeout(tt); tt=setTimeout(()=>$("toast").classList.remove("show"),2200); }
+function fallback(text){
+  const c=$("clip"); c.value=text; c.focus(); c.select();
+  try{ document.execCommand("copy"); }catch(e){}
+  c.blur();
+}
+function copy(text,msg){
+  const done=()=>flash(msg);
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>{fallback(text);done();});
+  }else{fallback(text);done();}
+}
+
+$("form").addEventListener("input",render);
+$("form").addEventListener("change",render);
+$("form").addEventListener("submit",e=>e.preventDefault());
+document.querySelectorAll("[data-preset]").forEach(b=>b.addEventListener("click",()=>load(b.dataset.preset)));
+document.querySelectorAll("#einsatz button").forEach(b=>b.addEventListener("click",()=>{einsatz=b.dataset.e;render();}));
+$("copy").addEventListener("click",()=>copy(buildPrompt(),"Prompt kopiert"));
+$("copyAll").addEventListener("click",()=>{
+  const t=[ "MEIN BILDER-REZEPT", recipeText(), "", "BILDPROMPT", buildPrompt(), "", "Seitenverhältnis: "+val("format")+" (im Tool einstellen)", "", "ARBEITSAUFTRAG", TASKS[einsatz], "", "KENNZEICHNUNG", labelText() ].join("\n");
+  copy(t,"Alles kopiert");
+});
+document.querySelectorAll("#fix button").forEach(b=>b.addEventListener("click",()=>copy(b.textContent,"Änderungsauftrag kopiert")));
+
+load("backstube");
+})();
+</script>
+</body>
+</html>

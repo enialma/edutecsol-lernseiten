@@ -44,6 +44,12 @@ export default async function AppHome({ searchParams }: { searchParams: Promise<
               <p>Prompt zusammenstellen und mit eigenem Material an Claude schicken.</p>
               <span className="foot">Öffnen →</span>
             </Link>
+            <Link className="tile" href="/bild-generator.html">
+              <span className="badge new">neu</span>
+              <h3>Bildprompt-Generator</h3>
+              <p>Bilder für Lernaufgaben beschreiben: mit Arbeitsauftrag, Stolperstein-Check und Vier-Satz-Planung.</p>
+              <span className="foot">Öffnen →</span>
+            </Link>
             <Link className="tile" href="/app/erzeugen" style={{ background: "var(--navy)", color: "#fff", borderColor: "var(--navy)" }}>
               <span className="badge new">neu</span>
               <h3>Lernseite direkt erzeugen</h3>
