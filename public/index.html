@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prompt-Generator mit Beispielen – EDUTECSOL</title>
+<title>Lernwege – Lernseiten und Bilder für den Unterricht – EDUTECSOL</title>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -95,11 +95,12 @@
 <header id="top">
   <div class="wrap">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1rem"><p class="brand" style="margin:0">EDUTECSOL · Digitale Schulentwicklung</p><span style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center"><a href="/zugang" style="font-size:.85rem;font-weight:600;color:#fff;border:1px solid rgba(255,255,255,.45);border-radius:9px;padding:.45rem .95rem;text-decoration:none">Zugang &amp; Preise</a><a href="/app" style="font-size:.85rem;font-weight:600;color:#fff;background:var(--terra);border-radius:9px;padding:.45rem .95rem;text-decoration:none">Anmelden · Mein Bereich</a></span></div>
-    <h1>Differenzierte, interaktive Lernseiten</h1>
-    <p>Aus deinem Unterrichtsmaterial oder einer kurzen Themenbeschreibung entsteht eine Lernseite mit drei Zugängen (A/B/C): mit Selbstkontrolle für die Lernenden und Lösungen für die Lehrperson. Probier es kostenlos mit dem Prompt-Generator und den Beispielen aus, oder lass die Lernseite im geschützten Bereich direkt erzeugen: als interaktive HTML-Datei zum Herunterladen, zusätzlich als Word-Arbeitsblatt und als SCORM-Paket für Moodle.</p>
+    <h1>Lernseiten und Bilder, die eine Lernaufgabe tragen</h1>
+    <p>Aus deinem Unterrichtsmaterial oder einer kurzen Themenbeschreibung entsteht eine interaktive Lernseite mit drei Zugängen (A/B/C): mit Selbstkontrolle für die Lernenden und Lösungen für die Lehrperson. Dazu KI-Bilder, die nicht nur schön sind, sondern vom Lernziel über den Prompt bis zum Arbeitsauftrag durchdacht. Beides kostenlos ausprobieren mit den Generatoren und Beispielen. Lernseiten lassen sich im geschützten Bereich direkt erzeugen: als interaktive HTML-Datei, als Word-Arbeitsblatt und als SCORM-Paket für Moodle.</p>
     <div class="hero-tags">
       <span class="tag">A/B/C-Differenzierung</span>
       <span class="tag">Selbstkontrolle</span>
+      <span class="tag">KI-Bilder mit Lernauftrag</span>
       <span class="tag">Offline &amp; druckbar</span>
       <span class="tag">Word &amp; Moodle</span>
       <span class="tag">Für Schweizer Schulen</span>
@@ -134,7 +135,7 @@
       <p class="kicker">Was ist Lernwege?</p>
       <h2>Beschreibung und Funktionen</h2>
     </div>
-    <p class="about">Lernwege ist eine Plattform der EDUTECSOL GmbH für Lehrpersonen an Schulen. Sie macht aus vorhandenem Unterrichtsmaterial interaktive Übungen, die dasselbe Thema auf drei Wegen anbieten: A mit Unterstützung, B als Standard, C als Vertiefung. Die Lernenden wählen ihren Zugang, kontrollieren sich selbst und erhalten sofort Rückmeldung. Jede Lernseite ist eine interaktive HTML-Datei: Du lädst sie herunter, speicherst sie bei dir und verwendest sie jederzeit lokal, auch ohne Internet, oder du lädst sie in Teams für die Klasse hoch. Zusätzlich gibt es sie als Word-Arbeitsblatt und als SCORM-Paket für Moodle.</p>
+    <p class="about">Lernwege ist eine Plattform der EDUTECSOL GmbH für Lehrpersonen an Schulen. Zwei Dinge entstehen hier: interaktive Lernseiten und KI-Bilder für Lernaufgaben. Die Lernseiten machen aus vorhandenem Unterrichtsmaterial Übungen, die dasselbe Thema auf drei Wegen anbieten: A mit Unterstützung, B als Standard, C als Vertiefung. Die Lernenden wählen ihren Zugang, kontrollieren sich selbst und erhalten sofort Rückmeldung. Jede Lernseite ist eine interaktive HTML-Datei: Du lädst sie herunter, speicherst sie bei dir und verwendest sie jederzeit lokal, auch ohne Internet, oder du lädst sie in Teams für die Klasse hoch. Zusätzlich gibt es sie als Word-Arbeitsblatt und als SCORM-Paket für Moodle. Die Bilder entstehen mit dem Bildprompt-Generator: Lernziel und Bildbeschreibung rein, Prompt, Arbeitsauftrag und Stolperstein-Check raus, dann im eigenen Bildwerkzeug generieren und prüfen.</p>
     <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
       <div class="feat">
         <span class="badge tool">kostenlos, ohne Konto</span>
@@ -402,7 +403,7 @@
 
 <script>
 (function(){
-  const links=[...document.querySelectorAll('.subnav a[href^="#"]')];
+  const links=[...document.querySelectorAll('.subnav a[href^="#"]:not(.up)')];
   const targets=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
   if(!targets.length||!('IntersectionObserver' in window))return;
   const setActive=id=>links.forEach(a=>a.classList.toggle('is-active',a.getAttribute('href')==='#'+id));
