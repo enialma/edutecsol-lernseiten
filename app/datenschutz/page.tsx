@@ -3,7 +3,7 @@ import Topbar from "../Topbar";
 
 export const metadata = { title: "Datenschutz – Lernwege EDUTECSOL" };
 
-const STAND = "4. Oktober 2026";
+const STAND = "11. Oktober 2026";
 
 export default function DatenschutzPage() {
   return (
@@ -87,6 +87,7 @@ export default function DatenschutzPage() {
               <tr><td><b>Microsoft Entra ID</b></td><td>Anmeldung mit Microsoft-365-Schulkonto</td><td>Wir erhalten nur E-Mail und Anzeigename. Kein Zugriff auf Mails, Dateien oder Kalender</td></tr>
               <tr><td><b>Anthropic PBC</b> (Claude)</td><td>KI-Erzeugung der Lernseite, wenn «Claude» gewählt ist</td><td>Verarbeitung in den USA. Über die kommerzielle Schnittstelle; Eingaben werden gemäss Anthropic nicht zum Training der Modelle verwendet und nur kurz zur Missbrauchskontrolle aufbewahrt</td></tr>
               <tr><td><b>Payrexx AG</b></td><td>Bezahlung des Abos für Einzelpersonen</td><td>Schweizer Unternehmen (Thun). Payrexx erhält E-Mail und Zahlungsdaten. Wir sehen und speichern keine Karten- oder TWINT-Daten, nur eine Abo-Nummer</td></tr>
+              <tr><td><b>OpenAI, L.L.C.</b> (gpt-image)</td><td>KI-Erzeugung und Nachbessern von Bildern für Lernaufgaben («Bild direkt erzeugen»)</td><td>Verarbeitung in den USA. Über die kommerzielle Schnittstelle; übermittelt werden nur der Bildprompt und beim Nachbessern das Ausgangsbild. Eingaben werden gemäss OpenAI nicht zum Training der Modelle verwendet</td></tr>
               <tr><td><b>Infomaniak Network SA</b> (Apertus)</td><td>KI-Erzeugung der Lernseite, wenn «Infomaniak» gewählt ist</td><td>Verarbeitung in der Schweiz, Schweizer Unternehmen, Schweizer Modell Apertus</td></tr>
             </tbody>
           </table>

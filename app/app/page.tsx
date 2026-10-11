@@ -34,7 +34,7 @@ export default async function AppHome({ searchParams }: { searchParams: Promise<
           <p className="kicker">Mein Bereich</p>
           <h1>Willkommen, {name}</h1>
           <p className="lead">
-            Hier entstehen die Werkzeuge, die über den Prompt-Generator hinausgehen: Lernseiten direkt erzeugen,
+            Hier entstehen die Werkzeuge, die über den Prompt-Generator hinausgehen: Lernseiten und Bilder direkt erzeugen,
             sammeln und in Moodle bringen.
           </p>
           <div className="grid">
@@ -54,6 +54,12 @@ export default async function AppHome({ searchParams }: { searchParams: Promise<
               <span className="badge new">neu</span>
               <h3>Lernseite direkt erzeugen</h3>
               <p style={{ color: "#c3ccd6" }}>Material hochladen, Achsen wählen, fertige HTML-Lernseite erhalten – ohne Medienbruch.</p>
+              <span className="foot" style={{ color: "var(--ochre)" }}>Starten →</span>
+            </Link>
+            <Link className="tile" href="/app/bilder/erzeugen" style={{ background: "var(--navy)", color: "#fff", borderColor: "var(--navy)" }}>
+              <span className="badge new">neu</span>
+              <h3>Bild direkt erzeugen</h3>
+              <p style={{ color: "#c3ccd6" }}>Bild-Rezept ausfüllen, Bild erhalten, Schritt für Schritt nachbessern – mit Arbeitsauftrag und Kennzeichnung.</p>
               <span className="foot" style={{ color: "var(--ochre)" }}>Starten →</span>
             </Link>
             <Link className="tile" href="/app/seiten">

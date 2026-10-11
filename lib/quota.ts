@@ -14,6 +14,17 @@ export const LIMITS: Record<Provider, number> = {
   claude: num(process.env.QUOTA_CLAUDE, 10),
   infomaniak: num(process.env.QUOTA_INFOMANIAK, 30),
 };
+/** Inklusive Bilder pro Kalendermonat (Erzeugen und Nachbessern zählen je einmal). */
+export const LIMIT_BILDER = num(process.env.QUOTA_BILDER, 20);
+
+/** Bilder im laufenden Kalendermonat (provider 'bild' im Protokoll). */
+export async function imageQuotaFor(userId: number, isAdmin: boolean): Promise<{ used: number; limit: number | null }> {
+  const rows = await q(
+    `SELECT COUNT(*)::int AS n FROM generations WHERE user_id = $1 AND ok AND provider = 'bild' AND created_at >= date_trunc('month', NOW())`,
+    [userId]
+  );
+  return { used: Number(rows[0]?.n ?? 0), limit: isAdmin ? null : LIMIT_BILDER };
+}
 
 export async function logGeneration(g: { userId: number; provider: string; model?: string | null; inputTokens: number; outputTokens: number; ok: boolean }) {
   await q(
@@ -40,14 +51,16 @@ export async function quotaFor(userId: number, isAdmin: boolean): Promise<Quota>
 
 export type Usage = {
   email: string; name: string | null; institution: string | null; pages: number; claude_month: number; infomaniak_month: number;
-  claude: number; infomaniak: number; input_tokens: number; output_tokens: number; last_page: string | null;
+  claude: number; infomaniak: number; bilder: number; bilder_month: number; input_tokens: number; output_tokens: number; last_page: string | null;
 };
 
 /** Erzeugungen und Tokens pro Person. Seiten = gelungene Erzeugungen; Tokens zählen auch misslungene Versuche. */
 export async function usageByUser(): Promise<Usage[]> {
   return (await q(
     `SELECT u.email, u.name, i.name AS institution,
-       COUNT(g.id) FILTER (WHERE g.ok)::int AS pages,
+       COUNT(g.id) FILTER (WHERE g.ok AND g.provider <> 'bild')::int AS pages,
+       COUNT(g.id) FILTER (WHERE g.ok AND g.provider = 'bild')::int AS bilder,
+       COUNT(g.id) FILTER (WHERE g.ok AND g.provider = 'bild' AND g.created_at >= date_trunc('month', NOW()))::int AS bilder_month,
        COUNT(g.id) FILTER (WHERE g.ok AND g.provider = 'claude' AND g.created_at >= date_trunc('month', NOW()))::int AS claude_month,
        COUNT(g.id) FILTER (WHERE g.ok AND g.provider = 'infomaniak' AND g.created_at >= date_trunc('month', NOW()))::int AS infomaniak_month,
        COUNT(g.id) FILTER (WHERE g.ok AND g.provider = 'claude')::int AS claude,

@@ -270,10 +270,11 @@
           <button class="btn ghost" id="copyAll" type="button">Alles kopieren</button>
           <button class="btn ghost" id="share" type="button">🔗 Link kopieren</button>
           <button class="btn ghost" id="print" type="button">🖨 Drucken / PDF</button>
+          <a class="btn ghost" id="direct" href="/app/bilder/erzeugen">✨ Bild direkt erzeugen</a>
           <span class="copied" id="toast" role="status"></span>
         </div>
         <p class="meta" id="formatNote"></p>
-        <p class="meta" id="storeNote">Deine Eingaben bleiben in diesem Browser gespeichert. «Link kopieren» packt alle Angaben in die Adresse, damit du das Rezept weitergeben kannst.</p>
+        <p class="meta" id="storeNote">Deine Eingaben bleiben in diesem Browser gespeichert. «Link kopieren» packt alle Angaben in die Adresse, damit du das Rezept weitergeben kannst. «Bild direkt erzeugen» nimmt dein Rezept mit in den Mitgliederbereich (Zugang nötig).</p>
       </div>
 
       <div class="block" id="b-task">
@@ -507,6 +508,7 @@ function render(){
   document.querySelectorAll("#einsatz button").forEach(b=>b.classList.toggle("on",b.dataset.e===einsatz));
   renderExample();
   save();
+  $("direct").href="/app/bilder/erzeugen?r="+encodeState();
 }
 
 function load(key){

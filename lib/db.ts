@@ -85,6 +85,29 @@ export function ready(): Promise<void> {
       await sql.query(`INSERT INTO generations (user_id, provider, model, input_tokens, output_tokens, created_at)
         SELECT user_id, provider, model, input_tokens, output_tokens, created_at FROM pages
         WHERE copied_from IS NULL AND provider <> 'beispiel' AND NOT EXISTS (SELECT 1 FROM generations)`);
+      // Direkt erzeugte Bilder für Lernaufgaben (Bilddaten base64 in der DB, Freigabelink für Lernende/Moodle)
+      await sql.query(`CREATE TABLE IF NOT EXISTS images (
+        id            SERIAL PRIMARY KEY,
+        user_id       INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        title         TEXT NOT NULL,
+        einsatz       TEXT,
+        thema         TEXT,
+        params        JSONB NOT NULL DEFAULT '{}'::jsonb,
+        prompt        TEXT NOT NULL,
+        instruction   TEXT,
+        parent_id     INTEGER,
+        provider      TEXT NOT NULL,
+        model         TEXT,
+        size          TEXT,
+        quality       TEXT,
+        input_tokens  INTEGER NOT NULL DEFAULT 0,
+        output_tokens INTEGER NOT NULL DEFAULT 0,
+        duration_ms   INTEGER,
+        mime          TEXT NOT NULL DEFAULT 'image/jpeg',
+        data_b64      TEXT NOT NULL,
+        share_token   TEXT UNIQUE,
+        created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )`);
       await sql.query(`CREATE TABLE IF NOT EXISTS moodle_links (
         user_id    INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
         base_url   TEXT NOT NULL,

@@ -15,6 +15,7 @@ export default async function Topbar() {
           {u && <Link href="/app">Mein Bereich</Link>}
           {u && <Link href="/app/erzeugen">Erzeugen</Link>}
           {u && <Link href="/app/seiten">Sammlung</Link>}
+          {u && <Link href="/app/bilder">Bilder</Link>}
           {u?.role === "admin" && <Link href="/admin/benutzer">Benutzer</Link>}
           {u ? (
             <>
