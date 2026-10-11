@@ -10,6 +10,24 @@ type ProviderOpt = { id: string; label: string; model: string };
 type Preset = { id: string; label: string };
 type Quota = { used: number; limit: number | null };
 
+type FieldProps = {
+  k: keyof BildState; label: string; hint?: string; rows?: number; ph?: string;
+  s: BildState; set: (k: keyof BildState, v: never) => void; busy: boolean;
+};
+
+function Field({ k, label, hint, rows, ph, s, set, busy }: FieldProps) {
+  return (
+    <div>
+      <label>{label}{hint && <span className="small-note" style={{ fontWeight: 400 }}> {hint}</span>}</label>
+      {rows ? (
+        <textarea rows={rows} value={s[k] as string} onChange={(e) => set(k, e.target.value as never)} disabled={busy} placeholder={ph} style={{ minHeight: 0 }} />
+      ) : (
+        <input value={s[k] as string} onChange={(e) => set(k, e.target.value as never)} disabled={busy} placeholder={ph} />
+      )}
+    </div>
+  );
+}
+
 export default function Form({ providers, presets, quota, initial }: { providers: ProviderOpt[]; presets: Preset[]; quota: Quota; initial: string | null }) {
   const router = useRouter();
   const [s, setS] = useState<BildState>(() => (initial && decodeState(initial)) || presetState("backstube"));
@@ -45,16 +63,6 @@ export default function Form({ providers, presets, quota, initial }: { providers
     }
   }
 
-  const Text = ({ k, label, hint, rows, ph }: { k: keyof BildState; label: string; hint?: string; rows?: number; ph?: string }) => (
-    <div>
-      <label>{label}{hint && <span className="small-note" style={{ fontWeight: 400 }}> {hint}</span>}</label>
-      {rows ? (
-        <textarea rows={rows} value={s[k] as string} onChange={(e) => set(k, e.target.value as never)} disabled={busy} placeholder={ph} style={{ minHeight: 0 }} />
-      ) : (
-        <input value={s[k] as string} onChange={(e) => set(k, e.target.value as never)} disabled={busy} placeholder={ph} />
-      )}
-    </div>
-  );
 
   return (
     <form onSubmit={submit} className="card">
@@ -74,8 +82,8 @@ export default function Form({ providers, presets, quota, initial }: { providers
         ))}
       </div>
       <div className="form-grid">
-        <Text k="thema" label="Unterrichtsthema" ph="z. B. Arbeitsabläufe im Beruf" />
-        <Text k="ziel" label="Die Lernenden sollen mit dem Bild …" ph="… Beobachtungen von Vermutungen unterscheiden" />
+        <Field s={s} set={set} busy={busy} k="thema" label="Unterrichtsthema" ph="z. B. Arbeitsabläufe im Beruf" />
+        <Field s={s} set={set} busy={busy} k="ziel" label="Die Lernenden sollen mit dem Bild …" ph="… Beobachtungen von Vermutungen unterscheiden" />
       </div>
 
       <h3 style={{ margin: "1.4rem 0 .2rem" }}>2 · Bild beschreiben</h3>
@@ -83,19 +91,19 @@ export default function Form({ providers, presets, quota, initial }: { providers
       <select value={s.stil} onChange={(e) => set("stil", e.target.value)} disabled={busy}>
         {STILE.map((v) => <option key={v}>{v}</option>)}
       </select>
-      <Text k="motiv" label="Motiv" hint="Wer oder was ist zu sehen?" ph="eine erwachsene, fiktive Person" />
-      <Text k="handlung" label="Handlung" hint="Was passiert? Mehrere Zeilen möglich" rows={3} ph="formt einen Brotlaib" />
-      <Text k="umgebung" label="Umgebung" hint="Wo findet die Szene statt?" ph="an einem Arbeitstisch in einer fiktiven Backstube" />
-      <Text k="details" label="Wichtige sichtbare Details" hint="eines pro Zeile, möglichst nicht mehr als fünf" rows={3} />
+      <Field s={s} set={set} busy={busy} k="motiv" label="Motiv" hint="Wer oder was ist zu sehen?" ph="eine erwachsene, fiktive Person" />
+      <Field s={s} set={set} busy={busy} k="handlung" label="Handlung" hint="Was passiert? Mehrere Zeilen möglich" rows={3} ph="formt einen Brotlaib" />
+      <Field s={s} set={set} busy={busy} k="umgebung" label="Umgebung" hint="Wo findet die Szene statt?" ph="an einem Arbeitstisch in einer fiktiven Backstube" />
+      <Field s={s} set={set} busy={busy} k="details" label="Wichtige sichtbare Details" hint="eines pro Zeile, möglichst nicht mehr als fünf" rows={3} />
       <label>Perspektive / Ausschnitt</label>
       <select value={s.persp} onChange={(e) => set("persp", e.target.value)} disabled={busy}>
         {PERSPEKTIVEN.map((v) => <option key={v} value={v}>{v || "– offen lassen –"}</option>)}
       </select>
-      <Text k="platz" label="Platzierung" hint="optional, mehrere Zeilen möglich" rows={2} ph="Hauptmotiv rechts, links freie Fläche für Titel" />
-      <Text k="licht" label="Licht und Farben" ph="helles, weiches Tageslicht; dezente Farben; ruhiger Hintergrund" />
+      <Field s={s} set={set} busy={busy} k="platz" label="Platzierung" hint="optional, mehrere Zeilen möglich" rows={2} ph="Hauptmotiv rechts, links freie Fläche für Titel" />
+      <Field s={s} set={set} busy={busy} k="licht" label="Licht und Farben" ph="helles, weiches Tageslicht; dezente Farben; ruhiger Hintergrund" />
 
       <h3 style={{ margin: "1.4rem 0 .2rem" }}>3 · Anforderungen</h3>
-      <Text k="muss" label="Muss für die Aufgabe unbedingt sichtbar sein" ph="Hände, Teig und Werkzeuge vollständig sichtbar" />
+      <Field s={s} set={set} busy={busy} k="muss" label="Muss für die Aufgabe unbedingt sichtbar sein" ph="Hände, Teig und Werkzeuge vollständig sichtbar" />
       <label>Ausschlüsse</label>
       <div className="row" style={{ gap: ".4rem 1rem" }}>
         {AUSSCHLUESSE.map((x) => (
@@ -122,8 +130,8 @@ export default function Form({ providers, presets, quota, initial }: { providers
 
       <h3 style={{ margin: "1.4rem 0 .2rem" }}>4 · Mein Bilder-Rezept</h3>
       <p className="small-note" style={{ margin: 0 }}>Wird mit dem Bild gespeichert und erscheint auf der Bildseite als Planungstext.</p>
-      <Text k="braucht" label="Dafür brauche ich eine Darstellung, die …" ph="… eine fiktive Arbeitssituation mit gut sichtbaren Werkzeugen zeigt" />
-      <Text k="pruefe" label="Vor dem Einsatz prüfe ich, …" ph="… ob Tätigkeit und Werkzeuge fachlich stimmen" />
+      <Field s={s} set={set} busy={busy} k="braucht" label="Dafür brauche ich eine Darstellung, die …" ph="… eine fiktive Arbeitssituation mit gut sichtbaren Werkzeugen zeigt" />
+      <Field s={s} set={set} busy={busy} k="pruefe" label="Vor dem Einsatz prüfe ich, …" ph="… ob Tätigkeit und Werkzeuge fachlich stimmen" />
 
       {providers.length > 1 && (
         <>
