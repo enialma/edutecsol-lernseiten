@@ -88,6 +88,36 @@
   .motto{font-size:.92rem;color:var(--ink-soft);font-style:italic;margin:1.2rem 0 0;padding-top:1rem;border-top:1px solid var(--line);}
   .note{font-size:.82rem;color:var(--ink-soft);margin-top:1.4rem;background:#fff;border:1px solid var(--line);border-radius:10px;padding:.8rem 1rem;}
   .sr{position:absolute;left:-9999px;top:0;}
+  .presets button.has-img::before{content:"";display:inline-block;width:.55rem;height:.55rem;border-radius:50%;background:var(--ochre);margin-right:.4rem;vertical-align:middle;}
+  .example{display:grid;grid-template-columns:150px 1fr;gap:.9rem;align-items:center;background:var(--cream);border-radius:12px;padding:.7rem;}
+  .example img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;border-radius:8px;display:block;background:#ddd;}
+  .example p{margin:0;font-size:.85rem;color:var(--ink-soft);}
+  .example a{color:var(--terra);font-weight:600;text-decoration:none;}
+  .example a:hover{text-decoration:underline;}
+  @media(max-width:480px){.example{grid-template-columns:1fr;}}
+  .print-head{display:none;}
+  @media print{
+    @page{size:A4 portrait;margin:14mm 16mm;}
+    body{background:#fff;padding:0;color:#000;font-size:10.5pt;line-height:1.4;}
+    .wrap{max-width:none;}
+    a.back,.lead,.flow,.presets,#form,.note,.actions,.copied,#b-example,#b-checks,#b-fix,.motto,.out>h2,.out>.sub,#storeNote{display:none !important;}
+    .layout{display:block;}
+    .card{border:none;box-shadow:none;padding:0;border-radius:0;}
+    .kicker{color:#000;}
+    h1{font-size:18pt;margin-bottom:2mm;}
+    .print-head{display:block;font-size:9pt;color:#444;margin:0 0 5mm;padding-bottom:2mm;border-bottom:1px solid #000;}
+    .out{display:flex;flex-direction:column;}
+    #b-recipe{order:1;}#b-prompt{order:2;}#b-task{order:3;}#b-qs{order:4;}#b-label{order:5;}
+    .out .block{break-inside:avoid;margin:0 0 4mm;padding:0 0 4mm;border-bottom:1px solid #bbb;}
+    .out h3{font-size:11pt;margin-bottom:1.5mm;}
+    .out h3 .tag{display:none;}
+    pre.prompt{background:#fff;color:#000;border:1px solid #000;border-radius:0;max-height:none;overflow:visible;font-size:9.5pt;padding:3mm 4mm;}
+    .meta{color:#444;}
+    .task{background:#fff;border-left:3px solid #000;border-radius:0;}
+    .recipe li{border:1px solid #bbb;border-radius:0;}
+    .recipe li b{color:#000;}
+    ol.qs li b{color:#000;}
+  }
 </style>
 </head>
 <body>
@@ -96,6 +126,7 @@
 
   <p class="kicker">Werkzeug · EDUTECSOL</p>
   <h1>Bildprompt-Generator für Lernaufgaben</h1>
+  <p class="print-head">Planungsblatt aus lernwege.edutecsol.ch/bild-generator.html · <span id="printDate"></span></p>
   <p class="lead">Erst die Lernaufgabe klären, dann das Bild beschreiben, danach das Ergebnis prüfen. Der Generator baut aus deinen Angaben einen Bildprompt für ChatGPT, Firefly, Canva oder ein anderes Bildwerkzeug, schlägt einen Arbeitsauftrag vor, zeigt typische Stolpersteine und füllt deine Vier-Satz-Planung.</p>
   <div class="flow"><b>Planung</b><span class="arrow">→</span><b>Bild beschreiben</b><span class="arrow">→</span><b>Prompt</b><span class="arrow">→</span><b>Prüfen</b><span class="arrow">→</span><b>Nachbessern</b></div>
 
@@ -223,33 +254,44 @@
       <h2>2 · Fertiger Prompt</h2>
       <p class="sub">Prompt kopieren und ins Bildwerkzeug einfügen. Mit «Alles kopieren» kommen Planung, Arbeitsauftrag und Kennzeichnung mit.</p>
 
-      <div class="block">
+      <div class="block" id="b-example" hidden>
+        <h3>Beispielbild zu diesem Schnellstart</h3>
+        <div class="example">
+          <a id="exLink" href="bild-beispiele.html"><img id="exImg" src="" alt="" loading="lazy" width="640" height="360"></a>
+          <p><span id="exText"></span><br><a id="exLink2" href="bild-beispiele.html">Beispielbild mit Arbeitsauftrag ansehen →</a></p>
+        </div>
+      </div>
+
+      <div class="block" id="b-prompt">
         <h3>Bildprompt</h3>
         <pre class="prompt" id="prompt"></pre>
         <div class="actions">
           <button class="btn primary" id="copy" type="button">📋 Prompt kopieren</button>
           <button class="btn ghost" id="copyAll" type="button">Alles kopieren</button>
+          <button class="btn ghost" id="share" type="button">🔗 Link kopieren</button>
+          <button class="btn ghost" id="print" type="button">🖨 Drucken / PDF</button>
           <span class="copied" id="toast" role="status"></span>
         </div>
         <p class="meta" id="formatNote"></p>
+        <p class="meta" id="storeNote">Deine Eingaben bleiben in diesem Browser gespeichert. «Link kopieren» packt alle Angaben in die Adresse, damit du das Rezept weitergeben kannst.</p>
       </div>
 
-      <div class="block">
+      <div class="block" id="b-task">
         <h3>Passender Arbeitsauftrag</h3>
         <p class="task" id="task"></p>
       </div>
 
-      <div class="block">
+      <div class="block" id="b-recipe">
         <h3>Mein Bilder-Rezept <span class="tag">Planung</span></h3>
         <ul class="recipe" id="recipe"></ul>
       </div>
 
-      <div class="block">
+      <div class="block" id="b-checks">
         <h3>Stolperstein-Check</h3>
         <ul class="checklist" id="checks"></ul>
       </div>
 
-      <div class="block">
+      <div class="block" id="b-qs">
         <h3>Nach dem Generieren prüfen</h3>
         <ol class="qs">
           <li><b>Fachlich:</b> Stimmen Gegenstände, Abläufe und Zusammenhänge?</li>
@@ -259,19 +301,13 @@
         </ol>
       </div>
 
-      <div class="block">
+      <div class="block" id="b-fix">
         <h3>Nachbessern, eine Sache nach der anderen</h3>
-        <div class="fix" id="fix">
-          <button type="button">Vereinfache nur den Hintergrund. Behalte Hauptmotiv, Perspektive und Farbpalette bei.</button>
-          <button type="button">Zeige die Szene aus grösserer Entfernung, sodass die vollständigen Körperhaltungen sichtbar sind. Behalte den Stil bei.</button>
-          <button type="button">Zeige Hände und Werkzeug vollständig. Behalte den Illustrationsstil bei.</button>
-          <button type="button">Entferne alle Schrift im Bild. Behalte die übrige Szene möglichst unverändert bei.</button>
-          <button type="button">Verschiebe das Hauptmotiv in die rechte Bildhälfte. Lasse links eine ruhige, helle Fläche für einen Titel frei.</button>
-        </div>
-        <p class="meta">Klick kopiert den Änderungsauftrag. Ob Details erhalten bleiben, hängt vom Tool ab: Ergebnis erneut prüfen.</p>
+        <div class="fix" id="fix"></div>
+        <p class="meta">Die Vorschläge richten sich nach Einsatz, Perspektive, Platzierung und Muss-Angabe. Klick kopiert den Änderungsauftrag. Ob Details erhalten bleiben, hängt vom Tool ab: Ergebnis erneut prüfen.</p>
       </div>
 
-      <div class="block">
+      <div class="block" id="b-label">
         <h3>Kennzeichnung fürs Material</h3>
         <p class="task" id="label"></p>
       </div>
@@ -290,6 +326,17 @@
 <script>
 (function(){
 const $=id=>document.getElementById(id);
+const NL=String.fromCharCode(10);
+const STORE="lw-bildgen-v1";
+let currentPreset=null, edited=false;
+const EXAMPLES={
+  backstube:{img:"backstube",anchor:"backstube",text:"Mit diesem Rezept in Canva erzeugt: Backstube, seitliche Nahaufnahme."},
+  pflege:{img:"pflege-blutdruck",anchor:"pflege",text:"Mit diesem Rezept in Canva erzeugt: Blutdruckmessung im Pflegezimmer."},
+  chatbild:{img:"wasserschaden-schulzimmer",anchor:"wasserschaden",text:"Mit diesem Rezept in Canva erzeugt: Schulzimmer nach Wasserschaden, fotorealistisch."},
+  markt:{img:"franzoesisch-markt",anchor:"markt",text:"Mit diesem Rezept in Canva erzeugt: Marktstand mit benennbaren Lebensmitteln."},
+  bushalte:{img:"deutsch-bushaltestelle",anchor:"bushaltestelle",text:"Mit diesem Rezept in Canva erzeugt: Bushaltestelle im Regen, offene Situation."},
+  wohnung:{img:"abu-wohnungsuebergabe",anchor:"wohnung",text:"Mit diesem Rezept in Canva erzeugt: Wohnungsübergabe mit sichtbaren Mängeln."}
+};
 const F=["thema","ziel","stil","motiv","handlung","umgebung","details","persp","platz","licht","muss","format","tool","braucht","pruefe"];
 let einsatz="beschreiben";
 
@@ -320,20 +367,20 @@ const PRESETS={
 };
 
 function val(id){return ($(id).value||"").trim();}
-function line(id){return val(id).split("\n").map(s=>s.trim().replace(/[;,.]+$/,"")).filter(Boolean).join("; ");}
+function line(id){return val(id).split(NL).map(s=>s.trim().replace(/[;,.]+$/,"")).filter(Boolean).join("; ");}
 function cap(s){return s? s.charAt(0).toUpperCase()+s.slice(1):s;}
 function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 function excl(){return [...document.querySelectorAll("[data-x]")].filter(c=>c.checked).map(c=>c.dataset.x);}
 
 function buildPrompt(){
   const stil=val("stil"),motiv=val("motiv"),hand=line("handlung"),umg=val("umgebung");
-  const det=val("details").split("\n").map(s=>s.trim()).filter(Boolean);
+  const det=val("details").split(NL).map(s=>s.trim()).filter(Boolean);
   const p=[];
   let first=stil;
   const scene=[motiv?motiv.charAt(0).toLowerCase()+motiv.slice(1):"",hand,umg].filter(Boolean).join(" ");
   if(scene) first+=": "+scene;
   p.push(first.replace(/[.\s]+$/,"")+".");
-  if(det.length) p.push("Wichtige sichtbare Details:\n"+det.map(d=>"– "+cap(d)).join("\n"));
+  if(det.length) p.push("Wichtige sichtbare Details:"+NL+det.map(d=>"– "+cap(d)).join(NL));
   const ba=[val("persp"),line("platz")].filter(Boolean).join(". ");
   if(ba) p.push("Bildaufbau: "+cap(ba)+".");
   if(val("licht")) p.push("Licht und Farben: "+cap(val("licht"))+".");
@@ -342,7 +389,7 @@ function buildPrompt(){
   const ex=excl();
   if(ex.length) req.push(cap(ex.join(", "))+".");
   if(req.length) p.push("Weitere Anforderungen: "+req.join(" "));
-  return p.join("\n\n");
+  return p.join(NL+NL);
 }
 
 const VAGUE=/\b(schön\w*|motivierend\w*|spannend\w*|professionell\w*|inklusiv\w*|kompetenzorientiert\w*|ansprechend\w*|modern\w*|übersichtlich\w*|toll\w*|stimmungsvoll\w*|wunderschön\w*)\b/i;
@@ -353,7 +400,7 @@ function check(){
   const out=[];
   const motiv=val("motiv"),hand=val("handlung");
   const all=[val("motiv"),val("handlung"),val("umgebung"),val("details"),val("licht"),val("muss"),val("platz")].join(" ");
-  const det=val("details").split("\n").filter(s=>s.trim());
+  const det=val("details").split(NL).filter(s=>s.trim());
   if(!val("ziel")) out.push(["bad","Fehlt","Keine Lernaufgabe geplant. Ergänze «Die Lernenden sollen mit dem Bild …», sonst bestellst du nur ein schönes Bild."]);
   else out.push(["ok","Ok","Lernziel formuliert: Es steuert, welche Details sichtbar sein müssen."]);
   if(!motiv||!hand) out.push(["bad","Fehlt","Nur ein Thema statt einer Szene. Motiv und Handlung machen das Bild konkret."]);
@@ -381,7 +428,7 @@ function recipeLines(){
   ];
 }
 function recipeText(){
-  return recipeLines().map(([a,b])=>a+" "+(b||"…")+(b&&!/[.!?]$/.test(b)?".":"")).join("\n");
+  return recipeLines().map(([a,b])=>a+" "+(b||"…")+(b&&!/[.!?]$/.test(b)?".":"")).join(NL);
 }
 function labelText(){
   const d=new Date().toLocaleDateString("de-CH");
@@ -389,6 +436,65 @@ function labelText(){
   return `KI-generierte Illustration, erstellt mit ${t}, ${d}; fiktive Szene.`;
 }
 
+function low(s){return s? s.charAt(0).toLowerCase()+s.slice(1):s;}
+function fixes(){
+  const persp=val("persp"),muss=val("muss"),platz=line("platz"),ex=excl();
+  const out=["Vereinfache nur den Hintergrund. Behalte Hauptmotiv, Perspektive und Farbpalette bei."];
+  let nearDone=false;
+  if(/Bildfelder/.test(persp)){
+    out.push("Zeige alle Bildfelder gleich gross, mit derselben Perspektive und derselben Farbpalette. Keine Rahmen, keine Schrift zwischen den Feldern.");
+  }else if(/Nahaufnahme|Draufsicht|Arbeitshöhe/.test(persp)){
+    out.push("Zeige die Szene aus grösserer Entfernung, sodass die vollständigen Körperhaltungen sichtbar sind. Behalte den Stil bei.");
+  }else if(/Weite Ansicht|Halbtotale/.test(persp)){
+    out.push(muss?"Gehe näher an das Hauptmotiv heran. Folgendes muss gross und deutlich sichtbar sein: "+muss.replace(/[.]+$/,"")+". Behalte den Stil bei.":"Gehe näher an das Hauptmotiv heran, sodass die entscheidenden Details gross und deutlich sichtbar sind. Behalte den Stil bei.");
+    nearDone=!!muss;
+  }else{
+    out.push("Zeige die Szene aus grösserer Entfernung, sodass die vollständigen Körperhaltungen sichtbar sind. Behalte den Stil bei.");
+  }
+  if(muss&&!nearDone) out.push("Achte darauf, dass Folgendes vollständig und gut erkennbar ist: "+muss.replace(/[.]+$/,"")+". Lasse alles andere unverändert.");
+  const E={
+    beschreiben:"Rücke die Tätigkeit in den Vordergrund: Hände und Werkzeug deutlich, Hintergrund ruhiger.",
+    interpretieren:"Mache Mimik und Gestik zurückhaltender, sodass die Situation mehrdeutig bleibt. Keine eindeutige Erklärung im Bild.",
+    vergleichen:"Verwende in beiden Darstellungen exakt dieselben Gegenstände in derselben Grösse, nur anders angeordnet.",
+    ablauf:"Zeige in jedem Feld nur einen Arbeitsschritt, in der beschriebenen Reihenfolge von links nach rechts.",
+    pruefen:"Entferne alle Hinweise auf einen realen Ort: Schilder, bekannte Gebäude, Nummernschilder, erkennbare Logos.",
+    konzept:"Reduziere auf die wesentlichen Elemente. Entferne alles, was nicht zum Konzept gehört."
+  };
+  out.push(E[einsatz]);
+  if(ex.includes("keine Schrift")) out.push("Entferne alle Schrift, Zahlen und Symbole im Bild. Behalte die übrige Szene möglichst unverändert bei.");
+  if(platz) out.push("Ändere nur die Anordnung: "+platz+". Lasse Stil, Motiv und Farben unverändert.");
+  else out.push("Verschiebe das Hauptmotiv in die rechte Bildhälfte. Lasse links eine ruhige, helle Fläche für einen Titel frei.");
+  return out.slice(0,6);
+}
+function state(){
+  const o={e:einsatz,x:excl()};
+  if(currentPreset) o.p=currentPreset;
+  F.forEach(f=>{const v=val(f); if(v) o[f]=v;});
+  return o;
+}
+function apply(o){
+  einsatz=TASKS[o.e]?o.e:"beschreiben";
+  F.forEach(f=>{ $(f).value=o[f]!==undefined?o[f]:""; });
+  const x=Array.isArray(o.x)?o.x:BASE.x;
+  document.querySelectorAll("[data-x]").forEach(c=>c.checked=x.includes(c.dataset.x));
+}
+function save(){ try{ localStorage.setItem(STORE,JSON.stringify(state())); }catch(e){} }
+function encodeState(){ return btoa(unescape(encodeURIComponent(JSON.stringify(state())))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
+function decodeState(h){
+  try{ const b=h.replace(/-/g,"+").replace(/_/g,"/"); return JSON.parse(decodeURIComponent(escape(atob(b)))); }catch(e){ return null; }
+}
+function shareUrl(){ return location.origin+location.pathname+"#r="+encodeState(); }
+function renderExample(){
+  const ex=currentPreset&&EXAMPLES[currentPreset];
+  const blk=$("b-example");
+  if(!ex){ blk.hidden=true; return; }
+  blk.hidden=false;
+  const src="bilder/klein/"+ex.img+".jpg";
+  if($("exImg").getAttribute("src")!==src) $("exImg").src=src;
+  $("exImg").alt="Beispielbild "+currentPreset;
+  $("exLink").href=$("exLink2").href="bild-beispiele.html#"+ex.anchor;
+  $("exText").textContent=ex.text+(edited?" Du hast das Rezept seither verändert; das Bild zeigt den Ausgangspunkt.":"");
+}
 function render(){
   const prompt=buildPrompt();
   $("prompt").textContent=prompt||"Wähle einen Schnellstart oder fülle die Felder aus.";
@@ -397,15 +503,24 @@ function render(){
   $("recipe").innerHTML=recipeLines().map(([a,b])=>`<li><b>${a}</b> ${b?esc(b):'<span class="empty">… (oben ausfüllen)</span>'}</li>`).join("");
   $("checks").innerHTML=check().map(([c,p,t])=>`<li class="${c}"><span class="pill">${p}</span><span>${esc(t)}</span></li>`).join("");
   $("label").textContent=labelText();
+  $("fix").innerHTML=fixes().map(t=>`<button type="button">${esc(t)}</button>`).join("");
   document.querySelectorAll("#einsatz button").forEach(b=>b.classList.toggle("on",b.dataset.e===einsatz));
+  renderExample();
+  save();
 }
 
 function load(key){
-  const p=Object.assign({},BASE,PRESETS[key]); einsatz=p.e;
-  F.forEach(f=>{ $(f).value=p[f]!==undefined?p[f]:""; });
-  document.querySelectorAll("[data-x]").forEach(c=>c.checked=p.x.includes(c.dataset.x));
+  const p=Object.assign({},BASE,PRESETS[key]);
+  apply(p);
+  currentPreset=key; edited=false;
+  if(key==="leer"){ currentPreset=null; try{ localStorage.removeItem(STORE); }catch(e){} }
+  if(location.hash) history.replaceState(null,"",location.pathname);
   document.querySelectorAll("[data-preset]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.preset===key));
   render();
+}
+function markEdited(){
+  edited=true;
+  document.querySelectorAll("[data-preset]").forEach(b=>b.setAttribute("aria-pressed","false"));
 }
 
 let tt;
@@ -422,19 +537,29 @@ function copy(text,msg){
   }else{fallback(text);done();}
 }
 
-$("form").addEventListener("input",render);
-$("form").addEventListener("change",render);
+$("form").addEventListener("input",()=>{markEdited();render();});
+$("form").addEventListener("change",()=>{markEdited();render();});
 $("form").addEventListener("submit",e=>e.preventDefault());
 document.querySelectorAll("[data-preset]").forEach(b=>b.addEventListener("click",()=>load(b.dataset.preset)));
-document.querySelectorAll("#einsatz button").forEach(b=>b.addEventListener("click",()=>{einsatz=b.dataset.e;render();}));
+document.querySelectorAll("#einsatz button").forEach(b=>b.addEventListener("click",()=>{einsatz=b.dataset.e;markEdited();render();}));
 $("copy").addEventListener("click",()=>copy(buildPrompt(),"Prompt kopiert"));
 $("copyAll").addEventListener("click",()=>{
-  const t=[ "MEIN BILDER-REZEPT", recipeText(), "", "BILDPROMPT", buildPrompt(), "", "Seitenverhältnis: "+val("format")+" (im Tool einstellen)", "", "ARBEITSAUFTRAG", TASKS[einsatz], "", "KENNZEICHNUNG", labelText() ].join("\n");
+  const t=[ "MEIN BILDER-REZEPT", recipeText(), "", "BILDPROMPT", buildPrompt(), "", "Seitenverhältnis: "+val("format")+" (im Tool einstellen)", "", "ARBEITSAUFTRAG", TASKS[einsatz], "", "KENNZEICHNUNG", labelText(), "", "ZUM WEITERBEARBEITEN", shareUrl() ].join(NL);
   copy(t,"Alles kopiert");
 });
-document.querySelectorAll("#fix button").forEach(b=>b.addEventListener("click",()=>copy(b.textContent,"Änderungsauftrag kopiert")));
+$("fix").addEventListener("click",e=>{ const b=e.target.closest("button"); if(b) copy(b.textContent,"Änderungsauftrag kopiert"); });
+$("share").addEventListener("click",()=>{ const u=shareUrl(); history.replaceState(null,"",u); copy(u,"Link kopiert"); });
+$("print").addEventListener("click",()=>{ $("printDate").textContent=new Date().toLocaleDateString("de-CH"); window.print(); });
+document.querySelectorAll("[data-preset]").forEach(b=>{ if(EXAMPLES[b.dataset.preset]) b.classList.add("has-img"); });
+$("printDate").textContent=new Date().toLocaleDateString("de-CH");
 
-load("backstube");
+(function init(){
+  const m=location.hash.match(/^#r=(.+)$/);
+  if(m){ const o=decodeState(m[1]); if(o){ apply(o); currentPreset=EXAMPLES[o.p]?o.p:null; edited=true; render(); return; } }
+  let saved=null; try{ saved=JSON.parse(localStorage.getItem(STORE)||"null"); }catch(e){}
+  if(saved&&(saved.thema||saved.motiv||saved.handlung)){ apply(saved); currentPreset=EXAMPLES[saved.p]?saved.p:null; edited=true; render(); return; }
+  load("backstube");
+})();
 })();
 </script>
 </body>
