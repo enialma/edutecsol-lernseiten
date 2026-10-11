@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 
 type ProviderOpt = { id: string; label: string; model: string; used: number; limit: number | null };
 type Preset = { id: string; label: string; fach?: string; stufe?: string; diffart?: string; anzahl?: number; sprache?: string; twist?: string; niveau?: string };
+type Bild = { id: number; title: string };
 
 const DIFFART = [["niveau", "nach Niveau (Hilfe)"], ["lerntyp", "nach Lerntyp"], ["interesse", "nach Berufsfeld"], ["sozialform", "nach Sozialform"]];
 const SPRACHE = [["standard", "Standard"], ["einfach", "vereinfachte Sprache"], ["glossar", "Fachbegriffe mit Glossar"], ["zweisprachig", "Schlüsselbegriffe zweisprachig"]];
@@ -12,16 +13,17 @@ const NIVEAU = [["reproduzieren", "reproduzieren"], ["anwenden", "anwenden"], ["
 
 type State = {
   fach: string; stufe: string; thema: string; extra: string; material: string;
-  diffart: string; anzahl: number; sprache: string; zweitsprache: string; twist: string; niveau: string; provider: string;
+  diffart: string; anzahl: number; sprache: string; zweitsprache: string; twist: string; niveau: string; provider: string; bild: number;
 };
 
-export default function Form({ providers, presets }: { providers: ProviderOpt[]; presets: Preset[] }) {
+export default function Form({ providers, presets, bilder, initialBild }: { providers: ProviderOpt[]; presets: Preset[]; bilder: Bild[]; initialBild: number }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const [s, setS] = useState<State>({
     fach: "", stufe: "", thema: "", extra: "", material: "",
     diffart: "niveau", anzahl: 3, sprache: "standard", zweitsprache: "", twist: "auto", niveau: "anwenden",
     provider: (providers.find((p) => p.limit === null || p.used < p.limit) ?? providers[0]).id,
+    bild: bilder.some((b) => b.id === initialBild) ? initialBild : 0,
   });
   const [busy, setBusy] = useState(false);
   const [log, setLog] = useState<string[]>([]);
@@ -117,6 +119,22 @@ export default function Form({ providers, presets }: { providers: ProviderOpt[];
       <Seg k="niveau" opts={NIVEAU} />
       <label>Zusatzwunsch (optional)</label>
       <input value={s.extra} onChange={(e) => set("extra", e.target.value)} disabled={busy} placeholder="z. B. Beispiel aus der Hotellerie" />
+
+      {bilder.length > 0 && (
+        <>
+          <label>Bild einbinden (optional)</label>
+          <select value={s.bild} onChange={(e) => set("bild", Number(e.target.value))} disabled={busy}>
+            <option value={0}>kein Bild</option>
+            {bilder.map((b) => <option key={b.id} value={b.id}>{b.title}</option>)}
+          </select>
+          {s.bild > 0 && (
+            <div className="row" style={{ alignItems: "center", marginTop: ".5rem" }}>
+              <img src={`/app/bilder/${s.bild}/jpg`} alt="" style={{ width: 160, aspectRatio: "16/9", objectFit: "cover", borderRadius: 8, border: "1px solid var(--line)" }} />
+              <span className="small-note" style={{ flex: "1 1 200px" }}>Das Bild kommt als Bildaufgabe mit Arbeitsauftrag in die Lernseite. Es wird dafür per Bildlink freigegeben (ohne Login erreichbar).</span>
+            </div>
+          )}
+        </>
+      )}
 
       <label>KI-Anbieter</label>
       <div className="seg">

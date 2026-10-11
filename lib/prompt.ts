@@ -17,6 +17,8 @@ export type GenParams = {
   zweitsprache?: string;
   twist: Twist;
   niveau: Niveau;
+  /** Optional: ein direkt erzeugtes Bild, das die Lernseite als Bildaufgabe einbindet. */
+  bild?: { id: number; url: string; title: string; auftrag: string; alt: string };
 };
 
 export const DIFFART_LABELS: Record<Diffart, string> = {
@@ -135,6 +137,15 @@ export function userPrompt(p: GenParams, material: { name?: string; text: string
       ? "- Thema: leer – wähle das geeignetste Thema selbst aus dem Material"
       : "- Thema: leer – leite ein geeignetes Thema aus Fach und Stufe ab";
   const extraLine = extra ? `\n- Zusatzwunsch: ${extra}` : "";
+  const bildLine = p.bild ? `\n- Bild: «${p.bild.title}» (siehe §BILD)` : "";
+  const bildBlock = p.bild
+    ? `\n\n§BILD
+Die Lernseite bindet dieses Bild als Bildaufgabe ein. Genau so, ohne Änderung der Adresse, kein anderes Bild, kein Platzhalter:
+<img src="${p.bild.url}" alt="${p.bild.alt.replace(/"/g, "'")}" style="width:100%;height:auto;border-radius:12px">
+- Position: direkt nach dem Einstieg, vor den Zugängen (Reitern), als Blickfang mit Bildunterschrift «KI-generierte Illustration, fiktive Szene».
+- Arbeitsauftrag zum Bild, als erste Aufgabe in jedem Zugang passend zum Niveau angepasst: «${p.bild.auftrag}»
+- Das Bild ersetzt keine Kernaufgabe; es dient als Einstieg, Beobachtungs- oder Transferaufgabe. Im Lehrpersonen-Bereich: ein Satz, was am Bild zu prüfen war.`
+    : "";
   const dateiLine = hasMaterial
     ? `- Material: ${material?.name ? `«${material.name}», ` : ""}Textauszug unten`
     : "- Material: keine Datei – arbeite allein mit den Angaben oben";
@@ -146,6 +157,7 @@ export function userPrompt(p: GenParams, material: { name?: string; text: string
   const materialBlock = hasMaterial
     ? `\n\n§MATERIAL (Textauszug)\n<<<\n${material!.text.trim()}\n>>>`
     : "";
+  const tailBlock = bildBlock + materialBlock;
 
   return `§ROLLE
 Du bist Fachdidaktiker:in für ${fach} auf der Stufe ${stufe} und Frontend-Entwickler:in.
@@ -153,7 +165,7 @@ Du bist Fachdidaktiker:in für ${fach} auf der Stufe ${stufe} und Frontend-Entwi
 §ANGABEN
 - Fach/Kontext: ${fach}
 - Zielstufe: ${stufe}
-${themaLine}${extraLine}
+${themaLine}${extraLine}${bildLine}
 ${dateiLine}
 
 §AUFGABE
@@ -185,7 +197,7 @@ Ruhiges, altersgerechtes Design für die Zielstufe; themenpassende Visualisierun
 - Rechne alle Lösungen selbst nach; die Feedback-Logik jedes Eingabefelds muss exakt zu den richtigen Werten passen.
 - Prüfe, dass jede Aufgabe klar zeigt, was wo einzutragen ist (welche Eingabe welche Visualisierung auslöst).
 - Kontrolliere alle Texte (auch Selbstchecks) auf Tipp- und Flüchtigkeitsfehler.
-- Schweizer Standarddeutsch; Selbstcheck-Listen abhakbar.${materialBlock}`;
+- Schweizer Standarddeutsch; Selbstcheck-Listen abhakbar.${tailBlock}`;
 }
 
 /** Zieht die reine HTML-Datei aus einer Modellantwort (entfernt Codezäune und Text ausserhalb). */

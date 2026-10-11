@@ -108,6 +108,10 @@ export function ready(): Promise<void> {
         share_token   TEXT UNIQUE,
         created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )`);
+      await sql.query(`ALTER TABLE images ADD COLUMN IF NOT EXISTS pool BOOLEAN NOT NULL DEFAULT FALSE`);
+      await sql.query(`ALTER TABLE images ADD COLUMN IF NOT EXISTS school BOOLEAN NOT NULL DEFAULT FALSE`);
+      await sql.query(`ALTER TABLE images ADD COLUMN IF NOT EXISTS beispiel BOOLEAN NOT NULL DEFAULT FALSE`);
+      await sql.query(`ALTER TABLE images ADD COLUMN IF NOT EXISTS copied_from INTEGER`);
       await sql.query(`CREATE TABLE IF NOT EXISTS moodle_links (
         user_id    INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
         base_url   TEXT NOT NULL,

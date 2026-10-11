@@ -2,7 +2,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
-import { deleteImage, renameImage, setImageShare } from "@/lib/images";
+import { deleteImage, duplicateImage, renameImage, setImageExample, setImageShare, setImageVisibility } from "@/lib/images";
 
 async function who() {
   const s = await auth();
@@ -30,4 +30,27 @@ export async function renameImageAction(fd: FormData) {
   if (title) await renameImage(id, userId, isAdmin, title.slice(0, 120));
   revalidatePath(`/app/bilder/${id}`);
   revalidatePath("/app/bilder");
+}
+
+export async function visibilityImageAction(fd: FormData) {
+  const { userId, isAdmin } = await who();
+  const id = Number(fd.get("id"));
+  const v = fd.get("v");
+  await setImageVisibility(id, userId, isAdmin, v === "all" ? "all" : v === "school" ? "school" : "private");
+  revalidatePath(`/app/bilder/${id}`);
+  revalidatePath("/app/bilder");
+}
+
+export async function copyImageAction(fd: FormData) {
+  const { userId, isAdmin } = await who();
+  const newId = await duplicateImage(Number(fd.get("id")), userId, isAdmin);
+  redirect(newId ? `/app/bilder/${newId}` : "/app/bilder");
+}
+
+export async function exampleImageAction(fd: FormData) {
+  const { isAdmin } = await who();
+  if (!isAdmin) throw new Error("Nur für Admins.");
+  const id = Number(fd.get("id"));
+  await setImageExample(id, fd.get("on") === "1");
+  revalidatePath(`/app/bilder/${id}`);
 }

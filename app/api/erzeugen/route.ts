@@ -6,6 +6,8 @@ import { extractFromFile, type Extracted } from "@/lib/extract";
 import { createPage } from "@/lib/pages";
 import { LIMITS, logGeneration, quotaFor } from "@/lib/quota";
 import { extractHtml, systemPrompt, titleFromHtml, userPrompt, type GenParams } from "@/lib/prompt";
+import { TASKS, type Einsatz } from "@/lib/bildprompt";
+import { getImageMeta, setImageShare } from "@/lib/images";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -43,6 +45,19 @@ export async function POST(req: Request) {
     niveau: pick(fd.get("niveau"), ["reproduzieren", "anwenden", "beurteilen"] as const, "anwenden"),
   };
   if (!params.fach || !params.stufe) return new Response("Fach und Zielstufe sind Pflicht.", { status: 400 });
+
+  // Optional: eigenes Bild als Bildaufgabe einbinden (braucht einen öffentlichen Bildlink)
+  const bildId = Number(fd.get("bild") ?? 0);
+  if (bildId > 0) {
+    const isAdmin = session.user.role === "admin";
+    const img = await getImageMeta(bildId, userId, isAdmin);
+    if (!img) return new Response("Das gewählte Bild wurde nicht gefunden.", { status: 400 });
+    const token = img.share_token ?? (img.user_id === userId || isAdmin ? await setImageShare(img.id, userId, isAdmin, true) : null);
+    if (!token) return new Response("Für fremde Bilder zuerst «In meine Sammlung kopieren».", { status: 400 });
+    const origin = `${req.headers.get("x-forwarded-proto") ?? "https"}://${req.headers.get("x-forwarded-host") ?? req.headers.get("host")}`;
+    const e = (img.einsatz ?? "beschreiben") as Einsatz;
+    params.bild = { id: img.id, url: `${origin}/b/${token}`, title: img.title, auftrag: TASKS[e] ?? TASKS.beschreiben, alt: `KI-generierte Illustration: ${img.title}` };
+  }
 
   const file = fd.get("datei");
   const materialText = String(fd.get("material") ?? "").trim();

@@ -7,7 +7,7 @@ import { imageProviderReady } from "@/lib/imagegen";
 import { getImageMeta, imageFamily } from "@/lib/images";
 import { imageQuotaFor } from "@/lib/quota";
 import Topbar from "../../../Topbar";
-import { deleteImageAction, renameImageAction, shareImageAction } from "../actions";
+import { copyImageAction, deleteImageAction, exampleImageAction, renameImageAction, shareImageAction, visibilityImageAction } from "../actions";
 import CopyText from "./CopyText";
 import EditForm from "./EditForm";
 
@@ -21,6 +21,7 @@ export default async function BildPage({ params }: { params: Promise<{ id: strin
   const img = await getImageMeta(Number(id), userId, isAdmin);
   if (!img) notFound();
   const own = img.user_id === userId;
+  const canEdit = own || isAdmin;
   const state = normalize(img.params);
   const family = await imageFamily(img.id, img.parent_id, userId, isAdmin);
   const quota = await imageQuotaFor(userId, isAdmin);
@@ -28,22 +29,25 @@ export default async function BildPage({ params }: { params: Promise<{ id: strin
   const einsatz = (img.einsatz ?? state.e) as Einsatz;
   const label = labelText(img.provider === "openai" ? "OpenAI gpt-image" : "Infomaniak Flux", new Date());
   const recipe = recipeLines(state);
+  const visibility = img.pool ? "all" : img.school && img.owner_institution ? "school" : "private";
 
   const h = await headers();
   const origin = `${h.get("x-forwarded-proto") ?? "https"}://${h.get("x-forwarded-host") ?? h.get("host")}`;
   const shareUrl = img.share_token ? `${origin}/b/${img.share_token}` : null;
   const slug = img.title.toLowerCase().replace(/[^a-z0-9äöü]+/g, "-").replace(/^-|-$/g, "") || "bild";
+  const back = own ? ["/app/bilder", "Meine Bilder"] : img.pool ? ["/app/bilder?modus=pool", "Bilder-Pool"] : img.school ? ["/app/bilder?modus=schule", "Meine Schule"] : ["/app/bilder?modus=alle", "Alle Bilder"];
 
   return (
     <>
       <Topbar />
       <main>
         <div className="wrap">
-          <p className="kicker"><Link href="/app/bilder">← Meine Bilder</Link></p>
+          <p className="kicker"><Link href={back[0]}>← {back[1]}</Link></p>
           <h1>{img.title}</h1>
           <p className="lead">
             {EINSATZ_LABELS[einsatz] ?? einsatz} · erzeugt am {img.created_at} · {img.size}
             {img.instruction ? " · nachgebesserte Variante" : ""}
+            {img.copied_from ? " · Kopie" : ""}
             {!own ? ` · von ${img.owner_name || img.owner_email}` : ""}
           </p>
 
@@ -52,7 +56,14 @@ export default async function BildPage({ params }: { params: Promise<{ id: strin
           <div className="row" style={{ margin: "1rem 0" }}>
             <a className="btn terra" href={`/app/bilder/${img.id}/jpg?download=1`} download={`${slug}.jpg`}>Bild herunterladen</a>
             <a className="btn" href={`/app/bilder/${img.id}/jpg`} target="_blank" rel="noopener">In neuem Tab öffnen</a>
+            {canEdit && <Link className="btn" href={`/app/erzeugen?bild=${img.id}`}>In eine Lernseite einbauen</Link>}
             <Link className="btn ghost" href={`/app/bilder/erzeugen?r=${encodeState(state)}`}>Rezept anpassen, neu erzeugen</Link>
+            {!own && (
+              <form action={copyImageAction}>
+                <input type="hidden" name="id" value={img.id} />
+                <button className="btn ghost">In meine Sammlung kopieren</button>
+              </form>
+            )}
           </div>
 
           {family.length > 1 && (
@@ -70,11 +81,13 @@ export default async function BildPage({ params }: { params: Promise<{ id: strin
           )}
 
           <div className="grid" style={{ marginBottom: "1rem" }}>
-            <div className="card">
-              <p className="kicker">Prüfen und nachbessern</p>
-              <h3 style={{ margin: "0 0 .4rem" }}>Nachbessern, eine Sache nach der anderen</h3>
-              <EditForm imageId={img.id} suggestions={fixes(state)} canEdit={imageProviderReady("openai")} exhausted={exhausted} />
-            </div>
+            {canEdit && (
+              <div className="card">
+                <p className="kicker">Prüfen und nachbessern</p>
+                <h3 style={{ margin: "0 0 .4rem" }}>Nachbessern, eine Sache nach der anderen</h3>
+                <EditForm imageId={img.id} suggestions={fixes(state)} canEdit={imageProviderReady("openai")} exhausted={exhausted} />
+              </div>
+            )}
 
             <div className="card">
               <p className="kicker">Für den Unterricht</p>
@@ -93,39 +106,78 @@ export default async function BildPage({ params }: { params: Promise<{ id: strin
               </ol>
             </div>
 
-            <div className="card">
-              <p className="kicker">Für Lernende und Moodle</p>
-              <h3 style={{ margin: "0 0 .4rem" }}>Bildlink</h3>
-              {shareUrl ? (
-                <>
-                  <p className="small-note">Wer den Link hat, sieht das Bild ohne Login. Als Bild-URL in Moodle, Teams oder in einer Lernseite verwendbar.</p>
-                  <div className="row" style={{ alignItems: "center" }}>
-                    <input readOnly value={shareUrl} style={{ flex: "1 1 220px", fontSize: ".85rem" }} />
-                    <CopyText text={shareUrl} label="Link kopieren" />
-                  </div>
-                  <form action={shareImageAction} style={{ marginTop: ".8rem" }}>
-                    <input type="hidden" name="id" value={img.id} />
-                    <input type="hidden" name="on" value="0" />
-                    <button className="btn small ghost" style={{ color: "var(--err)" }}>Freigabe zurückziehen</button>
-                  </form>
-                </>
-              ) : (
-                <>
-                  <p className="small-note">Noch nicht freigegeben. Ein Bildlink macht das Bild ohne Login erreichbar, bis du ihn zurückziehst.</p>
-                  <form action={shareImageAction}>
-                    <input type="hidden" name="id" value={img.id} />
-                    <input type="hidden" name="on" value="1" />
-                    <button className="btn small">Bildlink erstellen</button>
-                  </form>
-                </>
-              )}
-              <h3 style={{ margin: "1.2rem 0 .4rem" }}>Titel</h3>
-              <form action={renameImageAction} className="row">
-                <input type="hidden" name="id" value={img.id} />
-                <input name="title" defaultValue={img.title} style={{ flex: "1 1 180px" }} />
-                <button className="btn small ghost">Speichern</button>
-              </form>
-            </div>
+            {canEdit && (
+              <div className="card">
+                <p className="kicker">Für Lernende und Moodle</p>
+                <h3 style={{ margin: "0 0 .4rem" }}>Bildlink</h3>
+                {shareUrl ? (
+                  <>
+                    <p className="small-note">Wer den Link hat, sieht das Bild ohne Login. Als Bild-URL in Moodle, Teams oder in einer Lernseite verwendbar.</p>
+                    <div className="row" style={{ alignItems: "center" }}>
+                      <input readOnly value={shareUrl} style={{ flex: "1 1 220px", fontSize: ".85rem" }} />
+                      <CopyText text={shareUrl} label="Link kopieren" />
+                    </div>
+                    {!img.beispiel && (
+                      <form action={shareImageAction} style={{ marginTop: ".8rem" }}>
+                        <input type="hidden" name="id" value={img.id} />
+                        <input type="hidden" name="on" value="0" />
+                        <button className="btn small ghost" style={{ color: "var(--err)" }}>Freigabe zurückziehen</button>
+                      </form>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <p className="small-note">Noch nicht freigegeben. Ein Bildlink macht das Bild ohne Login erreichbar, bis du ihn zurückziehst.</p>
+                    <form action={shareImageAction}>
+                      <input type="hidden" name="id" value={img.id} />
+                      <input type="hidden" name="on" value="1" />
+                      <button className="btn small">Bildlink erstellen</button>
+                    </form>
+                  </>
+                )}
+                <h3 style={{ margin: "1.2rem 0 .4rem" }}>Titel</h3>
+                <form action={renameImageAction} className="row">
+                  <input type="hidden" name="id" value={img.id} />
+                  <input name="title" defaultValue={img.title} style={{ flex: "1 1 180px" }} />
+                  <button className="btn small ghost">Speichern</button>
+                </form>
+              </div>
+            )}
+
+            {canEdit && (
+              <div className="card">
+                <p className="kicker">Für Kolleginnen und Kollegen</p>
+                <h3 style={{ margin: "0 0 .4rem" }}>Sichtbarkeit</h3>
+                <p className="small-note">
+                  {visibility === "all"
+                    ? "Dieses Bild liegt im Pool. Alle angemeldeten Lehrpersonen können es ansehen und kopieren."
+                    : visibility === "school"
+                    ? `Nur Lehrpersonen von «${img.owner_institution}» können dieses Bild ansehen und kopieren.`
+                    : "Nur du siehst dieses Bild."}
+                </p>
+                <form action={visibilityImageAction} className="row">
+                  <input type="hidden" name="id" value={img.id} />
+                  <button name="v" value="private" className={`btn small ${visibility === "private" ? "" : "ghost"}`}>Nur ich</button>
+                  {img.owner_institution && <button name="v" value="school" className={`btn small ${visibility === "school" ? "" : "ghost"}`}>Meine Schule</button>}
+                  <button name="v" value="all" className={`btn small ${visibility === "all" ? "" : "ghost"}`}>Alle (Pool)</button>
+                </form>
+                {isAdmin && (
+                  <>
+                    <h3 style={{ margin: "1.2rem 0 .4rem" }}>Öffentliche Bilder-Seite</h3>
+                    <p className="small-note">
+                      {img.beispiel
+                        ? "Dieses Bild steht als Beispiel auf lernwege.edutecsol.ch/bild-beispiele.html (Abschnitt «Aus dem Mitgliederbereich») und ist damit ohne Login sichtbar."
+                        : "Als Beispiel auf die öffentliche Bilder-Seite stellen: Bild, Rezept, Prompt und Arbeitsauftrag werden dort ohne Login gezeigt (Admin)."}
+                    </p>
+                    <form action={exampleImageAction}>
+                      <input type="hidden" name="id" value={img.id} />
+                      <input type="hidden" name="on" value={img.beispiel ? "0" : "1"} />
+                      <button className={`btn small ${img.beispiel ? "ghost" : ""}`} style={img.beispiel ? { color: "var(--err)" } : undefined}>{img.beispiel ? "Von der Bilder-Seite nehmen" : "Als öffentliches Beispiel zeigen"}</button>
+                    </form>
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
           <details className="card" style={{ marginBottom: "1rem" }}>
@@ -149,15 +201,18 @@ export default async function BildPage({ params }: { params: Promise<{ id: strin
                   <tr><th>Dienst</th><td>{img.provider} · {img.model} · {img.quality === "high" ? "hohe Qualität" : "Standard"}</td></tr>
                   <tr><th>Tokens</th><td>{img.input_tokens.toLocaleString("de-CH")} ein / {img.output_tokens.toLocaleString("de-CH")} aus{img.duration_ms ? ` · ${Math.round(img.duration_ms / 1000)} s` : ""}</td></tr>
                   <tr><th>Grösse</th><td>{img.size} · {Math.round(img.bytes / 1024)} KB</td></tr>
+                  {img.copied_from && <tr><th>Kopie</th><td>aus freigegebenem Bild #{img.copied_from}</td></tr>}
                 </tbody>
               </table>
             </div>
           </details>
 
-          <form action={deleteImageAction} style={{ marginTop: "1rem" }}>
-            <input type="hidden" name="id" value={img.id} />
-            <button className="btn ghost" style={{ color: "var(--err)" }}>Bild löschen</button>
-          </form>
+          {canEdit && (
+            <form action={deleteImageAction} style={{ marginTop: "1rem" }}>
+              <input type="hidden" name="id" value={img.id} />
+              <button className="btn ghost" style={{ color: "var(--err)" }}>Bild löschen</button>
+            </form>
+          )}
         </div>
       </main>
     </>

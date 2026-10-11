@@ -2,13 +2,16 @@ import { availableProviders, CLAUDE_MODEL, INFOMANIAK_MODEL, PROVIDER_LABELS } f
 import { auth } from "@/auth";
 import { PRESETS } from "@/lib/prompt";
 import { quotaFor } from "@/lib/quota";
+import { listImages } from "@/lib/images";
 import Topbar from "../../Topbar";
 import Form from "./Form";
 
 export const dynamic = "force-dynamic";
 
-export default async function ErzeugenPage() {
+export default async function ErzeugenPage({ searchParams }: { searchParams: Promise<{ bild?: string }> }) {
   const session = await auth();
+  const { bild } = await searchParams;
+  const bilder = (await listImages(Number(session!.user.id), "mine")).map((b) => ({ id: b.id, title: b.title + (b.instruction ? " (Variante)" : "") }));
   const quota = await quotaFor(Number(session!.user.id), session!.user.role === "admin");
   const providers = availableProviders().map((p) => ({
     id: p,
@@ -32,7 +35,7 @@ export default async function ErzeugenPage() {
           {providers.length === 0 ? (
             <div className="msg err">Noch kein KI-Anbieter konfiguriert (ANTHROPIC_API_KEY oder INFOMANIAK_TOKEN fehlt).</div>
           ) : (
-            <Form providers={providers} presets={presets} />
+            <Form providers={providers} presets={presets} bilder={bilder} initialBild={bild ? Number(bild) : 0} />
           )}
         </div>
       </main>

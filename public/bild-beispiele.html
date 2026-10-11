@@ -66,6 +66,7 @@
     <a href="#markt">Französisch: Marché</a>
     <a href="#bushaltestelle">Deutsch: Bushaltestelle</a>
     <a href="#wohnung">ABU: Wohnungsübergabe</a>
+    <a id="toc-dyn" href="#aus-dem-mitgliederbereich" hidden>Neu aus dem Mitgliederbereich</a>
     <a class="cta" href="bild-generator.html">Bildprompt-Generator öffnen →</a>
   </div>
 
@@ -304,17 +305,57 @@ Weitere Anforderungen: Das Klemmbrett ohne Schrift. Keine Schrift, keine Logos, 
     </div>
   </article>
 
+  <section id="aus-dem-mitgliederbereich" hidden>
+    <p class="kicker" style="margin-top:1.5rem">Neu · aus dem Mitgliederbereich</p>
+    <h2 style="margin:0 0 .4rem">Mit lernwege direkt erzeugt</h2>
+    <p class="lead">Diese Bilder sind im Mitgliederbereich mit «Bild direkt erzeugen» entstanden: Rezept ausfüllen, Bild erhalten, nachbessern. Prompt kopieren oder das Rezept direkt im Generator öffnen.</p>
+    <div id="dyn"></div>
+  </section>
+
   <div class="note">
     <b>Prompts anpassen:</b> Alle Prompts folgen dem Rezept Stil, Motiv, Handlung, Umgebung, Details, Bildaufbau, Anforderungen. Im <a href="bild-generator.html" style="color:var(--terra);font-weight:600">Bildprompt-Generator</a> sind sie als Schnellstart hinterlegt und lassen sich auf das eigene Fach umbauen.
   </div>
 </div>
 
 <script>
-document.querySelectorAll("[data-copy]").forEach(b=>b.addEventListener("click",()=>{
-  const pre=b.closest(".cols > div").querySelector("pre.prompt");
-  const done=()=>{const c=b.nextElementSibling;c.classList.add("show");setTimeout(()=>c.classList.remove("show"),2000);};
-  navigator.clipboard.writeText(pre.textContent).then(done).catch(()=>{const r=document.createRange();r.selectNodeContents(pre);const s=getSelection();s.removeAllRanges();s.addRange(r);done();});
-}));
+function bindCopy(scope){
+  (scope||document).querySelectorAll("[data-copy]").forEach(b=>{ if(b.dataset.bound) return; b.dataset.bound="1"; b.addEventListener("click",()=>{
+    const pre=b.closest(".cols > div").querySelector("pre.prompt");
+    const done=()=>{const c=b.nextElementSibling;c.classList.add("show");setTimeout(()=>c.classList.remove("show"),2000);};
+    navigator.clipboard.writeText(pre.textContent).then(done).catch(()=>{const r=document.createRange();r.selectNodeContents(pre);const s=getSelection();s.removeAllRanges();s.addRange(r);done();});
+  });});
+}
+bindCopy();
+const esc=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+fetch("/api/beispielbilder").then(r=>r.ok?r.json():[]).then(list=>{
+  if(!Array.isArray(list)||!list.length) return;
+  const dyn=document.getElementById("dyn");
+  dyn.innerHTML=list.map(b=>`<article class="ex" id="${esc(b.anchor)}">
+    <img src="${esc(b.url)}" alt="KI-generierte Illustration: ${esc(b.title)}" loading="lazy">
+    <div class="body">
+      <div class="meta"><span class="tag einsatz">${esc(b.einsatz)}</span>${b.thema?`<span class="tag">${esc(b.thema)}</span>`:""}<span class="tag">Direkt erzeugt</span></div>
+      <h2>${esc(b.title)}</h2>
+      ${b.ziel?`<p class="ziel"><b>Die Lernenden sollen mit dem Bild</b> ${esc(b.ziel)}.</p>`:""}
+      <div class="cols">
+        <div>
+          <h3>Bildprompt</h3>
+          <pre class="prompt">${esc(b.prompt)}</pre>
+          <div class="actions"><button class="btn" type="button" data-copy>Prompt kopieren</button><span class="copied">Kopiert!</span> <a class="btn" href="bild-generator.html#r=${esc(b.r)}" style="margin-left:.4rem">Rezept im Generator öffnen</a></div>
+        </div>
+        <div>
+          <h3>Arbeitsauftrag</h3>
+          <p class="task">«${esc(b.task)}»</p>
+          ${b.braucht||b.pruefe?`<h3>Bilder-Rezept</h3><ul class="check">${b.braucht?`<li><b>Dafür brauche ich eine Darstellung, die</b> ${esc(b.braucht)}.</li>`:""}${b.pruefe?`<li><b>Vor dem Einsatz prüfe ich,</b> ${esc(b.pruefe)}.</li>`:""}</ul>`:""}
+          <p class="label">Kennzeichnung: ${esc(b.label)}</p>
+        </div>
+      </div>
+    </div>
+  </article>`).join("");
+  document.getElementById("aus-dem-mitgliederbereich").hidden=false;
+  document.getElementById("toc-dyn").hidden=false;
+  bindCopy(dyn);
+  if(location.hash&&document.querySelector(location.hash)) document.querySelector(location.hash).scrollIntoView();
+}).catch(()=>{});
 </script>
 </body>
 </html>

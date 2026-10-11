@@ -2,9 +2,32 @@
 // Interaktive Elemente werden in Papierform übersetzt (Eingabefeld → Schreiblinie, Checkbox → Kästchen).
 import { parse, HTMLElement, Node, NodeType } from "node-html-parser";
 import {
-  AlignmentType, BorderStyle, Document, Footer, HeadingLevel, Packer, PageBreak, PageNumber, Paragraph,
+  AlignmentType, BorderStyle, Document, Footer, HeadingLevel, ImageRun, Packer, PageBreak, PageNumber, Paragraph,
   ShadingType, Table, TableCell, TableRow, TextRun, WidthType, type IParagraphOptions, type ParagraphChild,
 } from "docx";
+import { getImageByToken } from "./images";
+
+type EmbeddedImage = { data: Buffer; type: "jpg" | "png"; width: number; height: number };
+
+/** Eigene Bilder (Bildlink /b/<token>) werden als Grafik eingebettet; alle anderen Grafiken als Hinweis. */
+async function resolveImages(root: HTMLElement): Promise<Map<string, EmbeddedImage>> {
+  const map = new Map<string, EmbeddedImage>();
+  for (const img of root.querySelectorAll("img")) {
+    const m = (img.getAttribute("src") ?? "").match(/\/b\/([A-Za-z0-9_-]{16,64})(?:[?#].*)?$/);
+    if (!m) continue;
+    const token = m[1];
+    if (!map.has(token)) {
+      const row = await getImageByToken(token).catch(() => null);
+      if (!row) continue;
+      const [w, h] = (row.size ?? "1536x1024").split("x").map(Number);
+      const width = 600;
+      const height = Math.round(width * (h && w ? h / w : 2 / 3));
+      map.set(token, { data: Buffer.from(row.data_b64, "base64"), type: row.mime === "image/png" ? "png" : "jpg", width, height });
+    }
+    img.replaceWith(...parse(`<p data-img="${token}"></p>`).childNodes);
+  }
+  return map;
+}
 
 const NAVY = "1E3246", TERRA = "B84816", OCHRE = "F1A51A", CREAM = "F6EFE2", SOFT = "5B6572";
 const LINE = "________________";
@@ -101,7 +124,7 @@ function decode(s: string) {
 // ---------- Block-Walker ----------
 const BLOCK = new Set(["html", "body", "head", "p", "div", "section", "article", "aside", "header", "footer", "main", "ul", "ol", "li", "table", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "pre", "hr", "details", "summary", "figure", "figcaption", "form", "fieldset", "legend", "label", "dl", "dt", "dd", "tr", "thead", "tbody", "tfoot"]);
 
-type Ctx = { blocks: (Paragraph | Table)[]; firstPanel: boolean; depth: number; lists: { n: number } };
+type Ctx = { blocks: (Paragraph | Table)[]; firstPanel: boolean; depth: number; lists: { n: number }; images?: Map<string, EmbeddedImage> };
 
 function pushPara(ctx: Ctx, children: ParagraphChild[], opts: IParagraphOptions = {}, textCount = 1) {
   if (children.length === 0) return;
@@ -127,6 +150,13 @@ function walk(el: HTMLElement, ctx: Ctx, fmt: Fmt = {}, listKind: "bullet" | "nu
     if (!tag) { walk(c, ctx, fmt, listKind); continue; }
     if (!BLOCK.has(tag)) { inlineCount += runsOf(c, fmt, inline); continue; }
     flush();
+
+    const imgToken = tag === "p" ? c.getAttribute("data-img") : null;
+    if (imgToken) {
+      const im = ctx.images?.get(imgToken);
+      if (im) ctx.blocks.push(new Paragraph({ children: [new ImageRun({ type: im.type, data: im.data, transformation: { width: im.width, height: im.height } })], spacing: { after: 160 } }));
+      continue;
+    }
 
     switch (tag) {
       case "h1": case "h2": case "h3": case "h4": case "h5": case "h6": {
@@ -243,11 +273,12 @@ export async function lernseiteToDocx(html: string, meta: DocxMeta): Promise<Buf
   const doc = parse(cleaned, { blockTextElements: { pre: true } });
   const body = doc.querySelector("body") ?? doc.querySelector("html") ?? doc;
   unhideAll(body);
+  const images = await resolveImages(body);
   paperize(body);
   // Erste h1 entfernen – der Titel kommt aus dem Kopf
   body.querySelector("h1")?.remove();
 
-  const ctx: Ctx = { blocks: [], firstPanel: true, depth: 0, lists: { n: 0 } };
+  const ctx: Ctx = { blocks: [], firstPanel: true, depth: 0, lists: { n: 0 }, images };
   walk(body, ctx);
 
   const head: (Paragraph | Table)[] = [
