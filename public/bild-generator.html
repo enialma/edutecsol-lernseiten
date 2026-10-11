@@ -157,18 +157,15 @@
             <option>Aquarell-Illustration</option>
             <option>Fotorealistische Darstellung</option>
           </select></label>
-        <div class="row">
-          <label class="field"><span class="lab">Motiv <span class="hint">Wer oder was ist zu sehen?</span></span>
-            <input type="text" id="motiv" placeholder="eine erwachsene, fiktive Person"></label>
-          <label class="field"><span class="lab">Handlung <span class="hint">Was passiert?</span></span>
-            <input type="text" id="handlung" placeholder="formt einen Brotlaib"></label>
-        </div>
+        <label class="field"><span class="lab">Motiv <span class="hint">Wer oder was ist zu sehen?</span></span>
+          <input type="text" id="motiv" placeholder="eine erwachsene, fiktive Person"></label>
+        <label class="field"><span class="lab">Handlung <span class="hint">Was passiert? Mehrere Zeilen möglich</span></span>
+          <textarea id="handlung" rows="3" placeholder="formt einen Brotlaib"></textarea></label>
         <label class="field"><span class="lab">Umgebung <span class="hint">Wo findet die Szene statt?</span></span>
           <input type="text" id="umgebung" placeholder="an einem Arbeitstisch in einer fiktiven Backstube"></label>
         <label class="field"><span class="lab">Wichtige sichtbare Details <span class="hint">eines pro Zeile, möglichst nicht mehr als fünf</span></span>
           <textarea id="details" rows="3"></textarea></label>
-        <div class="row">
-          <label class="field"><span class="lab">Perspektive / Ausschnitt</span>
+        <label class="field"><span class="lab">Perspektive / Ausschnitt</span>
             <select id="persp">
               <option value="">– offen lassen –</option>
               <option>Seitliche Nahaufnahme</option>
@@ -179,9 +176,8 @@
               <option>Drei gleich grosse Bildfelder nebeneinander</option>
               <option>Zwei gleich grosse Bildfelder nebeneinander</option>
             </select></label>
-          <label class="field"><span class="lab">Platzierung <span class="hint">optional</span></span>
-            <input type="text" id="platz" placeholder="Hauptmotiv rechts, links freie Fläche für Titel"></label>
-        </div>
+        <label class="field"><span class="lab">Platzierung <span class="hint">optional, mehrere Zeilen möglich</span></span>
+          <textarea id="platz" rows="3" placeholder="Hauptmotiv rechts, links freie Fläche für Titel"></textarea></label>
         <label class="field"><span class="lab">Licht und Farben</span>
           <input type="text" id="licht" placeholder="helles, weiches Tageslicht; dezente Farben; ruhiger Hintergrund"></label>
       </div>
@@ -324,12 +320,13 @@ const PRESETS={
 };
 
 function val(id){return ($(id).value||"").trim();}
+function line(id){return val(id).split("\n").map(s=>s.trim().replace(/[;,.]+$/,"")).filter(Boolean).join("; ");}
 function cap(s){return s? s.charAt(0).toUpperCase()+s.slice(1):s;}
 function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 function excl(){return [...document.querySelectorAll("[data-x]")].filter(c=>c.checked).map(c=>c.dataset.x);}
 
 function buildPrompt(){
-  const stil=val("stil"),motiv=val("motiv"),hand=val("handlung"),umg=val("umgebung");
+  const stil=val("stil"),motiv=val("motiv"),hand=line("handlung"),umg=val("umgebung");
   const det=val("details").split("\n").map(s=>s.trim()).filter(Boolean);
   const p=[];
   let first=stil;
@@ -337,7 +334,7 @@ function buildPrompt(){
   if(scene) first+=": "+scene;
   p.push(first.replace(/[.\s]+$/,"")+".");
   if(det.length) p.push("Wichtige sichtbare Details:\n"+det.map(d=>"– "+cap(d)).join("\n"));
-  const ba=[val("persp"),val("platz")].filter(Boolean).join(". ");
+  const ba=[val("persp"),line("platz")].filter(Boolean).join(". ");
   if(ba) p.push("Bildaufbau: "+cap(ba)+".");
   if(val("licht")) p.push("Licht und Farben: "+cap(val("licht"))+".");
   const req=[];
