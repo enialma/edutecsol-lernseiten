@@ -82,8 +82,8 @@ export default function Form({ providers, presets, quota, initial }: { providers
         ))}
       </div>
       <div className="form-grid">
-        <Field s={s} set={set} busy={busy} k="thema" label="Unterrichtsthema" ph="z. B. Arbeitsabläufe im Beruf" />
-        <Field s={s} set={set} busy={busy} k="ziel" label="Die Lernenden sollen mit dem Bild …" ph="… Beobachtungen von Vermutungen unterscheiden" />
+        <Field s={s} set={set} busy={busy} k="thema" label="Unterrichtsthema" rows={2} ph="z. B. Arbeitsabläufe im Beruf" />
+        <Field s={s} set={set} busy={busy} k="ziel" label="Die Lernenden sollen mit dem Bild …" rows={3} ph="… Beobachtungen von Vermutungen unterscheiden" />
       </div>
 
       <h3 style={{ margin: "1.4rem 0 .2rem" }}>2 · Bild beschreiben</h3>
@@ -91,7 +91,7 @@ export default function Form({ providers, presets, quota, initial }: { providers
       <select value={s.stil} onChange={(e) => set("stil", e.target.value)} disabled={busy}>
         {STILE.map((v) => <option key={v}>{v}</option>)}
       </select>
-      <Field s={s} set={set} busy={busy} k="motiv" label="Motiv" hint="Wer oder was ist zu sehen?" ph="eine erwachsene, fiktive Person" />
+      <Field s={s} set={set} busy={busy} k="motiv" label="Motiv" hint="Wer oder was ist zu sehen?" rows={2} ph="eine erwachsene, fiktive Person" />
       <Field s={s} set={set} busy={busy} k="handlung" label="Handlung" hint="Was passiert? Mehrere Zeilen möglich" rows={3} ph="formt einen Brotlaib" />
       <Field s={s} set={set} busy={busy} k="umgebung" label="Umgebung" hint="Wo findet die Szene statt?" ph="an einem Arbeitstisch in einer fiktiven Backstube" />
       <Field s={s} set={set} busy={busy} k="details" label="Wichtige sichtbare Details" hint="eines pro Zeile, möglichst nicht mehr als fünf" rows={3} />
