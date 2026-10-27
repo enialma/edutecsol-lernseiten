@@ -3,7 +3,7 @@ import Topbar from "../Topbar";
 
 export const metadata = { title: "Datenschutz – Lernwege EDUTECSOL" };
 
-const STAND = "11. Oktober 2026";
+const STAND = "27. Oktober 2026";
 
 export default function DatenschutzPage() {
   return (
@@ -23,7 +23,7 @@ export default function DatenschutzPage() {
             <ul>
               <li><b>Keine Daten von Lernenden.</b> Lernende öffnen Lernseiten ohne Konto. Ihre Eingaben bleiben im Browser und werden nirgends gespeichert.</li>
               <li><b>Hochgeladenes Material wird nicht aufbewahrt.</b> Aus PDF, Word oder PowerPoint wird nur der Text ausgelesen, an die gewählte KI geschickt und danach verworfen.</li>
-              <li><b>Zwei KI-Anbieter zur Wahl.</b> Claude (Anthropic, Verarbeitung in den USA) oder Apertus bei Infomaniak (Verarbeitung in der Schweiz). Die Lehrperson entscheidet pro Lernseite.</li>
+              <li><b>Zwei KI-Anbieter zur Wahl.</b> Claude (Anthropic, Verarbeitung in den USA) oder ein bei Infomaniak gehostetes Open-Source-Modell (Verarbeitung in der Schweiz). Die Lehrperson entscheidet pro Lernseite.</li>
               <li><b>Konten nur für Lehrpersonen.</b> Gespeichert werden E-Mail, Name, Schule und Anmeldezeitpunkte. Kein Tracking, keine Werbung, keine Analyse-Cookies.</li>
             </ul>
           </div>
@@ -88,7 +88,7 @@ export default function DatenschutzPage() {
               <tr><td><b>Anthropic PBC</b> (Claude)</td><td>KI-Erzeugung der Lernseite, wenn «Claude» gewählt ist</td><td>Verarbeitung in den USA. Über die kommerzielle Schnittstelle; Eingaben werden gemäss Anthropic nicht zum Training der Modelle verwendet und nur kurz zur Missbrauchskontrolle aufbewahrt</td></tr>
               <tr><td><b>Payrexx AG</b></td><td>Bezahlung des Abos für Einzelpersonen</td><td>Schweizer Unternehmen (Thun). Payrexx erhält E-Mail und Zahlungsdaten. Wir sehen und speichern keine Karten- oder TWINT-Daten, nur eine Abo-Nummer</td></tr>
               <tr><td><b>OpenAI, L.L.C.</b> (gpt-image)</td><td>KI-Erzeugung und Nachbessern von Bildern für Lernaufgaben («Bild direkt erzeugen»)</td><td>Verarbeitung in den USA. Über die kommerzielle Schnittstelle; übermittelt werden nur der Bildprompt und beim Nachbessern das Ausgangsbild. Eingaben werden gemäss OpenAI nicht zum Training der Modelle verwendet</td></tr>
-              <tr><td><b>Infomaniak Network SA</b> (Apertus)</td><td>KI-Erzeugung der Lernseite, wenn «Infomaniak» gewählt ist</td><td>Verarbeitung in der Schweiz, Schweizer Unternehmen, Schweizer Modell Apertus</td></tr>
+              <tr><td><b>Infomaniak Network SA</b> (AI Tools)</td><td>KI-Erzeugung der Lernseite, wenn «Infomaniak» gewählt ist</td><td>Verarbeitung in der Schweiz, Schweizer Unternehmen, Open-Source-Modell auf Infomaniak-Servern; Eingaben werden gemäss Infomaniak nicht zum Training verwendet</td></tr>
             </tbody>
           </table>
           <p>

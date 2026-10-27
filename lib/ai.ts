@@ -14,7 +14,7 @@ export type GenResult = {
 
 export const PROVIDER_LABELS: Record<Provider, string> = {
   claude: "Claude (Anthropic)",
-  infomaniak: "Infomaniak / Apertus (Schweiz)",
+  infomaniak: "Infomaniak (Schweiz)",
 };
 
 export function providerReady(p: Provider): boolean {
@@ -27,7 +27,7 @@ export function availableProviders(): Provider[] {
 }
 
 export const CLAUDE_MODEL = process.env.CLAUDE_MODEL || "claude-opus-5";
-export const INFOMANIAK_MODEL = process.env.INFOMANIAK_MODEL || "swiss-ai/Apertus-70B-Instruct-2509";
+export const INFOMANIAK_MODEL = process.env.INFOMANIAK_MODEL || "moonshotai/Kimi-K2.6";
 
 type Args = { system: string; user: string; onDelta: (chunk: string) => void; signal?: AbortSignal };
 
