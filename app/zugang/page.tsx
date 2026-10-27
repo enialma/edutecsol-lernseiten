@@ -57,7 +57,7 @@ export default async function ZugangPage({ searchParams }: { searchParams: Promi
           {status === "abgebrochen" && <div className="msg err">Die Zahlung wurde abgebrochen. Es wurde nichts belastet.</div>}
           {fehler && <div className="msg err">{fehler}</div>}
 
-          <div className="grid">
+          <div className="grid two">
             <div className="card">
               <p className="kicker">Einzelperson</p>
               <h2 style={{ marginTop: 0 }}>CHF 8 pro Monat oder CHF 60 pro Jahr</h2>
