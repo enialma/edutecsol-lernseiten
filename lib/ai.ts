@@ -78,7 +78,20 @@ async function runInfomaniak({ system, user, onDelta, signal }: Args): Promise<G
       ],
     }),
   });
-  if (!res.ok || !res.body) throw new Error(`Infomaniak antwortet mit ${res.status}: ${(await res.text()).slice(0, 300)}`);
+  if (!res.ok || !res.body) {
+    const body = await res.text();
+    // Bei falschem Modellnamen liefert Infomaniak die gültigen Namen mit – vollständig anzeigen
+    const values = body.match(/"values":\s*(\[[^\]]*\])/)?.[1];
+    if (values) {
+      try {
+        const list = JSON.parse(values) as string[];
+        throw new Error(`Infomaniak kennt das Modell «${INFOMANIAK_MODEL}» nicht. Gültige Modelle: ${list.join(", ")}`);
+      } catch (e) {
+        if (e instanceof Error && e.message.startsWith("Infomaniak kennt")) throw e;
+      }
+    }
+    throw new Error(`Infomaniak antwortet mit ${res.status}: ${body.slice(0, 1500)}`);
+  }
   const reader = res.body.getReader();
   const dec = new TextDecoder();
   let buf = "";
