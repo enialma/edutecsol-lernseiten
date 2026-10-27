@@ -27,7 +27,9 @@ export function availableProviders(): Provider[] {
 }
 
 export const CLAUDE_MODEL = process.env.CLAUDE_MODEL || "claude-opus-5";
-export const INFOMANIAK_MODEL = process.env.INFOMANIAK_MODEL || "moonshotai/Kimi-K2.6";
+// Leerzeichen und Anführungszeichen aus dem Env-Wert entfernen (häufige Fehler beim Eintragen im Dashboard)
+const clean = (v: string | undefined) => (v ?? "").trim().replace(/^["'`]+|["'`]+$/g, "").trim();
+export const INFOMANIAK_MODEL = clean(process.env.INFOMANIAK_MODEL) || "Qwen/Qwen3.5-397B-A17B-FP8";
 
 type Args = { system: string; user: string; onDelta: (chunk: string) => void; signal?: AbortSignal };
 
@@ -81,16 +83,17 @@ async function runInfomaniak({ system, user, onDelta, signal }: Args): Promise<G
   if (!res.ok || !res.body) {
     const body = await res.text();
     // Bei falschem Modellnamen liefert Infomaniak die gültigen Namen mit – vollständig anzeigen
-    const values = body.match(/"values":\s*(\[[^\]]*\])/)?.[1];
+    const plain = body.replace(/\\"/g, '"').replace(/\\\//g, "/");
+    const values = plain.match(/"values":\s*(\[[^\]]*\])/)?.[1];
     if (values) {
       try {
         const list = JSON.parse(values) as string[];
-        throw new Error(`Infomaniak kennt das Modell «${INFOMANIAK_MODEL}» nicht. Gültige Modelle: ${list.join(", ")}`);
+        throw new Error(`Infomaniak kennt das Modell «${INFOMANIAK_MODEL}» (${INFOMANIAK_MODEL.length} Zeichen) nicht. Gültige Modelle: ${list.join(", ")}`);
       } catch (e) {
         if (e instanceof Error && e.message.startsWith("Infomaniak kennt")) throw e;
       }
     }
-    throw new Error(`Infomaniak antwortet mit ${res.status}: ${body.slice(0, 1500)}`);
+    throw new Error(`Infomaniak antwortet mit ${res.status}: ${plain.slice(0, 1500)}`);
   }
   const reader = res.body.getReader();
   const dec = new TextDecoder();
