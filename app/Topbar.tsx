@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { auth, signOut } from "@/auth";
+import { IS_PREVIEW_DB } from "@/lib/db";
 
 export default async function Topbar() {
   const session = await auth();
@@ -8,6 +9,7 @@ export default async function Topbar() {
     <div className="topbar">
       <div className="wrap">
         <Link className="brand" href="/">EDUTECSOL · Lernwege</Link>
+        {IS_PREVIEW_DB && <span className="who" style={{ background: "var(--ochre, #F1A51A)", color: "#1E3246", borderRadius: 6, padding: ".1rem .5rem", fontWeight: 600 }}>Testplattform</span>}
         <nav>
           <Link href="/">Startseite</Link>
           {!u && <Link href="/zugang">Zugang &amp; Preise</Link>}

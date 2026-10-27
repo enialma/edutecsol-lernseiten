@@ -1,10 +1,15 @@
 import { neon } from "@neondatabase/serverless";
 
 export function db() {
-  const url = process.env.DATABASE_URL;
+  // Preview-Deployments (Testplattform) nutzen eine eigene Datenbank, wenn PREVIEW_DATABASE_URL gesetzt ist;
+  // Production bleibt immer auf DATABASE_URL (von der Neon-Integration verwaltet).
+  const url = (process.env.VERCEL_ENV === "preview" && process.env.PREVIEW_DATABASE_URL) || process.env.DATABASE_URL;
   if (!url) throw new Error("DATABASE_URL ist nicht gesetzt.");
   return neon(url);
 }
+
+/** Für die Anzeige in der App: läuft diese Instanz gegen die Test-Datenbank? */
+export const IS_PREVIEW_DB = !!(process.env.VERCEL_ENV === "preview" && process.env.PREVIEW_DATABASE_URL);
 
 // Tabellen beim ersten Zugriff anlegen (idempotent), damit kein manueller Migrationsschritt nötig ist.
 const SCHEMA = `CREATE TABLE IF NOT EXISTS users (
