@@ -11,6 +11,7 @@ import { getImageMeta, setImageShare } from "@/lib/images";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
+const TIME_BUDGET_MS = 280_000;
 export const dynamic = "force-dynamic";
 
 function pick<T extends string>(v: unknown, allowed: readonly T[], fallback: T): T {
@@ -81,6 +82,10 @@ export async function POST(req: Request) {
         send(`▸ Lernseite wird mit ${provider === "claude" ? "Claude" : "Infomaniak"} erzeugt – das dauert ein bis drei Minuten …\n`);
         let chars = 0;
         let lastTick = Date.now();
+        const tStart = Date.now();
+        // Vercel bricht nach maxDuration hart ab; wir brechen vorher selbst ab, damit eine klare Meldung ankommt.
+        const budget = new AbortController();
+        const budgetTimer = setTimeout(() => budget.abort(), TIME_BUDGET_MS);
         const result = await generate(provider, {
           system: systemPrompt(),
           user: userPrompt(params, material ? { name: material.name, text: material.text } : null),
@@ -88,11 +93,18 @@ export async function POST(req: Request) {
             chars += chunk.length;
             if (Date.now() - lastTick > 2500) {
               lastTick = Date.now();
-              send(`  … ${chars.toLocaleString("de-CH")} Zeichen\n`);
+              const secs = Math.max(1, Math.round((Date.now() - tStart) / 1000));
+              send(`  … ${chars.toLocaleString("de-CH")} Zeichen nach ${secs} s (${Math.round(chars / secs)} Zeichen/s)\n`);
             }
           },
-          signal: req.signal,
-        });
+          signal: AbortSignal.any([req.signal, budget.signal]),
+        }).catch((e) => {
+          if (budget.signal.aborted) {
+            const secs = Math.max(1, Math.round((Date.now() - tStart) / 1000));
+            throw new Error(`Das Modell ist zu langsam: nach ${secs} s erst ${chars.toLocaleString("de-CH")} Zeichen (${Math.round(chars / secs)} Zeichen/s). Bitte den anderen Anbieter wählen oder das Thema enger fassen.`);
+          }
+          throw e;
+        }).finally(() => clearTimeout(budgetTimer));
 
         spent = result;
         if (result.stopReason === "refusal") throw new Error("Das Modell hat die Anfrage abgelehnt.");
