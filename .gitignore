@@ -10,3 +10,6 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# Fremder OneDrive/Teams-Ordner, gehört nicht ins Repo
+KBL - Kundenportal - General/
