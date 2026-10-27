@@ -13,10 +13,10 @@ const NIVEAU = [["reproduzieren", "reproduzieren"], ["anwenden", "anwenden"], ["
 
 type State = {
   fach: string; stufe: string; thema: string; extra: string; material: string;
-  diffart: string; anzahl: number; sprache: string; zweitsprache: string; twist: string; niveau: string; provider: string; bild: number;
+  diffart: string; anzahl: number; sprache: string; zweitsprache: string; twist: string; niveau: string; provider: string; bild: number; modell: string;
 };
 
-export default function Form({ providers, presets, bilder, initialBild }: { providers: ProviderOpt[]; presets: Preset[]; bilder: Bild[]; initialBild: number }) {
+export default function Form({ providers, presets, bilder, initialBild, isAdmin }: { providers: ProviderOpt[]; presets: Preset[]; bilder: Bild[]; initialBild: number; isAdmin: boolean }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const [s, setS] = useState<State>({
@@ -24,6 +24,7 @@ export default function Form({ providers, presets, bilder, initialBild }: { prov
     diffart: "niveau", anzahl: 3, sprache: "standard", zweitsprache: "", twist: "auto", niveau: "anwenden",
     provider: (providers.find((p) => p.limit === null || p.used < p.limit) ?? providers[0]).id,
     bild: bilder.some((b) => b.id === initialBild) ? initialBild : 0,
+    modell: "",
   });
   const [busy, setBusy] = useState(false);
   const [log, setLog] = useState<string[]>([]);
@@ -142,6 +143,14 @@ export default function Form({ providers, presets, bilder, initialBild }: { prov
           <button type="button" key={p.id} className={s.provider === p.id ? "on" : ""} onClick={() => set("provider", p.id)} disabled={busy} title={p.model}>{p.label}</button>
         ))}
       </div>
+
+      {isAdmin && (
+        <>
+          <label htmlFor="modell" style={{ marginTop: ".8rem" }}>Modell (nur Admin, für Modelltests; leer = Standard)</label>
+          <input id="modell" value={s.modell} onChange={(e) => set("modell", e.target.value)} disabled={busy} placeholder={current.model} />
+          <p className="small-note" style={{ marginTop: ".3rem" }}>Exakter Modellname des gewählten Anbieters. Bei falschem Namen zeigt die Fehlermeldung die gültigen Namen.</p>
+        </>
+      )}
 
       {current.limit !== null && (
         <p className="small-note" style={{ marginTop: ".5rem", color: exhausted ? "var(--err)" : undefined }}>

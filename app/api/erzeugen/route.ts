@@ -1,7 +1,7 @@
 // Erzeugt eine Lernseite: Material extrahieren → Prompt bauen → KI streamen → in DB speichern.
 // Antwort ist ein Textstream: Fortschrittszeilen, am Ende eine Zeile "@@DONE {json}" oder "@@ERROR text".
 import { auth } from "@/auth";
-import { availableProviders, generate, type Provider } from "@/lib/ai";
+import { availableProviders, generate, PROVIDER_LABELS, type Provider } from "@/lib/ai";
 import { extractFromFile, type Extracted } from "@/lib/extract";
 import { createPage } from "@/lib/pages";
 import { LIMITS, logGeneration, quotaFor } from "@/lib/quota";
@@ -26,11 +26,13 @@ export async function POST(req: Request) {
   const fd = await req.formData();
   const provider = pick<Provider>(fd.get("provider"), availableProviders(), availableProviders()[0]);
   if (!provider) return new Response("Kein KI-Anbieter konfiguriert.", { status: 503 });
+  // Nur Admins dürfen das Modell übersteuern (Modelltests); leer = Standard des Anbieters
+  const modellOverride = session.user.role === "admin" ? String(fd.get("modell") ?? "").trim().slice(0, 120) : "";
 
   const quota = (await quotaFor(userId, session.user.role === "admin"))[provider];
   if (quota.limit !== null && quota.used >= quota.limit) {
     const other = provider === "claude" && availableProviders().includes("infomaniak") ? " Mit Infomaniak kannst du weiter erzeugen." : "";
-    return new Response(`Dein Monatskontingent von ${LIMITS[provider]} Lernseiten mit ${provider === "claude" ? "Claude" : "Infomaniak"} ist aufgebraucht. Am Monatsersten wird es zurückgesetzt.${other}`, { status: 429 });
+    return new Response(`Dein Monatskontingent von ${LIMITS[provider]} Lernseiten mit ${PROVIDER_LABELS[provider]} ist aufgebraucht. Am Monatsersten wird es zurückgesetzt.${other}`, { status: 429 });
   }
 
   const params: GenParams = {
@@ -79,7 +81,7 @@ export async function POST(req: Request) {
           material = { name: "", text: materialText, truncated: false, kind: "text" };
         }
 
-        send(`▸ Lernseite wird mit ${provider === "claude" ? "Claude" : "Infomaniak"} erzeugt – das dauert ein bis drei Minuten …\n`);
+        send(`▸ Lernseite wird mit ${PROVIDER_LABELS[provider]}${modellOverride ? ` (${modellOverride})` : ""} erzeugt – das dauert ein bis drei Minuten …\n`);
         let chars = 0;
         let lastTick = Date.now();
         const tStart = Date.now();
@@ -98,6 +100,7 @@ export async function POST(req: Request) {
             }
           },
           signal: AbortSignal.any([req.signal, budget.signal]),
+          model: modellOverride || undefined,
         }).catch((e) => {
           if (budget.signal.aborted) {
             const secs = Math.max(1, Math.round((Date.now() - tStart) / 1000));

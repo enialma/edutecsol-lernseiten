@@ -149,13 +149,13 @@ export default async function BenutzerPage() {
           <p className="small-note">
             Mit KI erzeugte Lernseiten pro Person ({total.pages} Seiten, {nf(total.input_tokens)} Eingabe- und{" "}
             {nf(total.output_tokens)} Ausgabe-Tokens). Gelöschte Seiten zählen weiter mit; die Tokens enthalten auch
-            misslungene Versuche. Monatskontingent pro Person: {LIMITS.claude} mit Claude, {LIMITS.infomaniak} mit
+            misslungene Versuche. Monatskontingent pro Person: {LIMITS.claude} mit Claude, {LIMITS.openai} mit ChatGPT, {LIMITS.infomaniak} mit
             Infomaniak, {LIMIT_BILDER} Bilder (Admins ohne Limit).
           </p>
           <div className="table-wrap">
             <table>
               <thead>
-                <tr><th>E-Mail</th><th>Institution</th><th>Seiten</th><th>Diesen Monat Claude / Infomaniak</th><th>Total Claude / Infomaniak</th><th>Bilder Monat / Total</th><th>Tokens Eingabe</th><th>Tokens Ausgabe</th><th>Letzte Seite</th></tr>
+                <tr><th>E-Mail</th><th>Institution</th><th>Seiten</th><th>Diesen Monat Claude / ChatGPT / Infomaniak</th><th>Total Claude / ChatGPT / Infomaniak</th><th>Bilder Monat / Total</th><th>Tokens Eingabe</th><th>Tokens Ausgabe</th><th>Letzte Seite</th></tr>
               </thead>
               <tbody>
                 {usage.map((u) => (
@@ -163,8 +163,8 @@ export default async function BenutzerPage() {
                     <td>{u.email}{u.name && <div className="small-note">{u.name}</div>}</td>
                     <td>{u.institution ?? "–"}</td>
                     <td>{u.pages}</td>
-                    <td>{u.claude_month} / {u.infomaniak_month}</td>
-                    <td>{u.claude} / {u.infomaniak}</td>
+                    <td>{u.claude_month} / {u.openai_month} / {u.infomaniak_month}</td>
+                    <td>{u.claude} / {u.openai} / {u.infomaniak}</td>
                     <td>{u.bilder_month} / {u.bilder}</td>
                     <td>{nf(u.input_tokens)}</td>
                     <td>{nf(u.output_tokens)}</td>

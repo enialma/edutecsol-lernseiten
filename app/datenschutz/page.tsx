@@ -23,7 +23,7 @@ export default function DatenschutzPage() {
             <ul>
               <li><b>Keine Daten von Lernenden.</b> Lernende öffnen Lernseiten ohne Konto. Ihre Eingaben bleiben im Browser und werden nirgends gespeichert.</li>
               <li><b>Hochgeladenes Material wird nicht aufbewahrt.</b> Aus PDF, Word oder PowerPoint wird nur der Text ausgelesen, an die gewählte KI geschickt und danach verworfen.</li>
-              <li><b>Zwei KI-Anbieter zur Wahl.</b> Claude (Anthropic, Verarbeitung in den USA) oder ein bei Infomaniak gehostetes Open-Source-Modell (Verarbeitung in der Schweiz). Die Lehrperson entscheidet pro Lernseite.</li>
+              <li><b>Drei KI-Anbieter zur Wahl.</b> Claude (Anthropic, Verarbeitung in den USA), ChatGPT (OpenAI, Verarbeitung in den USA) oder ein bei Infomaniak gehostetes Open-Source-Modell (Verarbeitung in der Schweiz). Die Lehrperson entscheidet pro Lernseite.</li>
               <li><b>Konten nur für Lehrpersonen.</b> Gespeichert werden E-Mail, Name, Schule und Anmeldezeitpunkte. Kein Tracking, keine Werbung, keine Analyse-Cookies.</li>
             </ul>
           </div>
@@ -87,7 +87,7 @@ export default function DatenschutzPage() {
               <tr><td><b>Microsoft Entra ID</b></td><td>Anmeldung mit Microsoft-365-Schulkonto</td><td>Wir erhalten nur E-Mail und Anzeigename. Kein Zugriff auf Mails, Dateien oder Kalender</td></tr>
               <tr><td><b>Anthropic PBC</b> (Claude)</td><td>KI-Erzeugung der Lernseite, wenn «Claude» gewählt ist</td><td>Verarbeitung in den USA. Über die kommerzielle Schnittstelle; Eingaben werden gemäss Anthropic nicht zum Training der Modelle verwendet und nur kurz zur Missbrauchskontrolle aufbewahrt</td></tr>
               <tr><td><b>Payrexx AG</b></td><td>Bezahlung des Abos für Einzelpersonen</td><td>Schweizer Unternehmen (Thun). Payrexx erhält E-Mail und Zahlungsdaten. Wir sehen und speichern keine Karten- oder TWINT-Daten, nur eine Abo-Nummer</td></tr>
-              <tr><td><b>OpenAI, L.L.C.</b> (gpt-image)</td><td>KI-Erzeugung und Nachbessern von Bildern für Lernaufgaben («Bild direkt erzeugen»)</td><td>Verarbeitung in den USA. Über die kommerzielle Schnittstelle; übermittelt werden nur der Bildprompt und beim Nachbessern das Ausgangsbild. Eingaben werden gemäss OpenAI nicht zum Training der Modelle verwendet</td></tr>
+              <tr><td><b>OpenAI, L.L.C.</b> (ChatGPT, gpt-image)</td><td>KI-Erzeugung der Lernseite, wenn «ChatGPT» gewählt ist; KI-Erzeugung und Nachbessern von Bildern für Lernaufgaben («Bild direkt erzeugen»)</td><td>Verarbeitung in den USA. Über die kommerzielle Schnittstelle; übermittelt werden nur der Bildprompt und beim Nachbessern das Ausgangsbild. Eingaben werden gemäss OpenAI nicht zum Training der Modelle verwendet</td></tr>
               <tr><td><b>Infomaniak Network SA</b> (AI Tools)</td><td>KI-Erzeugung der Lernseite, wenn «Infomaniak» gewählt ist</td><td>Verarbeitung in der Schweiz, Schweizer Unternehmen, Open-Source-Modell auf Infomaniak-Servern; Eingaben werden gemäss Infomaniak nicht zum Training verwendet</td></tr>
             </tbody>
           </table>

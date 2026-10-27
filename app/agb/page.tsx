@@ -31,7 +31,7 @@ export default function AgbPage() {
 
           <h2>2. Leistung</h2>
           <ul>
-            <li>Erzeugen differenzierter, interaktiver Lernseiten mit KI, pro Kalendermonat bis zu {LIMITS.claude} Lernseiten mit Claude und {LIMITS.infomaniak} mit Infomaniak. Nicht genutzte Kontingente verfallen am Monatsende.</li>
+            <li>Erzeugen differenzierter, interaktiver Lernseiten mit KI, pro Kalendermonat bis zu {LIMITS.claude} Lernseiten mit Claude, {LIMITS.openai} mit ChatGPT und {LIMITS.infomaniak} mit Infomaniak. Nicht genutzte Kontingente verfallen am Monatsende.</li>
             <li>Erzeugen von Bildern für Lernaufgaben mit KI, pro Kalendermonat bis zu {LIMIT_BILDER} Bilder (Erzeugen und Nachbessern zählen je einmal).</li>
             <li>Eigene Sammlung, Freigabelinks für Lernende, Teilen mit Kolleginnen und Kollegen.</li>
             <li>Export als HTML-Datei, Word-Arbeitsblatt und SCORM-Paket sowie die Anbindung an Moodle, soweit das jeweilige Moodle sie unterstützt.</li>

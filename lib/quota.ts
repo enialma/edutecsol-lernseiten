@@ -13,6 +13,7 @@ const num = (v: string | undefined, fallback: number) => (v && /^\d+$/.test(v) ?
 export const LIMITS: Record<Provider, number> = {
   claude: num(process.env.QUOTA_CLAUDE, 10),
   infomaniak: num(process.env.QUOTA_INFOMANIAK, 30),
+  openai: num(process.env.QUOTA_OPENAI, 10),
 };
 /** Inklusive Bilder pro Kalendermonat (Erzeugen und Nachbessern zählen je einmal). */
 export const LIMIT_BILDER = num(process.env.QUOTA_BILDER, 20);
@@ -46,12 +47,13 @@ export async function quotaFor(userId: number, isAdmin: boolean): Promise<Quota>
   return {
     claude: { used: used("claude"), limit: isAdmin ? null : LIMITS.claude },
     infomaniak: { used: used("infomaniak"), limit: isAdmin ? null : LIMITS.infomaniak },
+    openai: { used: used("openai"), limit: isAdmin ? null : LIMITS.openai },
   };
 }
 
 export type Usage = {
-  email: string; name: string | null; institution: string | null; pages: number; claude_month: number; infomaniak_month: number;
-  claude: number; infomaniak: number; bilder: number; bilder_month: number; input_tokens: number; output_tokens: number; last_page: string | null;
+  email: string; name: string | null; institution: string | null; pages: number; claude_month: number; infomaniak_month: number; openai_month: number;
+  claude: number; infomaniak: number; openai: number; bilder: number; bilder_month: number; input_tokens: number; output_tokens: number; last_page: string | null;
 };
 
 /** Erzeugungen und Tokens pro Person. Seiten = gelungene Erzeugungen; Tokens zählen auch misslungene Versuche. */
@@ -65,6 +67,8 @@ export async function usageByUser(): Promise<Usage[]> {
        COUNT(g.id) FILTER (WHERE g.ok AND g.provider = 'infomaniak' AND g.created_at >= date_trunc('month', NOW()))::int AS infomaniak_month,
        COUNT(g.id) FILTER (WHERE g.ok AND g.provider = 'claude')::int AS claude,
        COUNT(g.id) FILTER (WHERE g.ok AND g.provider = 'infomaniak')::int AS infomaniak,
+       COUNT(g.id) FILTER (WHERE g.ok AND g.provider = 'openai' AND g.created_at >= date_trunc('month', NOW()))::int AS openai_month,
+       COUNT(g.id) FILTER (WHERE g.ok AND g.provider = 'openai')::int AS openai,
        COALESCE(SUM(g.input_tokens),0)::int AS input_tokens, COALESCE(SUM(g.output_tokens),0)::int AS output_tokens,
        to_char(MAX(g.created_at), 'DD.MM.YYYY') AS last_page
      FROM users u LEFT JOIN generations g ON g.user_id = u.id LEFT JOIN institutions i ON i.id = u.institution_id

@@ -1,4 +1,4 @@
-import { availableProviders, CLAUDE_MODEL, INFOMANIAK_MODEL, PROVIDER_LABELS } from "@/lib/ai";
+import { availableProviders, DEFAULT_MODELS, PROVIDER_LABELS } from "@/lib/ai";
 import { auth } from "@/auth";
 import { PRESETS } from "@/lib/prompt";
 import { quotaFor } from "@/lib/quota";
@@ -16,7 +16,7 @@ export default async function ErzeugenPage({ searchParams }: { searchParams: Pro
   const providers = availableProviders().map((p) => ({
     id: p,
     label: PROVIDER_LABELS[p],
-    model: p === "claude" ? CLAUDE_MODEL : INFOMANIAK_MODEL,
+    model: DEFAULT_MODELS[p],
     used: quota[p].used,
     limit: quota[p].limit,
   }));
@@ -33,9 +33,9 @@ export default async function ErzeugenPage({ searchParams }: { searchParams: Pro
             landet in deiner Sammlung. Ohne Umweg über einen Chat.
           </p>
           {providers.length === 0 ? (
-            <div className="msg err">Noch kein KI-Anbieter konfiguriert (ANTHROPIC_API_KEY oder INFOMANIAK_TOKEN fehlt).</div>
+            <div className="msg err">Noch kein KI-Anbieter konfiguriert (ANTHROPIC_API_KEY, OPENAI_API_KEY oder INFOMANIAK_TOKEN fehlt).</div>
           ) : (
-            <Form providers={providers} presets={presets} bilder={bilder} initialBild={bild ? Number(bild) : 0} />
+            <Form providers={providers} presets={presets} bilder={bilder} initialBild={bild ? Number(bild) : 0} isAdmin={session!.user.role === "admin"} />
           )}
         </div>
       </main>
