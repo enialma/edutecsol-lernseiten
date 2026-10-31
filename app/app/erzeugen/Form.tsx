@@ -8,7 +8,7 @@ type Bild = { id: number; title: string };
 
 const TYP = [["lernseite", "Lernseite"], ["pruefung", "Prüfungsvorbereitung"], ["spiel", "Lernspiel"], ["hilfe", "Lernhilfe"]];
 const DAUER = [["20", "20 Minuten"], ["30", "30 Minuten"], ["45", "45 Minuten"]];
-const DIFFART = [["niveau", "nach Niveau (Hilfe)"], ["hilfestufe", "nach Hilfestufe (gleicher Lösungsweg)"], ["lerntyp", "nach Lerntyp"], ["interesse", "nach Berufsfeld"], ["sozialform", "nach Sozialform"]];
+const DIFFART = [["niveau", "nach Niveau (Hilfe)"], ["hilfestufe", "nach Hilfestufe"], ["lerntyp", "nach Lerntyp"], ["interesse", "nach Berufsfeld"], ["sozialform", "nach Sozialform"]];
 const SPRACHE = [["standard", "Standard"], ["einfach", "vereinfachte Sprache"], ["glossar", "Fachbegriffe mit Glossar"], ["zweisprachig", "Schlüsselbegriffe zweisprachig"]];
 const TWIST = [["auto", "passend wählen"], ["ausreisser", "Ausreisser/Robustheit"], ["vergleich", "Fälle vergleichen"], ["grenzfall", "Grenzfall"], ["fehler", "Fehler erkennen"], ["methoden", "Methoden vergleichen"], ["transfer", "Transfer/Anwendung"]];
 const NIVEAU = [["reproduzieren", "reproduzieren"], ["anwenden", "anwenden"], ["beurteilen", "beurteilen"]];
