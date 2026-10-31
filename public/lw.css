@@ -154,3 +154,4 @@ textarea{min-height:90px;resize:vertical}
 .badge.new{background:var(--ochre)}
 .badge.ok{background:#DFF3EA;color:#1F6B50}
 .badge.off{background:#F6DCD5;color:#8A2A14}
+.lw-nav a.is-active{color:var(--terra);font-weight:600}

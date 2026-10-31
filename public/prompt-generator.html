@@ -4,52 +4,72 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Prompt-Generator – Differenzierte Lernseiten</title>
+<link rel="preload" href="/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/lw.css">
 <style>
+  body > .wrap{padding-top:clamp(1.6rem,4vw,3rem);padding-bottom:clamp(3rem,6vw,5rem)}
+  .toc{display:flex;gap:.45rem;flex-wrap:wrap;margin:1.2rem 0 2.4rem}
+  .toc a{font-size:.85rem;font-weight:600;border:1px solid var(--line-strong);background:#fff;color:var(--ink);border-radius:var(--r);padding:.42rem .85rem;text-decoration:none}
+  .toc a:hover{border-color:var(--terra);color:var(--terra)}
+  .toc a.cta{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .toc a.cta:hover{background:var(--navy-soft);color:#fff}
+  .sec-head[id],[id]{scroll-margin-top:5rem}
+
   :root{
-    --paper:#f4f5f7;--ink:#1b1e24;--ink-soft:#565c68;--line:#d7dae1;--line-strong:#aeb4bf;
-    --accent:#2857a8;--accent-soft:#e4ecf7;--ok:#2f8f6f;--card:#ffffff;
-    --shadow:0 1px 2px rgba(27,30,36,.06),0 8px 24px rgba(27,30,36,.05);
+    --accent:var(--navy);--accent-soft:var(--paper);
   }
-  *{box-sizing:border-box;}html{-webkit-text-size-adjust:100%;}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,sans-serif;line-height:1.55;padding:clamp(1rem,4vw,3rem) 1rem 5rem;}
-  .wrap{max-width:860px;margin:0 auto;}
-  .eyebrow{font-size:.78rem;color:var(--ink-soft);margin:0 0 .4rem;letter-spacing:.03em;}
-  h1{font-size:clamp(1.7rem,5vw,2.4rem);line-height:1.12;margin:0 0 .5rem;font-weight:700;}
-  .lead{font-size:1.04rem;color:var(--ink-soft);margin:0 0 1.8rem;max-width:64ch;}
+  .wrap{max-width:860px}
+  .lead{margin-bottom:1.6rem}
   .layout{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:start;}
   @media(max-width:760px){.layout{grid-template-columns:1fr;}}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.3rem 1.4rem;box-shadow:var(--shadow);}
-  .card h2{margin:.1rem 0 1rem;font-size:1.1rem;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:1.4rem 1.5rem;}
+  .card h2{margin:.1rem 0 1rem;font-size:1.35rem;}
   label.field{display:block;margin:0 0 1rem;}
   label.field .lab{display:block;font-size:.85rem;font-weight:600;margin-bottom:.35rem;}
   label.field .hint{font-weight:400;color:var(--ink-soft);font-size:.8rem;}
-  input[type=text],textarea,select{width:100%;font:inherit;font-size:.95rem;padding:.55rem .7rem;border:1px solid var(--line-strong);border-radius:8px;background:#fff;color:var(--ink);}
+  input[type=text],textarea,select{width:100%;font:inherit;font-size:.95rem;padding:.55rem .7rem;border:1px solid var(--line-strong);border-radius:var(--r);background:#fff;color:var(--ink);}
   input[type=text]:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
   textarea{resize:vertical;min-height:2.5rem;}
   .seg{display:flex;gap:.4rem;flex-wrap:wrap;}
-  .seg button{font:inherit;font-size:.85rem;border:1px solid var(--line-strong);background:#fff;color:var(--ink);border-radius:8px;padding:.45rem .75rem;cursor:pointer;}
-  .seg button:hover{border-color:var(--accent);}
+  .seg button{font:inherit;font-size:.85rem;border:1px solid var(--line-strong);background:#fff;color:var(--ink);border-radius:var(--r);padding:.45rem .75rem;cursor:pointer;}
+  .seg button:hover{border-color:var(--terra);}
   .seg button.on{background:var(--accent);color:#fff;border-color:var(--accent);}
   .out{position:relative;}
-  .out pre{white-space:pre-wrap;word-wrap:break-word;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.82rem;line-height:1.5;background:#1e2430;color:#e8ebf0;border-radius:12px;padding:1.1rem 1.2rem;max-height:60vh;overflow:auto;margin:0;}
-  .out pre .ph{color:#e8b26b;}
+  .out pre{white-space:pre-wrap;word-wrap:break-word;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.82rem;line-height:1.5;background:var(--navy);color:#E8EBF0;border-radius:var(--r);padding:1.1rem 1.2rem;max-height:60vh;overflow:auto;margin:0;}
+  .out pre .ph{color:var(--ochre);}
   .actions{display:flex;gap:.6rem;margin-top:.8rem;flex-wrap:wrap;}
-  .btn{font:inherit;font-size:.9rem;font-weight:600;border:none;border-radius:9px;padding:.6rem 1.1rem;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem;box-shadow:var(--shadow);}
-  .btn.primary{background:var(--accent);color:#fff;}
-  .btn.primary:hover{background:#204688;}
+  
+  .btn.primary{background:var(--terra);border-color:var(--terra);color:#fff;}
+  .btn.primary:hover{background:var(--terra-deep);border-color:var(--terra-deep);}
   .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line-strong);}
-  .btn.ghost:hover{border-color:var(--accent);}
+  .btn.ghost:hover{border-color:var(--terra);color:var(--terra);}
   .copied{color:var(--ok);font-size:.85rem;font-weight:600;align-self:center;opacity:0;transition:opacity .2s;}
   .copied.show{opacity:1;}
-  .note{font-size:.82rem;color:var(--ink-soft);margin-top:1.4rem;background:var(--accent-soft);border-radius:10px;padding:.8rem 1rem;}
+  .note{font-size:.88rem;color:var(--ink-soft);margin-top:1.6rem;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:.9rem 1.1rem;}
 </style>
 </head>
 <body>
+<header class="lw-header">
+  <div class="wrap">
+    <a class="wordmark" href="/"><span class="name">Lernwege</span><span class="by">von EDUTECSOL</span></a>
+    <nav class="lw-nav" aria-label="Hauptnavigation">
+      <a href="/lernseiten-beispiele.html">Beispiele</a><a href="/#werkzeuge" class="is-active">Werkzeuge</a><a href="/#so-funktioniert-es">So funktioniert es</a><a href="/zugang">Zugang &amp; Preise</a>
+      <a class="btn small terra" href="/app">Anmelden</a>
+    </nav>
+    <details class="menu">
+      <summary>Menü</summary>
+      <div class="panel">
+        <a href="/lernseiten-beispiele.html">Beispiele</a><a href="/#werkzeuge" class="is-active">Werkzeuge</a><a href="/#so-funktioniert-es">So funktioniert es</a><a href="/zugang">Zugang &amp; Preise</a>
+        <a href="/app"><b>Anmelden</b></a>
+      </div>
+    </details>
+  </div>
+</header>
+
 <div class="wrap">
-  <a href="index.html" style="display:inline-block;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.88rem;color:#B84816;text-decoration:none;font-weight:600;margin-bottom:1rem;">← Übersicht</a>
 
 
-  <p class="eyebrow">Werkzeug · EDUTECSOL</p>
+  <p class="kicker">Werkzeug · Lernseiten · Basis-Version</p>
   <h1>Prompt-Generator für differenzierte Lernseiten</h1>
   <p class="lead">Felder ausfüllen, Prompt kopieren, zusammen mit einem Foliensatz (PPTX/PDF) an Claude schicken – fertig ist die interaktive A/B/C-Lernseite.</p>
 
@@ -204,5 +224,39 @@ Schweizer Standarddeutsch · keine Fehler: rechne alle Lösungen bzw. prüfe all
     setTimeout(()=>URL.revokeObjectURL(a.href),1000);
   });
 </script>
+<footer class="lw-footer">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <a class="wordmark" href="/"><span class="name">Lernwege</span><span class="by">von EDUTECSOL</span></a>
+        <p style="margin:.9rem 0 0;max-width:36ch">Differenzierte, interaktive Lernseiten für Schweizer Schulen. Gehostet in Frankfurt, KI auf Wunsch in der Schweiz.</p>
+      </div>
+      <div>
+        <h4>Lernwege</h4>
+        <a href="/lernseiten-beispiele.html">Beispiele</a>
+        <a href="/prompt-generator-v2.html">Prompt-Generator</a>
+        <a href="/bild-generator.html">Bildprompt-Generator</a>
+        <a href="/zugang">Zugang &amp; Preise</a>
+      </div>
+      <div>
+        <h4>Konto</h4>
+        <a href="/login">Anmelden</a>
+        <a href="/app">Mein Bereich</a>
+        <a href="/zugang">Zugang lösen</a>
+      </div>
+      <div>
+        <h4>EDUTECSOL GmbH</h4>
+        <a href="https://www.edutecsol.ch" rel="noopener">edutecsol.ch</a>
+        <a href="mailto:info@edutecsol.ch">info@edutecsol.ch</a>
+        <a href="/datenschutz">Datenschutz</a>
+        <a href="/agb">AGB</a>
+      </div>
+    </div>
+    <div class="bottom">
+      <span>© EDUTECSOL GmbH, Unterägeri</span>
+      <span>Digitale Schulentwicklung · <a href="/datenschutz">Datenschutz</a> · <a href="/agb">AGB</a></span>
+    </div>
+  </div>
+</footer>
 </body>
 </html>

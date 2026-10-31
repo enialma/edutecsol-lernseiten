@@ -5,6 +5,7 @@ import { prepareSignup } from "@/lib/billing";
 import { LIMITS } from "@/lib/quota";
 import { createCheckout, payrexxReady } from "@/lib/payrexx";
 import Topbar from "../Topbar";
+import Footer from "../Footer";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Zugang – EDUTECSOL Lernwege" };
@@ -113,6 +114,7 @@ export default async function ZugangPage({ searchParams }: { searchParams: Promi
           </div>
         </div>
       </main>
+      <Footer />
     </>
   );
 }

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { AuthError } from "next-auth";
 import { auth, signIn } from "@/auth";
 import Topbar from "../Topbar";
+import Footer from "../Footer";
 
 const ERRORS: Record<string, string> = {
   NotAllowed: "Diese E-Mail-Adresse ist nicht freigeschaltet oder der Zugang ist abgelaufen. Unter «Zugang» kannst du ihn kaufen oder verlängern.",
@@ -86,6 +87,7 @@ export default async function LoginPage({
           </div>
         </div>
       </main>
+      <Footer />
     </>
   );
 }
