@@ -7,8 +7,15 @@ export type Diffart = "niveau" | "lerntyp" | "interesse" | "sozialform";
 export type Sprache = "standard" | "einfach" | "glossar" | "zweisprachig";
 export type Twist = "auto" | "ausreisser" | "vergleich" | "grenzfall" | "fehler" | "methoden" | "transfer";
 export type Niveau = "reproduzieren" | "anwenden" | "beurteilen";
+/** Seitentyp: klassische Lernseite oder Prüfungsvorbereitung (weitere Typen folgen). */
+export type Typ = "lernseite" | "pruefung";
+export type Dauer = 20 | 30 | 45;
 
 export type GenParams = {
+  /** Seitentyp; fehlt bei älteren Seiten = Lernseite. */
+  typ?: Typ;
+  /** Nur Prüfungsvorbereitung: Dauer der Übungsprüfung in Minuten. */
+  dauer?: Dauer;
   fach: string;
   stufe: string;
   thema?: string;
@@ -23,6 +30,10 @@ export type GenParams = {
   bild?: { id: number; url: string; title: string; auftrag: string; alt: string };
 };
 
+export const TYP_LABELS: Record<Typ, string> = {
+  lernseite: "Lernseite",
+  pruefung: "Prüfungsvorbereitung",
+};
 export const DIFFART_LABELS: Record<Diffart, string> = {
   niveau: "nach Niveau (Hilfe)",
   lerntyp: "nach Lerntyp",
@@ -111,8 +122,8 @@ function niveauText(p: GenParams): string {
   return map[p.niveau];
 }
 
-/** System-Prompt: Rolle + Ausgabe-Vertrag (stabil, cachebar). */
-export function systemPrompt(): string {
+/** System-Prompt: Rolle + Ausgabe-Vertrag (stabil, cachebar; je Seitentyp eine Variante). */
+export function systemPrompt(typ: Typ = "lernseite"): string {
   return `Du erstellst differenzierte, interaktive Lernseiten für Schweizer Schulen, passend zur angegebenen Stufe.
 
 AUSGABE-VERTRAG (zwingend):
@@ -124,11 +135,12 @@ AUSGABE-VERTRAG (zwingend):
 - Struktur für den Druck: jeder Zugang ist ein eigenes Element mit role="tabpanel"; der Lehrpersonen-Bereich ist ein <details class="lehrperson">. Der PDF-Button öffnet vor window.print() alle Zugänge und alle <details> und setzt sie danach zurück. Druck-CSS: @page { size: A4 portrait; margin: 14mm }, Bedienelemente ausgeblendet, jeder Zugang beginnt auf einer neuen Seite, Rahmen und Überschriften in den EDUTECSOL-Farben (Navy #1E3246, Terra #B84816, Ocker #F1A51A), keine grossflächigen farbigen Hintergründe, keine Seitenumbrüche innerhalb von Aufgaben oder Grafiken.
 - Die abschliessende Notiz (gewähltes Thema, Differenzierungsart, Twist) gehört in einen HTML-Kommentar direkt vor </html>: <!-- NOTIZ: ... -->
 
-${designBasisPrompt()}`;
+${designBasisPrompt(typ)}`;
 }
 
 /** User-Prompt aus den Achsen + Material. */
 export function userPrompt(p: GenParams, material: { name?: string; text: string } | null): string {
+  if ((p.typ ?? "lernseite") === "pruefung") return pruefungPrompt(p, material);
   const fach = p.fach.trim() || "[Fach/Kontext]";
   const stufe = p.stufe.trim() || "[Zielstufe]";
   const thema = (p.thema ?? "").trim();
@@ -202,6 +214,76 @@ Halte dich an die DESIGNBASIS aus dem System-Prompt (CSS unverändert, Grundger�
 - Prüfe, dass jede Aufgabe klar zeigt, was wo einzutragen ist (welche Eingabe welche Visualisierung auslöst).
 - Kontrolliere alle Texte (auch Selbstchecks) auf Tipp- und Flüchtigkeitsfehler.
 - Schweizer Standarddeutsch; Selbstcheck-Listen abhakbar.${tailBlock}`;
+}
+
+/** User-Prompt für den Seitentyp «Prüfungsvorbereitung»: Lernziele checken, Übungsprüfung, Lücken schliessen. */
+function pruefungPrompt(p: GenParams, material: { name?: string; text: string } | null): string {
+  const fach = p.fach.trim() || "[Fach/Kontext]";
+  const stufe = p.stufe.trim() || "[Zielstufe]";
+  const thema = (p.thema ?? "").trim();
+  const extra = (p.extra ?? "").trim();
+  const dauer = p.dauer ?? 30;
+  const punkte = dauer === 20 ? 20 : dauer === 45 ? 40 : 30;
+  const hasMaterial = !!material && material.text.trim().length > 0;
+  const themaLine = thema
+    ? `- Prüfungsthema: ${thema}`
+    : hasMaterial
+      ? "- Prüfungsthema: leer – der Prüfungsstoff ist das gesamte Material"
+      : "- Prüfungsthema: leer – leite einen typischen Prüfungsstoff aus Fach und Stufe ab";
+  const extraLine = extra ? `\n- Zusatzwunsch: ${extra}` : "";
+  const dateiLine = hasMaterial
+    ? `- Material: ${material?.name ? `«${material.name}», ` : ""}Textauszug unten (= Prüfungsstoff)`
+    : "- Material: keine Datei – arbeite allein mit den Angaben oben";
+  const spr = spracheText(p);
+  const materialBlock = hasMaterial ? `\n\n§MATERIAL (Textauszug)\n<<<\n${material!.text.trim()}\n>>>` : "";
+
+  return `§ROLLE
+Du bist Fachdidaktiker:in für ${fach} auf der Stufe ${stufe} und Frontend-Entwickler:in. Du bereitest Lernende auf eine Prüfung vor.
+
+§ANGABEN
+- Fach/Kontext: ${fach}
+- Zielstufe: ${stufe}
+${themaLine}${extraLine}
+- Dauer der Übungsprüfung: ${dauer} Minuten, ${punkte} Punkte
+${dateiLine}
+
+§AUFGABE
+Erstelle aus dem Prüfungsstoff eine interaktive Seite zur Prüfungsvorbereitung mit drei Teilen (als Reiter A, B, C): Lernziele checken, Übungsprüfung, Lücken schliessen. Erfinde keine Inhalte ausserhalb des Materials; fehlt auslesbarer Inhalt, wähle einen fachlich stimmigen, typischen Prüfungsstoff für Fach und Stufe und vermerke das in der Notiz.
+
+§LERNZIELE
+Leite aus dem Stoff 5 bis 8 operationalisierte Lernziele ab («Ich kann …»), nach Themen geordnet, jedes mit einer Gewichtung in Punkten (Summe = ${punkte}). Jede Aufgabe der Übungsprüfung ist genau einem Lernziel zugeordnet (data-ziel="z1" …).
+
+§TEIL A – LERNZIELE CHECKEN (Reiter A)
+- Liste aller Lernziele; zu jedem Lernziel eine Selbsteinschätzung per .choices («sicher», «unsicher», «noch nicht») und eine kurze Kontrollfrage mit Rückmeldung (richtig/falsch mit Hinweis, ohne Lösung).
+- Knopf «Auswerten»: zeigt im .score-Block, wie viele Lernziele sicher sind, und listet die Lernziele auf, die in Teil C zu wiederholen sind (Verweis mit Reiterwechsel).
+
+§TEIL B – ÜBUNGSPRÜFUNG (Reiter B)
+- Kopf: Dauer ${dauer} Minuten, ${punkte} Punkte, Timer (.timer) mit Start/Stopp, nur Anzeige im Browser, keine Sperre.
+- 6 bis 10 Aufgaben in Prüfungsform, gemischt: Berechnen/Anwenden, Zuordnen/Auswählen, Begründen (kurze Textantwort mit Musterlösung zum Selbstvergleich). Punkte je Aufgabe sichtbar (.pts). Eingaben werden erst beim Klick auf «Prüfung auswerten» geprüft.
+- Auswertung im .score-Block: erreichte Punkte, Prozent, Note nach Schweizer Skala (Note = 1 + 5 × Punkte/Maximum, auf halbe Noten gerundet; mit dem Hinweis, dass die Lehrperson anders gewichten kann), je Aufgabe richtig/falsch mit Lösungsweg (erst nach Auswertung sichtbar), und eine Tabelle Lernziel → erreichte Punkte.
+- Knopf «Nochmals versuchen» setzt alle Eingaben und den Timer zurück.
+
+§TEIL C – LÜCKEN SCHLIESSEN (Reiter C)
+- Pro Lernziel ein Abschnitt (.card): Merkblock (Regel, Formel oder drei Merksätze im .hint), ein durchgerechnetes Beispiel mit Lösungsweg, zwei Übungsaufgaben mit sofortiger Rückmeldung.
+- Am Ende ein Lernplan für die letzten drei Tage vor der Prüfung (Tabelle: Tag, Lernziele, Dauer, Methode), abgeleitet aus der Gewichtung.
+
+§LEHRPERSON
+Ausklappbarer Bereich (details.lehrperson): vollständige Lösungen und Punkteschlüssel der Übungsprüfung, typische Fehler je Lernziel, und die Übungsprüfung als reine Aufgabenliste zum Kopieren für eine Prüfung im Unterricht.
+${spr ? "\n§" + spr + "\n" : ""}
+§AUSGABEFORMAT – INTERAKTIVE WEBSITE
+Eine einzige, voll funktionsfähige HTML-Seite (eine Datei, ohne externe Abhängigkeiten, offline lauffähig):
+- Drei Reiter A/B/C nach der Designbasis; die Lernenden sehen nur den gewählten Teil.
+- Interaktive Selbstkontrolle wie in der Designbasis (Klassen ok/err, .feedback); Timer und Auswertung in reinem JavaScript ohne Bibliotheken.
+- PDF-Button oben («Als PDF herunterladen»): blendet für den Export alle Teile und den Lehrpersonen-Bereich ein und löst den Druckdialog aus; eigene @media-print-CSS blendet Reiter/Buttons/Timer aus; Fallback, der die Seite in einem neuen Tab öffnet, falls der Druckdialog blockiert ist.
+
+§GESTALTUNG
+Halte dich an die DESIGNBASIS aus dem System-Prompt (CSS unverändert, Grundgerüst für Prüfungsvorbereitung, Klassen). Eigenes CSS nur für fachspezifische Darstellungen (Formeln, Tabellen, kleine SVG). Responsiv bis Mobile, Tastaturbedienbarkeit, sichtbarer Fokus. Keine zusätzlichen Farben, Schatten, Verläufe oder Emojis.
+
+§QUALITÄTSPRÜFUNG VOR DER AUSGABE
+- Rechne alle Lösungen selbst nach; Punkteschlüssel und Notenformel müssen exakt stimmen (Summe der Punkte = ${punkte}).
+- Jede Aufgabe ist genau einem Lernziel zugeordnet; die Lernziel-Tabelle in der Auswertung summiert korrekt.
+- Kontrolliere alle Texte auf Tipp- und Flüchtigkeitsfehler; Schweizer Standarddeutsch.
+- Die Notiz am Ende nennt Prüfungsstoff, Anzahl Lernziele und Aufgaben.${materialBlock}`;
 }
 
 /** Zieht die reine HTML-Datei aus einer Modellantwort (entfernt Codezäune und Text ausserhalb). */

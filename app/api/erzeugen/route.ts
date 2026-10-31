@@ -36,6 +36,8 @@ export async function POST(req: Request) {
   }
 
   const params: GenParams = {
+    typ: pick(fd.get("typ"), ["lernseite", "pruefung"] as const, "lernseite"),
+    dauer: (Number(fd.get("dauer")) === 20 ? 20 : Number(fd.get("dauer")) === 45 ? 45 : 30) as 20 | 30 | 45,
     fach: String(fd.get("fach") ?? "").trim(),
     stufe: String(fd.get("stufe") ?? "").trim(),
     thema: String(fd.get("thema") ?? "").trim(),
@@ -81,7 +83,7 @@ export async function POST(req: Request) {
           material = { name: "", text: materialText, truncated: false, kind: "text" };
         }
 
-        send(`▸ Lernseite wird mit ${PROVIDER_LABELS[provider]}${modellOverride ? ` (${modellOverride})` : ""} erzeugt – das dauert ein bis drei Minuten …\n`);
+        send(`▸ ${params.typ === "pruefung" ? "Prüfungsvorbereitung" : "Lernseite"} wird mit ${PROVIDER_LABELS[provider]}${modellOverride ? ` (${modellOverride})` : ""} erzeugt – das dauert ein bis drei Minuten …\n`);
         let chars = 0;
         let lastTick = Date.now();
         const tStart = Date.now();
@@ -89,7 +91,7 @@ export async function POST(req: Request) {
         const budget = new AbortController();
         const budgetTimer = setTimeout(() => budget.abort(), TIME_BUDGET_MS);
         const result = await generate(provider, {
-          system: systemPrompt(),
+          system: systemPrompt(params.typ),
           user: userPrompt(params, material ? { name: material.name, text: material.text } : null),
           onDelta: (chunk) => {
             chars += chunk.length;

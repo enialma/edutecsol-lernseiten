@@ -154,10 +154,11 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
             <summary style={{ cursor: "pointer", fontWeight: 600 }}>Details zur Erzeugung</summary>
             <table style={{ marginTop: ".8rem" }}>
               <tbody>
-                <tr><th>Differenzierung</th><td>{p.diffart ? DIFFART_LABELS[p.diffart] : "–"}{p.anzahl ? `, ${p.anzahl} Zugänge` : ""}</td></tr>
+                <tr><th>Typ</th><td>{p.typ === "pruefung" ? `Prüfungsvorbereitung (Übungsprüfung ${p.dauer ?? 30} Minuten)` : "Lernseite"}</td></tr>
+                {p.typ !== "pruefung" && <tr><th>Differenzierung</th><td>{p.diffart ? DIFFART_LABELS[p.diffart] : "–"}{p.anzahl ? `, ${p.anzahl} Zugänge` : ""}</td></tr>}
                 <tr><th>Sprache</th><td>{p.sprache ? SPRACHE_LABELS[p.sprache] : "–"}{p.zweitsprache ? ` (${p.zweitsprache})` : ""}</td></tr>
-                <tr><th>Twist</th><td>{p.twist ? TWIST_LABELS[p.twist] : "–"}</td></tr>
-                <tr><th>Niveau</th><td>{p.niveau ? NIVEAU_LABELS[p.niveau] : "–"}</td></tr>
+                {p.typ !== "pruefung" && <tr><th>Twist</th><td>{p.twist ? TWIST_LABELS[p.twist] : "–"}</td></tr>}
+                {p.typ !== "pruefung" && <tr><th>Niveau</th><td>{p.niveau ? NIVEAU_LABELS[p.niveau] : "–"}</td></tr>}
                 {p.extra && <tr><th>Zusatzwunsch</th><td>{p.extra}</td></tr>}
                 {p.bild && <tr><th>Bild</th><td><Link href={`/app/bilder/${p.bild.id}`}>{p.bild.title}</Link> (als Bildaufgabe eingebunden)</td></tr>}
                 <tr><th>Modell</th><td>{page.provider === "beispiel" ? "Beispielseite von der Startseite" : `${page.provider} · ${page.model}`}</td></tr>

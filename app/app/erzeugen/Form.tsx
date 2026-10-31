@@ -6,12 +6,15 @@ type ProviderOpt = { id: string; label: string; model: string; used: number; lim
 type Preset = { id: string; label: string; fach?: string; stufe?: string; diffart?: string; anzahl?: number; sprache?: string; twist?: string; niveau?: string };
 type Bild = { id: number; title: string };
 
+const TYP = [["lernseite", "Lernseite"], ["pruefung", "Prüfungsvorbereitung"]];
+const DAUER = [["20", "20 Minuten"], ["30", "30 Minuten"], ["45", "45 Minuten"]];
 const DIFFART = [["niveau", "nach Niveau (Hilfe)"], ["lerntyp", "nach Lerntyp"], ["interesse", "nach Berufsfeld"], ["sozialform", "nach Sozialform"]];
 const SPRACHE = [["standard", "Standard"], ["einfach", "vereinfachte Sprache"], ["glossar", "Fachbegriffe mit Glossar"], ["zweisprachig", "Schlüsselbegriffe zweisprachig"]];
 const TWIST = [["auto", "passend wählen"], ["ausreisser", "Ausreisser/Robustheit"], ["vergleich", "Fälle vergleichen"], ["grenzfall", "Grenzfall"], ["fehler", "Fehler erkennen"], ["methoden", "Methoden vergleichen"], ["transfer", "Transfer/Anwendung"]];
 const NIVEAU = [["reproduzieren", "reproduzieren"], ["anwenden", "anwenden"], ["beurteilen", "beurteilen"]];
 
 type State = {
+  typ: string; dauer: string;
   fach: string; stufe: string; thema: string; extra: string; material: string;
   diffart: string; anzahl: number; sprache: string; zweitsprache: string; twist: string; niveau: string; provider: string; bild: number; modell: string;
 };
@@ -20,6 +23,7 @@ export default function Form({ providers, presets, bilder, initialBild, isAdmin 
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const [s, setS] = useState<State>({
+    typ: "lernseite", dauer: "30",
     fach: "", stufe: "", thema: "", extra: "", material: "",
     diffart: "niveau", anzahl: 3, sprache: "standard", zweitsprache: "", twist: "auto", niveau: "anwenden",
     provider: (providers.find((p) => p.limit === null || p.used < p.limit) ?? providers[0]).id,
@@ -30,6 +34,7 @@ export default function Form({ providers, presets, bilder, initialBild, isAdmin 
   const [log, setLog] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const set = (k: keyof State, v: string | number) => setS((p) => ({ ...p, [k]: v }));
+  const pruefung = s.typ === "pruefung";
 
   function applyPreset(p: Preset) {
     setS((prev) => ({
@@ -88,7 +93,15 @@ export default function Form({ providers, presets, bilder, initialBild, isAdmin 
 
   return (
     <form onSubmit={submit} className="card">
-      <div className="row" style={{ marginBottom: ".6rem", alignItems: "center" }}>
+      <label style={{ marginTop: 0 }}>Was soll entstehen?</label>
+      <Seg k="typ" opts={TYP} />
+      <p className="small-note" style={{ margin: ".4rem 0 .2rem" }}>
+        {pruefung
+          ? "Aus dem Prüfungsstoff entstehen drei Teile: Lernziele checken, Übungsprüfung mit Timer und Note, Lücken schliessen mit Lernplan. Dazu ein Lehrpersonen-Bereich mit Lösungen und Punkteschlüssel."
+          : "Eine Kernaufgabe mit mehreren Zugängen, Selbstkontrolle und Lehrpersonen-Bereich."}
+      </p>
+
+      <div className="row" style={{ margin: ".8rem 0 .6rem", alignItems: "center" }}>
         <span className="small-note">Schnellstart:</span>
         {presets.map((p) => <button type="button" key={p.id} className="btn small ghost" onClick={() => applyPreset(p)} disabled={busy}>{p.label}</button>)}
       </div>
@@ -97,31 +110,45 @@ export default function Form({ providers, presets, bilder, initialBild, isAdmin 
         <div><label>Fach / Kontext *</label><input value={s.fach} onChange={(e) => set("fach", e.target.value)} required disabled={busy} placeholder="z. B. Mathematik" /></div>
         <div><label>Zielstufe *</label><input value={s.stufe} onChange={(e) => set("stufe", e.target.value)} required disabled={busy} placeholder="z. B. Berufsmaturität" /></div>
       </div>
-      <label>Thema (optional – leer = KI wählt aus dem Material)</label>
-      <input value={s.thema} onChange={(e) => set("thema", e.target.value)} disabled={busy} placeholder="z. B. Dosisberechnung" />
+      <label>{pruefung ? "Prüfungsthema (optional – leer = der ganze Stoff aus dem Material)" : "Thema (optional – leer = KI wählt aus dem Material)"}</label>
+      <input value={s.thema} onChange={(e) => set("thema", e.target.value)} disabled={busy} placeholder={pruefung ? "z. B. Semesterprüfung Statistik" : "z. B. Dosisberechnung"} />
 
-      <label>Material: Datei (PDF, Word, PowerPoint, Text · max. 4 MB)</label>
+      <label>{pruefung ? "Prüfungsstoff: Datei (PDF, Word, PowerPoint, Text · max. 4 MB)" : "Material: Datei (PDF, Word, PowerPoint, Text · max. 4 MB)"}</label>
       <input type="file" ref={fileRef} accept=".pdf,.docx,.pptx,.txt,.md" disabled={busy} />
       <label>… oder Themenbeschreibung / Textauszug</label>
       <textarea rows={4} value={s.material} onChange={(e) => set("material", e.target.value)} disabled={busy} placeholder="Wird ignoriert, wenn eine Datei hochgeladen ist." />
 
-      <label>Differenzierungsart</label>
-      <Seg k="diffart" opts={DIFFART} />
-      <label>Anzahl Zugänge</label>
-      <div className="seg">{[2, 3, 4].map((n) => <button type="button" key={n} className={s.anzahl === n ? "on" : ""} onClick={() => set("anzahl", n)} disabled={busy}>{n}</button>)}</div>
+      {pruefung ? (
+        <>
+          <label>Dauer der Übungsprüfung</label>
+          <Seg k="dauer" opts={DAUER} />
+          <p className="small-note" style={{ margin: ".3rem 0 0" }}>20 Minuten entsprechen 20 Punkten, 30 Minuten 30 Punkten, 45 Minuten 40 Punkten. Note nach Schweizer Skala, 60 Prozent ergibt eine 4.</p>
+        </>
+      ) : (
+        <>
+          <label>Differenzierungsart</label>
+          <Seg k="diffart" opts={DIFFART} />
+          <label>Anzahl Zugänge</label>
+          <div className="seg">{[2, 3, 4].map((n) => <button type="button" key={n} className={s.anzahl === n ? "on" : ""} onClick={() => set("anzahl", n)} disabled={busy}>{n}</button>)}</div>
+        </>
+      )}
       <label>Sprache</label>
       <Seg k="sprache" opts={SPRACHE} />
       {s.sprache === "zweisprachig" && (
         <input value={s.zweitsprache} onChange={(e) => set("zweitsprache", e.target.value)} disabled={busy} placeholder="Zweite Sprache, z. B. Portugiesisch" style={{ marginTop: ".4rem" }} />
       )}
-      <label>Twist in der Vertiefung</label>
-      <Seg k="twist" opts={TWIST} />
-      <label>Anforderungsniveau</label>
-      <Seg k="niveau" opts={NIVEAU} />
+      {!pruefung && (
+        <>
+          <label>Twist in der Vertiefung</label>
+          <Seg k="twist" opts={TWIST} />
+          <label>Anforderungsniveau</label>
+          <Seg k="niveau" opts={NIVEAU} />
+        </>
+      )}
       <label>Zusatzwunsch (optional)</label>
-      <input value={s.extra} onChange={(e) => set("extra", e.target.value)} disabled={busy} placeholder="z. B. Beispiel aus der Hotellerie" />
+      <input value={s.extra} onChange={(e) => set("extra", e.target.value)} disabled={busy} placeholder={pruefung ? "z. B. ohne Taschenrechner, Schwerpunkt Formeln" : "z. B. Beispiel aus der Hotellerie"} />
 
-      {bilder.length > 0 && (
+      {bilder.length > 0 && !pruefung && (
         <>
           <label>Bild einbinden (optional)</label>
           <select value={s.bild} onChange={(e) => set("bild", Number(e.target.value))} disabled={busy}>
@@ -160,7 +187,7 @@ export default function Form({ providers, presets, bilder, initialBild, isAdmin 
       )}
 
       <div style={{ marginTop: "1.3rem", display: "flex", gap: ".8rem", alignItems: "center", flexWrap: "wrap" }}>
-        <button className="btn terra" disabled={busy || exhausted}>{busy ? "Wird erzeugt …" : "Lernseite erzeugen"}</button>
+        <button className="btn terra" disabled={busy || exhausted}>{busy ? "Wird erzeugt …" : pruefung ? "Prüfungsvorbereitung erzeugen" : "Lernseite erzeugen"}</button>
         {busy && <span className="small-note">Bitte Fenster offen lassen. Dauer ein bis drei Minuten.</span>}
       </div>
 

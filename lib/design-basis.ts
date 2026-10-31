@@ -2,6 +2,7 @@
 // Das Modell übernimmt dieses CSS unverändert als erstes <style>-Element und baut die Seite nach dem Grundgerüst.
 // Offline-tauglich: keine Webfonts, keine externen Dateien. Schriften: Serife für Titel (Georgia-Stapel), Sans für Text.
 // Farben wie die Plattform lernwege.edutecsol.ch: Navy, Terra, Ocker, Creme.
+// Nach Änderungen: node scripts/sync-design-basis.mjs (überträgt die Basis in den statischen Prompt-Generator).
 
 export const DESIGN_CSS = `:root{--paper:#FBF8F1;--card:#FFFFFF;--ink:#1E3246;--ink-soft:#5B6572;--line:#E2DBCB;--line-strong:#CDC4AD;--navy:#1E3246;--terra:#B84816;--terra-deep:#9A3A10;--ochre:#F1A51A;--cream:#F6EFE2;--ok:#2F8F6F;--ok-soft:#DFF3EA;--err:#B8321A;--err-soft:#FBE6E1;--serif:Georgia,"Iowan Old Style","Palatino Linotype",Palatino,"Times New Roman",serif;--sans:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;--r:8px;--r-lg:12px}
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
@@ -53,6 +54,7 @@ input.err,select.err,textarea.err{border-color:var(--err)}
 .choices{display:flex;flex-wrap:wrap;gap:.5rem;margin:.5rem 0}
 .choice{font:inherit;font-size:.92rem;background:#fff;border:1px solid var(--line-strong);border-radius:var(--r);padding:.5rem .9rem;cursor:pointer;color:var(--ink)}
 .choice:hover{border-color:var(--terra)}
+.choice.on{border-color:var(--navy);background:var(--cream)}
 .choice.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
 .choice.err{background:var(--err-soft);border-color:var(--err);color:var(--err)}
 .check{list-style:none;margin:.5rem 0 0;padding:0}
@@ -72,9 +74,25 @@ table{width:100%;border-collapse:collapse;font-size:.92rem;background:#fff}
 th,td{text-align:left;padding:.45rem .6rem;border-bottom:1px solid var(--line);vertical-align:top}
 th{background:var(--cream);font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
 .foot{margin-top:2.5rem;font-size:.78rem;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:.8rem}
-.sr{position:absolute;left:-9999px}`;
+.sr{position:absolute;left:-9999px}
+/* Prüfungsvorbereitung */
+.exam-head{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;padding:.8rem 1rem;border:1px solid var(--line-strong);border-radius:var(--r-lg);background:#fff;margin:0 0 1rem}
+.timer{font-family:var(--serif);font-size:1.6rem;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.timer.over{color:var(--err)}
+.pts{float:right;font-size:.78rem;color:var(--ink-soft);border:1px solid var(--line);border-radius:999px;padding:.1rem .55rem;margin-left:.6rem}
+.score{display:none;background:var(--navy);color:#fff;border-radius:var(--r-lg);padding:1.1rem 1.3rem;margin:1rem 0}
+.score.show{display:block}
+.score .nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.8rem;margin:.3rem 0 .8rem}
+.score b{display:block;font-family:var(--serif);font-size:2rem;line-height:1;color:var(--ochre)}
+.score span{font-size:.82rem;color:#C3CCD6}
+.score table{background:transparent;color:#fff}.score th{background:transparent;color:#C3CCD6}.score td,.score th{border-color:#3A5068}
+.meter{height:8px;background:var(--cream);border-radius:999px;overflow:hidden;margin:.4rem 0}
+.meter i{display:block;height:100%;background:var(--terra);width:0;transition:width .4s}
+.loesung{display:none;margin-top:.6rem;padding:.6rem .9rem;background:var(--cream);border-radius:var(--r);font-size:.92rem}
+.loesung.show{display:block}
+.plan td:first-child{font-weight:600;white-space:nowrap}`;
 
-/** Grundgerüst, an das sich die erzeugte Seite hält (Klassen aus DESIGN_CSS). */
+/** Grundgerüst Lernseite (Klassen aus DESIGN_CSS). */
 export const DESIGN_SKELETON = `<body><div class="wrap">
 <header class="top"><div><p class="eyebrow">Fach · Stufe · Thema</p><h1>Titel der Lernseite</h1><p class="lead">Ein Satz zur Kernaufgabe. Wähle deinen Zugang.</p></div><button class="btn ghost pdf" type="button">Als PDF herunterladen</button></header>
 <section class="core"><h2>Die Kernaufgabe</h2><p class="task">…</p><div class="data">… (nur falls Daten/Werte)</div><div class="viz">… themenpassende Visualisierung (SVG/HTML)</div><ol class="steps"><li>…</li></ol></section>
@@ -86,16 +104,33 @@ export const DESIGN_SKELETON = `<body><div class="wrap">
 <p class="foot">Lernseite erzeugt mit Lernwege (EDUTECSOL). Fach · Stufe · Datum.</p>
 </div></body>`;
 
+/** Grundgerüst Prüfungsvorbereitung (Klassen aus DESIGN_CSS). */
+export const DESIGN_SKELETON_PRUEFUNG = `<body><div class="wrap">
+<header class="top"><div><p class="eyebrow">Fach · Stufe · Prüfungsvorbereitung</p><h1>Titel: Prüfungsstoff</h1><p class="lead">Ein Satz: Was geprüft wird, wie du dich hier vorbereitest.</p></div><button class="btn ghost pdf" type="button">Als PDF herunterladen</button></header>
+<section class="core"><h2>Lernziele und Gewichtung</h2><table><thead><tr><th>Nr.</th><th>Ich kann …</th><th>Punkte</th></tr></thead><tbody><tr><td>Z1</td><td>…</td><td>…</td></tr></tbody></table></section>
+<p class="pick">Wähle deinen Teil:</p>
+<div class="tabs" role="tablist"><button class="tab active" role="tab" aria-selected="true" aria-controls="p-a" id="t-a"><span class="tname">A · Lernziele checken</span><span class="tsub">Wo stehe ich?</span></button><button class="tab" role="tab" aria-selected="false" aria-controls="p-b" id="t-b"><span class="tname">B · Übungsprüfung</span><span class="tsub">… Minuten, … Punkte</span></button><button class="tab" role="tab" aria-selected="false" aria-controls="p-c" id="t-c"><span class="tname">C · Lücken schliessen</span><span class="tsub">Merken, üben, planen</span></button></div>
+<section class="panel show" id="p-a" role="tabpanel" aria-labelledby="t-a"><div class="card"><h2>Lernziele checken</h2><div class="card" data-ziel="z1"><h3>Z1 · Ich kann …</h3><div class="choices"><button class="choice" type="button" data-wert="sicher">sicher</button><button class="choice" type="button" data-wert="unsicher">unsicher</button><button class="choice" type="button" data-wert="nein">noch nicht</button></div><p class="aufgabe">Kontrollfrage …</p><div class="field"><label for="k1">Antwort</label><input id="k1" type="text"><span class="feedback" aria-live="polite"></span></div></div><button class="btn terra" type="button" id="check-a">Auswerten</button><div class="score" id="score-a"><div class="nums"><div><b>0/6</b><span>Lernziele sicher</span></div></div><p>Zu wiederholen in Teil C: …</p></div></div></section>
+<section class="panel" id="p-b" role="tabpanel" aria-labelledby="t-b"><div class="exam-head"><div><strong>Übungsprüfung</strong> · … Minuten · … Punkte</div><div><span class="timer" id="timer">00:00</span> <button class="btn ghost" type="button" id="timer-btn">Start</button></div></div><div class="card" data-ziel="z1"><h3>Aufgabe 1 <span class="pts">3 Punkte</span></h3><p class="aufgabe">…</p><div class="field"><label for="b1">…</label><input id="b1" type="number"><span class="feedback" aria-live="polite"></span></div><div class="loesung">Lösungsweg …</div></div><button class="btn terra" type="button" id="check-b">Prüfung auswerten</button> <button class="btn ghost" type="button" id="reset-b">Nochmals versuchen</button><div class="score" id="score-b"><div class="nums"><div><b>0</b><span>von … Punkten</span></div><div><b>0 %</b><span>erreicht</span></div><div><b>–</b><span>Note (1 + 5 × Anteil)</span></div></div><div class="meter"><i></i></div><table class="plan"><thead><tr><th>Lernziel</th><th>Punkte</th></tr></thead><tbody>…</tbody></table><p><span>Die Lehrperson kann anders gewichten.</span></p></div></section>
+<section class="panel" id="p-c" role="tabpanel" aria-labelledby="t-c"><div class="card" data-ziel="z1"><h2>Z1 · Ich kann …</h2><div class="hint">Merkblock …</div><h3>Beispiel</h3><p>… mit Lösungsweg</p><h3>Üben</h3><div class="field">…</div></div><div class="card"><h2>Lernplan: die letzten drei Tage</h2><table class="plan"><thead><tr><th>Tag</th><th>Lernziele</th><th>Dauer</th><th>Methode</th></tr></thead><tbody>…</tbody></table></div></section>
+<details class="lehrperson"><summary>Für die Lehrperson: Lösungen, Punkteschlüssel, typische Fehler</summary><div>…</div></details>
+<p class="foot">Prüfungsvorbereitung erzeugt mit Lernwege (EDUTECSOL). Fach · Stufe · Datum.</p>
+</div></body>`;
+
 /** Abschnitt für den System-Prompt. */
-export function designBasisPrompt(): string {
+export function designBasisPrompt(typ: "lernseite" | "pruefung" = "lernseite"): string {
+  const skeleton = typ === "pruefung" ? DESIGN_SKELETON_PRUEFUNG : DESIGN_SKELETON;
+  const extra = typ === "pruefung"
+    ? `- Timer: Start/Stopp per Knopf, Anzeige mm:ss, nach Ablauf Klasse over (nur Anzeige). Auswertung: Klassen ok/err auf allen Feldern, .loesung je Aufgabe und .score sichtbar (Klasse show), .meter-Breite = Prozent.`
+    : `- Der Aha-Moment des obersten Zugangs steht in einem .aha-Block, der erst nach Klick auf einen .btn erscheint.`;
   return `DESIGNBASIS (zwingend):
 - Übernimm dieses CSS unverändert als erstes <style>-Element im <head>; ergänze danach ein zweites <style> nur für die themenspezifische Visualisierung und Kleinigkeiten. Keine anderen Farben als die Variablen (--navy, --terra, --ochre, --cream, --ok, --err); keine Schatten, keine Verläufe, keine Emojis als Icons.
 <style>
 ${DESIGN_CSS}
 </style>
-- Baue die Seite nach diesem Grundgerüst (Klassen beibehalten, Inhalte ersetzen, Anzahl Zugänge gemäss Auftrag):
-${DESIGN_SKELETON}
+- Baue die Seite nach diesem Grundgerüst (Klassen beibehalten, Inhalte ersetzen${typ === "pruefung" ? "" : ", Anzahl Zugänge gemäss Auftrag"}):
+${skeleton}
 - Reiter: Klick setzt .active auf dem Reiter und .show auf dem zugehörigen Panel, aria-selected entsprechend; Pfeiltasten wechseln den Reiter.
-- Rückmeldung: richtige Eingabe → Klasse ok auf dem Feld und Text im .feedback (z. B. «Richtig»); falsche → Klasse err und ein Hinweis ohne Lösung. Auswahlaufgaben mit .choices/.choice analog.
-- Der Aha-Moment des obersten Zugangs steht in einem .aha-Block, der erst nach Klick auf einen .btn erscheint.`;
+- Rückmeldung: richtige Eingabe → Klasse ok auf dem Feld und Text im .feedback (z. B. «Richtig»); falsche → Klasse err und ein Hinweis ohne Lösung. Auswahlaufgaben mit .choices/.choice analog (gewählt = Klasse on).
+${extra}`;
 }
