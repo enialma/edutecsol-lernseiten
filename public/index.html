@@ -18,16 +18,36 @@
   .hero .cta{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:.3rem}
   @media (max-width:900px){.hero .wrap{grid-template-columns:1fr}}
 
-  /* Live-Demo */
-  .demo{background:#fff;border:1px solid var(--line-strong);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow)}
+  /* Live-Demo: erst Vorschaubild, nach Klick die echte Lernseite */
+  .hero .wrap{align-items:stretch}
+  .hero .right{display:flex;flex-direction:column;min-width:0}
+  .demo{flex:1;display:flex;flex-direction:column;background:#fff;border:1px solid var(--line-strong);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow)}
   .demo .bar{display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.55rem .6rem .55rem .9rem;border-bottom:1px solid var(--line);background:var(--paper);flex-wrap:wrap}
   .demo .tabs{display:flex;gap:.25rem;flex-wrap:wrap}
   .demo .tabs button{font:inherit;font-size:.82rem;font-weight:600;padding:.38rem .75rem;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--ink-soft);cursor:pointer}
   .demo .tabs button:hover{color:var(--ink)}
   .demo .tabs button.on{background:#fff;color:var(--ink);border-color:var(--line-strong)}
   .demo .open{font-size:.8rem;white-space:nowrap}
-  .demo iframe{display:block;width:100%;height:clamp(440px,56vw,600px);border:0;background:#fff}
+  .stage{position:relative;flex:1;min-height:clamp(420px,50vw,640px);background:#fff}
+  .stage iframe,.stage .poster{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+  .stage .poster{object-fit:cover;object-position:top;transition:opacity .35s}
+  .stage.live .poster{opacity:0;pointer-events:none}
+  .stage .veil{position:absolute;inset:0;background:linear-gradient(to top,rgba(30,50,70,.42),rgba(30,50,70,0) 55%);transition:opacity .35s}
+  .stage.live .veil{opacity:0;pointer-events:none}
+  .stage .play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:inherit;font-size:1rem;font-weight:600;background:var(--terra);color:#fff;border:0;border-radius:999px;padding:.85rem 1.5rem .85rem 1.2rem;cursor:pointer;display:inline-flex;align-items:center;gap:.6rem;box-shadow:0 12px 30px -8px rgba(184,72,22,.6);transition:transform .15s,background .15s}
+  .stage .play:hover{transform:translate(-50%,-50%) scale(1.04);background:var(--terra-deep)}
+  .stage .play svg{width:1.1rem;height:1.1rem;fill:currentColor}
+  .stage.live .play{display:none}
+  .stage .hint{position:absolute;left:50%;bottom:.9rem;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:.82rem;font-weight:600;padding:.45rem .9rem;border-radius:999px;box-shadow:var(--shadow);pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap}
+  .stage .hint.show{opacity:1}
+  .stage .mobile-open{display:none;position:absolute;left:50%;bottom:1rem;transform:translateX(-50%);white-space:nowrap}
   .demo-cap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-size:.82rem;color:var(--ink-soft);margin:.7rem .2rem 0}
+  @media (max-width:700px){
+    .stage{min-height:300px;aspect-ratio:16/10}
+    .stage .play,.stage .hint,.stage iframe{display:none}
+    .stage .mobile-open{display:inline-flex}
+    .demo .open{display:none}
+  }
 
   /* Zitat-Band */
   .quote .wrap{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(1.5rem,4vw,4rem);align-items:center}
@@ -100,18 +120,25 @@
         <div><b>KI nach Wahl</b><span>Claude, ChatGPT oder Infomaniak, Schweiz</span></div>
       </div>
     </div>
-    <div>
+    <div class="right">
       <div class="demo">
         <div class="bar">
           <div class="tabs" role="tablist" aria-label="Beispiel wählen">
-            <button type="button" class="on" data-src="statistik-lagemasse.html" role="tab" aria-selected="true">Statistik</button>
-            <button type="button" data-src="franzoesisch-voci-game.html" role="tab" aria-selected="false">Französisch, Spiel</button>
-            <button type="button" data-src="dosisberechnung-pharma.html" role="tab" aria-selected="false">Pharma</button>
-            <button type="button" data-src="pflegedokumentation.html" role="tab" aria-selected="false">Pflege</button>
+            <button type="button" class="on" role="tab" aria-selected="true" data-src="statistik-lagemasse.html" data-img="img/poster/statistik-lagemasse.jpg" data-title="Lernseite Mittelwert, Median und Modus">Statistik</button>
+            <button type="button" role="tab" aria-selected="false" data-src="franzoesisch-voci-game.html" data-img="img/poster/franzoesisch-voci-game.jpg" data-title="Lernseite Voci-Mission Französisch">Französisch, Spiel</button>
+            <button type="button" role="tab" aria-selected="false" data-src="dosisberechnung-pharma.html" data-img="img/poster/dosisberechnung-pharma.jpg" data-title="Lernseite Dosisberechnung">Pharma</button>
+            <button type="button" role="tab" aria-selected="false" data-src="pflegedokumentation.html" data-img="img/poster/pflegedokumentation.jpg" data-title="Lernseite Pflegedokumentation">Pflege</button>
           </div>
           <a class="link open" id="demo-open" href="statistik-lagemasse.html" target="_blank" rel="noopener">In neuem Fenster öffnen ↗</a>
         </div>
-        <iframe id="demo-frame" src="statistik-lagemasse.html" title="Beispiel einer Lernseite, bedienbar" loading="eager"></iframe>
+        <div class="stage" id="demo-stage">
+          <img class="poster" id="demo-poster" src="img/poster/statistik-lagemasse.jpg" alt="Lernseite Mittelwert, Median und Modus" width="880" height="960" fetchpriority="high">
+          <div class="veil"></div>
+          <iframe id="demo-frame" title="Beispiel einer Lernseite, bedienbar" data-src="statistik-lagemasse.html"></iframe>
+          <button type="button" class="play" id="demo-play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>Ausprobieren</button>
+          <div class="hint" id="demo-hint">Wähle Zugang A, B oder C</div>
+          <a class="btn terra mobile-open" id="demo-mobile" href="statistik-lagemasse.html" target="_blank" rel="noopener">Lernseite öffnen ↗</a>
+        </div>
       </div>
       <div class="demo-cap"><span>Echte Lernseite, direkt bedienbar. Reiter A, B, C wählen und Aufgaben lösen.</span><span>Erzeugt mit dem Prompt-Generator.</span></div>
     </div>
@@ -287,17 +314,40 @@
 
 <script>
 (function(){
-  var frame=document.getElementById('demo-frame'), open=document.getElementById('demo-open');
-  var tabs=[].slice.call(document.querySelectorAll('.demo .tabs button'));
+  var stage=document.getElementById('demo-stage'), frame=document.getElementById('demo-frame'),
+      poster=document.getElementById('demo-poster'), open=document.getElementById('demo-open'),
+      mobile=document.getElementById('demo-mobile'), play=document.getElementById('demo-play'),
+      hint=document.getElementById('demo-hint'), tabs=[].slice.call(document.querySelectorAll('.demo .tabs button'));
+  var live=false, hintTimer=null, current=tabs[0];
+  function tidy(){
+    /* Gleiche Domain: Störendes in der eingebetteten Lernseite ausblenden (Rücklink, grosser Rand oben). */
+    try{
+      var d=frame.contentDocument; if(!d) return;
+      var st=d.createElement('style');
+      st.textContent='a.back,.back,a[href="index.html"],a[href="lernseiten-beispiele.html"]{display:none!important}body{padding-top:.75rem!important}';
+      d.head.appendChild(st);
+      d.addEventListener('pointerdown',function(){hint.classList.remove('show');},{once:true});
+    }catch(e){}
+  }
+  function showHint(){
+    hint.classList.add('show'); clearTimeout(hintTimer);
+    hintTimer=setTimeout(function(){hint.classList.remove('show');},7000);
+  }
+  frame.addEventListener('load',function(){ if(!frame.src) return; tidy(); stage.classList.add('live'); showHint(); });
+  function goLive(){ live=true; frame.src=current.getAttribute('data-src'); }
+  play.addEventListener('click',goLive);
   tabs.forEach(function(b){
     b.addEventListener('click',function(){
       tabs.forEach(function(x){x.classList.remove('on');x.setAttribute('aria-selected','false');});
-      b.classList.add('on');b.setAttribute('aria-selected','true');
-      frame.src=b.getAttribute('data-src');open.href=b.getAttribute('data-src');
+      b.classList.add('on'); b.setAttribute('aria-selected','true'); current=b;
+      var src=b.getAttribute('data-src');
+      open.href=src; mobile.href=src;
+      poster.src=b.getAttribute('data-img'); poster.alt=b.getAttribute('data-title');
+      if(live){ stage.classList.remove('live'); frame.src=src; }
     });
   });
   var menu=document.querySelector('.menu');
-  if(menu){menu.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){menu.removeAttribute('open');});});}
+  if(menu){[].slice.call(menu.querySelectorAll('a')).forEach(function(a){a.addEventListener('click',function(){menu.removeAttribute('open');});});}
 })();
 </script>
 
