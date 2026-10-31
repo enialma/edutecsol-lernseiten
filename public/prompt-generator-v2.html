@@ -22,7 +22,6 @@
   :root{
     --accent:var(--navy);--accent-soft:var(--paper);
   }
-  .wrap{max-width:960px}
   .lead{margin-bottom:1.6rem}
   .layout{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:start;}
   @media(max-width:820px){.layout{grid-template-columns:1fr;}}
@@ -385,7 +384,10 @@ Gib am Ende eine kurze Notiz: gewähltes Thema, gewählte Differenzierungsart, g
 
   function render(){
     const txt=build();
+    // HTML-Zeichen zuerst maskieren: Der Prompt enthält das <style>-/HTML-Gerüst der Designbasis, das sonst
+    // als echtes Markup in die Seite gelangt und deren Stile überschreibt (z. B. Hinweis beim Feld «Thema»).
     el('output').innerHTML=txt
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
       .replace(/\[([^\]]+)\]/g,'§§PH§§[$1]§§/PH§§')
       .replace(/^§(.+)$/gm,'<span class="sec">$1</span>')
       .replace(/§§PH§§/g,'<span class="ph">').replace(/§§\/PH§§/g,'</span>');
