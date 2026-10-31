@@ -18,7 +18,7 @@ export default async function KlassenSeite({ params }: { params: Promise<{ token
           <span className="small-note">Klassenseite</span>
         </div>
       </header>
-      <main>
+      <main style={{ minHeight: "calc(100vh - 64px - 80px)" }}>
         <div className="wrap">
           {!gruppe ? (
             <div className="card" style={{ maxWidth: 520 }}>
