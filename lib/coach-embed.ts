@@ -35,10 +35,10 @@ export function withCoach(html: string, token: string, name: string): string {
     return {reiter:txt(tab).slice(0,80),aufgabe:txt(auf).slice(0,400),eingabe:lastInput.slice(0,200)};
   }
   function inExam(){var r=kontext().reiter;return /Übungsprüfung|Uebungspruefung/i.test(r);}
-  function updateBtn(){btn.style.display=inExam()?'none':'inline-flex';}
+  function updateBtn(){btn.style.display=(inExam()||panel.classList.contains('open'))?'none':'inline-flex';}
   function send(){ if(frame.contentWindow) frame.contentWindow.postMessage({type:'lw-kontext',kontext:kontext()},'*'); }
   document.addEventListener('input',function(e){var t=e.target; if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA')&&t.value) lastInput=String(t.value);},true);
-  document.addEventListener('click',function(e){ if(e.target&&e.target.closest&&e.target.closest('.tab,[role=tab]')) setTimeout(function(){updateBtn();send();},50); },true);
+  document.addEventListener('click',function(e){ if(e.target&&e.target.closest&&e.target.closest('.tab,[role=tab]')) setTimeout(function(){ if(inExam()) panel.classList.remove('open'); updateBtn(); send(); },50); },true);
   btn.addEventListener('click',function(){
     var k=kontext();
     if(!frame.src){ frame.src='/coach/'+encodeURIComponent(TOKEN)+'?reiter='+encodeURIComponent(k.reiter)+'&aufgabe='+encodeURIComponent(k.aufgabe)+'&eingabe='+encodeURIComponent(k.eingabe); }
