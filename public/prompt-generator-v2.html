@@ -51,6 +51,10 @@
   .out pre{white-space:pre-wrap;overflow-wrap:anywhere;word-wrap:break-word;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.8rem;line-height:1.5;background:var(--navy);color:#E8EBF0;border-radius:var(--r);padding:1.1rem 1.2rem;max-height:64vh;overflow:auto;margin:0;}
   .out pre .ph{color:var(--ochre);}
   .out pre .sec{color:#8fd0b4;font-weight:700;}
+  .out pre details.basis{margin:.2rem 0 .4rem;}
+  .out pre details.basis summary{cursor:pointer;color:#C3CCD6;font-style:italic;white-space:normal;padding:.35rem .6rem;border:1px dashed #4A5F76;border-radius:6px;}
+  .out pre details.basis summary:hover{color:#fff;border-color:#8fd0b4;}
+  .out pre details.basis[open] summary{margin-bottom:.4rem;}
   .actions{display:flex;gap:.6rem;margin-top:.8rem;flex-wrap:wrap;}
   
   .btn.primary{background:var(--terra);border-color:var(--terra);color:#fff;}.btn.primary:hover{background:var(--terra-deep);border-color:var(--terra-deep);}
@@ -388,11 +392,23 @@ Gib am Ende eine kurze Notiz: gewähltes Thema, gewählte Differenzierungsart, g
     const txt=build();
     // HTML-Zeichen zuerst maskieren: Der Prompt enthält das <style>-/HTML-Gerüst der Designbasis, das sonst
     // als echtes Markup in die Seite gelangt und deren Stile überschreibt (z. B. Hinweis beim Feld «Thema»).
-    el('output').innerHTML=txt
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    const esc=txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    el('output').innerHTML=foldBasis(esc)
       .replace(/\[([^\]]+)\]/g,'§§PH§§[$1]§§/PH§§')
       .replace(/^§(.+)$/gm,'<span class="sec">$1</span>')
       .replace(/§§PH§§/g,'<span class="ph">').replace(/§§\/PH§§/g,'</span>');
+  }
+  // Die Designbasis (CSS + Seitengerüst) ist für Lehrpersonen nicht lesenswert: in der Vorschau eingeklappt,
+  // im kopierten und gespeicherten Prompt aber vollständig enthalten.
+  function foldBasis(html){
+    const start=html.indexOf('§DESIGNBASIS'); if(start<0) return html;
+    const headEnd=html.indexOf('\n',start); if(headEnd<0) return html;
+    let end=html.indexOf('\n\n§',headEnd); if(end<0) end=html.length;
+    const body=html.slice(headEnd+1,end);
+    const lines=body.split('\n').length;
+    return html.slice(0,headEnd+1)
+      +'<details class="basis"><summary>Technischer Teil: Farben, Schrift und Seitengerüst von Lernwege ('+lines+' Zeilen). In der Vorschau eingeklappt, im kopierten Prompt vollständig enthalten. Zum Anzeigen klicken.</summary>'
+      +body+'</details>'+html.slice(end);
   }
   render();
 
