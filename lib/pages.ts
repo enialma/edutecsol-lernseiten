@@ -30,13 +30,25 @@ export type PageMeta = {
   owner_email: string;
   owner_name: string | null;
   owner_institution: string | null;
+  /** KI-Lerncoach: pro Seite eingeschaltet, Stil, Anbieter; owner_coach = Zusatzoption der Lehrperson */
+  coach: boolean;
+  coach_stil: string;
+  coach_provider: string;
+  owner_coach: boolean;
 };
 export type PageFull = PageMeta & { html: string };
 
 const META = `p.id, p.user_id, p.title, p.fach, p.stufe, p.thema, p.params, p.material_name, p.provider, p.model,
   p.input_tokens, p.output_tokens, p.duration_ms, p.notiz, p.share_token, p.pool, p.school, p.copied_from,
+  p.coach, p.coach_stil, p.coach_provider, u.coach AS owner_coach,
   to_char(p.created_at, 'DD.MM.YYYY HH24:MI') AS created_at, length(p.html) AS html_bytes,
   u.email AS owner_email, u.name AS owner_name, i.name AS owner_institution`;
+
+/** Coach-Einstellungen einer Seite (nur Besitzerin oder Admin). */
+export async function setCoach(id: number, userId: number, isAdmin: boolean, s: { on: boolean; stil: string; provider: string }) {
+  await q(`UPDATE pages SET coach = $4, coach_stil = $5, coach_provider = $6 WHERE id = $1 AND ($2 OR user_id = $3)`,
+    [id, isAdmin, userId, s.on, s.stil, s.provider]);
+}
 const FROM = `FROM pages p JOIN users u ON u.id = p.user_id LEFT JOIN institutions i ON i.id = u.institution_id`;
 // Für die eigene Schule freigegeben: Autorin und betrachtende Person gehören zur selben Institution ($n = userId)
 const sameSchool = (n: number) => `(p.school = TRUE AND u.institution_id IS NOT NULL AND u.institution_id = (SELECT institution_id FROM users WHERE id = $${n}))`;

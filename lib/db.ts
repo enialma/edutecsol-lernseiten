@@ -123,6 +123,19 @@ export function ready(): Promise<void> {
         token_enc  TEXT NOT NULL,
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )`);
+      // KI-Lerncoach (Zusatzoption pro Lehrperson; pro Seite ein-/ausschaltbar; Zähler ohne Gesprächsinhalte)
+      await sql.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS coach BOOLEAN NOT NULL DEFAULT FALSE`);
+      await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS coach BOOLEAN NOT NULL DEFAULT FALSE`);
+      await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS coach_stil TEXT NOT NULL DEFAULT 'gestuft'`);
+      await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS coach_provider TEXT NOT NULL DEFAULT 'infomaniak'`);
+      await sql.query(`CREATE TABLE IF NOT EXISTS coach_usage (
+        page_id       INTEGER NOT NULL REFERENCES pages(id) ON DELETE CASCADE,
+        day           DATE NOT NULL,
+        messages      INTEGER NOT NULL DEFAULT 0,
+        input_tokens  INTEGER NOT NULL DEFAULT 0,
+        output_tokens INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (page_id, day)
+      )`);
     })().catch((e) => {
       readyPromise = null;
       throw e;

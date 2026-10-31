@@ -7,7 +7,8 @@ import { getPage } from "@/lib/pages";
 import { DIFFART_LABELS, NIVEAU_LABELS, SPRACHE_LABELS, TWIST_LABELS, type GenParams } from "@/lib/prompt";
 import Topbar from "../../../Topbar";
 import Footer from "../../../Footer";
-import { copyAction, deletePageAction, renameAction, shareAction, visibilityAction } from "../actions";
+import { coachAction, copyAction, deletePageAction, renameAction, shareAction, visibilityAction } from "../actions";
+import { coachAllowedFor, coachUsageForPage, COACH_NAME, COACH_STIL_LABELS } from "@/lib/coach";
 import { getMoodleBase } from "@/lib/moodle";
 import CopyButton from "./CopyButton";
 import MoodleCard from "./MoodleCard";
@@ -25,6 +26,8 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
   const canEdit = own || isAdmin;
   const visibility = page.pool ? "all" : page.school && page.owner_institution ? "school" : "private";
   const moodleBase = canEdit ? await getMoodleBase(userId) : null;
+  const coachOk = coachAllowedFor(page);
+  const coachUse = canEdit && coachOk ? await coachUsageForPage(page.id) : null;
   const p = page.params as Partial<GenParams>;
   const slug = page.title.toLowerCase().replace(/[^a-z0-9äöü]+/g, "-").replace(/^-|-$/g, "") || "lernseite";
 
@@ -118,6 +121,45 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
                   <button className="btn small ghost">Speichern</button>
                 </form>
               </div>
+            </div>
+          )}
+
+          {canEdit && coachOk && (
+            <div className="card" style={{ marginBottom: "1rem" }}>
+              <p className="kicker">Für Lernende · Zusatzoption</p>
+              <h3 style={{ margin: "0 0 .4rem" }}>{COACH_NAME}, der Lerncoach</h3>
+              {!page.owner_coach ? (
+                <p className="small-note">
+                  Der Lerncoach ist für dein Konto nicht freigeschaltet. Er beantwortet Fragen der Lernenden auf der Seite mit Gegenfragen und gestufter Hilfe, ohne Lösungen zu verraten.
+                  Interesse? <a href="mailto:info@edutecsol.ch">info@edutecsol.ch</a>
+                </p>
+              ) : (
+                <>
+                  <p className="small-note">
+                    Erscheint als Knopf «Frag {COACH_NAME}» auf der Seite, wenn Lernende sie über den Freigabelink öffnen. Kennt Aufgaben und deine Lösungen, verrät sie aber nicht.
+                    Gespräche werden nicht gespeichert. {page.share_token ? "" : "Dazu braucht die Seite einen Freigabelink."}
+                    {coachUse ? ` Diesen Monat ${coachUse.month} Nachrichten, insgesamt ${coachUse.total}.` : ""}
+                  </p>
+                  <form action={coachAction} className="row" style={{ alignItems: "flex-end" }}>
+                    <input type="hidden" name="id" value={page.id} />
+                    <div style={{ flex: "1 1 200px" }}>
+                      <label style={{ margin: "0 0 .2rem" }}>Stil</label>
+                      <select name="stil" defaultValue={page.coach_stil}>
+                        {Object.entries(COACH_STIL_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                      </select>
+                    </div>
+                    <div style={{ flex: "1 1 160px" }}>
+                      <label style={{ margin: "0 0 .2rem" }}>KI</label>
+                      <select name="provider" defaultValue={page.coach_provider}>
+                        <option value="infomaniak">Infomaniak (Schweiz)</option>
+                        <option value="claude">Claude (USA)</option>
+                      </select>
+                    </div>
+                    <button name="on" value="1" className={`btn small ${page.coach ? "" : "ghost"}`}>{page.coach ? "Eingeschaltet · speichern" : "Einschalten"}</button>
+                    {page.coach && <button name="on" value="0" className="btn small ghost" style={{ color: "var(--err)" }}>Ausschalten</button>}
+                  </form>
+                </>
+              )}
             </div>
           )}
 

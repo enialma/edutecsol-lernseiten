@@ -23,9 +23,11 @@ export type User = {
   last_login_at: string | null;
   last_login_via: string | null;
   has_password: boolean;
+  /** Zusatzoption KI-Lerncoach freigeschaltet */
+  coach: boolean;
 };
 
-const COLS = `id, email, name, role, active, organisation, notes, institution_id,
+const COLS = `id, email, name, role, active, organisation, notes, institution_id, coach,
   (SELECT i.name FROM institutions i WHERE i.id = users.institution_id) AS institution,
   to_char(valid_until, 'YYYY-MM-DD') AS valid_until,
   to_char(created_at, 'YYYY-MM-DD HH24:MI') AS created_at,
@@ -102,6 +104,11 @@ export async function createUser(input: {
 
 export async function setActive(id: number, active: boolean) {
   await q(`UPDATE users SET active = $2 WHERE id = $1`, [id, active]);
+}
+
+/** Zusatzoption KI-Lerncoach für eine Lehrperson freischalten oder entziehen. */
+export async function setCoachOption(id: number, on: boolean) {
+  await q(`UPDATE users SET coach = $2 WHERE id = $1`, [id, on]);
 }
 
 export async function setPassword(id: number, password: string) {

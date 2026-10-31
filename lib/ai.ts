@@ -134,3 +134,52 @@ export function generate(provider: Provider, args: Args): Promise<GenResult> {
   if (!providerReady(provider)) throw new Error(`${PROVIDER_LABELS[provider]} ist nicht konfiguriert.`);
   return provider === "claude" ? runClaude(args) : runCompat(provider, args);
 }
+
+/** Kurzer Mehrzug-Chat ohne Streaming (KI-Lerncoach). Claude mit Prompt-Caching auf dem System-Prompt. */
+export type ChatMsg = { role: "user" | "assistant"; content: string };
+export async function chat(provider: Provider, args: { system: string; messages: ChatMsg[]; maxTokens?: number; signal?: AbortSignal; model?: string })
+  : Promise<{ text: string; model: string; inputTokens: number; outputTokens: number }> {
+  if (!providerReady(provider)) throw new Error(`${PROVIDER_LABELS[provider]} ist nicht konfiguriert.`);
+  const maxTokens = args.maxTokens ?? 300;
+  if (provider === "claude") {
+    const client = new Anthropic();
+    const model = args.model || process.env.COACH_CLAUDE_MODEL || "claude-sonnet-5-5";
+    const res = await client.messages.create(
+      {
+        model, max_tokens: maxTokens,
+        system: [{ type: "text", text: args.system, cache_control: { type: "ephemeral" } }],
+        messages: args.messages,
+      } as never,
+      { signal: args.signal }
+    );
+    const r = res as unknown as { content: { type: string; text?: string }[]; model: string; usage: { input_tokens?: number; output_tokens?: number; cache_read_input_tokens?: number; cache_creation_input_tokens?: number } };
+    return {
+      text: r.content.map((b) => (b.type === "text" ? b.text ?? "" : "")).join(""),
+      model: r.model ?? model,
+      inputTokens: (r.usage.input_tokens ?? 0) + (r.usage.cache_read_input_tokens ?? 0) + (r.usage.cache_creation_input_tokens ?? 0),
+      outputTokens: r.usage.output_tokens ?? 0,
+    };
+  }
+  const model = args.model || (provider === "openai" ? OPENAI_MODEL : process.env.COACH_INFOMANIAK_MODEL?.trim() || INFOMANIAK_MODEL);
+  const url = provider === "openai"
+    ? "https://api.openai.com/v1/chat/completions"
+    : `https://api.infomaniak.com/2/ai/${process.env.INFOMANIAK_PRODUCT_ID}/openai/v1/chat/completions`;
+  const token = provider === "openai" ? process.env.OPENAI_API_KEY : process.env.INFOMANIAK_TOKEN;
+  const res = await fetch(url, {
+    method: "POST", signal: args.signal,
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model,
+      ...(provider === "openai" ? { max_completion_tokens: maxTokens } : { max_tokens: maxTokens, temperature: 0.5 }),
+      messages: [{ role: "system", content: args.system }, ...args.messages],
+    }),
+  });
+  if (!res.ok) throw new Error(`${PROVIDER_LABELS[provider]} antwortet mit ${res.status}: ${(await res.text()).slice(0, 400)}`);
+  const j = await res.json();
+  return {
+    text: j.choices?.[0]?.message?.content ?? "",
+    model,
+    inputTokens: j.usage?.prompt_tokens ?? 0,
+    outputTokens: j.usage?.completion_tokens ?? 0,
+  };
+}

@@ -4,7 +4,7 @@ import Topbar from "../../Topbar";
 import Footer from "../../Footer";
 import {
   createInstitutionAction, createUserAction, deleteInstitutionAction, deleteUserAction, renameInstitutionAction,
-  setInstitutionAction, setPasswordAction, toggleActiveAction,
+  setInstitutionAction, setPasswordAction, toggleActiveAction, toggleCoachAction,
 } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -80,6 +80,11 @@ export default async function BenutzerPage() {
                       <span className={`badge ${u.active ? "ok" : "off"}`}>{u.active ? "aktiv" : u.pending ? "Zahlung offen" : "gesperrt"}</span>
                       {u.has_subscription && <div className="small-note">Abo (Payrexx)</div>}
                       {u.valid_until && <div className="small-note">bis {u.valid_until}</div>}
+                      <form action={toggleCoachAction} style={{ marginTop: ".3rem" }}>
+                        <input type="hidden" name="id" value={u.id} />
+                        <input type="hidden" name="coach" value={u.coach ? "0" : "1"} />
+                        <button className="btn small ghost" title="Zusatzoption KI-Lerncoach">{u.coach ? "Coach: an" : "Coach: aus"}</button>
+                      </form>
                     </td>
                     <td>{u.has_password ? "M365 + Passwort" : "M365"}</td>
                     <td>{u.last_login_at ?? "–"}{u.last_login_via && <div className="small-note">{u.last_login_via}</div>}</td>

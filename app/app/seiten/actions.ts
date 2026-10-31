@@ -4,7 +4,17 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { auth } from "@/auth";
 import { importBeispiele } from "@/lib/beispiele";
-import { deletePage, duplicatePage, setShare, setVisibility, updateTitle } from "@/lib/pages";
+import { deletePage, duplicatePage, setCoach, setShare, setVisibility, updateTitle } from "@/lib/pages";
+
+/** KI-Lerncoach einer Seite ein-/ausschalten, Stil und Anbieter setzen. */
+export async function coachAction(fd: FormData) {
+  const { userId, isAdmin } = await who();
+  const id = Number(fd.get("id"));
+  const stil = ["streng", "gestuft", "erklaer"].includes(String(fd.get("stil"))) ? String(fd.get("stil")) : "gestuft";
+  const provider = fd.get("provider") === "claude" ? "claude" : "infomaniak";
+  await setCoach(id, userId, isAdmin, { on: fd.get("on") === "1", stil, provider });
+  revalidatePath(`/app/seiten/${id}`);
+}
 
 async function who() {
   const s = await auth();

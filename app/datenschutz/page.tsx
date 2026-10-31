@@ -26,6 +26,7 @@ export default function DatenschutzPage() {
               <li><b>Hochgeladenes Material wird nicht aufbewahrt.</b> Aus PDF, Word oder PowerPoint wird nur der Text ausgelesen, an die gewählte KI geschickt und danach verworfen.</li>
               <li><b>Drei KI-Anbieter zur Wahl.</b> Claude (Anthropic, Verarbeitung in den USA), ChatGPT (OpenAI, Verarbeitung in den USA) oder ein bei Infomaniak gehostetes Open-Source-Modell (Verarbeitung in der Schweiz). Die Lehrperson entscheidet pro Lernseite.</li>
               <li><b>Konten nur für Lehrpersonen.</b> Gespeichert werden E-Mail, Name, Schule und Anmeldezeitpunkte. Kein Tracking, keine Werbung, keine Analyse-Cookies.</li>
+              <li><b>KI-Lerncoach ohne Speicherung.</b> Schaltet die Lehrperson den Coach auf einer Lernseite ein, können Lernende ihm Fragen stellen. Die Nachrichten gehen an den gewählten KI-Anbieter (Standard: Infomaniak, Schweiz) und werden von uns nicht gespeichert. Gezählt werden nur Anzahl und Umfang der Nachrichten je Seite und Tag. Lernende sollen keine Namen oder persönlichen Angaben eingeben; der Coach fragt nicht danach.</li>
             </ul>
           </div>
 

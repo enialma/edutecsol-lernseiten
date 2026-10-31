@@ -1,7 +1,14 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
-import { createInstitution, createUser, deleteInstitution, deleteUser, renameInstitution, setActive, setInstitution, setPassword } from "@/lib/users";
+import { createInstitution, createUser, deleteInstitution, deleteUser, renameInstitution, setActive, setCoachOption, setInstitution, setPassword } from "@/lib/users";
+
+/** Zusatzoption KI-Lerncoach freischalten oder entziehen. */
+export async function toggleCoachAction(fd: FormData) {
+  await requireAdmin();
+  await setCoachOption(Number(fd.get("id")), fd.get("coach") === "1");
+  revalidatePath("/admin/benutzer");
+}
 
 async function requireAdmin() {
   const s = await auth();
