@@ -98,7 +98,7 @@ export default async function SeitenPage({ searchParams }: { searchParams: Promi
                   </span>
                   <h3>{p.title}</h3>
                   <p>
-                    {p.created_at} · {p.provider === "claude" ? "Claude" : p.provider === "beispiel" ? "Beispielseite" : "Infomaniak"}
+                    {p.created_at} · {p.provider === "claude" ? "Claude" : p.provider === "openai" ? "ChatGPT" : p.provider === "beispiel" ? "Beispielseite" : "Infomaniak"}
                     {mode !== "mine" ? ` · ${p.owner_name || p.owner_email}` : ""}
                   </p>
                   <span className="foot">Öffnen →</span>
