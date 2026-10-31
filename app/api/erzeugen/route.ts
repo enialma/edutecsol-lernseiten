@@ -6,12 +6,14 @@ import { extractFromFile, type Extracted } from "@/lib/extract";
 import { createPage } from "@/lib/pages";
 import { LIMITS, logGeneration, quotaFor } from "@/lib/quota";
 import { extractHtml, systemPrompt, titleFromHtml, userPrompt, type GenParams } from "@/lib/prompt";
+import { injectDesignBasis } from "@/lib/design-basis";
 import { TASKS, type Einsatz } from "@/lib/bildprompt";
 import { getImageMeta, setImageShare } from "@/lib/images";
 
 export const runtime = "nodejs";
-export const maxDuration = 300;
-const TIME_BUDGET_MS = 280_000;
+// Vercel Pro mit Fluid Compute erlaubt bis 800 s; wir nutzen 600 s und brechen selbst 20 s vorher ab.
+export const maxDuration = 600;
+const TIME_BUDGET_MS = 580_000;
 export const dynamic = "force-dynamic";
 
 function pick<T extends string>(v: unknown, allowed: readonly T[], fallback: T): T {
@@ -113,7 +115,7 @@ export async function POST(req: Request) {
 
         spent = result;
         if (result.stopReason === "refusal") throw new Error("Das Modell hat die Anfrage abgelehnt.");
-        const html = extractHtml(result.text);
+        const html = injectDesignBasis(extractHtml(result.text));
         if (!/<html[\s>]/i.test(html) || !/<\/html>/i.test(html)) {
           throw new Error(result.stopReason === "max_tokens" ? "Antwort wurde abgeschnitten (zu lang). Bitte Thema enger fassen." : "Antwort enthielt keine vollständige HTML-Seite.");
         }

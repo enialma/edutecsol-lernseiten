@@ -251,7 +251,7 @@ ${dateiLine}
 Erstelle aus dem Prüfungsstoff eine interaktive Seite zur Prüfungsvorbereitung mit drei Teilen (als Reiter A, B, C): Lernziele checken, Übungsprüfung, Lücken schliessen. Erfinde keine Inhalte ausserhalb des Materials; fehlt auslesbarer Inhalt, wähle einen fachlich stimmigen, typischen Prüfungsstoff für Fach und Stufe und vermerke das in der Notiz.
 
 §LERNZIELE
-Leite aus dem Stoff 5 bis 8 operationalisierte Lernziele ab («Ich kann …»), nach Themen geordnet, jedes mit einer Gewichtung in Punkten (Summe = ${punkte}). Jede Aufgabe der Übungsprüfung ist genau einem Lernziel zugeordnet (data-ziel="z1" …).
+Leite aus dem Stoff 5 bis 6 operationalisierte Lernziele ab («Ich kann …»), nach Themen geordnet, jedes mit einer Gewichtung in Punkten (Summe = ${punkte}). Jede Aufgabe der Übungsprüfung ist genau einem Lernziel zugeordnet (data-ziel="z1" …).
 
 §TEIL A – LERNZIELE CHECKEN (Reiter A)
 - Liste aller Lernziele; zu jedem Lernziel eine Selbsteinschätzung per .choices («sicher», «unsicher», «noch nicht») und eine kurze Kontrollfrage mit Rückmeldung (richtig/falsch mit Hinweis, ohne Lösung).
@@ -259,12 +259,12 @@ Leite aus dem Stoff 5 bis 8 operationalisierte Lernziele ab («Ich kann …»), 
 
 §TEIL B – ÜBUNGSPRÜFUNG (Reiter B)
 - Kopf: Dauer ${dauer} Minuten, ${punkte} Punkte, Timer (.timer) mit Start/Stopp, nur Anzeige im Browser, keine Sperre.
-- 6 bis 10 Aufgaben in Prüfungsform, gemischt: Berechnen/Anwenden, Zuordnen/Auswählen, Begründen (kurze Textantwort mit Musterlösung zum Selbstvergleich). Punkte je Aufgabe sichtbar (.pts). Eingaben werden erst beim Klick auf «Prüfung auswerten» geprüft.
+- 6 bis 8 Aufgaben in Prüfungsform, gemischt: Berechnen/Anwenden, Zuordnen/Auswählen, Begründen (kurze Textantwort mit Musterlösung zum Selbstvergleich). Punkte je Aufgabe sichtbar (.pts). Eingaben werden erst beim Klick auf «Prüfung auswerten» geprüft. Formuliere knapp; die Seite muss kompakt bleiben.
 - Auswertung im .score-Block: erreichte Punkte, Prozent, Note nach Schweizer Skala (Note = 1 + 5 × Punkte/Maximum, auf halbe Noten gerundet; mit dem Hinweis, dass die Lehrperson anders gewichten kann), je Aufgabe richtig/falsch mit Lösungsweg (erst nach Auswertung sichtbar), und eine Tabelle Lernziel → erreichte Punkte.
 - Knopf «Nochmals versuchen» setzt alle Eingaben und den Timer zurück.
 
 §TEIL C – LÜCKEN SCHLIESSEN (Reiter C)
-- Pro Lernziel ein Abschnitt (.card): Merkblock (Regel, Formel oder drei Merksätze im .hint), ein durchgerechnetes Beispiel mit Lösungsweg, zwei Übungsaufgaben mit sofortiger Rückmeldung.
+- Pro Lernziel ein kompakter Abschnitt (.card): Merkblock (Regel, Formel oder drei Merksätze im .hint), ein durchgerechnetes Beispiel mit Lösungsweg, eine Übungsaufgabe mit sofortiger Rückmeldung.
 - Am Ende ein Lernplan für die letzten drei Tage vor der Prüfung (Tabelle: Tag, Lernziele, Dauer, Methode), abgeleitet aus der Gewichtung.
 
 §LEHRPERSON

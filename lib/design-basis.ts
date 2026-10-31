@@ -117,6 +117,18 @@ export const DESIGN_SKELETON_PRUEFUNG = `<body><div class="wrap">
 <p class="foot">Prüfungsvorbereitung erzeugt mit Lernwege (EDUTECSOL). Fach · Stufe · Datum.</p>
 </div></body>`;
 
+/** Setzt die Designbasis in eine erzeugte Seite ein: in den Platzhalter <style id="lw-basis">, sonst als erstes Element im <head>.
+ *  Spart dem Modell rund 6000 Zeichen Ausgabe und garantiert, dass das CSS exakt der Basis entspricht. */
+export function injectDesignBasis(html: string): string {
+  const block = `<style id="lw-basis">\n${DESIGN_CSS}\n</style>`;
+  const re = /<style\s+id=["']lw-basis["'][^>]*>[\s\S]*?<\/style>/i;
+  if (re.test(html)) return html.replace(re, block);
+  if (html.includes(":root{--paper:#FBF8F1")) return html; // Modell hat das CSS doch selbst ausgegeben
+  const i = html.search(/<head[^>]*>/i);
+  if (i >= 0) { const j = html.indexOf(">", i) + 1; return html.slice(0, j) + "\n" + block + html.slice(j); }
+  return block + html;
+}
+
 /** Abschnitt für den System-Prompt. */
 export function designBasisPrompt(typ: "lernseite" | "pruefung" = "lernseite"): string {
   const skeleton = typ === "pruefung" ? DESIGN_SKELETON_PRUEFUNG : DESIGN_SKELETON;
@@ -124,7 +136,7 @@ export function designBasisPrompt(typ: "lernseite" | "pruefung" = "lernseite"): 
     ? `- Timer: Start/Stopp per Knopf, Anzeige mm:ss, nach Ablauf Klasse over (nur Anzeige). Auswertung: Klassen ok/err auf allen Feldern, .loesung je Aufgabe und .score sichtbar (Klasse show), .meter-Breite = Prozent.`
     : `- Der Aha-Moment des obersten Zugangs steht in einem .aha-Block, der erst nach Klick auf einen .btn erscheint.`;
   return `DESIGNBASIS (zwingend):
-- Übernimm dieses CSS unverändert als erstes <style>-Element im <head>; ergänze danach ein zweites <style> nur für die themenspezifische Visualisierung und Kleinigkeiten. Keine anderen Farben als die Variablen (--navy, --terra, --ochre, --cream, --ok, --err); keine Schatten, keine Verläufe, keine Emojis als Icons.
+- Das folgende CSS ist die Designbasis. Gib es NICHT aus: schreibe als erstes Element im <head> nur den Platzhalter <style id="lw-basis">/* Designbasis wird beim Speichern eingesetzt */</style>; die Plattform setzt das CSS dort ein. Ergänze danach ein zweites <style> nur für die themenspezifische Visualisierung und Kleinigkeiten. Keine anderen Farben als die Variablen (--navy, --terra, --ochre, --cream, --ok, --err); keine Schatten, keine Verläufe, keine Emojis als Icons.
 <style>
 ${DESIGN_CSS}
 </style>

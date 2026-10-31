@@ -188,7 +188,7 @@ export default function Form({ providers, presets, bilder, initialBild, isAdmin 
 
       <div style={{ marginTop: "1.3rem", display: "flex", gap: ".8rem", alignItems: "center", flexWrap: "wrap" }}>
         <button className="btn terra" disabled={busy || exhausted}>{busy ? "Wird erzeugt …" : pruefung ? "Prüfungsvorbereitung erzeugen" : "Lernseite erzeugen"}</button>
-        {busy && <span className="small-note">Bitte Fenster offen lassen. Dauer ein bis drei Minuten.</span>}
+        {busy && <span className="small-note">Bitte Fenster offen lassen. Dauer: Lernseite ein bis drei Minuten, Prüfungsvorbereitung bis zu acht Minuten.</span>}
       </div>
 
       {error && <div className="msg err" style={{ marginTop: "1rem" }}>{error}</div>}
