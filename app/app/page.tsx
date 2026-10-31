@@ -75,6 +75,13 @@ export default async function AppHome({ searchParams }: { searchParams: Promise<
               </div>
             </li>
             <li>
+              <h3 className="t">Klassen und Gruppen<small>Ordnung in der Sammlung</small></h3>
+              <div>
+                <p>Eigene Gruppen anlegen, Lernseiten einer oder mehreren Gruppen zuordnen und pro Gruppe einen Klassenlink geben, der alle freigegebenen Seiten zeigt.</p>
+                <Link className="link arrow" href="/app/gruppen">Gruppen verwalten</Link>
+              </div>
+            </li>
+            <li>
               <h3 className="t">Meine Bilder<small>Bilder für Lernaufgaben</small></h3>
               <div>
                 <p>Direkt erzeugte Bilder ansehen, nachbessern, herunterladen und in eine Lernseite einbinden.</p>

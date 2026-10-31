@@ -70,7 +70,8 @@ export async function createPage(input: {
 }
 
 export type ListMode = "mine" | "school" | "pool" | "all";
-export type ListFilter = { fach?: string; stufe?: string; q?: string };
+/** gruppe: nur Seiten dieser Gruppe; ohneGruppe: Seiten, die in keiner eigenen Gruppe liegen */
+export type ListFilter = { fach?: string; stufe?: string; q?: string; gruppe?: number; ohneGruppe?: boolean };
 
 export async function listPages(userId: number, mode: ListMode, f: ListFilter = {}): Promise<PageMeta[]> {
   const where: string[] = [];
@@ -79,6 +80,8 @@ export async function listPages(userId: number, mode: ListMode, f: ListFilter = 
   if (mode === "mine") add("p.user_id = ?", userId);
   if (mode === "school") { params.push(userId); where.push(sameSchool(params.length)); }
   if (mode === "pool") where.push("p.pool = TRUE");
+  if (f.gruppe) add("EXISTS (SELECT 1 FROM lerngruppe_seiten ls WHERE ls.page_id = p.id AND ls.group_id = ?)", f.gruppe);
+  if (f.ohneGruppe) add("NOT EXISTS (SELECT 1 FROM lerngruppe_seiten ls JOIN lerngruppen g ON g.id = ls.group_id WHERE ls.page_id = p.id AND g.user_id = ?)", userId);
   if (f.fach) add("p.fach = ?", f.fach);
   if (f.stufe) add("p.stufe = ?", f.stufe);
   if (f.q) add("(p.title ILIKE ? OR p.thema ILIKE $" + (params.length + 1) + ")", `%${f.q}%`);

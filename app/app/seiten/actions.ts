@@ -4,7 +4,21 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { auth } from "@/auth";
 import { importBeispiele } from "@/lib/beispiele";
-import { deletePage, duplicatePage, setCoach, setShare, setVisibility, updateTitle } from "@/lib/pages";
+import { deletePage, duplicatePage, getPage, setCoach, setShare, setVisibility, updateTitle } from "@/lib/pages";
+import { setPageGruppen } from "@/lib/gruppen";
+
+/** Zuordnung einer Seite zu Klassen und Gruppen (Checkboxen «gruppe» auf der Detailseite). */
+export async function pageGruppenAction(fd: FormData) {
+  const { userId, isAdmin } = await who();
+  const id = Number(fd.get("id"));
+  const page = await getPage(id, userId, isAdmin);
+  if (!page || (!isAdmin && page.user_id !== userId)) throw new Error("Keine Berechtigung.");
+  const groupIds = fd.getAll("gruppe").map(Number).filter((n) => Number.isInteger(n) && n > 0);
+  await setPageGruppen(id, page.user_id, groupIds);
+  revalidatePath(`/app/seiten/${id}`);
+  revalidatePath("/app/seiten");
+  revalidatePath("/app/gruppen");
+}
 
 /** KI-Lerncoach einer Seite ein-/ausschalten, Stil und Anbieter setzen. */
 export async function coachAction(fd: FormData) {

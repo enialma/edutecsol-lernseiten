@@ -145,6 +145,23 @@ export function ready(): Promise<void> {
         output_tokens INTEGER NOT NULL DEFAULT 0,
         PRIMARY KEY (page_id, day)
       )`);
+      // Klassen und Gruppen: jede Lehrperson ordnet ihre Seiten beliebig vielen eigenen Gruppen zu;
+      // eine Gruppe kann einen Klassenlink haben (Übersicht aller freigegebenen Seiten der Gruppe, ohne Login)
+      await sql.query(`CREATE TABLE IF NOT EXISTS lerngruppen (
+        id           SERIAL PRIMARY KEY,
+        user_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        name         TEXT NOT NULL,
+        beschreibung TEXT,
+        share_token  TEXT UNIQUE,
+        created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        UNIQUE (user_id, name)
+      )`);
+      await sql.query(`CREATE TABLE IF NOT EXISTS lerngruppe_seiten (
+        page_id  INTEGER NOT NULL REFERENCES pages(id) ON DELETE CASCADE,
+        group_id INTEGER NOT NULL REFERENCES lerngruppen(id) ON DELETE CASCADE,
+        added_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        PRIMARY KEY (page_id, group_id)
+      )`);
     })().catch((e) => {
       readyPromise = null;
       throw e;

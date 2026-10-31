@@ -7,7 +7,8 @@ import { getPage } from "@/lib/pages";
 import { DIFFART_LABELS, NIVEAU_LABELS, SPRACHE_LABELS, TWIST_LABELS, type GenParams } from "@/lib/prompt";
 import Topbar from "../../../Topbar";
 import Footer from "../../../Footer";
-import { coachAction, copyAction, deletePageAction, renameAction, shareAction, visibilityAction } from "../actions";
+import { coachAction, copyAction, deletePageAction, pageGruppenAction, renameAction, shareAction, visibilityAction } from "../actions";
+import { gruppenOfPages, listGruppen } from "@/lib/gruppen";
 import { coachAllowedFor, coachTopicsForPage, coachUsageForPage, defaultStilFor, COACH_DEN, COACH_DER_GROSS, COACH_NAME, COACH_STIL_LABELS, IS_GENERIC } from "@/lib/coach";
 import { getMoodleBase } from "@/lib/moodle";
 import CopyButton from "./CopyButton";
@@ -29,6 +30,9 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
   const coachOk = coachAllowedFor(page);
   const coachUse = canEdit && coachOk ? await coachUsageForPage(page.id) : null;
   const coachTopics = canEdit && coachOk && page.coach ? await coachTopicsForPage(page.id) : [];
+  // Klassen und Gruppen der Besitzerin; Admins sehen die Gruppen der Besitzerin
+  const gruppen = canEdit ? await listGruppen(page.user_id) : [];
+  const inGruppen = new Set((canEdit ? (await gruppenOfPages([page.id])).get(page.id) ?? [] : []).map((g) => g.id));
   const p = page.params as Partial<GenParams>;
   const slug = page.title.toLowerCase().replace(/[^a-z0-9äöü]+/g, "-").replace(/^-|-$/g, "") || "lernseite";
 
@@ -122,6 +126,37 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
                   <input name="title" defaultValue={page.title} style={{ flex: "1 1 180px" }} />
                   <button className="btn small ghost">Speichern</button>
                 </form>
+              </div>
+
+              <div className="card">
+                <p className="kicker">Ordnung</p>
+                <h3 style={{ margin: "0 0 .4rem" }}>Klassen und Gruppen</h3>
+                {gruppen.length === 0 ? (
+                  <p className="small-note">
+                    Noch keine Gruppe angelegt. Mit Gruppen ordnest du die Sammlung nach Klassen oder Kursen und gibst pro Gruppe einen Klassenlink mit allen freigegebenen Seiten.
+                    {" "}<Link href="/app/gruppen">Erste Gruppe anlegen</Link>
+                  </p>
+                ) : (
+                  <form action={pageGruppenAction}>
+                    <input type="hidden" name="id" value={page.id} />
+                    <p className="small-note">
+                      Diese Seite liegt in den angekreuzten Gruppen. Auf der Klassenseite einer Gruppe erscheint sie{shareUrl ? "" : " erst mit Freigabelink"}.
+                    </p>
+                    <div className="checks">
+                      {gruppen.map((g) => (
+                        <label key={g.id} className="check">
+                          <input type="checkbox" name="gruppe" value={g.id} defaultChecked={inGruppen.has(g.id)} />
+                          <span>{g.name}</span>
+                          {g.share_token && <span className="badge ok" style={{ margin: 0 }}>Klassenlink</span>}
+                        </label>
+                      ))}
+                    </div>
+                    <div className="row">
+                      <button className="btn small">Zuordnung speichern</button>
+                      <Link className="btn small ghost" href="/app/gruppen">Gruppen verwalten</Link>
+                    </div>
+                  </form>
+                )}
               </div>
             </div>
           )}
