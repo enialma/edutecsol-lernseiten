@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lineare Ungleichungen und Ungleichungssysteme – Prüfungsvorbereitung</title>
+<meta name="description" content="Prüfungsvorbereitung Mathematik BM: lineare Ungleichungen lösen, Halbebenen zeichnen, Ungleichungssysteme grafisch lösen – mit Selbstcheck, Übungsprüfung (30 Minuten, 30 Punkte) und Übungsteil.">
+<style id="lw-basis">
+:root{--paper:#FBF8F1;--card:#FFFFFF;--ink:#1E3246;--ink-soft:#5B6572;--line:#E2DBCB;--line-strong:#CDC4AD;--navy:#1E3246;--terra:#B84816;--terra-deep:#9A3A10;--ochre:#F1A51A;--cream:#F6EFE2;--ok:#2F8F6F;--ok-soft:#DFF3EA;--err:#B8321A;--err-soft:#FBE6E1;--serif:Georgia,"Iowan Old Style","Palatino Linotype",Palatino,"Times New Roman",serif;--sans:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;--r:8px;--r-lg:12px}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;padding:clamp(1rem,4vw,2.5rem) 1rem 4rem}
+.wrap{max-width:820px;margin:0 auto}
+.eyebrow{font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;color:var(--terra);font-weight:600;margin:0 0 .5rem}
+h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.15;color:var(--ink);letter-spacing:-.01em}
+h1{font-size:clamp(1.8rem,5vw,2.5rem);margin:0 0 .5rem}
+h2{font-size:1.35rem;margin:0 0 .7rem}
+h3{font-size:1.1rem;margin:1.1rem 0 .4rem}
+.lead{font-size:1.05rem;color:var(--ink-soft);margin:0 0 1.4rem;max-width:62ch}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;margin-bottom:1.6rem}
+.top>div{flex:1 1 320px;min-width:0}
+.btn{font:inherit;font-size:.9rem;font-weight:600;background:var(--navy);color:#fff;border:1px solid var(--navy);border-radius:var(--r);padding:.6rem 1.1rem;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem}
+.btn:hover{background:#2B4259;border-color:#2B4259}
+.btn.ghost{background:#fff;color:var(--ink);border-color:var(--line-strong)}
+.btn.ghost:hover{border-color:var(--terra);color:var(--terra)}
+.btn.terra{background:var(--terra);border-color:var(--terra)}
+.btn.terra:hover{background:var(--terra-deep);border-color:var(--terra-deep)}
+.core{background:var(--card);border:1px solid var(--line-strong);border-radius:var(--r-lg);padding:1.4rem 1.5rem;margin:0 0 1.8rem}
+.core .task{font-family:var(--serif);font-size:1.08rem}
+.data{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.05rem;background:var(--cream);border:1px solid var(--line);border-radius:var(--r);padding:.7rem 1rem;margin:.6rem 0 1rem;letter-spacing:.04em;overflow-x:auto}
+.viz{margin:1rem 0 .4rem}
+.pick{font-size:.85rem;color:var(--ink-soft);margin:0 0 .6rem}
+.tabs{display:flex;gap:.6rem;flex-wrap:wrap;margin:0 0 1.4rem}
+.tab{flex:1 1 200px;text-align:left;cursor:pointer;background:var(--card);border:1px solid var(--line-strong);border-radius:var(--r-lg);padding:.85rem 1rem;font:inherit;color:var(--ink);transition:border-color .15s,background .15s}
+.tab:hover{border-color:var(--terra)}
+.tab:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--terra);outline-offset:2px}
+.tab .tname{display:block;font-family:var(--serif);font-size:1.08rem;font-weight:600}
+.tab .tsub{display:block;font-size:.8rem;color:var(--ink-soft);margin-top:.15rem}
+.tab.active{border-color:var(--terra);background:#fff;box-shadow:inset 0 0 0 1px var(--terra)}
+.tab.active .tname{color:var(--terra)}
+.panel{display:none}
+.panel.show{display:block;animation:rise .3s ease}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:1.2rem 1.4rem;margin:0 0 1rem}
+.aufgabe{border-left:3px solid var(--terra);padding:.1rem 0 .1rem 1rem;margin:0 0 1rem;font-family:var(--serif);font-size:1.04rem}
+.hint{background:var(--cream);border-left:3px solid var(--ochre);border-radius:0 var(--r) var(--r) 0;padding:.6rem .9rem;margin:.6rem 0;font-size:.92rem}
+.steps{margin:0;padding-left:1.25rem}.steps li{margin:.35rem 0}
+.field{display:grid;grid-template-columns:minmax(140px,1fr) minmax(120px,160px) auto;gap:.5rem .8rem;align-items:center;margin:.5rem 0}
+@media(max-width:560px){.field{grid-template-columns:1fr}}
+.field label{font-weight:600;font-size:.92rem}
+input[type=text],input[type=number],select,textarea{font:inherit;width:100%;padding:.5rem .7rem;border:1px solid var(--line-strong);border-radius:var(--r);background:#fff;color:var(--ink)}
+input.ok,select.ok,textarea.ok{border-color:var(--ok);background:var(--ok-soft)}
+input.err,select.err,textarea.err{border-color:var(--err)}
+.feedback{font-size:.88rem;min-height:1.2em}
+.feedback.ok{color:var(--ok);font-weight:600}
+.feedback.err{color:var(--err)}
+.choices{display:flex;flex-wrap:wrap;gap:.5rem;margin:.5rem 0}
+.choice{font:inherit;font-size:.92rem;background:#fff;border:1px solid var(--line-strong);border-radius:var(--r);padding:.5rem .9rem;cursor:pointer;color:var(--ink)}
+.choice:hover{border-color:var(--terra)}
+.choice.on{border-color:var(--navy);background:var(--cream)}
+.choice.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.choice.err{background:var(--err-soft);border-color:var(--err);color:var(--err)}
+.check{list-style:none;margin:.5rem 0 0;padding:0}
+.check li{display:flex;gap:.6rem;align-items:flex-start;padding:.4rem 0;border-top:1px solid var(--line)}
+.check li:first-child{border-top:0}
+.check input{width:auto;margin-top:.3rem;accent-color:var(--terra)}
+.reveal{margin-top:.8rem}
+.aha{background:var(--navy);color:#fff;border-radius:var(--r-lg);padding:1rem 1.2rem;margin:.8rem 0}
+.aha h3{color:var(--ochre);margin:0 0 .4rem}
+.lehrperson{margin-top:2rem;border:1px solid var(--terra);border-radius:var(--r-lg);background:#fff}
+.lehrperson>summary{cursor:pointer;padding:.9rem 1.2rem;font-weight:600;color:var(--terra);list-style:none}
+.lehrperson>summary::-webkit-details-marker{display:none}
+.lehrperson>summary::before{content:"+";display:inline-block;width:1.2rem;font-family:var(--serif)}
+.lehrperson[open]>summary::before{content:"–"}
+.lehrperson>div{padding:0 1.2rem 1.2rem;border-top:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:.92rem;background:#fff}
+th,td{text-align:left;padding:.45rem .6rem;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--cream);font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+.foot{margin-top:2.5rem;font-size:.78rem;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:.8rem}
+.sr{position:absolute;left:-9999px}
+/* Prüfungsvorbereitung */
+.exam-head{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;padding:.8rem 1rem;border:1px solid var(--line-strong);border-radius:var(--r-lg);background:#fff;margin:0 0 1rem}
+.timer{font-family:var(--serif);font-size:1.6rem;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.timer.over{color:var(--err)}
+.pts{float:right;font-size:.78rem;color:var(--ink-soft);border:1px solid var(--line);border-radius:999px;padding:.1rem .55rem;margin-left:.6rem}
+.score{display:none;background:var(--navy);color:#fff;border-radius:var(--r-lg);padding:1.1rem 1.3rem;margin:1rem 0}
+.score.show{display:block}
+.score .nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.8rem;margin:.3rem 0 .8rem}
+.score b{display:block;font-family:var(--serif);font-size:2rem;line-height:1;color:var(--ochre)}
+.score span{font-size:.82rem;color:#C3CCD6}
+.score table{background:transparent;color:#fff}.score th{background:transparent;color:#C3CCD6}.score td,.score th{border-color:#3A5068}
+.meter{height:8px;background:var(--cream);border-radius:999px;overflow:hidden;margin:.4rem 0}
+.meter i{display:block;height:100%;background:var(--terra);width:0;transition:width .4s}
+.loesung{display:none;margin-top:.6rem;padding:.6rem .9rem;background:var(--cream);border-radius:var(--r);font-size:.92rem}
+.loesung.show{display:block}
+.plan td:first-child{font-weight:600;white-space:nowrap}
+</style>
+<style>
+.m{font-family:ui-monospace,Menlo,Consolas,monospace}
+.sys{font-family:ui-monospace,Menlo,Consolas,monospace;margin:.5rem 0;padding:.4rem 0 .4rem 1rem;border-left:2px solid var(--ochre)}
+.sys div{margin:.12rem 0}
+.viz svg{max-width:100%;height:auto;display:block;margin:.4rem auto}
+.axis{stroke:#1E3246;stroke-width:1.6}
+.gline{stroke:#B84816;stroke-width:2.4;fill:none}
+.gline.dash{stroke-dasharray:6 4}
+.lbl{font-family:system-ui,Arial,sans-serif;font-size:11px;fill:#5B6572}
+.cap{font-size:.84rem;color:var(--ink-soft);text-align:center;margin:.2rem 0 0}
+.kopie{font-size:.9rem}
+.kopie li{margin:.3rem 0}
+.sub{font-size:.86rem;color:var(--ink-soft)}
+@media print{
+ @page{size:A4 portrait;margin:14mm}
+ body{padding:0;background:#fff}
+ .tabs,.pick,.btn,.exam-head>div:last-child,.score,.foot .nodrucken{display:none!important}
+ .panel{display:block!important;animation:none}
+ #p-b,#p-c,.lehrperson{break-before:page;page-break-before:always}
+ .lehrperson>div{display:block!important}
+ .card,.core,.aufgabe,.field,.viz,svg,table,.hint,.loesung{break-inside:avoid;page-break-inside:avoid}
+ h1,h2,h3{break-after:avoid;page-break-after:avoid}
+ .loesung{display:block!important;background:#fff;border:1px solid var(--line)}
+ .panel{border-top:1px solid var(--navy);padding-top:6mm}
+}
+</style>
+<!-- lernwege-print -->
+<style media="print" id="lernwege-print">
+@page { size: A4 portrait; margin: 14mm 16mm; }
+@media print {
+  html, body { background: #fff !important; color: #111 !important; font-size: 11pt !important; line-height: 1.4 !important; }
+  * { box-shadow: none !important; text-shadow: none !important; animation: none !important; transition: none !important; }
+  body { max-width: none !important; margin: 0 !important; padding: 0 !important; }
+  /* Bedienelemente weg */
+  button, [role="tablist"], [role="tab"], nav, .tabs, .tab-bar, .tabbar, .reiter, .toolbar, .no-print { display: none !important; }
+  input[type="button"], input[type="submit"] { display: none !important; }
+  a[href^="http"]::after { content: ""; }
+  /* Verborgene Inhalte sichtbar (alle Zugänge, Lösungen) */
+  [hidden], .hidden, [aria-hidden="true"]:not(svg):not(span) { display: block !important; }
+  [role="tabpanel"], .panel, .tab-panel, .zugang { display: block !important; }
+  details { display: block !important; }
+  details > summary { list-style: none; font-weight: 600; }
+  details > :not(summary) { display: block !important; }
+  /* Grosse Abschnitte je auf neuer Seite, nichts mittendrin brechen */
+  [role="tabpanel"], .panel, .tab-panel, .zugang, section.zugang, .teacher, .lehrperson, .fuer-lehrperson { break-before: page; page-break-before: always; }
+  [role="tabpanel"]:first-of-type, .panel:first-of-type, .tab-panel:first-of-type { break-before: auto; page-break-before: auto; }
+  h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+  p, li, tr, .card, .box, .aufgabe, .frage, figure, svg, table, pre { break-inside: avoid; page-break-inside: avoid; }
+  /* Eingabefelder als Linien, Häkchen und Hinweise ausblenden */
+  input[type="text"], input[type="number"], textarea, select { border: none !important; border-bottom: 1px solid #333 !important; background: #fff !important; box-shadow: none !important; }
+  input[type="checkbox"], input[type="radio"] { -webkit-appearance: checkbox; appearance: auto; }
+  .feedback, .hint, .ok, .check-ok, .correct { color: #111 !important; }
+  /* CI-Farben: Navy #1E3246, Terra #B84816, Ocker #F1A51A, Creme #F6EFE2 */
+  h1, h2, h3, h4 { color: #1E3246 !important; }
+  h1 { font-size: 20pt !important; border-bottom: 2pt solid #B84816 !important; padding-bottom: 4pt !important; }
+  h2 { font-size: 15pt !important; margin-top: 14pt !important; }
+  h3 { font-size: 12.5pt !important; }
+  header, .hero { background: transparent !important; color: #1E3246 !important; padding: 0 0 .6rem !important; margin: 0 0 1rem !important; border: 0 !important; box-shadow: none !important; }
+  .card, .box, section, article, aside, [role="tabpanel"], .panel, .tab-panel, .zugang, details {
+    background: transparent !important; color: #111 !important;
+    border: 1pt solid #1E3246 !important; border-radius: 4pt !important; padding: 8pt 10pt !important; margin: 0 0 10pt !important;
+  }
+  [role="tabpanel"] > .card, .panel > .card, section > section, section > .card { border-color: #cdc4ad !important; }
+  details.lehrperson, .lehrperson, .teacher { border-color: #B84816 !important; }
+  details > summary { color: #B84816 !important; }
+  blockquote, .hinweis, .tipp, .info { border-left: 3pt solid #F1A51A !important; border-top: 0 !important; border-right: 0 !important; border-bottom: 0 !important; padding-left: 8pt !important; background: transparent !important; }
+  table { border-collapse: collapse !important; }
+  td, th { border: 1pt solid #1E3246 !important; padding: .25rem .5rem !important; }
+  th { background: #F6EFE2 !important; color: #1E3246 !important; }
+  a { color: #B84816 !important; text-decoration: none !important; }
+  svg { max-width: 100% !important; height: auto !important; }
+  img { max-width: 100% !important; }
+}
+</style>
+</head>
+<body><div class="wrap">
+
+<header class="top">
+<div>
+<p class="eyebrow">Mathematik · Berufsmaturität · Prüfungsvorbereitung</p>
+<h1>Lineare Ungleichungen und Ungleichungssysteme</h1>
+<p class="lead">Geprüft werden das Lösen linearer Ungleichungen, das Zeichnen von Halbebenen und das grafische Lösen von Ungleichungssystemen – hier prüfst du dich selbst, schreibst eine Übungsprüfung und schliesst deine Lücken.</p>
+</div>
+<button class="btn ghost pdf" type="button">Als PDF herunterladen</button>
+</header>
+
+<section class="core">
+<h2>Lernziele und Gewichtung</h2>
+<table>
+<thead><tr><th>Nr.</th><th>Ich kann …</th><th>Punkte</th></tr></thead>
+<tbody>
+<tr><td>Z1</td><td>… lineare Ungleichungen nach den Rechenregeln umformen und lösen (Zeichenumkehr bei negativem Faktor oder Divisor).</td><td>5</td></tr>
+<tr><td>Z2</td><td>… eine lineare Ungleichung in die Form <span class="m">y ≤ …</span> bzw. <span class="m">y ≥ …</span> bringen und die Halbebene (oberhalb/unterhalb) bestimmen.</td><td>5</td></tr>
+<tr><td>Z3</td><td>… eine lineare Ungleichung grafisch darstellen: Randgerade (gestrichelt oder durchgezogen) und richtige Halbebene.</td><td>5</td></tr>
+<tr><td>Z4</td><td>… mit der Punktprobe entscheiden, ob ein Punkt zur Lösungsmenge einer Ungleichung gehört.</td><td>4</td></tr>
+<tr><td>Z5</td><td>… ein Ungleichungssystem grafisch lösen: Durchschnittsmenge der Halbebenen und Eckpunkte bestimmen.</td><td>7</td></tr>
+<tr><td>Z6</td><td>… den Lösungsbereich beschreiben und begründen (Durchschnittsmenge, leere Lösungsmenge, Rand).</td><td>4</td></tr>
+<tr><td></td><td><strong>Total</strong></td><td><strong>30</strong></td></tr>
+</tbody>
+</table>
+</section>
+
+<p class="pick">Wähle deinen Teil:</p>
+<div class="tabs" role="tablist">
+<button class="tab active" role="tab" aria-selected="true" aria-controls="p-a" id="t-a" type="button"><span class="tname">A · Lernziele checken</span><span class="tsub">Wo stehe ich?</span></button>
+<button class="tab" role="tab" aria-selected="false" aria-controls="p-b" id="t-b" type="button"><span class="tname">B · Übungsprüfung</span><span class="tsub">30 Minuten, 30 Punkte</span></button>
+<button class="tab" role="tab" aria-selected="false" aria-controls="p-c" id="t-c" type="button"><span class="tname">C · Lücken schliessen</span><span class="tsub">Merken, üben, planen</span></button>
+</div>
+
+<!-- ============ TEIL A ============ -->
+<section class="panel show" id="p-a" role="tabpanel" aria-labelledby="t-a">
+<div class="card">
+<h2>Lernziele checken</h2>
+<p class="sub">Schätze dich zu jedem Lernziel ein und beantworte die Kontrollfrage. Danach weisst du, was du in Teil C wiederholen musst.</p>
+
+<div class="card" data-ziel="z1">
+<h3>Z1 · Ich kann lineare Ungleichungen umformen und lösen.</h3>
+<div class="choices"><button class="choice" type="button" data-wert="sicher">sicher</button><button class="choice" type="button" data-wert="unsicher">unsicher</button><button class="choice" type="button" data-wert="nein">noch nicht</button></div>
+<p class="aufgabe">Kontrollfrage: Welches Zeichen steht in der Lösung von <span class="m">-2x &lt; 8</span>?&nbsp; <span class="m">x __ -4</span></p>
+<div class="field"><label for="k1">Zeichen</label>
+<select id="k1" data-ans="&gt;"><option value="">– wählen –</option><option value="&lt;">&lt;</option><option value="≤">≤</option><option value="&gt;">&gt;</option><option value="≥">≥</option></select>
+<span class="feedback" aria-live="polite"></span></div>
+</div>
+
+<div class="card" data-ziel="z2">
+<h3>Z2 · Ich kann nach y auflösen und die Halbebene bestimmen.</h3>
+<div class="choices"><button class="choice" type="button" data-wert="sicher">sicher</button><button class="choice" type="button" data-wert="unsicher">unsicher</button><button class="choice" type="button" data-wert="nein">noch nicht</button></div>
+<p class="aufgabe">Kontrollfrage: <span class="m">3x - y ≤ 6</span> nach y aufgelöst ergibt <span class="m">y __ 3x - 6</span>. Welches Zeichen?</p>
+<div class="field"><label for="k2">Zeichen</label>
+<select id="k2" data-ans="≥"><option value="">– wählen –</option><option value="&lt;">&lt;</option><option value="≤">≤</option><option value="&gt;">&gt;</option><option value="≥">≥</option></select>
+<span class="feedback" aria-live="polite"></span></div>
+</div>
+
+<div class="card" data-ziel="z3">
+<h3>Z3 · Ich kann eine Ungleichung grafisch darstellen.</h3>
+<div class="choices"><button class="choice" type="button" data-wert="sicher">sicher</button><button class="choice" type="button" data-wert="unsicher">unsicher</button><button class="choice" type="button" data-wert="nein">noch nicht</button></div>
+<p class="aufgabe">Kontrollfrage: Wie zeichnest du die Randgerade bei <span class="m">y &lt; 2x + 1</span>?</p>
+<div class="field"><label for="k3">Randgerade</label>
+<select id="k3" data-ans="gestrichelt"><option value="">– wählen –</option><option value="gestrichelt">gestrichelt</option><option value="durchgezogen">durchgezogen</option></select>
+<span class="feedback" aria-live="polite"></span></div>
+</div>
+
+<div class="card" data-ziel="z4">
+<h3>Z4 · Ich kann die Punktprobe durchführen.</h3>
+<div class="choices"><button class="choice" type="button" data-wert="sicher">sicher</button><button class="choice" type="button" data-wert="unsicher">unsicher</button><button class="choice" type="button" data-wert="nein">noch nicht</button></div>
+<p class="aufgabe">Kontrollfrage: Gehört <span class="m">P(2|1)</span> zur Lösungsmenge von <span class="m">3x + 2y ≤ 8</span>?</p>
+<div class="field"><label for="k4">Antwort</label>
+<select id="k4" data-ans="ja"><option value="">– wählen –</option><option value="ja">ja</option><option value="nein">nein</option></select>
+<span class="feedback" aria-live="polite"></span></div>
+</div>
+
+<div class="card" data-ziel="z5">
+<h3>Z5 · Ich kann Ungleichungssysteme grafisch lösen.</h3>
+<div class="choices"><button class="choice" type="button" data-wert="sicher">sicher</button><button class="choice" type="button" data-wert="unsicher">unsicher</button><button class="choice" type="button" data-wert="nein">noch nicht</button></div>
+<p class="aufgabe">Kontrollfrage: Welcher Punkt erfüllt das System <span class="m">y ≥ 0</span>, <span class="m">y ≤ x</span>, <span class="m">x ≤ 4</span>?</p>
+<div class="field"><label for="k5">Punkt</label>
+<select id="k5" data-ans="c"><option value="">– wählen –</option><option value="a">A(5|1)</option><option value="b">B(2|3)</option><option value="c">C(3|1)</option><option value="d">D(1|-1)</option></select>
+<span class="feedback" aria-live="polite"></span></div>
+</div>
+
+<div class="card" data-ziel="z6">
+<h3>Z6 · Ich kann den Lösungsbereich beschreiben und begründen.</h3>
+<div class="choices"><button class="choice" type="button" data-wert="sicher">sicher</button><button class="choice" type="button" data-wert="unsicher">unsicher</button><button class="choice" type="button" data-wert="nein">noch nicht</button></div>
+<p class="aufgabe">Kontrollfrage: Die Lösungsmenge eines Ungleichungssystems ist die … der Halbebenen.</p>
+<div class="field"><label for="k6">Begriff</label>
+<select id="k6" data-ans="durchschnitt"><option value="">– wählen –</option><option value="vereinigung">Vereinigungsmenge</option><option value="durchschnitt">Durchschnittsmenge</option><option value="differenz">Differenzmenge</option></select>
+<span class="feedback" aria-live="polite"></span></div>
+</div>
+
+<button class="btn terra" type="button" id="check-a">Auswerten</button>
+<div class="score" id="score-a"></div>
+</div>
+</section>
+
+<!-- ============ TEIL B ============ -->
+<section class="panel" id="p-b" role="tabpanel" aria-labelledby="t-b">
+<div class="exam-head">
+<div><strong>Übungsprüfung</strong> · 30 Minuten · 30 Punkte · Hilfsmittel: Taschenrechner</div>
+<div><span class="timer" id="timer">30:00</span> <button class="btn ghost" type="button" id="timer-btn">Start</button></div>
+</div>
+
+<div class="card" data-ziel="z1">
+<h3>Aufgabe 1 · Ungleichungen lösen <span class="pts">5 Punkte</span></h3>
+<p class="aufgabe">Löse nach x auf und gib Zeichen und Grenzwert an.<br>a) <span class="m">-3x + 7 ≤ 13</span>&nbsp;&nbsp; b) <span class="m">4 - 2x &gt; x + 13</span></p>
+<div class="field"><label for="b1a">a) x __</label>
+<select id="b1a" data-pts="1" data-ans="≥"><option value="">–</option><option value="&lt;">&lt;</option><option value="≤">≤</option><option value="&gt;">&gt;</option><option value="≥">≥</option></select>
+<span class="feedback" aria-live="polite"></span></div>
+<div class="field"><label for="b1b">a) Grenzwert</label>
+<input id="b1b" type="text" inputmode="text" data-pts="1" data-type="num" data-ans="-2">
+<span class="feedback" aria-live="polite"></span></div>
+<div class="field"><label for="b1c">b) x __</label>
+<select id="b1c" data-pts="1" data-ans="&lt;"><option value="">–</option><option value="&lt;">&lt;</option><option value="≤">≤</option><option value="&gt;">&gt;</option><option value="≥">≥</option></select>
+<span class="feedback" aria-live="polite"></span></div>
+<div class="field"><label for="b1d">b) Grenzwert</label>
+<input id="b1d" type="text" data-pts="1" data-type="num" data-ans="-3">
+<span class="feedback" aria-live="polite"></span></div>
+<p class="sub">c) Was geschieht beim Dividieren beider Seiten durch <span class="m">-3</span>?</p>
+<div class="choices" data-pts="1" data-ans="um"><button class="choice" type="button" data-wert="um">Das Ungleichheitszeichen kehrt um.</button><button class="choice" type="button" data-wert="bleibt">Das Zeichen bleibt gleich.</button><button class="choice" type="button" data-wert="tausch">Die Seiten werden getauscht.</button></div>
+<span class="feedback" aria-live="polite"></span>
+<div class="loesung">a) <span class="m">-3x + 7 ≤ 13 | -7 → -3x ≤ 6 | :(-3)</span> (Zeichen umkehren) <span class="m">→ x ≥ -2</span>.<br>b) <span class="m">4 - 2x &gt; x + 13 | -x -4 → -3x &gt; 9 | :(-3)</span> (Zeichen umkehren) <span class="m">→ x &lt; -3</span>.<br>c) Division durch eine negative Zahl kehrt das Ungleichheitszeichen um.</div>
+</div>
+
+<div class="card" data-ziel="z2">
+<h3>Aufgabe 2 · Nach y auflösen <span class="pts">5 Punkte</span></h3>
+<p class="aufgabe">Gegeben ist <span class="m">4x - 2y ≥ 6</span>. Bringe die Ungleichung in die Form <span class="m">y __ m·x + q</span> und beschreibe die Halbebene.</p>
+<div class="field"><label for="b2a">Zeichen bei y</label>
+<select id="b2a" data-pts="1" data-ans="≤"><option value="">–</option><option value="&lt;">&lt;</option><option value="≤">≤</option><option value="&gt;">&gt;</option><option value="≥">≥</option></select>
+<span class="feedback" aria-live="polite"></span></div>
+<div class="field"><label for="b2b">Steigung m</label>
+<input id="b2b" type="text" data-pts="1" data-type="num" data-ans="2"><span class="feedback" aria-live="polite"></span></div>
+<div class="field"><label for="b2c">Achsenabschnitt q</label>
+<input id="b2c" type="text" data-pts="1" data-type="num" data-ans="-3"><span class="feedback" aria-live="polite"></span></div>
+<p class="sub">Welche Halbebene?</p>
+<div class="choices" data-pts="1" data-ans="unten"><button class="choice" type="button" data-wert="oben">oberhalb der Geraden</button><button class="choice" type="button" data-wert="unten">unterhalb der Geraden</button></div>
+<span class="feedback" aria-live="polite"></span>
+<p class="sub">Wie wird die Randgerade gezeichnet?</p>
+<div class="choices" data-pts="1" data-ans="durch"><button class="choice" type="button" data-wert="durch">durchgezogen</button><button class="choice" type="button" data-wert="gestr">gestrichelt</button></div>
+<span class="feedback" aria-live="polite"></span>
+<div class="loesung"><span class="m">4x - 2y ≥ 6 | -4x → -2y ≥ -4x + 6 | :(-2)</span> (Zeichen umkehren) <span class="m">→ y ≤ 2x - 3</span>. Also m = 2, q = -3, untere Halbebene; wegen «≤» gehört der Rand dazu → durchgezogene Gerade.</div>
+</div>
+
+<div class="card" data-ziel="z3">
+<h3>Aufgabe 3 · Grafik lesen und zeichnen <span class="pts">5 Punkte</span></h3>
+<p class="aufgabe">a) Welche Ungleichung gehört zur Grafik (durchgezogene Randgerade, schraffierte Halbebene)?</p>
+<div class="viz">
+<svg viewBox="0 0 270 345" role="img" aria-label="Koordinatensystem mit der Geraden durch (0|4) und (4|0); die Halbebene unterhalb der Geraden ist schraffiert.">
+<defs>
+<pattern id="g1" width="40" height="40" patternUnits="userSpaceOnUse" x="50" y="290"><path d="M40 0H0V40" fill="none" stroke="#E2DBCB" stroke-width="1"/></pattern>
+<pattern id="h1" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#B84816" stroke-width="1.2"/></pattern>
+</defs>
+<rect x="10" y="50" width="240" height="280" fill="url(#g1)"/>
+<polygon points="10,90 250,330 10,330" fill="url(#h1)"/>
+<line class="axis" x1="10" y1="290" x2="250" y2="290"/>
+<line class="axis" x1="50" y1="50" x2="50" y2="330"/>
+<line class="gline" x1="10" y1="90" x2="250" y2="330"/>
+<text class="lbl" x="238" y="305">x</text><text class="lbl" x="56" y="60">y</text>
+<text class="lbl" x="38" y="134">4</text><text class="lbl" x="207" y="305">4</text>
+</svg>
+<p class="cap">Grafik zu Aufgabe 3a</p>
+</div>
+<div class="choices" data-pts="2" data-ans="a">
+<button class="choice" type="button" data-wert="a">x + y ≤ 4</button>
+<button class="choice" type="button" data-wert="b">x + y ≥ 4</button>
+<button class="choice" type="button" data-wert="c">y &gt; -x + 4</button>
+<button class="choice" type="button" data-wert="d">x - y ≤ 4</button>
+</div>
+<span class="feedback" aria-live="polite"></span>
+<p class="aufgabe">b) Du zeichnest <span class="m">y &gt; 2x - 1</span>.</p>
+<div class="field"><label for="b3b">Randgerade</label>
+<select id="b3b" data-pts="1" data-ans="gestrichelt"><option value="">–</option><option value="gestrichelt">gestrichelt</option><option value="durchgezogen">durchgezogen</option></select>
+<span class="feedback" aria-live="polite"></span></div>
+<div class="field"><label for="b3c">Halbebene</label>
+<select id="b3c" data-pts="1" data-ans="oberhalb"><option value="">–</option><option value="oberhalb">oberhalb</option><option value="unterhalb">unterhalb</option></select>
+<span class="feedback" aria-live="polite"></span></div>
+<div class="field"><label for="b3d">Gehört O(0|0) dazu?</label>
+<select id="b3d" data-pts="1" data-ans="ja"><option value="">–</option><option value="ja">ja</option><option value="nein">nein</option></select>
+<span class="feedback" aria-live="polite"></span></div>
+<div class="loesung">a) Die Randgerade hat die Gleichung <span class="m">y = -x + 4</span>, also <span class="m">x + y = 4</span>; schraffiert ist unterhalb, der Rand ist durchgezogen → <span class="m">x + y ≤ 4</span>.<br>b) Wegen «&gt;» ist die Gerade gestrichelt, es gilt die obere Halbebene. Punktprobe O(0|0): <span class="m">0 &gt; 2·0 - 1 = -1</span> → wahr, O gehört dazu.</div>
+</div>
+
+<div class="card" data-ziel="z4">
+<h3>Aufgabe 4 · Punktprobe <span class="pts">4 Punkte</span></h3>
+<p class="aufgabe">Gegeben: <span class="m">2x + 3y &lt; 12</span>. Gehört der Punkt zur Lösungsmenge?</p>
+<div class="field"><label for="b4a">P(0|0)</label><select id="b4a" data-pts="1" data-ans="ja"><option value="">–</option><option value="ja">ja</option><option value="nein">nein</option></select><span class="feedback" aria-live="polite"></span></div>
+<div class="field"><label for="b4b">Q(3|2)</label><select id="b4b" data-pts="1" data-ans="nein"><option value="">–</option><option value="ja">ja</option><option value="nein">nein</option></select><span class="feedback" aria-live="polite"></span></div>
+<div class="field"><label for="b4c">R(6|1)</label><select id="b4c" data-pts="1" data-ans="nein"><option value="">–</option><option value="ja">ja</option><option value="nein">nein</option></select><span class="feedback" aria-live="polite"></span></div>
+<div class="field"><label for="b4d">S(-1|4)</label><select id="b4d" data-pts="1" data-ans="ja"><option value="">–</option><option value="ja">ja</option><option value="nein">nein</option></select><span class="feedback" aria-live="polite"></span></div>
+<div class="loesung">P: <span class="m">0 &lt; 12</span> → ja. Q: <span class="m">6 + 6 = 12</span>, aber 12 &lt; 12 ist falsch (Rand gehört bei «&lt;» nicht dazu) → nein. R: <span class="m">12 + 3 = 15 &lt; 12</span> falsch → nein. S: <span class="m">-2 + 12 = 10 &lt; 12</span> wahr → ja.</div>
+</div>
+
+<div class="card" data-ziel="z5">
+<h3>Aufgabe 5 · Ungleichungssystem <span class="pts">4 Punkte</span></h3>
+<p class="aufgabe">Gegeben ist das System</p>
+<div class="sys"><div>I:&nbsp;&nbsp; y ≥ 0</div><div>II:&nbsp; y ≤ 2x</div><div>III: x + y ≤ 6</div></div>
+<div class="field"><label for="b5a">Gehört P(1|3) dazu?</label><select id="b5a" data-pts="1" data-ans="nein"><option value="">–</option><option value="ja">ja</option><option value="nein">nein</option></select><span class="feedback" aria-live="polite"></span></div>
+<div class="field"><label for="b5b">Gehört Q(3|2) dazu?</label><select id="b5b" data-pts="1" data-ans="ja"><option value="">–</option><option value="ja">ja</option><option value="nein">nein</option></select><span class="feedback" aria-live="polite"></span></div>
+<p class="sub">Schnittpunkt der Randgeraden von II und III:</p>
+<div class="field"><label for="b5c">x-Koordinate</label><input id="b5c" type="text" data-pts="1" data-type="num" data-ans="2"><span class="feedback" aria-live="polite"></span></div>
+<div class="field"><label for="b5d">y-Koordinate</label><input id="b5d" type="text" data-pts="1" data-type="num" data-ans="4"><span class="feedback" aria-live="polite"></span></div>
+<div class="loesung">P(1|3): II verlangt <span class="m">3 ≤ 2·1 = 2</span> → falsch, P gehört nicht dazu. Q(3|2): <span class="m">2 ≥ 0</span> ✓, <span class="m">2 ≤ 6</span> ✓, <span class="m">3 + 2 = 5 ≤ 6</span> ✓ → ja.<br>Schnittpunkt: <span class="m">2x = 6 - x → 3x = 6 → x = 2</span>, <span class="m">y = 2·2 = 4</span> → S(2|4).</div>
+</div>
+
+<div class="card" data-ziel="z5">
+<h3>Aufgabe 6 · Lösungsbereich desselben Systems <span class="pts">3 Punkte</span></h3>
+<p class="aufgabe">Der Lösungsbereich des Systems aus Aufgabe 5 hat die Eckpunkte (0|0), (6|0) und (2|4).</p>
+<p class="sub">a) Welche Form hat der Lösungsbereich?</p>
+<div class="choices" data-pts="1" data-ans="drei"><button class="choice" type="button" data-wert="drei">Dreieck</button><button class="choice" type="button" data-wert="vier">Viereck</button><button class="choice" type="button" data-wert="unb">unbeschränkter Bereich</button></div>
+<span class="feedback" aria-live="polite"></span>
+<div class="field"><label for="b6b">b) Grösster y-Wert im Bereich</label><input id="b6b" type="text" data-pts="1" data-type="num" data-ans="4"><span class="feedback" aria-live="polite"></span></div>
+<div class="field"><label for="b6c">c) Grösster x-Wert im Bereich</label><input id="b6c" type="text" data-pts="1" data-type="num" data-ans="6"><span class="feedback" aria-live="polite"></span></div>
+<div class="loesung">Drei Randgeraden begrenzen den Bereich vollständig → Dreieck mit den Ecken (0|0), (6|0), (2|4). Der grösste y-Wert ist 4 (Ecke (2|4)), der grösste x-Wert ist 6 (Ecke (6|0)). Extremwerte liegen immer in einer Ecke.</div>
+</div>
+
+<div class="card" data-ziel="z6">
+<h3>Aufgabe 7 · Begründen <span class="pts">4 Punkte</span></h3>
+<p class="aufgabe">a) Begründe in zwei Sätzen, weshalb die Lösungsmenge eines Ungleichungssystems die Durchschnittsmenge der einzelnen Halbebenen ist. <span class="pts">2 Punkte</span></p>
+<div class="field" style="grid-template-columns:1fr"><label class="sr" for="b7a">Begründung</label><textarea id="b7a" rows="3" placeholder="Deine Begründung …"></textarea></div>
+<p class="sub">Bewerte deine Antwort nach der Musterlösung (erscheint bei der Auswertung):</p>
+<div class="choices" data-pts="2" data-self="1"><button class="choice" type="button" data-wert="0">0 Punkte</button><button class="choice" type="button" data-wert="1">1 Punkt</button><button class="choice" type="button" data-wert="2">2 Punkte</button></div>
+<span class="feedback" aria-live="polite"></span>
+<p class="aufgabe">b) Die drei Halbebenen eines Systems haben keinen gemeinsamen Punkt. Welche Aussage ist richtig? <span class="pts">2 Punkte</span></p>
+<div class="choices" data-pts="2" data-ans="leer">
+<button class="choice" type="button" data-wert="leer">Die Lösungsmenge ist leer.</button>
+<button class="choice" type="button" data-wert="rand">Nur die Randgeraden sind Lösung.</button>
+<button class="choice" type="button" data-wert="alle">Alle Punkte der Ebene sind Lösung.</button>
+</div>
+<span class="feedback" aria-live="polite"></span>
+<div class="loesung">a) Musterlösung: Ein Punkt ist nur dann Lösung des Systems, wenn er jede einzelne Ungleichung erfüllt. Da jede Ungleichung genau die Punkte einer Halbebene zulässt, muss der Punkt in allen Halbebenen zugleich liegen – also im Durchschnitt der Halbebenen. (1 P: «alle Ungleichungen gleichzeitig erfüllt», 1 P: «deshalb Durchschnitt/gemeinsamer Bereich».)<br>b) Ohne gemeinsamen Bereich gibt es keinen Punkt, der alle Ungleichungen erfüllt: die Lösungsmenge ist leer.</div>
+</div>
+
+<button class="btn terra" type="button" id="check-b">Prüfung auswerten</button>
+<button class="btn ghost" type="button" id="reset-b">Nochmals versuchen</button>
+<div class="score" id="score-b"></div>
+</section>
+
+<!-- ============ TEIL C ============ -->
+<section class="panel" id="p-c" role="tabpanel" aria-labelledby="t-c">
+
+<div class="card" id="c-z1" data-ziel="z1">
+<h2>Z1 · Ungleichungen umformen und lösen</h2>
+<div class="hint">
+<strong>Drei Merksätze</strong><br>
+1. Addieren und Subtrahieren auf beiden Seiten: das Zeichen bleibt.<br>
+2. Multiplizieren oder Dividieren mit einer <em>positiven</em> Zahl: das Zeichen bleibt.<br>
+3. Multiplizieren oder Dividieren mit einer <em>negativen</em> Zahl: das Zeichen kehrt um (<span class="m">&lt; → &gt;</span>, <span class="m">≤ → ≥</span>).
+</div>
+<h3>Beispiel</h3>
+<p class="m">5 - 3x ≥ 14 &nbsp;| -5<br>-3x ≥ 9 &nbsp;| :(-3) → Zeichen umkehren<br>x ≤ -3</p>
+<p class="sub">Lösungsmenge: alle Zahlen kleiner oder gleich -3.</p>
+<h3>Üben</h3>
+<p class="aufgabe">Löse <span class="m">-4x + 3 &lt; 19</span>.</p>
+<div class="field"><label for="c1a">x __</label><select id="c1a" data-ans="&gt;"><option value="">–</option><option value="&lt;">&lt;</option><option value="≤">≤</option><option value="&gt;">&gt;</option><option value="≥">≥</option></select><span class="feedback" aria-live="polite"></span></div>
+<div class="field"><label for="c1b">Grenzwert</label><input id="c1b" type="text" data-type="num" data-ans="-4"><span class="feedback" aria-live="polite"></span></div>
+</div>
+
+<div class="card" id="c-z2" data-ziel="z2">
+<h2>Z2 · Nach y auflösen, Halbebene bestimmen</h2>
+<div class="hint">
+y alleine auf die linke Seite bringen. Danach gilt:<br>
+<span class="m">y ≤ …</span> oder <span class="m">y &lt; …</span> → Halbebene <strong>unterhalb</strong> der Geraden.<br>
+<span class="m">y ≥ …</span> oder <span class="m">y &gt; …</span> → Halbebene <strong>oberhalb</strong> der Geraden.<br>
+Achtung: Beim Teilen durch einen negativen y-Koeffizienten kehrt das Zeichen um.
+</div>
+<h3>Beispiel</h3>
+<p class="m">2x - y &lt; 4 &nbsp;| -2x<br>-y &lt; -2x + 4 &nbsp;| :(-1) → Zeichen umkehren<br>y &gt; 2x - 4</p>
+<p class="sub">Obere Halbebene, Randgerade gestrichelt (weil «&gt;»).</p>
+<h3>Üben</h3>
+<p class="aufgabe">Forme <span class="m">3x + 2y ≥ 12</span> in die Form <span class="m">y __ m·x + q</span> um.</p>
+<div class="field"><label for="c2a">Zeichen</label><select id="c2a" data-ans="≥"><option value="">–</option><option value="&lt;">&lt;</option><option value="≤">≤</option><option value="&gt;">&gt;</option><option value="≥">≥</option></select><span class="feedback" aria-live="polite"></span></div>
+<div class="field"><label for="c2b">m (auch -3/2 möglich)</label><input id="c2b" type="text" data-type="num" data-ans="-1.5"><span class="feedback" aria-live="polite"></span></div>
+<div class="field"><label for="c2c">q</label><input id="c2c" type="text" data-type="num" data-ans="6"><span class="feedback" aria-live="polite"></span></div>
+<div class="field"><label for="c2d">Halbebene</label><select id="c2d" data-ans="oberhalb"><option value="">–</option><option value="oberhalb">oberhalb</option><option value="unterhalb">unterhalb</option></select><span class="feedback" aria-live="polite"></span></div>
+</div>
+
+<div class="card" id="c-z3" data-ziel="z3">
+<h2>Z3 · Ungleichung grafisch darstellen</h2>
+<div class="hint">
+1. Ungleichung nach y auflösen und die Randgerade <span class="m">y = m·x + q</span> zeichnen.<br>
+2. Bei <span class="m">&lt;</span> oder <span class="m">&gt;</span> gestrichelt (Rand gehört nicht dazu), bei <span class="m">≤</span> oder <span class="m">≥</span> durchgezogen.<br>
+3. Halbebene einfärben: <span class="m">y ≥ …</span> oberhalb, <span class="m">y ≤ …</span> unterhalb – zur Kontrolle einen Testpunkt (meist O(0|0)) einsetzen.
+</div>
+<h3>Beispiel: <span class="m">2x - y ≤ 2</span></h3>
+<p class="m">-y ≤ -2x + 2 | :(-1) → y ≥ 2x - 2</p>
+<p class="sub">Randgerade <span class="m">y = 2x - 2</span> durchgezogen, obere Halbebene schraffiert. Testpunkt O(0|0): <span class="m">0 ≥ -2</span> ✓ – O liegt im schraffierten Bereich.</p>
+<div class="viz">
+<svg viewBox="0 0 290 350" role="img" aria-label="Gerade y gleich 2x minus 2, die Halbebene oberhalb ist schraffiert.">
+<defs>
+<pattern id="g2" width="36" height="36" patternUnits="userSpaceOnUse" x="90" y="230"><path d="M36 0H0V36" fill="none" stroke="#E2DBCB" stroke-width="1"/></pattern>
+<pattern id="h2" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#B84816" stroke-width="1.2"/></pattern>
+</defs>
+<rect x="18" y="50" width="252" height="288" fill="url(#g2)"/>
+<polygon points="72,338 216,50 18,50 18,338" fill="url(#h2)"/>
+<line class="axis" x1="18" y1="230" x2="270" y2="230"/>
+<line class="axis" x1="90" y1="50" x2="90" y2="338"/>
+<line class="gline" x1="72" y1="338" x2="216" y2="50"/>
+<text class="lbl" x="258" y="245">x</text><text class="lbl" x="96" y="60">y</text>
+<text class="lbl" x="78" y="316">-2</text><text class="lbl" x="124" y="245">1</text>
+</svg>
+<p class="cap">Lösungsmenge von <span class="m">2x - y ≤ 2</span></p>
+</div>
+<h3>Üben</h3>
+<p class="aufgabe">Du zeichnest <span class="m">y &gt; -2x + 3</span>.</p>
+<div class="field"><label for="c3a">Randgerade</label><select id="c3a" data-ans="gestrichelt"><option value="">–</option><option value="gestrichelt">gestrichelt</option><option value="durchgezogen">durchgezogen</option></select><span class="feedback" aria-live="polite"></span></div>
+<div class="field"><label for="c3b">Gehört O(0|0) dazu?</label><select id="c3b" data-ans="nein"><option value="">–</option><option value="ja">ja</option><option value="nein">nein</option></select><span class="feedback" aria-live="polite"></span></div>
+</div>
+
+<div class="card" id="c-z4" data-ziel="z4">
+<h2>Z4 · Punktprobe</h2>
+<div class="hint">
+1. Koordinaten des Punktes in die Ungleichung einsetzen.<br>
+2. Entsteht eine wahre Aussage, gehört der Punkt zur Lösungsmenge.<br>
+3. Bei <span class="m">&lt;</span> und <span class="m">&gt;</span> gehören Punkte <em>auf</em> der Randgeraden nicht dazu, bei <span class="m">≤</span> und <span class="m">≥</span> schon.
+</div>
+<h3>Beispiel: <span class="m">3x - 2y ≥ 6</span></h3>
+<p>P(4|1): <span class="m">3·4 - 2·1 = 10 ≥ 6</span> → wahr, P gehört dazu.<br>Q(1|0): <span class="m">3·1 - 0 = 3 ≥ 6</span> → falsch, Q gehört nicht dazu.</p>
+<h3>Üben</h3>
+<p class="aufgabe">Gegeben: <span class="m">x + 4y &lt; 8</span>.</p>
+<div class="field"><label for="c4a">A(2|1)</label><select id="c4a" data-ans="ja"><option value="">–</option><option value="ja">ja</option><option value="nein">nein</option></select><span class="feedback" aria-live="polite"></span></div>
+<div class="field"><label for="c4b">B(0|2)</label><select id="c4b" data-ans="nein"><option value="">–</option><option value="ja">ja</option><option value="nein">nein</option></select><span class="feedback" aria-live="polite"></span></div>
+</div>
+
+<div class="card" id="c-z5" data-ziel="z5">
+<h2>Z5 · Ungleichungssysteme grafisch lösen</h2>
+<div class="hint">
+1. Jede Ungleichung einzeln nach y auflösen und ihre Halbebene zeichnen.<br>
+2. Die Lösungsmenge ist der Bereich, der in <em>allen</em> Halbebenen liegt (Durchschnittsmenge, am dunkelsten).<br>
+3. Eckpunkte erhältst du, indem du je zwei Randgeraden gleichsetzt.
+</div>
+<h3>Beispiel</h3>
+<div class="sys"><div>I:&nbsp;&nbsp; x ≥ 0</div><div>II:&nbsp; y ≥ 0</div><div>III: x + 2y ≤ 8&nbsp; → y ≤ -0.5x + 4</div></div>
+<p class="sub">I gibt die rechte Halbebene, II die obere, III die Halbebene unterhalb von <span class="m">y = -0.5x + 4</span>. Der Durchschnitt ist ein Dreieck mit den Ecken (0|0), (8|0) und (0|4).</p>
+<div class="viz">
+<svg viewBox="0 0 310 290" role="img" aria-label="Lösungsbereich des Systems x grösser gleich null, y grösser gleich null, x plus 2y kleiner gleich 8: Dreieck mit den Ecken (0|0), (8|0) und (0|4).">
+<defs>
+<pattern id="g3" width="28" height="28" patternUnits="userSpaceOnUse" x="40" y="250"><path d="M28 0H0V28" fill="none" stroke="#E2DBCB" stroke-width="1"/></pattern>
+<pattern id="h3" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#B84816" stroke-width="1.2"/></pattern>
+</defs>
+<rect x="12" y="82" width="280" height="196" fill="url(#g3)"/>
+<polygon points="40,250 264,250 40,138" fill="url(#h3)"/>
+<line class="axis" x1="12" y1="250" x2="292" y2="250"/>
+<line class="axis" x1="40" y1="82" x2="40" y2="278"/>
+<line class="gline" x1="12" y1="124" x2="292" y2="264"/>
+<text class="lbl" x="280" y="265">x</text><text class="lbl" x="46" y="92">y</text>
+<text class="lbl" x="26" y="142">4</text><text class="lbl" x="260" y="265">8</text>
+</svg>
+<p class="cap">Durchschnittsmenge der drei Halbebenen</p>
+</div>
+<h3>Üben</h3>
+<p class="aufgabe">System: <span class="m">y ≥ 0</span>, <span class="m">y ≤ x</span>, <span class="m">x ≤ 4</span>.</p>
+<div class="field"><label for="c5a">Gehört P(3|1) dazu?</label><select id="c5a" data-ans="ja"><option value="">–</option><option value="ja">ja</option><option value="nein">nein</option></select><span class="feedback" aria-live="polite"></span></div>
+<div class="field"><label for="c5b">Ecke rechts oben: x</label><input id="c5b" type="text" data-type="num" data-ans="4"><span class="feedback" aria-live="polite"></span></div>
+<div class="field"><label for="c5c">Ecke rechts oben: y</label><input id="c5c" type="text" data-type="num" data-ans="4"><span class="feedback" aria-live="polite"></span></div>
+</div>
+
+<div class="card" id="c-z6" data-ziel="z6">
+<h2>Z6 · Lösungsbereich beschreiben und begründen</h2>
+<div class="hint">
+1. «Lösungsmenge» heisst: alle Punkte, die <em>alle</em> Ungleichungen gleichzeitig erfüllen.<br>
+2. Gibt es keinen gemeinsamen Punkt, ist die Lösungsmenge leer.<br>
+3. Bei <span class="m">≤</span> und <span class="m">≥</span> gehören die Randgeraden zur Lösungsmenge, bei <span class="m">&lt;</span> und <span class="m">&gt;</span> nicht.
+</div>
+<h3>Beispiel einer Begründung</h3>
+<p>«Ein Punkt löst das System nur, wenn er jede einzelne Ungleichung erfüllt. Jede Ungleichung lässt genau die Punkte einer Halbebene zu, also muss der Punkt in allen Halbebenen zugleich liegen – die Lösungsmenge ist deshalb die Durchschnittsmenge der Halbebenen.»</p>
+<h3>Üben</h3>
+<p class="aufgabe">Welche Lösungsmenge hat das System <span class="m">y ≥ 3</span> und <span class="m">y ≤ 1</span>?</p>
+<div class="field"><label for="c6a">Lösungsmenge</label><select id="c6a" data-ans="leer"><option value="">–</option><option value="streifen">ein Streifen zwischen den Geraden</option><option value="leer">leer, kein gemeinsamer Punkt</option><option value="ganz">die ganze Ebene</option></select><span class="feedback" aria-live="polite"></span></div>
+</div>
+
+<div class="card">
+<h2>Lernplan: die letzten drei Tage</h2>
+<table class="plan">
+<thead><tr><th>Tag</th><th>Lernziele</th><th>Dauer</th><th>Methode</th></tr></thead>
+<tbody>
+<tr><td>Tag 3</td><td>Z1, Z2 (10 Punkte)</td><td>45 min</td><td>Rechenregeln laut aufsagen; je fünf Ungleichungen umformen und nach y auflösen; Übungen in Teil C.</td></tr>
+<tr><td>Tag 2</td><td>Z3, Z4 (9 Punkte)</td><td>45 min</td><td>Drei Ungleichungen von Hand zeichnen (Randgerade, Strichart, Halbebene), jede mit Testpunkt prüfen und mit GeoGebra kontrollieren.</td></tr>
+<tr><td>Tag 1</td><td>Z5, Z6 (11 Punkte)</td><td>60 min</td><td>Zwei Systeme zeichnen und die Eckpunkte berechnen; danach Teil B in 30 Minuten schreiben und Fehler notieren.</td></tr>
+<tr><td>Prüfungstag</td><td>alle</td><td>15 min</td><td>Nur die Merkblöcke von Teil C durchlesen; besonders die Zeichenumkehr und «≤ = unterhalb».</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<details class="lehrperson">
+<summary>Für die Lehrperson: Lösungen, Punkteschlüssel, typische Fehler</summary>
+<div>
+<h3>Punkteschlüssel (Total 30)</h3>
+<table>
+<thead><tr><th>Aufgabe</th><th>Lernziel</th><th>Lösung</th><th>Punkte</th></tr></thead>
+<tbody>
+<tr><td>1a</td><td>Z1</td><td><span class="m">-3x ≤ 6 → x ≥ -2</span></td><td>1 (Zeichen) + 1 (Wert)</td></tr>
+<tr><td>1b</td><td>Z1</td><td><span class="m">-3x &gt; 9 → x &lt; -3</span></td><td>1 (Zeichen) + 1 (Wert)</td></tr>
+<tr><td>1c</td><td>Z1</td><td>Zeichen kehrt um</td><td>1</td></tr>
+<tr><td>2</td><td>Z2</td><td><span class="m">y ≤ 2x - 3</span>; m = 2, q = -3; unterhalb; durchgezogen</td><td>5 × 1</td></tr>
+<tr><td>3a</td><td>Z3</td><td><span class="m">x + y ≤ 4</span></td><td>2</td></tr>
+<tr><td>3b</td><td>Z3</td><td>gestrichelt; oberhalb; O(0|0) gehört dazu</td><td>3 × 1</td></tr>
+<tr><td>4</td><td>Z4</td><td>P ja, Q nein (12 &lt; 12 falsch), R nein (15), S ja (10)</td><td>4 × 1</td></tr>
+<tr><td>5</td><td>Z5</td><td>P nein, Q ja; Schnittpunkt S(2|4)</td><td>4 × 1</td></tr>
+<tr><td>6</td><td>Z5</td><td>Dreieck; y<sub>max</sub> = 4; x<sub>max</sub> = 6</td><td>3 × 1</td></tr>
+<tr><td>7a</td><td>Z6</td><td>alle Ungleichungen gleichzeitig erfüllt (1 P) → Durchschnitt der Halbebenen (1 P)</td><td>2</td></tr>
+<tr><td>7b</td><td>Z6</td><td>Lösungsmenge ist leer</td><td>2</td></tr>
+</tbody>
+</table>
+<p class="sub">Verteilung: Z1 5, Z2 5, Z3 5, Z4 4, Z5 7, Z6 4. Note = 1 + 5 · Punkte/30, auf halbe Noten gerundet (andere Gewichtung jederzeit möglich).</p>
+
+<h3>Typische Fehler</h3>
+<table>
+<thead><tr><th>Lernziel</th><th>Typischer Fehler</th></tr></thead>
+<tbody>
+<tr><td>Z1</td><td>Zeichenumkehr bei Multiplikation/Division mit negativer Zahl vergessen; Vorzeichenfehler beim Sortieren der x-Terme.</td></tr>
+<tr><td>Z2</td><td>Beim Teilen durch -2 nur das Vorzeichen, nicht aber das Ungleichheitszeichen ändern; «y links» wird nicht hergestellt und die Halbebene wird geraten.</td></tr>
+<tr><td>Z3</td><td>Strichart verwechselt (gestrichelt bei &lt;/&gt;); Halbebene ohne Testpunkt gewählt; Randgerade falsch abgelesen.</td></tr>
+<tr><td>Z4</td><td>Randpunkte bei strenger Ungleichung fälschlich zur Lösungsmenge gezählt (Aufgabe 4, Q).</td></tr>
+<tr><td>Z5</td><td>Vereinigung statt Durchschnitt eingefärbt; Eckpunkte abgelesen statt durch Gleichsetzen berechnet.</td></tr>
+<tr><td>Z6</td><td>«Keine Lösung» wird als «alle Punkte» oder «nur Randgeraden» beschrieben; fehlende Begründung über die gleichzeitige Erfüllung.</td></tr>
+</tbody>
+</table>
+
+<h3>Übungsprüfung als Aufgabenliste (zum Kopieren)</h3>
+<ol class="kopie">
+<li>Löse nach x auf: a) -3x + 7 ≤ 13&nbsp;&nbsp; b) 4 - 2x &gt; x + 13&nbsp;&nbsp; c) Was geschieht beim Dividieren durch -3? (5 P)</li>
+<li>Bringe 4x - 2y ≥ 6 in die Form y … m·x + q. Gib m, q, die Halbebene und die Strichart der Randgeraden an. (5 P)</li>
+<li>a) Welche Ungleichung gehört zur Grafik (Randgerade durch (0|4) und (4|0), durchgezogen, unterhalb schraffiert)? b) Beschreibe für y &gt; 2x - 1 die Strichart, die Halbebene und prüfe O(0|0). (5 P)</li>
+<li>Prüfe für 2x + 3y &lt; 12, ob P(0|0), Q(3|2), R(6|1), S(-1|4) zur Lösungsmenge gehören. (4 P)</li>
+<li>System I: y ≥ 0, II: y ≤ 2x, III: x + y ≤ 6. Gehören P(1|3) und Q(3|2) dazu? Berechne den Schnittpunkt der Randgeraden von II und III. (4 P)</li>
+<li>Der Lösungsbereich dieses Systems hat die Ecken (0|0), (6|0), (2|4). Welche Form hat er? Grösster y-Wert? Grösster x-Wert? (3 P)</li>
+<li>a) Begründe in zwei Sätzen, weshalb die Lösungsmenge die Durchschnittsmenge der Halbebenen ist. b) Drei Halbebenen haben keinen gemeinsamen Punkt – was folgt daraus? (4 P)</li>
+</ol>
+</div>
+</details>
+
+<p class="foot">Prüfungsvorbereitung erzeugt mit Lernwege (EDUTECSOL). Mathematik · Berufsmaturität · Lineare Ungleichungen und Ungleichungssysteme.</p>
+</div>
+
+<script>
+(function(){
+"use strict";
+var $=function(s,c){return (c||document).querySelector(s);};
+var $$=function(s,c){return Array.prototype.slice.call((c||document).querySelectorAll(s));};
+
+/* ---- Reiter ---- */
+var tabs=$$('.tab');
+function sel(i,focus){
+  tabs.forEach(function(t,j){
+    var on=(i===j);
+    t.classList.toggle('active',on);
+    t.setAttribute('aria-selected',on?'true':'false');
+    var p=document.getElementById(t.getAttribute('aria-controls'));
+    if(p)p.classList.toggle('show',on);
+  });
+  if(focus)tabs[i].focus();
+}
+tabs.forEach(function(t,i){
+  t.addEventListener('click',function(){sel(i,false);});
+  t.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'){e.preventDefault();sel((i+1)%tabs.length,true);}
+    if(e.key==='ArrowLeft'){e.preventDefault();sel((i+tabs.length-1)%tabs.length,true);}
+  });
+});
+
+/* ---- Auswahlknöpfe ---- */
+document.addEventListener('click',function(e){
+  var b=e.target.closest? e.target.closest('.choice'):null;
+  if(!b)return;
+  var g=b.parentElement;
+  $$('.choice',g).forEach(function(x){x.classList.remove('on','ok','err');});
+  b.classList.add('on');
+});
+
+/* ---- Hilfsfunktionen ---- */
+function num(s){
+  s=String(s).trim().replace(/,/g,'.').replace(/\s/g,'').replace(/\u2212/g,'-');
+  if(/^-?\d+(\.\d+)?\/-?\d+(\.\d+)?$/.test(s)){var p=s.split('/');return Number(p[0])/Number(p[1]);}
+  if(s==='')return null;
+  var v=Number(s);return isNaN(v)?null:v;
+}
+function fbOf(el){
+  var n=el.nextElementSibling;
+  while(n&&!(n.classList&&n.classList.contains('feedback')))n=n.nextElementSibling;
+  return n;
+}
+function checkEl(el){
+  var max=Number(el.getAttribute('data-pts')||0);
+  if(el.classList.contains('choices')){
+    var s=$('.choice.on',el);
+    if(el.hasAttribute('data-self')){
+      var p=s?Number(s.getAttribute('data-wert')):0;
+      return {pts:Math.min(p,max),self:true,correct:null};
+    }
+    var ok=!!s&&s.getAttribute('data-wert')===el.getAttribute('data-ans');
+    return {pts:ok?max:0,correct:ok};
+  }
+  var ans=el.getAttribute('data-ans'),c;
+  if(el.getAttribute('data-type')==='num'){
+    var v=num(el.value);
+    c=(v!==null)&&Math.abs(v-num(ans))<1e-9;
+  }else{
+    c=el.value.trim()===ans;
+  }
+  return {pts:c?max:0,correct:c};
+}
+function mark(el,r,okText,errText){
+  var fb=fbOf(el);
+  if(el.classList.contains('choices')){
+    $$('.choice.on',el).forEach(function(b){b.classList.add(r.correct?'ok':'err');});
+  }else{
+    el.classList.remove('ok','err');
+    el.classList.add(r.correct?'ok':'err');
+  }
+  if(fb){fb.className='feedback '+(r.correct?'ok':'err');fb.textContent=r.correct?okText:errText;}
+}
+
+/* ---- Teil A ---- */
+var ZNAME={z1:'Z1 Ungleichungen umformen und lösen',z2:'Z2 Nach y auflösen und Halbebene',z3:'Z3 Grafisch darstellen',z4:'Z4 Punktprobe',z5:'Z5 Ungleichungssysteme',z6:'Z6 Beschreiben und begründen'};
+var ZMAX={z1:5,z2:5,z3:5,z4:4,z5:7,z6:4};
+
+$('#check-a').addEventListener('click',function(){
+  var sicher=0,offen=[];
+  $$('#p-a .card[data-ziel]').forEach(function(c){
+    var z=c.getAttribute('data-ziel');
+    var selEl=$('select[data-ans]',c);
+    var ok=selEl.value===selEl.getAttribute('data-ans');
+    selEl.classList.remove('ok','err');
+    selEl.classList.add(ok?'ok':'err');
+    var fb=fbOf(selEl);
+    if(fb){fb.className='feedback '+(ok?'ok':'err');fb.textContent=ok?'Richtig':'Noch nicht – schau dir Z'+z.slice(1)+' in Teil C an.';}
+    var ch=$('.choice.on',c);
+    var selbst=ch?ch.getAttribute('data-wert'):'';
+    if(ok&&selbst==='sicher'){sicher++;}else{offen.push(z);}
+  });
+  var box=$('#score-a');
+  var html='<div class="nums"><div><b>'+sicher+'/6</b><span>Lernziele sicher</span></div><div><b>'+offen.length+'</b><span>zu wiederholen</span></div></div>';
+  if(offen.length){
+    html+='<p>Wiederhole in Teil C:</p><p>';
+    offen.forEach(function(z){html+='<button class="btn ghost" type="button" data-go="c-'+z+'">'+ZNAME[z]+'</button> ';});
+    html+='</p>';
+  }else{
+    html+='<p>Alle Lernziele sitzen. Schreibe jetzt die Übungsprüfung in Teil B.</p>';
+  }
+  box.innerHTML=html;
+  box.classList.add('show');
+});
+
+document.addEventListener('click',function(e){
+  var b=e.target.closest? e.target.closest('[data-go]'):null;
+  if(!b)return;
+  sel(2,false);
+  var t=document.getElementById(b.getAttribute('data-go'));
+  if(t)t.scrollIntoView({behavior:'smooth',block:'start'});
+});
+
+/* ---- Timer ---- */
+var total=30*60,left=total,running=false,iv=null;
+var tEl=$('#timer'),tBtn=$('#timer-btn');
+function show(){
+  var over=left<0,s=Math.abs(left);
+  var m=Math.floor(s/60),r=s%60;
+  tEl.textContent=(over?'+':'')+(m<10?'0':'')+m+':'+(r<10?'0':'')+r;
+  tEl.classList.toggle('over',over);
+}
+function tick(){left--;show();}
+tBtn.addEventListener('click',function(){
+  if(running){clearInterval(iv);running=false;tBtn.textContent='Weiter';}
+  else{iv=setInterval(tick,1000);running=true;tBtn.textContent='Stopp';}
+});
+show();
+
+/* ---- Teil B auswerten ---- */
+$('#check-b').addEventListener('click',function(){
+  var tot=0,perZ={};
+  Object.keys(ZMAX).forEach(function(z){perZ[z]=0;});
+  $$('#p-b [data-pts]').forEach(function(el){
+    var r=checkEl(el);
+    tot+=r.pts;
+    var card=el.closest('[data-ziel]');
+    if(card)perZ[card.getAttribute('data-ziel')]+=r.pts;
+    if(r.self){
+      var fb=fbOf(el);
+      if(fb){fb.className='feedback';fb.textContent='Selbstbewertung: '+r.pts+' von 2 Punkten';}
+    }else{
+      mark(el,r,'Richtig','Falsch – siehe Lösungsweg');
+    }
+  });
+  $$('#p-b .loesung').forEach(function(l){l.classList.add('show');});
+  var pct=Math.round(tot/30*1000)/10;
+  var note=Math.round((1+5*tot/30)*2)/2;
+  var html='<div class="nums"><div><b>'+tot+'</b><span>von 30 Punkten</span></div><div><b>'+pct+' %</b><span>erreicht</span></div><div><b>'+note.toFixed(1)+'</b><span>Note (1 + 5 × Anteil)</span></div></div>';
+  html+='<div class="meter"><i style="width:'+Math.min(pct,100)+'%"></i></div>';
+  html+='<table class="plan"><thead><tr><th>Lernziel</th><th>Punkte</th></tr></thead><tbody>';
+  Object.keys(ZMAX).forEach(function(z){
+    html+='<tr><td>'+ZNAME[z]+'</td><td>'+perZ[z]+' / '+ZMAX[z]+'</td></tr>';
+  });
+  html+='</tbody></table><p>Lernziele unter der Hälfte: in Teil C wiederholen. <span>Die Lehrperson kann anders gewichten.</span></p>';
+  var sb=$('#score-b');
+  sb.innerHTML=html;
+  sb.classList.add('show');
+  sb.scrollIntoView({behavior:'smooth',block:'nearest'});
+});
+
+$('#reset-b').addEventListener('click',function(){
+  $$('#p-b input, #p-b select, #p-b textarea').forEach(function(el){
+    el.value='';el.classList.remove('ok','err');
+  });
+  $$('#p-b .choice').forEach(function(b){b.classList.remove('on','ok','err');});
+  $$('#p-b .feedback').forEach(function(f){f.className='feedback';f.textContent='';});
+  $$('#p-b .loesung').forEach(function(l){l.classList.remove('show');});
+  var sb=$('#score-b');sb.classList.remove('show');sb.innerHTML='';
+  clearInterval(iv);running=false;left=total;tBtn.textContent='Start';show();
+});
+
+/* ---- Teil C: sofortige Rückmeldung ---- */
+$$('#p-c [data-ans]').forEach(function(el){
+  el.addEventListener('change',function(){
+    if(el.value.trim()===''){el.classList.remove('ok','err');var f=fbOf(el);if(f){f.className='feedback';f.textContent='';}return;}
+    var r=checkEl(el);
+    mark(el,r,'Richtig','Noch nicht – lies den Merkblock oben.');
+  });
+});
+
+/* ---- PDF ---- */
+$('.pdf').addEventListener('click',function(){
+  var state=tabs.map(function(t){return t.classList.contains('active');});
+  var dts=$$('details');
+  var dstate=dts.map(function(d){return d.open;});
+  $$('.panel').forEach(function(p){p.classList.add('show');});
+  dts.forEach(function(d){d.open=true;});
+  var restore=function(){
+    $$('.panel').forEach(function(p,i){p.classList.toggle('show',state[i]);});
+    dts.forEach(function(d,i){d.open=dstate[i];});
+  };
+  var done=false;
+  window.addEventListener('afterprint',function h(){if(done)return;done=true;restore();window.removeEventListener('afterprint',h);});
+  try{
+    window.print();
+    setTimeout(function(){if(!done){done=true;restore();}},1500);
+  }catch(err){
+    var w=window.open('','_blank');
+    if(w){w.document.write('<!DOCTYPE html>'+document.documentElement.outerHTML);w.document.close();}
+    restore();
+  }
+});
+})();
+</script>
+
+</body>
+<!-- NOTIZ: Prüfungsstoff aus dem Material «Lineare Ungleichungen und Ungleichungssysteme» (Halbebenen, Rechenregeln für Ungleichungen, grafisches Lösen von Systemen); im Material fehlten die konkreten Formeln in den Beispielen, daher wurden fachlich typische BM-Beispiele (y = -x + 4, y = 2x - 2, x + 2y ≤ 8) ergänzt. Differenzierungsart: Selbstdiagnose – Prüfungssimulation – gezielte Förderung (Reiter A/B/C). Twist: Selbstbewertung der Begründungsaufgabe fliesst in die Punktzahl ein, Lernplan direkt aus der Gewichtung abgeleitet. 6 Lernziele, 7 Prüfungsaufgaben, 30 Punkte. -->
+</html>

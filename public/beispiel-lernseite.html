@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Break-even-Analyse mit linearen Funktionen (Berufsmaturität)</title>
+<meta name="description" content="Kernaufgabe: Break-even-Menge und Gewinn in einem Verkaufsmodell bestimmen, begründen und als Ergebnissatz formulieren. Differenzierung A–C.">
+<style id="lw-basis">
+:root{--paper:#FBF8F1;--card:#FFFFFF;--ink:#1E3246;--ink-soft:#5B6572;--line:#E2DBCB;--line-strong:#CDC4AD;--navy:#1E3246;--terra:#B84816;--terra-deep:#9A3A10;--ochre:#F1A51A;--cream:#F6EFE2;--ok:#2F8F6F;--ok-soft:#DFF3EA;--err:#B8321A;--err-soft:#FBE6E1;--serif:Georgia,"Iowan Old Style","Palatino Linotype",Palatino,"Times New Roman",serif;--sans:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;--r:8px;--r-lg:12px}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;padding:clamp(1rem,4vw,2.5rem) 1rem 4rem}
+.wrap{max-width:820px;margin:0 auto}
+.eyebrow{font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;color:var(--terra);font-weight:600;margin:0 0 .5rem}
+h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.15;color:var(--ink);letter-spacing:-.01em}
+h1{font-size:clamp(1.8rem,5vw,2.5rem);margin:0 0 .5rem}
+h2{font-size:1.35rem;margin:0 0 .7rem}
+h3{font-size:1.1rem;margin:1.1rem 0 .4rem}
+.lead{font-size:1.05rem;color:var(--ink-soft);margin:0 0 1.4rem;max-width:62ch}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;margin-bottom:1.6rem}
+.top>div{flex:1 1 320px;min-width:0}
+.btn{font:inherit;font-size:.9rem;font-weight:600;background:var(--navy);color:#fff;border:1px solid var(--navy);border-radius:var(--r);padding:.6rem 1.1rem;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem}
+.btn:hover{background:#2B4259;border-color:#2B4259}
+.btn.ghost{background:#fff;color:var(--ink);border-color:var(--line-strong)}
+.btn.ghost:hover{border-color:var(--terra);color:var(--terra)}
+.btn.terra{background:var(--terra);border-color:var(--terra)}
+.btn.terra:hover{background:var(--terra-deep);border-color:var(--terra-deep)}
+.core{background:var(--card);border:1px solid var(--line-strong);border-radius:var(--r-lg);padding:1.4rem 1.5rem;margin:0 0 1.8rem}
+.core .task{font-family:var(--serif);font-size:1.08rem}
+.data{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.05rem;background:var(--cream);border:1px solid var(--line);border-radius:var(--r);padding:.7rem 1rem;margin:.6rem 0 1rem;letter-spacing:.04em;overflow-x:auto}
+.viz{margin:1rem 0 .4rem}
+.pick{font-size:.85rem;color:var(--ink-soft);margin:0 0 .6rem}
+.tabs{display:flex;gap:.6rem;flex-wrap:wrap;margin:0 0 1.4rem}
+.tab{flex:1 1 200px;text-align:left;cursor:pointer;background:var(--card);border:1px solid var(--line-strong);border-radius:var(--r-lg);padding:.85rem 1rem;font:inherit;color:var(--ink);transition:border-color .15s,background .15s}
+.tab:hover{border-color:var(--terra)}
+.tab:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--terra);outline-offset:2px}
+.tab .tname{display:block;font-family:var(--serif);font-size:1.08rem;font-weight:600}
+.tab .tsub{display:block;font-size:.8rem;color:var(--ink-soft);margin-top:.15rem}
+.tab.active{border-color:var(--terra);background:#fff;box-shadow:inset 0 0 0 1px var(--terra)}
+.tab.active .tname{color:var(--terra)}
+.panel{display:none}
+.panel.show{display:block;animation:rise .3s ease}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:1.2rem 1.4rem;margin:0 0 1rem}
+.aufgabe{border-left:3px solid var(--terra);padding:.1rem 0 .1rem 1rem;margin:0 0 1rem;font-family:var(--serif);font-size:1.04rem}
+.hint{background:var(--cream);border-left:3px solid var(--ochre);border-radius:0 var(--r) var(--r) 0;padding:.6rem .9rem;margin:.6rem 0;font-size:.92rem}
+.steps{margin:0;padding-left:1.25rem}.steps li{margin:.35rem 0}
+.field{display:grid;grid-template-columns:minmax(140px,1fr) minmax(120px,160px) auto;gap:.5rem .8rem;align-items:center;margin:.5rem 0}
+@media(max-width:560px){.field{grid-template-columns:1fr}}
+.field label{font-weight:600;font-size:.92rem}
+input[type=text],input[type=number],select,textarea{font:inherit;width:100%;padding:.5rem .7rem;border:1px solid var(--line-strong);border-radius:var(--r);background:#fff;color:var(--ink)}
+input.ok,select.ok,textarea.ok{border-color:var(--ok);background:var(--ok-soft)}
+input.err,select.err,textarea.err{border-color:var(--err)}
+.feedback{font-size:.88rem;min-height:1.2em}
+.feedback.ok{color:var(--ok);font-weight:600}
+.feedback.err{color:var(--err)}
+.choices{display:flex;flex-wrap:wrap;gap:.5rem;margin:.5rem 0}
+.choice{font:inherit;font-size:.92rem;background:#fff;border:1px solid var(--line-strong);border-radius:var(--r);padding:.5rem .9rem;cursor:pointer;color:var(--ink)}
+.choice:hover{border-color:var(--terra)}
+.choice.on{border-color:var(--navy);background:var(--cream)}
+.choice.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.choice.err{background:var(--err-soft);border-color:var(--err);color:var(--err)}
+.check{list-style:none;margin:.5rem 0 0;padding:0}
+.check li{display:flex;gap:.6rem;align-items:flex-start;padding:.4rem 0;border-top:1px solid var(--line)}
+.check li:first-child{border-top:0}
+.check input{width:auto;margin-top:.3rem;accent-color:var(--terra)}
+.reveal{margin-top:.8rem}
+.aha{background:var(--navy);color:#fff;border-radius:var(--r-lg);padding:1rem 1.2rem;margin:.8rem 0}
+.aha h3{color:var(--ochre);margin:0 0 .4rem}
+.lehrperson{margin-top:2rem;border:1px solid var(--terra);border-radius:var(--r-lg);background:#fff}
+.lehrperson>summary{cursor:pointer;padding:.9rem 1.2rem;font-weight:600;color:var(--terra);list-style:none}
+.lehrperson>summary::-webkit-details-marker{display:none}
+.lehrperson>summary::before{content:"+";display:inline-block;width:1.2rem;font-family:var(--serif)}
+.lehrperson[open]>summary::before{content:"–"}
+.lehrperson>div{padding:0 1.2rem 1.2rem;border-top:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:.92rem;background:#fff}
+th,td{text-align:left;padding:.45rem .6rem;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--cream);font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+.foot{margin-top:2.5rem;font-size:.78rem;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:.8rem}
+.sr{position:absolute;left:-9999px}
+/* Prüfungsvorbereitung */
+.exam-head{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;padding:.8rem 1rem;border:1px solid var(--line-strong);border-radius:var(--r-lg);background:#fff;margin:0 0 1rem}
+.timer{font-family:var(--serif);font-size:1.6rem;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.timer.over{color:var(--err)}
+.pts{float:right;font-size:.78rem;color:var(--ink-soft);border:1px solid var(--line);border-radius:999px;padding:.1rem .55rem;margin-left:.6rem}
+.score{display:none;background:var(--navy);color:#fff;border-radius:var(--r-lg);padding:1.1rem 1.3rem;margin:1rem 0}
+.score.show{display:block}
+.score .nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.8rem;margin:.3rem 0 .8rem}
+.score b{display:block;font-family:var(--serif);font-size:2rem;line-height:1;color:var(--ochre)}
+.score span{font-size:.82rem;color:#C3CCD6}
+.score table{background:transparent;color:#fff}.score th{background:transparent;color:#C3CCD6}.score td,.score th{border-color:#3A5068}
+.meter{height:8px;background:var(--cream);border-radius:999px;overflow:hidden;margin:.4rem 0}
+.meter i{display:block;height:100%;background:var(--terra);width:0;transition:width .4s}
+.loesung{display:none;margin-top:.6rem;padding:.6rem .9rem;background:var(--cream);border-radius:var(--r);font-size:.92rem}
+.loesung.show{display:block}
+.plan td:first-child{font-weight:600;white-space:nowrap}
+</style>
+<style>
+/* Thematische Ergänzungen und Druckanpassungen */
+.viz svg{width:100%;height:auto;max-height:420px;border:1px solid var(--line-strong);border-radius:var(--r)}
+.viz .legend{display:flex;gap:1rem;flex-wrap:wrap;font-size:.85rem;color:var(--ink-soft);margin:.3rem 0}
+.viz .key{display:inline-flex;align-items:center;gap:.4rem}
+.viz .swatch{width:16px;height:3px;display:inline-block}
+.viz .rev{background:var(--ochre)}
+.viz .cost{background:var(--navy)}
+.viz .be{background:var(--terra)}
+#chart .guide{display:none}
+#chart.show-be #beGuide{display:block}
+#chart.show-aha #ahaGuide{display:block}
+.axis text{font-size:10px;fill:var(--ink-soft)}
+.line-rev{stroke:var(--ochre);stroke-width:2.5}
+.line-cost{stroke:var(--navy);stroke-width:2.5}
+.dash{stroke:var(--terra);stroke-dasharray:5 4}
+.mark{fill:#fff;stroke:var(--terra);stroke-width:2}
+.label{fill:var(--ink-soft);font-size:11px}
+.hint small code{font-family:ui-monospace,Menlo,Consolas,monospace}
+.aha .mini{font-family:ui-monospace,Menlo,Consolas,monospace;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:.3rem .5rem;display:inline-block;margin:.15rem 0}
+.feedback.ok::after{content:" ✓"}
+.feedback.err::after{content:" ✗"}
+/* Druck */
+@media print{
+  @page{size:A4 portrait;margin:14mm}
+  body{background:#fff;padding:0}
+  .btn,.tabs,.pick,.pdf,.choice,.reveal button{display:none !important}
+  header.top{margin:0 0 .6rem}
+  .panel{display:block !important}
+  .lehrperson{display:block}
+  .lehrperson>div{display:block}
+  .viz svg{max-height:none}
+  .panel{break-before:page}
+  .core,.card,.aufgabe,.viz,table{break-inside:avoid}
+  .score{display:none !important}
+}
+</style>
+<!-- lernwege-print -->
+<style media="print" id="lernwege-print">
+@page { size: A4 portrait; margin: 14mm 16mm; }
+@media print {
+  html, body { background: #fff !important; color: #111 !important; font-size: 11pt !important; line-height: 1.4 !important; }
+  * { box-shadow: none !important; text-shadow: none !important; animation: none !important; transition: none !important; }
+  body { max-width: none !important; margin: 0 !important; padding: 0 !important; }
+  /* Bedienelemente weg */
+  button, [role="tablist"], [role="tab"], nav, .tabs, .tab-bar, .tabbar, .reiter, .toolbar, .no-print { display: none !important; }
+  input[type="button"], input[type="submit"] { display: none !important; }
+  a[href^="http"]::after { content: ""; }
+  /* Verborgene Inhalte sichtbar (alle Zugänge, Lösungen) */
+  [hidden], .hidden, [aria-hidden="true"]:not(svg):not(span) { display: block !important; }
+  [role="tabpanel"], .panel, .tab-panel, .zugang { display: block !important; }
+  details { display: block !important; }
+  details > summary { list-style: none; font-weight: 600; }
+  details > :not(summary) { display: block !important; }
+  /* Grosse Abschnitte je auf neuer Seite, nichts mittendrin brechen */
+  [role="tabpanel"], .panel, .tab-panel, .zugang, section.zugang, .teacher, .lehrperson, .fuer-lehrperson { break-before: page; page-break-before: always; }
+  [role="tabpanel"]:first-of-type, .panel:first-of-type, .tab-panel:first-of-type { break-before: auto; page-break-before: auto; }
+  h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+  p, li, tr, .card, .box, .aufgabe, .frage, figure, svg, table, pre { break-inside: avoid; page-break-inside: avoid; }
+  /* Eingabefelder als Linien, Häkchen und Hinweise ausblenden */
+  input[type="text"], input[type="number"], textarea, select { border: none !important; border-bottom: 1px solid #333 !important; background: #fff !important; box-shadow: none !important; }
+  input[type="checkbox"], input[type="radio"] { -webkit-appearance: checkbox; appearance: auto; }
+  .feedback, .hint, .ok, .check-ok, .correct { color: #111 !important; }
+  /* CI-Farben: Navy #1E3246, Terra #B84816, Ocker #F1A51A, Creme #F6EFE2 */
+  h1, h2, h3, h4 { color: #1E3246 !important; }
+  h1 { font-size: 20pt !important; border-bottom: 2pt solid #B84816 !important; padding-bottom: 4pt !important; }
+  h2 { font-size: 15pt !important; margin-top: 14pt !important; }
+  h3 { font-size: 12.5pt !important; }
+  header, .hero { background: transparent !important; color: #1E3246 !important; padding: 0 0 .6rem !important; margin: 0 0 1rem !important; border: 0 !important; box-shadow: none !important; }
+  .card, .box, section, article, aside, [role="tabpanel"], .panel, .tab-panel, .zugang, details {
+    background: transparent !important; color: #111 !important;
+    border: 1pt solid #1E3246 !important; border-radius: 4pt !important; padding: 8pt 10pt !important; margin: 0 0 10pt !important;
+  }
+  [role="tabpanel"] > .card, .panel > .card, section > section, section > .card { border-color: #cdc4ad !important; }
+  details.lehrperson, .lehrperson, .teacher { border-color: #B84816 !important; }
+  details > summary { color: #B84816 !important; }
+  blockquote, .hinweis, .tipp, .info { border-left: 3pt solid #F1A51A !important; border-top: 0 !important; border-right: 0 !important; border-bottom: 0 !important; padding-left: 8pt !important; background: transparent !important; }
+  table { border-collapse: collapse !important; }
+  td, th { border: 1pt solid #1E3246 !important; padding: .25rem .5rem !important; }
+  th { background: #F6EFE2 !important; color: #1E3246 !important; }
+  a { color: #B84816 !important; text-decoration: none !important; }
+  svg { max-width: 100% !important; height: auto !important; }
+  img { max-width: 100% !important; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div>
+    <p class="eyebrow">Mathematik · Berufsmaturität · Break-even-Analyse</p>
+    <h1>Kosten, Erlös, Gewinn: Wo liegt der Break-even?</h1>
+    <p class="lead">Bestimme die Break-even-Menge und den Gewinn in einem realistischen Verkaufsszenario. Wähle deinen Zugang.</p>
+  </div>
+  <button class="btn ghost pdf" type="button">Als PDF herunterladen</button>
+</header>
+
+<section class="core">
+  <h2>Die Kernaufgabe</h2>
+  <p class="task">Ein Foodtruck verkauft Bowls. Pro Tag fallen fixe Kosten von CHF 450 an. Die variablen Kosten betragen CHF 6.00 pro Bowl. Der Verkaufspreis beträgt CHF 10.50 pro Bowl. Bestimme (1) die Break-even-Menge, (2) den Tagesgewinn bei 120 verkauften Bowls. Zeige (3) einen nachvollziehbaren Rechen-/Begründungsweg und formuliere (4) einen sachlichen Ergebnissatz.</p>
+  <div class="data">
+    Fixkosten F = CHF 450 · Variable Kosten v = CHF 6.00/Stk · Preis p = CHF 10.50/Stk · Absatz x in Stück · Kosten K(x) = F + v·x · Erlös E(x) = p·x · Gewinn G(x) = E(x) − K(x)
+  </div>
+  <div class="viz" aria-describedby="vizdesc">
+    <div class="legend">
+      <span class="key"><i class="swatch rev"></i>Erlös E(x)</span>
+      <span class="key"><i class="swatch cost"></i>Kosten K(x)</span>
+      <span class="key"><i class="swatch be"></i>Break-even (erscheint nach korrekter Eingabe)</span>
+    </div>
+    <svg id="chart" viewBox="0 0 640 360" role="img" aria-labelledby="vizdesc">
+      <title id="vizdesc">Diagramm mit Kosten- und Erlösgerade; der Break-even wird nach korrekter Eingabe markiert.</title>
+      <!-- Plot-Rand -->
+      <rect x="50" y="20" width="560" height="300" fill="#fff" stroke="var(--line-strong)"></rect>
+      <!-- Achsen -->
+      <g class="axis">
+        <line x1="60" y1="300" x2="580" y2="300" stroke="var(--line-strong)"></line>
+        <line x1="60" y1="300" x2="60" y2="40"  stroke="var(--line-strong)"></line>
+        <!-- x-Ticks -->
+        <g fill="none" stroke="var(--line)">
+          <line x1="60" y1="260" x2="580" y2="260"></line>
+          <line x1="60" y1="220" x2="580" y2="220"></line>
+          <line x1="60" y1="180" x2="580" y2="180"></line>
+          <line x1="60" y1="140" x2="580" y2="140"></line>
+          <line x1="60" y1="100" x2="580" y2="100"></line>
+          <line x1="60" y1="60"  x2="580" y2="60"></line>
+        </g>
+        <g>
+          <text x="60" y="318">0</text>
+          <text x="172" y="318">40</text>
+          <text x="284" y="318">80</text>
+          <text x="348.9" y="318">100</text>
+          <text x="396" y="318">120</text>
+          <text x="508" y="318">160</text>
+          <text x="572" y="318">180</text>
+          <text x="22" y="304">0</text>
+          <text x="18" y="242">450</text>
+          <text x="18" y="154">1050</text>
+          <text x="18" y="44">2000</text>
+          <text x="580" y="335" class="label">Stück x</text>
+          <text x="12" y="28" class="label" transform="rotate(-90 12 28)">CHF</text>
+        </g>
+      </g>
+      <!-- Erlös: E(x) = 10.5x -->
+      <line class="line-rev" x1="60" y1="300" x2="580" y2="35.4"></line>
+      <!-- Kosten: K(x) = 450 + 6x -->
+      <line class="line-cost" x1="60" y1="237" x2="580" y2="85.8"></line>
+      <!-- Guide erscheint erst bei korrekter BE-Eingabe -->
+      <g id="beGuide" class="guide">
+        <line class="dash" x1="348.9" y1="300" x2="348.9" y2="20"></line>
+        <line class="dash" x1="60" y1="153" x2="580" y2="153"></line>
+        <circle class="mark" cx="348.9" cy="153" r="5"></circle>
+        <text class="label" x="356" y="147">Break-even: 100 Stk, CHF 1050</text>
+      </g>
+      <!-- Aha-Overlay (zeigt Deckungsbeitrag und Fixkosten) -->
+      <g id="ahaGuide" class="guide">
+        <text class="label" x="100" y="245">Fixkosten = Abstand der Geraden bei x = 0</text>
+        <path d="M90,240 h-20" stroke="var(--terra)"></path>
+        <text class="label" x="430" y="120">Deckungsbeitrag je Stk = Steigungsdifferenz</text>
+        <path d="M420,116 l-18,-28" stroke="var(--terra)"></path>
+      </g>
+    </svg>
+  </div>
+  <ol class="steps">
+    <li>Deckungsbeitrag je Stück berechnen: d = p − v.</li>
+    <li>Gleichungen aufstellen: K(x) = F + v·x und E(x) = p·x.</li>
+    <li>Break-even lösen: K(x) = E(x) ⇒ F + v·x = p·x ⇒ x = F / (p − v).</li>
+    <li>Gewinn bei 120 Stück: G(120) = E(120) − K(120).</li>
+    <li>Ergebnissatz formulieren (Menge, CHF, sachlich korrekt).</li>
+  </ol>
+  <div class="hint">
+    Erfolgskriterien (Ebene «anwenden»):
+    <ul class="steps">
+      <li>Du wendest das Verfahren korrekt an (Formeln, Einsetzen, Umformen).</li>
+      <li>Du begründest deinen Rechenweg knapp und fachlich stimmig.</li>
+      <li>Du schliesst mit einem präzisen Ergebnissatz (Menge, CHF, Kontext).</li>
+    </ul>
+  </div>
+</section>
+
+<p class="pick">Wähle deinen Zugang:</p>
+<div class="tabs" role="tablist">
+  <button class="tab active" role="tab" aria-selected="true" aria-controls="p-a" id="t-a">
+    <span class="tname">A · Mit Unterstützung</span>
+    <span class="tsub">Begriffe, Rechenrahmen, Leitfragen</span>
+  </button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="p-b" id="t-b">
+    <span class="tname">B · Eigenständig</span>
+    <span class="tsub">ohne Hilfen, mit Ergebnisprüfung</span>
+  </button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="p-c" id="t-c">
+    <span class="tname">C · Vertiefung</span>
+    <span class="tsub">Twist, Begründung, Transfer · Aha</span>
+  </button>
+</div>
+
+<section class="panel show" id="p-a" role="tabpanel" aria-labelledby="t-a">
+  <div class="card">
+    <h2>Zugang A · Mit Unterstützung</h2>
+    <p class="aufgabe">Fülle den Rechenrahmen zur Kernaufgabe aus. Nutze die Begriffe unten, beantworte die Leitfragen und beende den Ergebnissatz. Die Markierung im Diagramm erscheint, sobald die Break-even-Menge korrekt ist.</p>
+    <div class="hint">
+      Begriffe kurz erklärt:
+      <ul class="steps">
+        <li>Fixkosten F: fallen unabhängig von x an (z. B. Standgebühr, Personal).</li>
+        <li>Variable Kosten v: pro Stück (z. B. Zutaten, Verpackung).</li>
+        <li>Erlös E(x): Einnahmen = p·x.</li>
+        <li>Break-even: Punkt, an dem E(x) = K(x) (weder Verlust noch Gewinn).</li>
+      </ul>
+      Tipp: Deckungsbeitrag je Stück d = p − v. <small>Einheiten: CHF, Stück; schreibe z. B. <code>4.5</code> oder <code>4,5</code>.</small>
+    </div>
+
+    <div class="field">
+      <label for="a1">Deckungsbeitrag je Bowl d = p − v (in CHF)</label>
+      <input id="a1" type="text" inputmode="decimal" data-sol="4.5" data-tol="0.01" data-hint="Preis minus variable Kosten.">
+      <span class="feedback" aria-live="polite"></span>
+    </div>
+    <div class="field">
+      <label for="a2">Break-even-Menge x_BE (Stück)</label>
+      <input id="a2" type="text" inputmode="numeric" data-sol="100" data-tol="0.01" data-hint="Nutze x = F / d. Ganze Stückzahl sinnvoll interpretieren.">
+      <span class="feedback" aria-live="polite"></span>
+    </div>
+    <div class="field">
+      <label for="a3">Erlös bei 120 Bowls E(120) (in CHF)</label>
+      <input id="a3" type="text" inputmode="decimal" data-sol="1260" data-tol="0.1" data-hint="E(120) = p · 120.">
+      <span class="feedback" aria-live="polite"></span>
+    </div>
+    <div class="field">
+      <label for="a4">Kosten bei 120 Bowls K(120) (in CHF)</label>
+      <input id="a4" type="text" inputmode="decimal" data-sol="1170" data-tol="0.1" data-hint="K(120) = F + v · 120.">
+      <span class="feedback" aria-live="polite"></span>
+    </div>
+    <div class="field">
+      <label for="a5">Gewinn bei 120 Bowls G(120) (in CHF)</label>
+      <input id="a5" type="text" inputmode="decimal" data-sol="90" data-tol="0.1" data-hint="G = E − K.">
+      <span class="feedback" aria-live="polite"></span>
+    </div>
+
+    <h3>Leitfragen</h3>
+    <ul class="check">
+      <li><input type="checkbox" id="a-q1"><label for="a-q1">Habe ich Formeln, Werte und Einheiten klar notiert (CHF, Stück)?</label></li>
+      <li><input type="checkbox" id="a-q2"><label for="a-q2">Habe ich den Rechenweg kurz begründet (z. B. weshalb x = F / (p − v))?</label></li>
+      <li><input type="checkbox" id="a-q3"><label for="a-q3">Ist mein Ergebnissatz sachlich korrekt und verständlich?</label></li>
+    </ul>
+
+    <h3>Ergebnissatz – Satzanfang</h3>
+    <div class="hint">Formuliere zu Ende: «Der Foodtruck arbeitet ab <em>[Menge]</em> Bowls kostendeckend. Bei 120 Bowls beträgt der Tagesgewinn <em>[CHF]</em>.»</div>
+  </div>
+</section>
+
+<section class="panel" id="p-b" role="tabpanel" aria-labelledby="t-b">
+  <div class="card">
+    <h2>Zugang B · Eigenständig</h2>
+    <p class="aufgabe">Bearbeite die Kernaufgabe ohne weitere Hilfen. Trage deine Resultate ein und prüfe sie. Die Markierung im Diagramm erscheint bei korrekter Break-even-Menge.</p>
+
+    <div class="field">
+      <label for="b1">Break-even-Menge x_BE (Stück)</label>
+      <input id="b1" type="text" inputmode="numeric" data-sol="100" data-tol="0.01" data-hint="Setze F + v·x = p·x.">
+      <span class="feedback" aria-live="polite"></span>
+    </div>
+    <div class="field">
+      <label for="b2">Gewinn bei 120 Bowls G(120) (in CHF)</label>
+      <input id="b2" type="text" inputmode="decimal" data-sol="90" data-tol="0.1" data-hint="G(120) = p·120 − (F + v·120).">
+      <span class="feedback" aria-live="polite"></span>
+    </div>
+    <button class="btn terra" type="button" id="b-check">Ergebnis prüfen</button>
+
+    <h3>Selbstcheck</h3>
+    <ul class="check">
+      <li><input type="checkbox" id="b-q1"><label for="b-q1">Ich habe d = p − v bestimmt und korrekt eingesetzt.</label></li>
+      <li><input type="checkbox" id="b-q2"><label for="b-q2">Ich habe die Gleichung K(x) = E(x) korrekt umgeformt.</label></li>
+      <li><input type="checkbox" id="b-q3"><label for="b-q3">Ich habe den Gewinn sauber mit Einheiten angegeben.</label></li>
+      <li><input type="checkbox" id="b-q4"><label for="b-q4">Mein Ergebnissatz ist knapp und fachlich korrekt.</label></li>
+    </ul>
+  </div>
+</section>
+
+<section class="panel" id="p-c" role="tabpanel" aria-labelledby="t-c">
+  <div class="card">
+    <h2>Zugang C · Vertiefung</h2>
+    <p class="aufgabe">Twist 1 (Preispolitik): Der Preis soll sinken, um mehr Kundschaft anzuziehen. Wie tief darf der Preis <em>mindestens</em> sein, damit der Break-even bei höchstens 120 Bowls liegt?<br>Twist 2 (Fixkosten-Änderung): Die Standgebühr steigt; neue Fixkosten: CHF 510. Wie viele Bowls sind nötig, um trotzdem einen Tagesgewinn von CHF 90 zu erzielen?</p>
+
+    <div class="field">
+      <label for="c1">Minimaler Preis p_min (CHF), sodass x_BE ≤ 120</label>
+      <input id="c1" type="text" inputmode="decimal" data-sol="9.75" data-tol="0.01" data-hint="x_BE = F / (p − v) ≤ 120 ⇒ p − v ≥ F/120.">
+      <span class="feedback" aria-live="polite"></span>
+    </div>
+    <div class="field">
+      <label for="c2">Erforderliche Menge x (Stück) bei F = 510 und G = 90</label>
+      <input id="c2" type="text" inputmode="numeric" data-sol="134" data-tol="0.5" data-hint="G = (p − v)x − F ⇒ x = (G + F)/(p − v). Ganze Stückzahl sinnvoll runden.">
+      <span class="feedback" aria-live="polite"></span>
+    </div>
+
+    <h3>Begründungsfrage</h3>
+    <div class="field">
+      <label for="c3">Warum verschiebt sich der Break-even, wenn sich Preis, variable Kosten oder Fixkosten ändern?</label>
+      <textarea id="c3" rows="3" placeholder="Hinweis: Steigung (Deckungsbeitrag) und Achsenabschnitt (Fixkosten) bestimmen Lage und Schnittpunkt."></textarea>
+      <span class="feedback" aria-live="polite"></span>
+    </div>
+
+    <h3>Transfer in den Berufskontext</h3>
+    <div class="hint">Beziehe die Idee auf deinen Bereich (z. B. Technik, KV, Gestaltung, Gesundheit): Welche Grössen entsprechen Fixkosten und variablen Kosten? Welche Stellschrauben beeinflussen den Deckungsbeitrag?</div>
+    <div class="field">
+      <label for="c4">Kurzskizze deines Beispiels (2–3 Sätze)</label>
+      <textarea id="c4" rows="3" placeholder="Beispiel: In der Druckerei sind Miet- und Maschinenleasing Fixkosten; Papier und Farbe sind variable Kosten. Preis pro Auftrag ..."></textarea>
+      <span class="feedback" aria-live="polite"></span>
+    </div>
+
+    <div class="reveal">
+      <button class="btn" type="button" id="aha-btn">Kernzusammenhang anzeigen</button>
+      <div class="aha" id="aha-box" style="display:none">
+        <h3>Das steckt dahinter</h3>
+        <p>Break-even entsteht, wenn sich zwei Geraden schneiden: E(x) = p·x und K(x) = F + v·x.</p>
+        <div class="mini">x_BE = F / (p − v) = F / d</div>
+        <p>Der <b>Deckungsbeitrag je Stück d</b> ist die <b>Steigungsdifferenz</b> der Geraden (p − v). Die <b>Fixkosten F</b> sind der <b>Achsenabschnitt</b> der Kostenfunktion. Vergrössert sich d, wandert der Schnittpunkt nach links; steigen F, verschiebt er sich nach rechts.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<details class="lehrperson">
+  <summary>Für die Lehrperson: Lösungen, Wege, Anschluss</summary>
+  <div>
+    <h3>Lösungen und Rechenwege</h3>
+    <table>
+      <tr><th>Grösse</th><th>Berechnung</th><th>Wert</th></tr>
+      <tr><td>Deckungsbeitrag d</td><td>p − v = 10.50 − 6.00</td><td>CHF 4.50</td></tr>
+      <tr><td>Break-even-Menge x_BE</td><td>x = F / d = 450 / 4.50</td><td>100 Stück</td></tr>
+      <tr><td>Erlös bei 120</td><td>E(120) = 10.50 · 120</td><td>CHF 1’260</td></tr>
+      <tr><td>Kosten bei 120</td><td>K(120) = 450 + 6.00 · 120</td><td>CHF 1’170</td></tr>
+      <tr><td>Gewinn bei 120</td><td>G(120) = 1’260 − 1’170</td><td>CHF 90</td></tr>
+      <tr><td>Twist 1</td><td>x_BE ≤ 120 ⇒ F/(p − v) ≤ 120 ⇒ p − v ≥ 450/120 = 3.75 ⇒ p ≥ 6 + 3.75</td><td>p_min = CHF 9.75</td></tr>
+      <tr><td>Twist 2</td><td>G = d·x − F ⇒ 90 = 4.50·x − 510 ⇒ x = 600/4.50</td><td>x = 133.33… ⇒ 134 Stück</td></tr>
+    </table>
+    <p><b>Ergebnissatz (Muster):</b> Der Foodtruck arbeitet ab 100 Bowls kostendeckend. Bei 120 Bowls beträgt der Tagesgewinn CHF 90.</p>
+    <h3>Didaktischer Anschluss</h3>
+    <ul>
+      <li>Parameter-Studium (Sensitivität): Wie verändern Rabatte (p ↓) oder Effizienzgewinne (v ↓) den Break-even?</li>
+      <li>Transfer: Stückzahl als reelle vs. ganze Grösse; Interpretation von Rundung.</li>
+      <li>Ausblick: Lineare Optimierung mit Kapazitätsgrenzen oder Preis-Absatz-Funktion.</li>
+    </ul>
+  </div>
+</details>
+
+<p class="foot">Lernseite erzeugt mit Lernwege (EDUTECSOL). Mathematik · Berufsmaturität · <span id="heute"></span>.</p>
+
+<script>
+(function(){
+  const $ = (sel,ctx=document)=>ctx.querySelector(sel);
+  const $$ = (sel,ctx=document)=>Array.from(ctx.querySelectorAll(sel));
+
+  // Datum
+  $('#heute').textContent = new Date().toLocaleDateString('de-CH');
+
+  // Tabs
+  const tabs = $$('.tab');
+  const panels = $$('.panel');
+  function activateTab(btn){
+    tabs.forEach(t=>{t.classList.toggle('active', t===btn); t.setAttribute('aria-selected', t===btn ? 'true' : 'false');});
+    panels.forEach(p=>p.classList.toggle('show', p.id === btn.getAttribute('aria-controls')));
+  }
+  tabs.forEach(t=>{
+    t.addEventListener('click', ()=>activateTab(t));
+    t.addEventListener('keydown', e=>{
+      const i = tabs.indexOf(t);
+      if(e.key==='ArrowRight'){ e.preventDefault(); const n = tabs[(i+1)%tabs.length]; n.focus(); activateTab(n); }
+      if(e.key==='ArrowLeft'){ e.preventDefault(); const n = tabs[(i-1+tabs.length)%tabs.length]; n.focus(); activateTab(n); }
+    });
+  });
+
+  // Helpers
+  function toNumber(v){
+    if(v==null) return NaN;
+    const s = String(v).trim().replace(/\s/g,'').replace(',','.');
+    if(s==='') return NaN;
+    return Number(s);
+  }
+  function nearly(a,b,tol){ return Math.abs(a-b) <= tol; }
+  function setState(inp, ok, msg){
+    const fb = inp.closest('.field')?.querySelector('.feedback');
+    inp.classList.remove('ok','err');
+    if(!inp.value.trim()){
+      if(fb){ fb.textContent=''; fb.classList.remove('ok','err'); }
+      return;
+    }
+    if(ok){ inp.classList.add('ok'); if(fb){ fb.textContent = msg || 'Richtig'; fb.classList.add('ok'); fb.classList.remove('err'); } }
+    else{ inp.classList.add('err'); if(fb){ fb.textContent = msg || 'Bitte prüfen'; fb.classList.add('err'); fb.classList.remove('ok'); } }
+  }
+
+  // Chart guide toggling
+  const chart = $('#chart');
+  function showBEGuide(){ chart.classList.add('show-be'); }
+  // register generic instant checkers for inputs with data-sol
+  function registerInstantChecker(inp){
+    const sol = toNumber(inp.dataset.sol);
+    const tol = toNumber(inp.dataset.tol || 0);
+    const hint = inp.dataset.hint || 'Bitte prüfe deine Rechnung.';
+    inp.addEventListener('input', ()=>{
+      const val = toNumber(inp.value);
+      if(isNaN(val)){ setState(inp,false,'Zahl erwartet'); return; }
+      const ok = nearly(val, sol, tol);
+      setState(inp, ok, ok ? 'Richtig' : hint);
+      // If this is a BE field with correct value, show guide
+      if(ok && (inp.id==='a2' || inp.id==='b1')) showBEGuide();
+    });
+  }
+  $$('input[data-sol],textarea[data-sol]').forEach(registerInstantChecker);
+
+  // B: Ergebnis prüfen button validates both
+  $('#b-check')?.addEventListener('click', ()=>{
+    const be = $('#b1'); const g = $('#b2');
+    [be,g].forEach(el=>{
+      const sol = toNumber(el.dataset.sol), tol = toNumber(el.dataset.tol||0), hint = el.dataset.hint||'';
+      const val = toNumber(el.value);
+      if(isNaN(val)) setState(el,false,'Zahl erwartet');
+      else setState(el, nearly(val,sol,tol), nearly(val,sol,tol)?'Richtig':'Stimmt noch nicht – '+hint);
+    });
+    const okBE = be.classList.contains('ok');
+    if(okBE) showBEGuide();
+  });
+
+  // C: Begründungsfrage – einfache Stichwortprüfung
+  $('#c3')?.addEventListener('blur', e=>{
+    const txt = (e.target.value||'').toLowerCase();
+    const hits = ['steigung','deckungsbeitrag','fixkosten','achsenabschnitt','schnittpunkt'].some(k=>txt.includes(k));
+    setState(e.target, hits, hits ? 'Begründung enthält zentrale Begriffe.' : 'Tipp: Nenne Steigung (Deckungsbeitrag) und Achsenabschnitt (Fixkosten).');
+  });
+
+  // Aha-Button
+  const ahaBtn = $('#aha-btn'), ahaBox = $('#aha-box');
+  ahaBtn?.addEventListener('click', ()=>{
+    ahaBox.style.display = 'block';
+    chart.classList.add('show-aha');
+  });
+
+  // PDF / Drucken: Alle Panels & Details öffnen, danach zurücksetzen
+  const pdfBtn = $('.pdf');
+  pdfBtn?.addEventListener('click', ()=>{
+    // Zustand merken
+    const activeTab = $('.tab.active')?.id;
+    const openDetails = $$('details').map(d=>({el:d, open:d.open}));
+    // Alles zeigen
+    panels.forEach(p=>p.classList.add('show'));
+    $$('details').forEach(d=>d.open = true);
+    // Druckdialog
+    const after = ()=>{
+      // Zustand zurück
+      tabs.forEach(t=>{
+        const makeActive = t.id === activeTab;
+        t.classList.toggle('active', makeActive);
+        t.setAttribute('aria-selected', makeActive ? 'true':'false');
+      });
+      panels.forEach(p=>p.classList.toggle('show', ('t-'+p.id.split('-')[1]) === activeTab));
+      openDetails.forEach(s=>s.el.open = s.open);
+      mm?.removeListener(onAfterPrint);
+    };
+    const onAfterPrint = ()=> setTimeout(after, 50);
+    const mm = window.matchMedia ? window.matchMedia('print') : null;
+    if(mm){ mm.addListener(onAfterPrint); }
+    setTimeout(()=>{
+      try{
+        window.print();
+        // Fallback: falls blockiert/ohne Wirkung – neuen Tab öffnen
+        setTimeout(()=>{
+          after();
+        }, 500);
+      }catch(e){
+        after();
+        try{ window.open(location.href, '_blank'); }catch(_){}
+      }
+    }, 50);
+  });
+
+})();
+</script>
+<!-- NOTIZ: Thema: Break-even-Analyse mit linearen Funktionen (BM). Differenzierung nach Niveau: A – Mit Unterstützung, B – Eigenständig, C – Vertiefung (Twist: Preispolitik mit Mindestpreis; Fixkostenänderung). Aha-Moment: Visualisiert den Zusammenhang x_BE = F/(p−v) als Schnitt zweier Geraden (Steigung/Deckungsbeitrag, Achsenabschnitt/Fixkosten). Material: keine Datei vorlag; Beispiel selbst entwickelt. -->
+</html>

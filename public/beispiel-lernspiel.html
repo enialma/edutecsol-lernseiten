@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lineare Optimierung – Lernspiel Mathematik (BM)</title>
+<meta name="description" content="Lernspiel in vier Levels zur linearen Optimierung: Zielfunktion, Nebenbedingungen, zulässiger Bereich, Eckpunkte und grafisches Lösungsverfahren.">
+<style id="lw-basis">
+:root{--paper:#FBF8F1;--card:#FFFFFF;--ink:#1E3246;--ink-soft:#5B6572;--line:#E2DBCB;--line-strong:#CDC4AD;--navy:#1E3246;--terra:#B84816;--terra-deep:#9A3A10;--ochre:#F1A51A;--cream:#F6EFE2;--ok:#2F8F6F;--ok-soft:#DFF3EA;--err:#B8321A;--err-soft:#FBE6E1;--serif:Georgia,"Iowan Old Style","Palatino Linotype",Palatino,"Times New Roman",serif;--sans:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;--r:8px;--r-lg:12px}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;padding:clamp(1rem,4vw,2.5rem) 1rem 4rem}
+.wrap{max-width:820px;margin:0 auto}
+.eyebrow{font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;color:var(--terra);font-weight:600;margin:0 0 .5rem}
+h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.15;color:var(--ink);letter-spacing:-.01em}
+h1{font-size:clamp(1.8rem,5vw,2.5rem);margin:0 0 .5rem}
+h2{font-size:1.35rem;margin:0 0 .7rem}
+h3{font-size:1.1rem;margin:1.1rem 0 .4rem}
+.lead{font-size:1.05rem;color:var(--ink-soft);margin:0 0 1.4rem;max-width:62ch}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;margin-bottom:1.6rem}
+.top>div{flex:1 1 320px;min-width:0}
+.btn{font:inherit;font-size:.9rem;font-weight:600;background:var(--navy);color:#fff;border:1px solid var(--navy);border-radius:var(--r);padding:.6rem 1.1rem;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem}
+.btn:hover{background:#2B4259;border-color:#2B4259}
+.btn.ghost{background:#fff;color:var(--ink);border-color:var(--line-strong)}
+.btn.ghost:hover{border-color:var(--terra);color:var(--terra)}
+.btn.terra{background:var(--terra);border-color:var(--terra)}
+.btn.terra:hover{background:var(--terra-deep);border-color:var(--terra-deep)}
+.core{background:var(--card);border:1px solid var(--line-strong);border-radius:var(--r-lg);padding:1.4rem 1.5rem;margin:0 0 1.8rem}
+.core .task{font-family:var(--serif);font-size:1.08rem}
+.data{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.05rem;background:var(--cream);border:1px solid var(--line);border-radius:var(--r);padding:.7rem 1rem;margin:.6rem 0 1rem;letter-spacing:.04em;overflow-x:auto}
+.viz{margin:1rem 0 .4rem}
+.pick{font-size:.85rem;color:var(--ink-soft);margin:0 0 .6rem}
+.tabs{display:flex;gap:.6rem;flex-wrap:wrap;margin:0 0 1.4rem}
+.tab{flex:1 1 200px;text-align:left;cursor:pointer;background:var(--card);border:1px solid var(--line-strong);border-radius:var(--r-lg);padding:.85rem 1rem;font:inherit;color:var(--ink);transition:border-color .15s,background .15s}
+.tab:hover{border-color:var(--terra)}
+.tab:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--terra);outline-offset:2px}
+.tab .tname{display:block;font-family:var(--serif);font-size:1.08rem;font-weight:600}
+.tab .tsub{display:block;font-size:.8rem;color:var(--ink-soft);margin-top:.15rem}
+.tab.active{border-color:var(--terra);background:#fff;box-shadow:inset 0 0 0 1px var(--terra)}
+.tab.active .tname{color:var(--terra)}
+.panel{display:none}
+.panel.show{display:block;animation:rise .3s ease}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:1.2rem 1.4rem;margin:0 0 1rem}
+.aufgabe{border-left:3px solid var(--terra);padding:.1rem 0 .1rem 1rem;margin:0 0 1rem;font-family:var(--serif);font-size:1.04rem}
+.hint{background:var(--cream);border-left:3px solid var(--ochre);border-radius:0 var(--r) var(--r) 0;padding:.6rem .9rem;margin:.6rem 0;font-size:.92rem}
+.steps{margin:0;padding-left:1.25rem}.steps li{margin:.35rem 0}
+.field{display:grid;grid-template-columns:minmax(140px,1fr) minmax(120px,160px) auto;gap:.5rem .8rem;align-items:center;margin:.5rem 0}
+@media(max-width:560px){.field{grid-template-columns:1fr}}
+.field label{font-weight:600;font-size:.92rem}
+input[type=text],input[type=number],select,textarea{font:inherit;width:100%;padding:.5rem .7rem;border:1px solid var(--line-strong);border-radius:var(--r);background:#fff;color:var(--ink)}
+input.ok,select.ok,textarea.ok{border-color:var(--ok);background:var(--ok-soft)}
+input.err,select.err,textarea.err{border-color:var(--err)}
+.feedback{font-size:.88rem;min-height:1.2em}
+.feedback.ok{color:var(--ok);font-weight:600}
+.feedback.err{color:var(--err)}
+.choices{display:flex;flex-wrap:wrap;gap:.5rem;margin:.5rem 0}
+.choice{font:inherit;font-size:.92rem;background:#fff;border:1px solid var(--line-strong);border-radius:var(--r);padding:.5rem .9rem;cursor:pointer;color:var(--ink)}
+.choice:hover{border-color:var(--terra)}
+.choice.on{border-color:var(--navy);background:var(--cream)}
+.choice.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.choice.err{background:var(--err-soft);border-color:var(--err);color:var(--err)}
+.check{list-style:none;margin:.5rem 0 0;padding:0}
+.check li{display:flex;gap:.6rem;align-items:flex-start;padding:.4rem 0;border-top:1px solid var(--line)}
+.check li:first-child{border-top:0}
+.check input{width:auto;margin-top:.3rem;accent-color:var(--terra)}
+.reveal{margin-top:.8rem}
+.aha{background:var(--navy);color:#fff;border-radius:var(--r-lg);padding:1rem 1.2rem;margin:.8rem 0}
+.aha h3{color:var(--ochre);margin:0 0 .4rem}
+.lehrperson{margin-top:2rem;border:1px solid var(--terra);border-radius:var(--r-lg);background:#fff}
+.lehrperson>summary{cursor:pointer;padding:.9rem 1.2rem;font-weight:600;color:var(--terra);list-style:none}
+.lehrperson>summary::-webkit-details-marker{display:none}
+.lehrperson>summary::before{content:"+";display:inline-block;width:1.2rem;font-family:var(--serif)}
+.lehrperson[open]>summary::before{content:"–"}
+.lehrperson>div{padding:0 1.2rem 1.2rem;border-top:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:.92rem;background:#fff}
+th,td{text-align:left;padding:.45rem .6rem;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--cream);font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+.foot{margin-top:2.5rem;font-size:.78rem;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:.8rem}
+.sr{position:absolute;left:-9999px}
+/* Prüfungsvorbereitung */
+.exam-head{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;padding:.8rem 1rem;border:1px solid var(--line-strong);border-radius:var(--r-lg);background:#fff;margin:0 0 1rem}
+.timer{font-family:var(--serif);font-size:1.6rem;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.timer.over{color:var(--err)}
+.pts{float:right;font-size:.78rem;color:var(--ink-soft);border:1px solid var(--line);border-radius:999px;padding:.1rem .55rem;margin-left:.6rem}
+.score{display:none;background:var(--navy);color:#fff;border-radius:var(--r-lg);padding:1.1rem 1.3rem;margin:1rem 0}
+.score.show{display:block}
+.score .nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.8rem;margin:.3rem 0 .8rem}
+.score b{display:block;font-family:var(--serif);font-size:2rem;line-height:1;color:var(--ochre)}
+.score span{font-size:.82rem;color:#C3CCD6}
+.score table{background:transparent;color:#fff}.score th{background:transparent;color:#C3CCD6}.score td,.score th{border-color:#3A5068}
+.meter{height:8px;background:var(--cream);border-radius:999px;overflow:hidden;margin:.4rem 0}
+.meter i{display:block;height:100%;background:var(--terra);width:0;transition:width .4s}
+.loesung{display:none;margin-top:.6rem;padding:.6rem .9rem;background:var(--cream);border-radius:var(--r);font-size:.92rem}
+.loesung.show{display:block}
+.plan td:first-child{font-weight:600;white-space:nowrap}
+/* Lernspiel */
+.hud{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.6rem;margin:0 0 .8rem}
+.stat{background:#fff;border:1px solid var(--line-strong);border-radius:var(--r-lg);padding:.55rem .8rem;text-align:center}
+.stat b{display:block;font-family:var(--serif);font-size:1.5rem;line-height:1.1}
+.stat span{font-size:.74rem;color:var(--ink-soft)}
+.tab.locked{opacity:.45;cursor:not-allowed}
+.tab.done .tname::after{content:" ✓";color:var(--ok)}
+.q{font-family:var(--serif);font-size:1.35rem;line-height:1.3;margin:.2rem 0 .8rem}
+.choices.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+@media(max-width:560px){.choices.grid2{grid-template-columns:1fr}}
+.choice.sel{border-color:var(--navy);background:var(--cream)}
+.choice.done{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);pointer-events:none}
+.pairs{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.order .choice::before{content:attr(data-n) " ";color:var(--terra);font-weight:600}
+.next{display:flex;justify-content:space-between;align-items:center;gap:.8rem;flex-wrap:wrap;margin-top:1rem;min-height:2.4rem}
+.msg-level{background:var(--cream);border-radius:var(--r);padding:.7rem .9rem;margin:.6rem 0;font-size:.95rem}
+</style>
+<style>
+.pairs .col{display:grid;gap:.5rem;align-content:start}
+.pairs .choice,.choices.order .choice{width:100%;text-align:left}
+.choices.order{display:grid;gap:.5rem}
+.choice .num{font-weight:600;color:var(--terra);margin-right:.4rem}
+.choice.done .num{color:var(--ok)}
+.msg-level b{font-family:var(--serif)}
+#erklaerung[hidden]{display:none}
+.lv-print{margin:0 0 1.2rem}
+@media print{
+  @page{size:A4 portrait;margin:14mm}
+  body{background:#fff;padding:0;color:#1E3246}
+  .tabs,.hud,.meter,#stage,.score,.btn,.lead{display:none!important}
+  .top{margin-bottom:.6rem}
+  .eyebrow{color:#B84816}
+  h1{font-size:1.6rem;color:#1E3246}
+  .lehrperson{border:1px solid #1E3246;margin-top:.6rem;break-inside:auto}
+  .lehrperson>summary{color:#B84816;border-bottom:1px solid #CDC4AD}
+  .lehrperson>div{border-top:0}
+  .lv-print{break-before:page}
+  .lv-print:first-child{break-before:auto}
+  .lv-print h3{color:#B84816;border-bottom:1px solid #F1A51A;padding-bottom:.2rem}
+  table{break-inside:auto}
+  tr,td,th,.aufgabe,.hint{break-inside:avoid}
+  th{background:#fff;color:#5B6572}
+  .foot{color:#5B6572}
+}
+</style>
+<!-- lernwege-print -->
+<style media="print" id="lernwege-print">
+@page { size: A4 portrait; margin: 14mm 16mm; }
+@media print {
+  html, body { background: #fff !important; color: #111 !important; font-size: 11pt !important; line-height: 1.4 !important; }
+  * { box-shadow: none !important; text-shadow: none !important; animation: none !important; transition: none !important; }
+  body { max-width: none !important; margin: 0 !important; padding: 0 !important; }
+  /* Bedienelemente weg */
+  button, [role="tablist"], [role="tab"], nav, .tabs, .tab-bar, .tabbar, .reiter, .toolbar, .no-print { display: none !important; }
+  input[type="button"], input[type="submit"] { display: none !important; }
+  a[href^="http"]::after { content: ""; }
+  /* Verborgene Inhalte sichtbar (alle Zugänge, Lösungen) */
+  [hidden], .hidden, [aria-hidden="true"]:not(svg):not(span) { display: block !important; }
+  [role="tabpanel"], .panel, .tab-panel, .zugang { display: block !important; }
+  details { display: block !important; }
+  details > summary { list-style: none; font-weight: 600; }
+  details > :not(summary) { display: block !important; }
+  /* Grosse Abschnitte je auf neuer Seite, nichts mittendrin brechen */
+  [role="tabpanel"], .panel, .tab-panel, .zugang, section.zugang, .teacher, .lehrperson, .fuer-lehrperson { break-before: page; page-break-before: always; }
+  [role="tabpanel"]:first-of-type, .panel:first-of-type, .tab-panel:first-of-type { break-before: auto; page-break-before: auto; }
+  h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
+  p, li, tr, .card, .box, .aufgabe, .frage, figure, svg, table, pre { break-inside: avoid; page-break-inside: avoid; }
+  /* Eingabefelder als Linien, Häkchen und Hinweise ausblenden */
+  input[type="text"], input[type="number"], textarea, select { border: none !important; border-bottom: 1px solid #333 !important; background: #fff !important; box-shadow: none !important; }
+  input[type="checkbox"], input[type="radio"] { -webkit-appearance: checkbox; appearance: auto; }
+  .feedback, .hint, .ok, .check-ok, .correct { color: #111 !important; }
+  /* CI-Farben: Navy #1E3246, Terra #B84816, Ocker #F1A51A, Creme #F6EFE2 */
+  h1, h2, h3, h4 { color: #1E3246 !important; }
+  h1 { font-size: 20pt !important; border-bottom: 2pt solid #B84816 !important; padding-bottom: 4pt !important; }
+  h2 { font-size: 15pt !important; margin-top: 14pt !important; }
+  h3 { font-size: 12.5pt !important; }
+  header, .hero { background: transparent !important; color: #1E3246 !important; padding: 0 0 .6rem !important; margin: 0 0 1rem !important; border: 0 !important; box-shadow: none !important; }
+  .card, .box, section, article, aside, [role="tabpanel"], .panel, .tab-panel, .zugang, details {
+    background: transparent !important; color: #111 !important;
+    border: 1pt solid #1E3246 !important; border-radius: 4pt !important; padding: 8pt 10pt !important; margin: 0 0 10pt !important;
+  }
+  [role="tabpanel"] > .card, .panel > .card, section > section, section > .card { border-color: #cdc4ad !important; }
+  details.lehrperson, .lehrperson, .teacher { border-color: #B84816 !important; }
+  details > summary { color: #B84816 !important; }
+  blockquote, .hinweis, .tipp, .info { border-left: 3pt solid #F1A51A !important; border-top: 0 !important; border-right: 0 !important; border-bottom: 0 !important; padding-left: 8pt !important; background: transparent !important; }
+  table { border-collapse: collapse !important; }
+  td, th { border: 1pt solid #1E3246 !important; padding: .25rem .5rem !important; }
+  th { background: #F6EFE2 !important; color: #1E3246 !important; }
+  a { color: #B84816 !important; text-decoration: none !important; }
+  svg { max-width: 100% !important; height: auto !important; }
+  img { max-width: 100% !important; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div>
+    <p class="eyebrow">Mathematik · Berufsmaturität · Lernspiel</p>
+    <h1>Lineare Optimierung</h1>
+    <p class="lead">Vier Levels: Begriffe erkennen, Fachwörter und Werte erinnern, Modelle anwenden, Lösungswege ordnen. Mit Punkten, Serie, Leben und Bestleistung.</p>
+  </div>
+  <div>
+    <button class="btn ghost" type="button" id="restart">Neu starten</button>
+    <button class="btn ghost pdf" type="button" id="pdf">Aufgabenliste als PDF</button>
+  </div>
+</header>
+
+<div class="hud">
+  <div class="stat"><b id="punkte">0</b><span>Punkte</span></div>
+  <div class="stat"><b id="serie">0</b><span>Serie</span></div>
+  <div class="stat"><b id="leben">3</b><span>Leben</span></div>
+  <div class="stat"><b id="pos">1/7</b><span>Aufgabe</span></div>
+</div>
+<div class="meter"><i id="fortschritt"></i></div>
+
+<div class="tabs" role="tablist" aria-label="Levels">
+  <button class="tab active" role="tab" aria-selected="true" aria-controls="p-1" id="t-1" data-level="1"><span class="tname">1 · Erkennen</span><span class="tsub">Auswahl</span></button>
+  <button class="tab locked" role="tab" aria-selected="false" aria-controls="p-2" id="t-2" data-level="2"><span class="tname">2 · Erinnern</span><span class="tsub">Eingabe</span></button>
+  <button class="tab locked" role="tab" aria-selected="false" aria-controls="p-3" id="t-3" data-level="3"><span class="tname">3 · Anwenden</span><span class="tsub">Zuordnen, Szenarien</span></button>
+  <button class="tab locked" role="tab" aria-selected="false" aria-controls="p-4" id="t-4" data-level="4"><span class="tname">4 · Meistern</span><span class="tsub">Reihenfolge, Transfer</span></button>
+</div>
+
+<section class="card panel show" id="stage" role="tabpanel" aria-labelledby="t-1" aria-live="polite">
+  <p class="eyebrow" id="level-label">Level 1 · Erkennen</p>
+  <p class="q" id="frage">…</p>
+  <div class="choices grid2" id="antworten"></div>
+  <div class="hint" id="erklaerung" hidden></div>
+  <div class="next">
+    <span class="feedback" id="feedback"></span>
+    <button class="btn terra" type="button" id="weiter" hidden>Weiter</button>
+  </div>
+</section>
+
+<div class="score" id="ende">
+  <h2 style="color:#F1A51A;margin-top:0">Spiel beendet</h2>
+  <div class="nums">
+    <div><b id="ende-punkte">0</b><span>Punkte</span></div>
+    <div><b id="ende-best">0</b><span>Bestleistung</span></div>
+    <div><b id="ende-quote">0 %</b><span>richtig</span></div>
+  </div>
+  <table><thead><tr><th>Level</th><th>richtig</th><th>falsch</th></tr></thead><tbody id="ende-tabelle"></tbody></table>
+  <p><button class="btn terra" type="button" id="nochmals">Nochmals spielen</button></p>
+</div>
+
+<details class="lehrperson">
+  <summary>Für die Lehrperson: alle Aufgaben mit Lösungen, Einsatz im Unterricht</summary>
+  <div>
+    <div id="loesungen"></div>
+    <h3>Einsatz im Unterricht</h3>
+    <ul class="steps">
+      <li><b>Einzeltraining:</b> 15 Minuten vor der Repetitionslektion. Alle spielen bis Level 3; wer Level 4 erreicht, notiert die Punktzahl. Falsch beantwortete Aufgaben werden ins Heft übertragen und von Hand gerechnet.</li>
+      <li><b>Partnerduell:</b> Zwei Lernende an einem Gerät, abwechselnd eine Aufgabe. Vor dem Klick muss die Partnerin oder der Partner die Wahl begründen; nur begründete Antworten zählen. Gewonnen hat, wer nach Level 2 mehr Punkte beigesteuert hat.</li>
+      <li><b>Wettkampf in Gruppen:</b> Vierergruppen, 10 Minuten Zeitlimit, ein Durchgang pro Gruppe. Gewertet werden Punkte plus erreichtes Level. Anschliessend besprechen die Gruppen die Aufgaben aus Level 4 an der Wandtafel (grafisches Verfahren skizzieren).</li>
+    </ul>
+    <h3>Aufgaben anpassen</h3>
+    <p>Alle Inhalte stehen im JavaScript-Datenfeld <code>AUFGABEN</code> am Ende der Datei. Jeder Eintrag hat <code>level</code>, <code>typ</code> (<code>mc</code>, <code>eingabe</code>, <code>zuordnen</code>, <code>reihenfolge</code>), <code>frage</code>, je nach Typ <code>optionen</code>/<code>loesung</code>, <code>paare</code> oder <code>reihenfolge</code> sowie <code>erklaerung</code>. Neue Aufgaben einfach ergänzen – Spiel und diese Lösungsliste werden aus demselben Datenfeld gespeist. Bei Eingaben lassen sich erlaubte Schreibweisen als weitere Einträge im Lösungsarray hinzufügen.</p>
+    <h3>Spielregeln</h3>
+    <p>10 Punkte beim ersten Versuch, 5 beim zweiten, ab drei richtigen Antworten in Serie 5 Bonuspunkte. Drei Leben pro Level; bei null Leben startet das Level neu. Das nächste Level öffnet ab 70 Prozent richtig.</p>
+  </div>
+</details>
+
+<p class="foot">Lernspiel erzeugt mit Lernwege (EDUTECSOL). Mathematik · Berufsmaturität · Lineare Optimierung.</p>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+var LEVELNAMEN = {1:"Erkennen",2:"Erinnern",3:"Anwenden",4:"Meistern"};
+
+var AUFGABEN = [
+/* ---------- Level 1: Erkennen ---------- */
+{level:1,typ:"mc",frage:"Was beschreibt die Zielfunktion eines linearen Optimierungsproblems?",
+ optionen:["Die Grösse, die maximiert oder minimiert werden soll","Die Menge aller zulässigen Punkte","Die Bedingung, dass alle Variablen ganzzahlig sind","Die Randgerade der schärfsten Nebenbedingung"],
+ loesung:0,erklaerung:"Die Zielfunktion, z. B. z = 5x + 8y, ordnet jedem Punkt einen Wert zu. Gesucht ist der zulässige Punkt mit grösstem (oder kleinstem) Wert."},
+{level:1,typ:"mc",frage:"Welche Punktmenge beschreibt die Ungleichung 2x + 3y ≤ 12 in der Ebene?",
+ optionen:["Eine Halbebene samt Randgerade","Nur die Gerade 2x + 3y = 12","Einen Kreis um den Ursprung","Die ganze Ebene ohne eine Gerade"],
+ loesung:0,erklaerung:"Die Gleichung 2x + 3y = 12 liefert die Randgerade; die Ungleichung mit ≤ nimmt zusätzlich die Halbebene auf jener Seite dazu, in der der Ursprung liegt."},
+{level:1,typ:"mc",frage:"Wie entsteht der zulässige Bereich?",
+ optionen:["Als Schnittmenge aller Halbebenen der Nebenbedingungen","Als Vereinigung aller Halbebenen","Als Menge aller Punkte auf der Zielgeraden","Durch Einsetzen der Eckpunkte in die Zielfunktion"],
+ loesung:0,erklaerung:"Ein Punkt ist nur zulässig, wenn er alle Nebenbedingungen gleichzeitig erfüllt – also in allen Halbebenen zugleich liegt."},
+{level:1,typ:"mc",frage:"Der zulässige Bereich ist ein beschränktes, konvexes Vieleck. Wo liegt das Optimum der linearen Zielfunktion?",
+ optionen:["In mindestens einem Eckpunkt","Immer genau im Innern des Bereichs","Stets im Schwerpunkt des Vielecks","Immer im Ursprung (0|0)"],
+ loesung:0,erklaerung:"Das ist die Kernaussage des Ecksatzes: Es genügt, die Eckpunkte zu prüfen."},
+{level:1,typ:"mc",frage:"Wie heissen die Bedingungen x ≥ 0 und y ≥ 0 in einem Produktionsmodell?",
+ optionen:["Nichtnegativitätsbedingungen","Zielbedingungen","Niveaulinien","Optimalitätskriterium"],
+ loesung:0,erklaerung:"Stückzahlen oder Mengen können nicht negativ sein; die Nichtnegativitätsbedingungen beschränken das Problem auf den ersten Quadranten."},
+{level:1,typ:"mc",frage:"Die Niveaulinien (Zielgeraden) der Zielfunktion z = 3x + 4y sind …",
+ optionen:["parallele Geraden mit gleicher Steigung","konzentrische Kreise","Parabeln","Geraden durch den Ursprung mit verschiedenen Steigungen"],
+ loesung:0,erklaerung:"Für jedes feste z ergibt 3x + 4y = z eine Gerade mit Steigung −3/4. Verschiedene z liefern parallel verschobene Geraden."},
+{level:1,typ:"mc",frage:"Wie bestimmt man die Koordinaten eines Eckpunkts des zulässigen Bereichs?",
+ optionen:["Zwei Randgeraden schneiden, also ein Gleichungssystem lösen","Die Zielfunktion null setzen","Den Mittelwert aller Nebenbedingungen bilden","Die Zielgerade ableiten"],
+ loesung:0,erklaerung:"Jeder Eckpunkt ist Schnittpunkt zweier Randgeraden. Anschliessend prüft man, ob er alle übrigen Bedingungen erfüllt."},
+
+/* ---------- Level 2: Erinnern ---------- */
+{level:2,typ:"eingabe",frage:"Wie heisst die Funktion, deren Wert maximiert oder minimiert werden soll? (ein Wort)",
+ loesung:["Zielfunktion"],erklaerung:"Die Zielfunktion ist linear, z. B. z = 5x + 8y."},
+{level:2,typ:"eingabe",frage:"Nenne das Fachwort für die einschränkenden Ungleichungen (anderes Wort als «Nebenbedingungen»).",
+ loesung:["Restriktionen","Restriktion"],erklaerung:"Nebenbedingungen heissen auch Restriktionen; sie beschreiben begrenzte Kapazitäten wie Zeit, Material oder Platz."},
+{level:2,typ:"eingabe",frage:"Berechne den Wert der Zielfunktion z = 4x + 5y im Punkt P(3|2).",
+ loesung:["22"],erklaerung:"z = 4·3 + 5·2 = 12 + 10 = 22."},
+{level:2,typ:"eingabe",frage:"Bei welchem x-Wert schneidet die Randgerade 2x + y = 10 die x-Achse?",
+ loesung:["5","x=5"],erklaerung:"Auf der x-Achse ist y = 0, also 2x = 10 und damit x = 5."},
+{level:2,typ:"eingabe",frage:"Berechne die y-Koordinate des Schnittpunkts der Geraden x + y = 6 und x = 2.",
+ loesung:["4","y=4"],erklaerung:"Einsetzen: 2 + y = 6, also y = 4. Der Eckpunkt ist (2|4)."},
+{level:2,typ:"eingabe",frage:"Welches Rechenverfahren löst lineare Optimierungsprobleme mit vielen Variablen (Stichwort: Tableau)?",
+ loesung:["Simplex","Simplexverfahren","Simplexalgorithmus","Simplexmethode","Simplex-Verfahren","Simplex-Algorithmus"],erklaerung:"Das Simplexverfahren wandert rechnerisch von Eckpunkt zu Eckpunkt und verbessert dabei den Zielfunktionswert."},
+{level:2,typ:"eingabe",frage:"Der zulässige Bereich eines beschränkten Problems ist geometrisch ein konvexes … (ein Wort)",
+ loesung:["Vieleck","Polygon","n-Eck","Neck"],erklaerung:"Da jede Nebenbedingung eine Halbebene liefert, ist die Schnittmenge ein konvexes Vieleck (Polygon)."},
+
+/* ---------- Level 3: Anwenden ---------- */
+{level:3,typ:"zuordnen",frage:"Ordne jedem Fachbegriff die passende Erklärung zu.",
+ paare:[["Zielfunktion","Wird maximiert oder minimiert"],["Nebenbedingung","Begrenzt als Ungleichung die Variablen"],["Zulässiger Bereich","Menge aller Punkte, die alle Bedingungen erfüllen"],["Eckpunkt","Schnittpunkt zweier Randgeraden am Rand des Bereichs"]],
+ erklaerung:"Diese vier Begriffe bilden das Grundgerüst jedes Modells der linearen Optimierung."},
+{level:3,typ:"mc",frage:"Ein Betrieb fertigt x Stück von A und y Stück von B. A braucht 2 h, B braucht 4 h Maschinenzeit, pro Woche stehen 40 h zur Verfügung. Welche Nebenbedingung gilt?",
+ optionen:["2x + 4y ≤ 40","2x + 4y ≥ 40","4x + 2y ≤ 40","2x + 4y = 40"],
+ loesung:0,erklaerung:"Der Zeitverbrauch 2x + 4y darf die vorhandenen 40 Stunden nicht überschreiten – also eine ≤-Bedingung."},
+{level:3,typ:"mc",frage:"Produkt A bringt 5 Fr. Gewinn pro Stück, Produkt B 8 Fr. Welche Zielfunktion wird maximiert?",
+ optionen:["z = 5x + 8y","z = 8x + 5y","z = 5x · 8y","z = 13(x + y)"],
+ loesung:0,erklaerung:"Der Gesamtgewinn ist die Summe der Einzelgewinne: 5 Fr. je Stück A, 8 Fr. je Stück B."},
+{level:3,typ:"zuordnen",frage:"Ordne jeder Situation die richtige Folgerung zu.",
+ paare:[["Zielgerade parallel zu einer Kante","Unendlich viele optimale Lösungen auf dieser Kante"],["Zulässiger Bereich ist leer","Keine Lösung, die Bedingungen widersprechen sich"],["Bereich unbeschränkt, Maximum gesucht","Die Zielfunktion kann beliebig gross werden"],["Bereich beschränktes Vieleck","Das Optimum liegt in einem Eckpunkt"]],
+ erklaerung:"Vor dem Rechnen lohnt sich immer ein Blick auf die Gestalt des zulässigen Bereichs."},
+{level:3,typ:"mc",frage:"Der zulässige Bereich hat die Eckpunkte (0|0), (0|5), (4|3) und (6|0). Wo wird z = 4x + 2y maximal?",
+ optionen:["(6|0) mit z = 24","(4|3) mit z = 22","(0|5) mit z = 10","(0|0) mit z = 0"],
+ loesung:0,erklaerung:"Werte: 0, 10, 22 und 24. Das Maximum 24 liegt im Eckpunkt (6|0)."},
+{level:3,typ:"zuordnen",frage:"Ordne jeder Ungleichung die Achsenschnittpunkte ihrer Randgeraden zu.",
+ paare:[["3x + y ≤ 9","Randgerade durch (3|0) und (0|9)"],["x + 2y ≤ 8","Randgerade durch (8|0) und (0|4)"],["5x + 2y ≤ 20","Randgerade durch (4|0) und (0|10)"],["x + y ≤ 7","Randgerade durch (7|0) und (0|7)"]],
+ erklaerung:"Für den x-Achsenschnittpunkt setzt man y = 0, für den y-Achsenschnittpunkt x = 0. So zeichnet man jede Randgerade in Sekunden."},
+
+/* ---------- Level 4: Meistern ---------- */
+{level:4,typ:"reihenfolge",frage:"Bringe die Schritte des grafischen Lösungsverfahrens in die richtige Reihenfolge.",
+ reihenfolge:["Variablen festlegen (x, y)","Zielfunktion aufstellen","Nebenbedingungen als Ungleichungen aufstellen","Zulässigen Bereich zeichnen","Eckpunkte berechnen","Zielfunktionswerte vergleichen und Optimum angeben"],
+ erklaerung:"Zuerst wird modelliert, dann gezeichnet, erst zuletzt gerechnet und entschieden."},
+{level:4,typ:"reihenfolge",frage:"Ordne die Eckpunkte nach steigendem Wert von z = 3x + 2y.",
+ reihenfolge:["(0|0)","(0|4)","(2|3)","(5|0)"],
+ erklaerung:"Werte: 0, 8, 12 und 15. Das Maximum liegt also in (5|0)."},
+{level:4,typ:"mc",frage:"Die Zielgerade verläuft parallel zu einer Kante des zulässigen Bereichs. Was folgt daraus?",
+ optionen:["Alle Punkte dieser Kante sind optimal, es gibt unendlich viele Lösungen","Es gibt gar keine Lösung","Nur der Mittelpunkt der Kante ist optimal","Die Zielfunktion ist dann nicht linear"],
+ loesung:0,erklaerung:"Beide Endecken der Kante liefern denselben Zielfunktionswert; damit ist die ganze Verbindungsstrecke optimal."},
+{level:4,typ:"mc",frage:"Die Maschinenkapazität sinkt von 50 h auf 40 h, alles andere bleibt gleich. Was geschieht mit dem maximalen Gewinn?",
+ optionen:["Er kann nur sinken oder gleich bleiben","Er steigt sicher","Er bleibt immer exakt gleich","Er wird negativ"],
+ loesung:0,erklaerung:"Die schärfere Bedingung verkleinert den zulässigen Bereich. Eine Teilmenge kann kein grösseres Maximum enthalten."},
+{level:4,typ:"reihenfolge",frage:"Ordne die Randgeraden nach steigendem x-Achsenabschnitt.",
+ reihenfolge:["3x + y = 9","5x + y = 20","x + y = 6","x + 2y = 8"],
+ erklaerung:"Mit y = 0 ergeben sich die x-Werte 3, 4, 6 und 8."},
+{level:4,typ:"mc",frage:"Warum genügt es bei beschränktem zulässigem Bereich, nur die Eckpunkte zu prüfen?",
+ optionen:["Weil eine lineare Zielfunktion ihr Optimum über einem konvexen Vieleck stets in einem Eckpunkt annimmt","Weil im Innern keine zulässigen Punkte liegen","Weil die Zielfunktion in den Ecken immer null ist","Weil die Nebenbedingungen nur in den Ecken gelten"],
+ loesung:0,erklaerung:"Die Zielgerade wird parallel verschoben; der letzte Berührpunkt mit dem Vieleck ist eine Ecke oder eine ganze Randkante."}
+];
+
+/* ---------- Hilfsfunktionen ---------- */
+function shuffle(arr){var a=arr.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function norm(s){return String(s).toLowerCase().trim().replace(/ß/g,"ss").replace(/,/g,".").replace(/\s+/g," ");}
+function normHart(s){return norm(s).replace(/[\s\-]/g,"");}
+function loesungstext(a){
+  if(a.typ==="mc") return a.optionen[a.loesung];
+  if(a.typ==="eingabe") return a.loesung[0];
+  if(a.typ==="zuordnen") return a.paare.map(function(p){return p[0]+" → "+p[1];}).join("; ");
+  if(a.typ==="reihenfolge") return a.reihenfolge.join(" → ");
+  return "";
+}
+
+/* ---------- DOM ---------- */
+var elPunkte=document.getElementById("punkte"),elSerie=document.getElementById("serie"),elLeben=document.getElementById("leben"),
+    elPos=document.getElementById("pos"),elMeter=document.getElementById("fortschritt"),elLabel=document.getElementById("level-label"),
+    elFrage=document.getElementById("frage"),elAntw=document.getElementById("antworten"),elErkl=document.getElementById("erklaerung"),
+    elFb=document.getElementById("feedback"),elWeiter=document.getElementById("weiter"),elStage=document.getElementById("stage"),
+    elEnde=document.getElementById("ende"),tabs=Array.prototype.slice.call(document.querySelectorAll(".tab"));
+
+var BESTKEY="lw-lineare-optimierung-best";
+var state=null;
+
+function neuerState(){
+  return {level:1,queue:[],index:0,versuch:1,punkte:0,serie:0,leben:3,
+    stats:{1:{r:0,f:0},2:{r:0,f:0},3:{r:0,f:0},4:{r:0,f:0}},
+    frei:{1:true,2:false,3:false,4:false},fertig:{1:false,2:false,3:false,4:false},
+    aktiv:true,gewaehlt:null,selLinks:null,geloest:0,ordPos:0,phase:"frage"};
+}
+
+function hud(){
+  elPunkte.textContent=state.punkte;
+  elSerie.textContent=state.serie;
+  elLeben.textContent=state.leben;
+  if(state.queue.length&&state.phase==="frage"){
+    elPos.textContent=(state.index+1)+"/"+state.queue.length;
+    elMeter.style.width=Math.round((state.index/state.queue.length)*100)+"%";
+  }
+}
+
+function tabsAktualisieren(){
+  tabs.forEach(function(t){
+    var lv=parseInt(t.dataset.level,10);
+    t.classList.toggle("locked",!state.frei[lv]);
+    t.classList.toggle("done",state.fertig[lv]);
+    t.classList.toggle("active",lv===state.level);
+    t.setAttribute("aria-selected",lv===state.level?"true":"false");
+  });
+  elStage.setAttribute("aria-labelledby","t-"+state.level);
+}
+
+/* ---------- Levelsteuerung ---------- */
+function startLevel(lv){
+  state.level=lv;
+  state.leben=3;
+  state.stats[lv]={r:0,f:0};
+  state.queue=shuffle(AUFGABEN.filter(function(a){return a.level===lv;}));
+  state.index=0;
+  state.phase="frage";
+  elEnde.classList.remove("show");
+  elStage.style.display="";
+  tabsAktualisieren();
+  renderAufgabe();
+}
+
+function renderAufgabe(){
+  var a=state.queue[state.index];
+  state.versuch=1;state.aktiv=true;state.gewaehlt=null;state.selLinks=null;state.geloest=0;state.ordPos=0;state.phase="frage";
+  elLabel.textContent="Level "+a.level+" · "+LEVELNAMEN[a.level];
+  elFrage.textContent=a.frage;
+  elErkl.hidden=true;elErkl.innerHTML="";
+  elFb.textContent="";elFb.className="feedback";
+  elWeiter.hidden=true;
+  elAntw.innerHTML="";
+  if(a.typ==="mc") renderMC(a);
+  else if(a.typ==="eingabe") renderEingabe(a);
+  else if(a.typ==="zuordnen") renderZuordnen(a);
+  else if(a.typ==="reihenfolge") renderReihenfolge(a);
+  hud();
+}
+
+function pruefknopf(){
+  elWeiter.hidden=false;
+  elWeiter.textContent="Prüfen";
+  elWeiter.dataset.mode="pruefen";
+}
+function weiterknopf(){
+  elWeiter.hidden=false;
+  elWeiter.textContent="Weiter";
+  elWeiter.dataset.mode="weiter";
+  elWeiter.focus();
+}
+
+/* ---------- Aufgabentypen ---------- */
+function renderMC(a){
+  elAntw.className="choices grid2";
+  a.optionen.forEach(function(o,i){
+    var b=document.createElement("button");
+    b.type="button";b.className="choice";b.dataset.i=i;
+    b.innerHTML='<span class="num">'+(i+1)+'</span>'+o;
+    b.addEventListener("click",function(){waehleMC(i);});
+    elAntw.appendChild(b);
+  });
+  pruefknopf();
+}
+function waehleMC(i){
+  if(!state.aktiv) return;
+  state.gewaehlt=i;
+  Array.prototype.forEach.call(elAntw.children,function(b,k){b.classList.toggle("sel",k===i);});
+  elFb.textContent="";elFb.className="feedback";
+  pruefknopf();
+}
+function pruefeMC(){
+  var a=state.queue[state.index];
+  if(state.gewaehlt===null){elFb.textContent="Bitte zuerst eine Antwort wählen.";elFb.className="feedback err";return;}
+  var b=elAntw.children[state.gewaehlt];
+  if(state.gewaehlt===a.loesung){b.classList.remove("sel");b.classList.add("ok");abschliessen(true);}
+  else{
+    b.classList.remove("sel");b.classList.add("err");
+    fehlversuch("Diese Option passt nicht. Lies die Frage nochmals genau und wähle neu.");
+  }
+}
+
+function renderEingabe(a){
+  elAntw.className="";
+  var wrap=document.createElement("div");
+  wrap.className="field";
+  wrap.innerHTML='<label for="eing">Deine Antwort</label><input type="text" id="eing" autocomplete="off" spellcheck="false"><span></span>';
+  elAntw.appendChild(wrap);
+  var inp=wrap.querySelector("input");
+  inp.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();aktion();}});
+  setTimeout(function(){inp.focus();},30);
+  pruefknopf();
+}
+function pruefeEingabe(){
+  var a=state.queue[state.index];
+  var inp=document.getElementById("eing");
+  var wert=inp.value;
+  if(!wert.trim()){elFb.textContent="Bitte etwas eintragen.";elFb.className="feedback err";return;}
+  var ok=a.loesung.some(function(l){return norm(l)===norm(wert)||normHart(l)===normHart(wert);});
+  if(ok){inp.classList.remove("err");inp.classList.add("ok");inp.readOnly=true;abschliessen(true);}
+  else{
+    inp.classList.add("err");
+    fehlversuch("Noch nicht richtig. Achte auf den Fachbegriff bzw. rechne nochmals nach.");
+  }
+}
+
+function renderZuordnen(a){
+  elAntw.className="pairs";
+  var cl=document.createElement("div");cl.className="col";
+  var cr=document.createElement("div");cr.className="col";
+  var li=shuffle(a.paare.map(function(p,i){return {t:p[0],i:i};}));
+  var re=shuffle(a.paare.map(function(p,i){return {t:p[1],i:i};}));
+  li.forEach(function(o){
+    var b=document.createElement("button");b.type="button";b.className="choice";b.dataset.i=o.i;b.dataset.seite="l";b.textContent=o.t;
+    b.addEventListener("click",function(){klickLinks(b);});cl.appendChild(b);
+  });
+  re.forEach(function(o){
+    var b=document.createElement("button");b.type="button";b.className="choice";b.dataset.i=o.i;b.dataset.seite="r";b.textContent=o.t;
+    b.addEventListener("click",function(){klickRechts(b);});cr.appendChild(b);
+  });
+  elAntw.appendChild(cl);elAntw.appendChild(cr);
+  elFb.textContent="Links einen Begriff wählen, dann rechts die passende Aussage.";
+  elWeiter.hidden=true;
+}
+function klickLinks(b){
+  if(!state.aktiv||b.classList.contains("done")) return;
+  Array.prototype.forEach.call(elAntw.children[0].children,function(x){x.classList.remove("sel");});
+  b.classList.add("sel");state.selLinks=b;
+  elFb.textContent="Nun rechts die passende Aussage wählen.";elFb.className="feedback";
+}
+function klickRechts(b){
+  if(!state.aktiv||b.classList.contains("done")) return;
+  if(!state.selLinks){elFb.textContent="Zuerst links einen Begriff wählen.";elFb.className="feedback err";return;}
+  var a=state.queue[state.index];
+  if(state.selLinks.dataset.i===b.dataset.i){
+    state.selLinks.classList.remove("sel");
+    state.selLinks.classList.add("done");b.classList.add("done");
+    state.selLinks=null;state.geloest++;
+    if(state.geloest===a.paare.length){abschliessen(true);}
+    else{elFb.textContent="Paar stimmt. Weiter geht's.";elFb.className="feedback ok";}
+  }else{
+    state.selLinks.classList.remove("sel");state.selLinks=null;
+    b.classList.add("err");
+    var bb=b;setTimeout(function(){bb.classList.remove("err");},600);
+    fehlversuch("Dieses Paar passt nicht zusammen. Überlege, welcher Begriff zu dieser Aussage gehört.");
+  }
+}
+
+function renderReihenfolge(a){
+  elAntw.className="choices order";
+  shuffle(a.reihenfolge.map(function(t,i){return {t:t,i:i};})).forEach(function(o){
+    var b=document.createElement("button");b.type="button";b.className="choice";b.dataset.i=o.i;
+    b.innerHTML='<span class="num">·</span>'+o.t;
+    b.addEventListener("click",function(){klickOrder(b);});
+    elAntw.appendChild(b);
+  });
+  elFb.textContent="In der richtigen Reihenfolge anklicken.";
+  elWeiter.hidden=true;
+}
+function klickOrder(b){
+  if(!state.aktiv||b.classList.contains("done")) return;
+  var a=state.queue[state.index];
+  if(parseInt(b.dataset.i,10)===state.ordPos){
+    state.ordPos++;
+    b.classList.add("done");
+    b.dataset.n=state.ordPos;
+    b.querySelector(".num").textContent=state.ordPos+".";
+    if(state.ordPos===a.reihenfolge.length){abschliessen(true);}
+    else{elFb.textContent="Richtig eingeordnet.";elFb.className="feedback ok";}
+  }else{
+    b.classList.add("err");
+    var bb=b;setTimeout(function(){bb.classList.remove("err");},600);
+    fehlversuch("Dieser Schritt kommt noch nicht. Überlege, was zuerst geschehen muss.");
+  }
+}
+
+/* ---------- Bewertung ---------- */
+function fehlversuch(hinweis){
+  state.versuch++;
+  if(state.versuch>2){abschliessen(false);}
+  else{elFb.textContent=hinweis;elFb.className="feedback err";}
+}
+
+function abschliessen(richtig){
+  var a=state.queue[state.index];
+  state.aktiv=false;state.phase="auswertung";
+  if(richtig){
+    var p=(state.versuch===1)?10:5;
+    state.serie++;
+    var bonus=(state.serie>=3)?5:0;
+    state.punkte+=p+bonus;
+    state.stats[a.level].r++;
+    elFb.textContent="Richtig. +"+(p+bonus)+" Punkte"+(bonus?" (Serienbonus)":"")+".";
+    elFb.className="feedback ok";
+  }else{
+    state.serie=0;state.leben--;
+    state.stats[a.level].f++;
+    elFb.textContent="Leider falsch. Ein Leben weniger.";
+    elFb.className="feedback err";
+    loesungZeigen(a);
+  }
+  elErkl.innerHTML="<b>Erklärung:</b> "+a.erklaerung+(richtig?"":"<br><b>Lösung:</b> "+loesungstext(a));
+  elErkl.hidden=false;
+  hud();
+  weiterknopf();
+}
+
+function loesungZeigen(a){
+  if(a.typ==="mc"){
+    Array.prototype.forEach.call(elAntw.children,function(b,k){
+      b.classList.remove("sel");
+      if(k===a.loesung) b.classList.add("ok");
+    });
+  }else if(a.typ==="eingabe"){
+    var inp=document.getElementById("eing");if(inp){inp.readOnly=true;}
+  }else if(a.typ==="zuordnen"){
+    Array.prototype.forEach.call(elAntw.querySelectorAll(".choice"),function(b){b.classList.remove("sel");b.disabled=true;});
+  }else if(a.typ==="reihenfolge"){
+    Array.prototype.forEach.call(elAntw.children,function(b){b.disabled=true;});
+  }
+}
+
+/* ---------- Weiter / Prüfen ---------- */
+function aktion(){
+  if(elWeiter.hidden) return;
+  if(elWeiter.dataset.mode==="pruefen"){
+    var a=state.queue[state.index];
+    if(a.typ==="mc") pruefeMC();
+    else if(a.typ==="eingabe") pruefeEingabe();
+    return;
+  }
+  if(state.leben<=0){levelNeustart();return;}
+  state.index++;
+  if(state.index>=state.queue.length){levelAbschluss();}
+  else{renderAufgabe();}
+}
+
+function meldung(titel,text,knopf,fn){
+  state.phase="meldung";
+  elLabel.textContent="Level "+state.level+" · "+LEVELNAMEN[state.level];
+  elFrage.textContent=titel;
+  elAntw.className="";
+  elAntw.innerHTML='<div class="msg-level">'+text+'</div>';
+  var b=document.createElement("button");
+  b.type="button";b.className="btn terra";b.textContent=knopf;
+  b.addEventListener("click",fn);
+  elAntw.appendChild(b);
+  elErkl.hidden=true;
+  elFb.textContent="";elFb.className="feedback";
+  elWeiter.hidden=true;
+  setTimeout(function(){b.focus();},30);
+}
+
+function levelNeustart(){
+  meldung("Keine Leben mehr","Dieses Level beginnt neu. Die Aufgaben werden neu gemischt, die bisherigen Punkte bleiben erhalten.","Level "+state.level+" neu starten",function(){startLevel(state.level);});
+  elMeter.style.width="0%";
+}
+
+function levelAbschluss(){
+  var lv=state.level,s=state.stats[lv],gesamt=s.r+s.f;
+  var quote=gesamt?Math.round((s.r/gesamt)*100):0;
+  elMeter.style.width="100%";
+  if(quote>=70){
+    state.fertig[lv]=true;
+    if(lv<4){
+      state.frei[lv+1]=true;
+      tabsAktualisieren();
+      meldung("Level "+lv+" geschafft","<b>"+quote+" % richtig.</b> Level "+(lv+1)+" · "+LEVELNAMEN[lv+1]+" ist jetzt offen. Punktestand: "+state.punkte+".","Level "+(lv+1)+" starten",function(){startLevel(lv+1);});
+    }else{
+      tabsAktualisieren();
+      spielEnde();
+    }
+  }else{
+    tabsAktualisieren();
+    if(lv<4){
+      meldung("Level "+lv+" noch nicht bestanden","Du hast "+quote+" % richtig. Für die Freischaltung des nächsten Levels sind 70 % nötig. Versuch es nochmals – die Erklärungen helfen dir weiter.","Level "+lv+" wiederholen",function(){startLevel(lv);});
+    }else{
+      spielEnde();
+    }
+  }
+}
+
+function spielEnde(){
+  var ges=0,ric=0,tb=document.getElementById("ende-tabelle");
+  tb.innerHTML="";
+  [1,2,3,4].forEach(function(lv){
+    var s=state.stats[lv];ges+=s.r+s.f;ric+=s.r;
+    var tr=document.createElement("tr");
+    tr.innerHTML="<td>"+lv+" · "+LEVELNAMEN[lv]+"</td><td>"+s.r+"</td><td>"+s.f+"</td>";
+    tb.appendChild(tr);
+  });
+  var best=0;
+  try{best=parseInt(localStorage.getItem(BESTKEY)||"0",10)||0;}catch(e){best=0;}
+  if(state.punkte>best){best=state.punkte;try{localStorage.setItem(BESTKEY,String(best));}catch(e){}}
+  document.getElementById("ende-punkte").textContent=state.punkte;
+  document.getElementById("ende-best").textContent=best;
+  document.getElementById("ende-quote").textContent=(ges?Math.round((ric/ges)*100):0)+" %";
+  elStage.style.display="none";
+  elEnde.classList.add("show");
+  document.getElementById("nochmals").focus();
+}
+
+/* ---------- Steuerung ---------- */
+elWeiter.addEventListener("click",aktion);
+document.getElementById("restart").addEventListener("click",function(){state=neuerState();startLevel(1);});
+document.getElementById("nochmals").addEventListener("click",function(){state=neuerState();startLevel(1);});
+
+tabs.forEach(function(t,idx){
+  t.addEventListener("click",function(){
+    var lv=parseInt(t.dataset.level,10);
+    if(!state.frei[lv]){
+      elFb.textContent="Level "+lv+" ist noch gesperrt – erst 70 % im aktuellen Level erreichen.";
+      elFb.className="feedback err";
+      return;
+    }
+    startLevel(lv);
+  });
+  t.addEventListener("keydown",function(e){
+    var n=null;
+    if(e.key==="ArrowRight") n=(idx+1)%tabs.length;
+    if(e.key==="ArrowLeft") n=(idx-1+tabs.length)%tabs.length;
+    if(n!==null){e.preventDefault();tabs[n].focus();}
+  });
+});
+
+document.addEventListener("keydown",function(e){
+  if(e.target&&(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA")) return;
+  if(e.key==="Enter"){
+    if(!elWeiter.hidden){e.preventDefault();aktion();}
+    return;
+  }
+  if(/^[1-4]$/.test(e.key)&&state&&state.phase==="frage"&&state.aktiv){
+    var a=state.queue[state.index];
+    if(!a) return;
+    var i=parseInt(e.key,10)-1;
+    if(a.typ==="mc"&&i<a.optionen.length){e.preventDefault();waehleMC(i);}
+  }
+});
+
+/* ---------- Lehrpersonen-Liste ---------- */
+(function(){
+  var ziel=document.getElementById("loesungen");
+  [1,2,3,4].forEach(function(lv){
+    var sec=document.createElement("section");
+    sec.className="lv-print";
+    var h=document.createElement("h3");
+    h.textContent="Level "+lv+" · "+LEVELNAMEN[lv];
+    sec.appendChild(h);
+    var tab=document.createElement("table");
+    tab.innerHTML="<thead><tr><th>Nr.</th><th>Aufgabe</th><th>Lösung und Erklärung</th></tr></thead>";
+    var tb=document.createElement("tbody");
+    var n=0;
+    AUFGABEN.filter(function(a){return a.level===lv;}).forEach(function(a){
+      n++;
+      var tr=document.createElement("tr");
+      var f=a.frage;
+      if(a.typ==="mc") f+="<br><i>"+a.optionen.join(" / ")+"</i>";
+      if(a.typ==="zuordnen") f+="<br><i>"+a.paare.map(function(p){return p[0];}).join(" / ")+" ↔ "+a.paare.map(function(p){return p[1];}).join(" / ")+"</i>";
+      if(a.typ==="reihenfolge") f+="<br><i>Elemente: "+a.reihenfolge.join(" / ")+"</i>";
+      tr.innerHTML="<td>"+lv+"."+n+"</td><td>"+f+"</td><td><b>"+loesungstext(a)+"</b><br>"+a.erklaerung+"</td>";
+      tb.appendChild(tr);
+    });
+    tab.appendChild(tb);
+    sec.appendChild(tab);
+    ziel.appendChild(sec);
+  });
+})();
+
+/* ---------- PDF ---------- */
+document.getElementById("pdf").addEventListener("click",function(){
+  var alleDetails=Array.prototype.slice.call(document.querySelectorAll("details"));
+  var zustand=alleDetails.map(function(d){return d.open;});
+  alleDetails.forEach(function(d){d.open=true;});
+  var panels=Array.prototype.slice.call(document.querySelectorAll('[role="tabpanel"]'));
+  var pz=panels.map(function(p){return p.className;});
+  panels.forEach(function(p){p.classList.add("show");});
+  window.print();
+  setTimeout(function(){
+    alleDetails.forEach(function(d,i){d.open=zustand[i];});
+    panels.forEach(function(p,i){p.className=pz[i];});
+  },400);
+});
+
+/* ---------- Start ---------- */
+state=neuerState();
+try{document.getElementById("ende-best").textContent=parseInt(localStorage.getItem(BESTKEY)||"0",10)||0;}catch(e){}
+startLevel(1);
+
+})();
+</script>
+</body>
+<!-- NOTIZ: Material enthielt nur den Titel «Lineare Optimierung» und einen Videolink, kein auslesbarer Fachtext; Thema daher als typisches BM-Thema ausgestaltet (Zielfunktion, Nebenbedingungen, zulässiger Bereich, Ecksatz, grafisches Verfahren, Simplex). Differenzierung über vier Levels mit steigender Anforderung (Erkennen – Erinnern – Anwenden – Meistern) und zwei Versuchen je Aufgabe. Twist: Freischaltung des nächsten Levels erst ab 70 Prozent, drei Leben pro Level mit Levelneustart. Aufgaben: Level 1: 7, Level 2: 7, Level 3: 6, Level 4: 6, total 26. -->
+</html>
