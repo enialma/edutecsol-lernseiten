@@ -4,307 +4,300 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lernwege – Lernseiten und Bilder für den Unterricht – EDUTECSOL</title>
+<meta name="description" content="Aus Unterrichtsmaterial entsteht eine interaktive Lernseite mit drei Zugängen A/B/C, Selbstkontrolle und Lösungen. Für Lehrpersonen in der Schweiz.">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-
+<link rel="preload" href="/fonts/fraunces-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/lw.css">
 <style>
-  :root{
-    --navy:#1E3246;--terra:#B84816;--ochre:#F1A51A;--cream:#F6EFE2;
-    --ink:#1E3246;--ink-soft:#5b6572;--line:#e2dbcb;--line-strong:#cdc4ad;
-    --card:#ffffff;--shadow:0 1px 2px rgba(30,50,70,.06),0 10px 30px rgba(30,50,70,.07);
-  }
-  *{box-sizing:border-box;}html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;}
-  body{margin:0;background:var(--cream);color:var(--ink);font-family:"Arial Nova Light",Arial,ui-sans-serif,system-ui,sans-serif;line-height:1.55;}
-  .wrap{max-width:1000px;margin:0 auto;padding:0 1.1rem;}
-
   /* Hero */
-  header{background:var(--navy);color:#fff;padding:clamp(2.4rem,7vw,4.5rem) 0 clamp(2rem,6vw,3.5rem);}
-  .brand{font-size:.82rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ochre);margin:0 0 1rem;font-weight:600;}
-  header h1{font-size:clamp(2rem,6vw,3.2rem);line-height:1.08;margin:0 0 .8rem;font-weight:600;max-width:20ch;}
-  header p{font-size:clamp(1.05rem,2.4vw,1.25rem);color:#cdd6df;margin:0 0 1.8rem;max-width:60ch;}
-  .hero-tags{display:flex;gap:.6rem;flex-wrap:wrap;}
-  .tag{font-size:.85rem;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:.35rem .9rem;}
+  .hero{padding:clamp(2.2rem,5vw,4rem) 0 clamp(2rem,4vw,3.5rem)}
+  .hero .wrap{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(1.5rem,4vw,3.5rem);align-items:start}
+  .hero .wrap > *{min-width:0}
+  .hero .cta{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:.3rem}
+  @media (max-width:900px){.hero .wrap{grid-template-columns:1fr}}
 
-  /* Prinzip-Band */
-  .principle{background:var(--terra);color:#fff;padding:1.2rem 0;}
-  .principle .wrap{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
-  .principle .big{font-size:1.15rem;font-weight:600;}
-  .principle .small{color:#ffe4d6;font-size:.95rem;}
+  /* Live-Demo */
+  .demo{background:#fff;border:1px solid var(--line-strong);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow)}
+  .demo .bar{display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.55rem .6rem .55rem .9rem;border-bottom:1px solid var(--line);background:var(--paper);flex-wrap:wrap}
+  .demo .tabs{display:flex;gap:.25rem;flex-wrap:wrap}
+  .demo .tabs button{font:inherit;font-size:.82rem;font-weight:600;padding:.38rem .75rem;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--ink-soft);cursor:pointer}
+  .demo .tabs button:hover{color:var(--ink)}
+  .demo .tabs button.on{background:#fff;color:var(--ink);border-color:var(--line-strong)}
+  .demo .open{font-size:.8rem;white-space:nowrap}
+  .demo iframe{display:block;width:100%;height:clamp(440px,56vw,600px);border:0;background:#fff}
+  .demo-cap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-size:.82rem;color:var(--ink-soft);margin:.7rem .2rem 0}
 
-  main{padding:clamp(2.2rem,6vw,3.5rem) 0 4rem;}
-  .sec-head{margin:2.6rem 0 1.1rem;}
-  .sec-head:first-child{margin-top:0;}
-  .sec-head h2{font-size:1.4rem;margin:0 0 .3rem;}
-  .sec-head p{margin:0;color:var(--ink-soft);font-size:.98rem;max-width:66ch;}
-  .kicker{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--terra);font-weight:600;margin:0 0 .3rem;}
+  /* Zitat-Band */
+  .quote .wrap{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(1.5rem,4vw,4rem);align-items:center}
+  .quote .wrap > *{min-width:0}
+  .quote blockquote{margin:0;font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(1.9rem,4vw,3.1rem);line-height:1.1;letter-spacing:-.01em}
+  .quote blockquote span{color:var(--ochre);font-style:normal}
+  .quote p{margin:0;color:#C9D2DC;font-size:1.02rem}
+  @media (max-width:820px){.quote .wrap{grid-template-columns:1fr}}
 
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;}
-  a.tile{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.1rem 1.2rem;box-shadow:var(--shadow);transition:transform .12s,border-color .2s,box-shadow .2s;}
-  a.tile:hover{transform:translateY(-2px);border-color:var(--ochre);box-shadow:0 4px 10px rgba(30,50,70,.08),0 16px 36px rgba(30,50,70,.1);}
-  a.tile:focus-visible{outline:2px solid var(--terra);outline-offset:2px;}
-  .tile .top{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;}
-  .tile .ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;flex:none;}
-  .tile h3{font-size:1.05rem;margin:0;font-weight:600;line-height:1.2;}
-  .tile p{margin:.1rem 0 .7rem;font-size:.9rem;color:var(--ink-soft);flex:1;}
-  .tile .foot{font-size:.82rem;color:var(--terra);font-weight:600;display:flex;align-items:center;gap:.3rem;}
-  .badge{align-self:flex-start;font-size:.72rem;font-weight:600;border-radius:20px;padding:.15rem .6rem;margin-bottom:.5rem;}
-  .badge.tool{background:#e9eef3;color:var(--navy);}
-  .badge.new{background:var(--ochre);color:var(--navy);}
+  /* Bilder-Reihe */
+  .pics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin-top:1.4rem}
+  .pics a{display:block;text-decoration:none;color:inherit}
+  .pics img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;border-radius:var(--r);border:1px solid var(--line-strong)}
+  .pics .t{font-family:var(--serif);font-size:1.05rem;margin:.55rem 0 0}
+  .pics span{font-size:.82rem;color:var(--ink-soft)}
+  @media (max-width:640px){.pics{grid-template-columns:1fr}}
 
-  /* Werkzeug-Tiles hervorheben */
-  a.tile.tool-tile{background:var(--navy);color:#fff;border-color:var(--navy);}
-  a.tile.tool-tile p{color:#c3ccd6;}
-  a.tile.tool-tile .foot{color:var(--ochre);}
-  a.tile.tool-tile:hover{border-color:var(--ochre);}
+  /* Preis-Band */
+  .price .wrap{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(1.5rem,4vw,4rem);align-items:center}
+  .price .wrap > *{min-width:0}
+  .price .big{font-family:var(--serif);font-weight:500;font-size:clamp(1.8rem,3.4vw,2.7rem);line-height:1.1;letter-spacing:-.01em;margin:0 0 .8rem}
+  .price ul{margin:0 0 1.3rem;padding-left:1.1rem;color:var(--ink-soft)}
+  .price li{margin:.25rem 0}
+  .price .side{border-left:1px solid var(--line-strong);padding-left:clamp(1rem,3vw,2.5rem)}
+  @media (max-width:820px){.price .wrap{grid-template-columns:1fr}.price .side{border-left:0;padding-left:0;border-top:1px solid var(--line-strong);padding-top:1.5rem}}
 
-  footer{background:var(--navy);color:#c3ccd6;padding:2rem 0;font-size:.9rem;}
-  footer .wrap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:center;}
-  footer a{color:var(--ochre);text-decoration:none;}
-  footer a:hover{text-decoration:underline;}
-
-  .how{background:#fff;border:1px solid var(--line);border-radius:14px;padding:1.3rem 1.4rem;box-shadow:var(--shadow);margin-top:1rem;}
-  .how ol{margin:.4rem 0 0;padding-left:1.3rem;}
-  .how li{margin:.35rem 0;}
-
-  /* Beschreibung und Funktionen */
-  .about{max-width:70ch;margin:0 0 1.2rem;}
-  .feat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.1rem 1.2rem;box-shadow:var(--shadow);}
-  .feat h3{font-size:1.05rem;margin:0 0 .4rem;font-weight:600;}
-  .feat ul{margin:0;padding-left:1.15rem;font-size:.92rem;color:var(--ink-soft);}
-  .feat li{margin:.3rem 0;}
-  .feat li b{color:var(--ink);font-weight:600;}
-  .feat .foot{display:inline-block;margin-top:.7rem;font-size:.85rem;color:var(--terra);font-weight:600;text-decoration:none;}
-  .feat .foot:hover{text-decoration:underline;}
-  .more{font-size:.92rem;color:var(--ink-soft);margin:.9rem 0 0;}
-  .more a{color:var(--terra);font-weight:600;text-decoration:none;}
-  .more a:hover{text-decoration:underline;}
-
-  /* Sprungleiste */
-  .subnav{position:sticky;top:0;z-index:20;background:rgba(246,239,226,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(6px);}
-  .subnav .wrap{display:flex;gap:.3rem;align-items:center;overflow-x:auto;padding-top:.5rem;padding-bottom:.5rem;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
-  .subnav .wrap::-webkit-scrollbar{display:none;}
-  .subnav a{flex:none;font-size:.88rem;font-weight:600;color:var(--navy);text-decoration:none;padding:.45rem .85rem;border-radius:9px;white-space:nowrap;}
-  .subnav a:hover{background:#fff;color:var(--terra);}
-  .subnav a.is-active{background:var(--navy);color:#fff;}
-  .subnav a.up{margin-left:auto;color:var(--ink-soft);}
-  .subnav a.cta{background:var(--terra);color:#fff;}
-  .subnav a.cta:hover{background:#9a3a10;}
-  .sec-head[id],.how[id],.anchor{scroll-margin-top:4.2rem;}
+  .more-links{display:flex;gap:1.6rem;flex-wrap:wrap;margin-top:1.8rem}
+  .sec-head.center{text-align:center;margin:0 auto 2.4rem;max-width:62ch}
+  .sec-head.center p{margin:0 auto}
 </style>
 </head>
 <body>
 
-<header id="top">
+<header class="lw-header">
   <div class="wrap">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1rem"><p class="brand" style="margin:0">EDUTECSOL · Digitale Schulentwicklung</p><span style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center"><a href="/zugang" style="font-size:.85rem;font-weight:600;color:#fff;border:1px solid rgba(255,255,255,.45);border-radius:9px;padding:.45rem .95rem;text-decoration:none">Zugang &amp; Preise</a><a href="/app" style="font-size:.85rem;font-weight:600;color:#fff;background:var(--terra);border-radius:9px;padding:.45rem .95rem;text-decoration:none">Anmelden · Mein Bereich</a></span></div>
-    <h1>Lernseiten und Bilder, die eine Lernaufgabe tragen</h1>
-    <p>Aus deinem Unterrichtsmaterial oder einer kurzen Themenbeschreibung entsteht eine interaktive Lernseite mit drei Zugängen (A/B/C): mit Selbstkontrolle für die Lernenden und Lösungen für die Lehrperson. Dazu KI-Bilder, die nicht nur schön sind, sondern vom Lernziel über den Prompt bis zum Arbeitsauftrag durchdacht. Beides kostenlos ausprobieren mit den Generatoren und Beispielen. Lernseiten lassen sich im geschützten Bereich direkt erzeugen: als interaktive HTML-Datei, als Word-Arbeitsblatt und als SCORM-Paket für Moodle.</p>
-    <div class="hero-tags">
-      <span class="tag">A/B/C-Differenzierung</span>
-      <span class="tag">Selbstkontrolle</span>
-      <span class="tag">KI-Bilder mit Lernauftrag</span>
-      <span class="tag">Offline &amp; druckbar</span>
-      <span class="tag">Word &amp; Moodle</span>
-      <span class="tag">Für Schweizer Schulen</span>
-    </div>
+    <a class="wordmark" href="/"><span class="name">Lernwege</span><span class="by">von EDUTECSOL</span></a>
+    <nav class="lw-nav" aria-label="Hauptnavigation">
+      <a href="#beispiele">Beispiele</a>
+      <a href="#werkzeuge">Werkzeuge</a>
+      <a href="#so-funktioniert-es">So funktioniert es</a>
+      <a href="/zugang">Zugang &amp; Preise</a>
+      <a class="btn small terra" href="/app">Anmelden</a>
+    </nav>
+    <details class="menu">
+      <summary>Menü</summary>
+      <div class="panel">
+        <a href="#beispiele">Beispiele</a>
+        <a href="#werkzeuge">Werkzeuge</a>
+        <a href="#so-funktioniert-es">So funktioniert es</a>
+        <a href="/zugang">Zugang &amp; Preise</a>
+        <a href="/app"><b>Anmelden</b></a>
+      </div>
+    </details>
   </div>
 </header>
 
-<div class="principle">
+<section class="hero" id="top">
   <div class="wrap">
-    <span class="big">Produkt ohne Prozess stirbt.</span>
-    <span class="small">Technik wird erst dann Unterricht, wenn sie didaktisch strukturiert und einbettbar ist.</span>
-  </div>
-</div>
-
-<nav class="subnav" aria-label="Seitenabschnitte">
-  <div class="wrap">
-    <a href="#was-ist-lernwege">Was ist Lernwege</a>
-    <a href="#werkzeuge">Werkzeuge</a>
-    <a href="#beispiele-lernseiten">Beispiele: Lernseiten</a>
-    <a href="#beispiele-bilder">Beispiele: Bilder</a>
-    <a href="#so-funktioniert-es">So entsteht eine Seite</a>
-    <a class="up" href="#top" title="Zum Seitenanfang">↑ Nach oben</a>
-    <a class="cta" href="/zugang">Zugang &amp; Preise</a>
-  </div>
-</nav>
-
-<main>
-  <div class="wrap">
-
-    <!-- Beschreibung und Funktionen -->
-    <div class="sec-head" id="was-ist-lernwege">
-      <p class="kicker">Was ist Lernwege?</p>
-      <h2>Beschreibung und Funktionen</h2>
-    </div>
-    <p class="about">Lernwege ist eine Plattform der EDUTECSOL GmbH für Lehrpersonen. Hier entstehen zwei Dinge: interaktive Lernseiten und KI-Bilder für Lernaufgaben. Die Lernseiten bieten ein Thema auf drei Wegen an (A mit Unterstützung, B Standard, C Vertiefung), mit Selbstkontrolle und sofortiger Rückmeldung. Jede Seite ist eine HTML-Datei, die lokal und ohne Internet läuft, dazu als Word-Arbeitsblatt und SCORM-Paket für Moodle. Die Bilder entstehen mit dem Bildprompt-Generator: Lernziel und Bildbeschreibung rein, Prompt und Arbeitsauftrag raus, im eigenen Bildwerkzeug generieren und prüfen.</p>
-    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
-      <div class="feat">
-        <span class="badge tool">kostenlos, ohne Konto</span>
-        <h3>Ausprobieren und selbst bauen</h3>
-        <ul>
-          <li><b>Prompt-Generator:</b> Fach, Stufe und vier didaktische Achsen wählen (Differenzierungsart, Sprache, Twist-Typ, Niveau), Prompt kopieren und im eigenen KI-Chat verwenden</li>
-          <li><b>Bildprompt-Generator:</b> Bilder für Lernaufgaben beschreiben, mit Arbeitsauftrag und Stolperstein-Check</li>
-          <li><b>Schnellstart-Vorlagen</b> für Mathematik BM, Pharma, IT-Security und DaZ</li>
-          <li><b>Beispielseiten</b> aus sechs Fachbereichen zum Ansehen und Einsetzen</li>
-          <li><b>Master-Prompt</b> als Textvorlage zum Anpassen</li>
-        </ul>
-        <a class="foot" href="prompt-generator-v2.html">Zum Prompt-Generator →</a>
+    <div>
+      <p class="kicker">Für Lehrpersonen in der Schweiz</p>
+      <h1 class="display">Lernseiten, die eine <em>Lernaufgabe</em> tragen.</h1>
+      <p class="lead">Aus deinem Unterrichtsmaterial entsteht eine interaktive Lernseite mit drei Zugängen A, B und C, Selbstkontrolle für die Lernenden und Lösungen für dich. Eine Datei, offline nutzbar, als Word und für Moodle.</p>
+      <div class="cta">
+        <a class="btn terra arrow" href="/zugang">Zugang &amp; Preise</a>
+        <a class="btn ghost" href="prompt-generator-v2.html">Kostenlos ausprobieren</a>
       </div>
-      <div class="feat">
-        <span class="badge new">mit Zugang</span>
-        <h3>Lernseiten direkt erzeugen</h3>
-        <ul>
-          <li><b>Material hochladen</b> (PDF, Word, PowerPoint oder Text) oder Thema beschreiben, die fertige Lernseite entsteht in wenigen Minuten</li>
-          <li><b>KI nach Wahl:</b> Claude, ChatGPT oder Infomaniak mit Verarbeitung in der Schweiz</li>
-          <li><b>Eigene Sammlung</b> mit Suche und Filter nach Fach und Stufe</li>
-          <li><b>Monatliches Kontingent</b> an Lernseiten, im Abo enthalten</li>
-        </ul>
-        <a class="foot" href="/zugang">Zugang &amp; Preise →</a>
-      </div>
-      <div class="feat">
-        <span class="badge new">mit Zugang</span>
-        <h3>Ausgabe und Weitergabe</h3>
-        <ul>
-          <li><b>Interaktive HTML-Datei:</b> herunterladen, bei dir speichern und jederzeit lokal ohne Internet verwenden</li>
-          <li><b>Für die Klasse:</b> die HTML-Datei in Teams hochladen oder per Freigabelink mit QR-Code teilen</li>
-          <li><b>Zusätzlich als Word-Arbeitsblatt</b> zum Drucken und Anpassen</li>
-          <li><b>Zusätzlich als SCORM-Paket</b> für Moodle</li>
-          <li><b>Teilen im Kollegium:</b> nur für mich, für meine Schule oder im gemeinsamen Pool</li>
-        </ul>
-        <a class="foot" href="/zugang">Zugang &amp; Preise →</a>
+      <div class="facts">
+        <div><b>A · B · C</b><span>Drei Zugänge zum selben Thema</span></div>
+        <div><b>Eine Datei</b><span>Offline, druckbar, Word und Moodle</span></div>
+        <div><b>KI nach Wahl</b><span>Claude, ChatGPT oder Infomaniak, Schweiz</span></div>
       </div>
     </div>
-
-    <!-- Werkzeuge -->
-    <div class="sec-head" id="werkzeuge">
-      <p class="kicker">Prompt-Generator</p>
-      <h2>Selbst Lernseiten erzeugen</h2>
-      <p>Der Generator baut den passenden Prompt. Diesen mit deinem Material oder einer Themenbeschreibung an Claude schicken – fertig ist die interaktive Übung. Der Bildprompt-Generator macht dasselbe für Bilder, die eine Lernaufgabe tragen. Die Beispiele unten zeigen, was dabei herauskommt.</p>
+    <div>
+      <div class="demo">
+        <div class="bar">
+          <div class="tabs" role="tablist" aria-label="Beispiel wählen">
+            <button type="button" class="on" data-src="statistik-lagemasse.html" role="tab" aria-selected="true">Statistik</button>
+            <button type="button" data-src="franzoesisch-voci-game.html" role="tab" aria-selected="false">Französisch, Spiel</button>
+            <button type="button" data-src="dosisberechnung-pharma.html" role="tab" aria-selected="false">Pharma</button>
+            <button type="button" data-src="pflegedokumentation.html" role="tab" aria-selected="false">Pflege</button>
+          </div>
+          <a class="link open" id="demo-open" href="statistik-lagemasse.html" target="_blank" rel="noopener">In neuem Fenster öffnen ↗</a>
+        </div>
+        <iframe id="demo-frame" src="statistik-lagemasse.html" title="Beispiel einer Lernseite, bedienbar" loading="eager"></iframe>
+      </div>
+      <div class="demo-cap"><span>Echte Lernseite, direkt bedienbar. Reiter A, B, C wählen und Aufgaben lösen.</span><span>Erzeugt mit dem Prompt-Generator.</span></div>
     </div>
-    <div class="grid">
-      <a class="tile tool-tile" href="prompt-generator-v2.html">
-        <span class="badge new">empfohlen</span>
-        <div class="top"><span class="ic" style="background:var(--ochre);color:var(--navy)">⚙︎</span><h3>Prompt-Generator</h3></div>
-        <p>Vier didaktische Achsen: Differenzierungsart, Sprache, Twist-Typ und Anforderungsniveau. Mit Schnellstart-Presets.</p>
-        <span class="foot">Öffnen →</span>
-      </a>
-      <a class="tile tool-tile" href="bild-generator.html">
-        <span class="badge new">neu</span>
-        <div class="top"><span class="ic" style="background:var(--ochre);color:var(--navy)">🖼️</span><h3>Bildprompt-Generator</h3></div>
-        <p>Bilder für Lernaufgaben beschreiben: Lernziel, Motiv, Bildaufbau und Anforderungen. Mit Arbeitsauftrag, Stolperstein-Check und Vier-Satz-Planung.</p>
-        <span class="foot">Öffnen →</span>
-      </a>
-      <a class="tile" href="/zugang">
-        <span class="badge new">mit Zugang</span>
-        <div class="top"><span class="ic" style="background:var(--ochre);color:var(--navy)">✦</span><h3>Lernseite direkt erzeugen</h3></div>
-        <p>Material hochladen, Achsen wählen, fertige Lernseite erhalten – ohne Umweg über einen Chat. Mit Sammlung, Freigabelink, Word- und Moodle-Export.</p>
-        <span class="foot">Zugang &amp; Preise →</span>
-      </a>
-    </div>
-
-    <p class="more">Ausserdem: <a href="prompt-generator.html">Generator (Basis)</a> · <a href="master-prompt.html">Prompt-Textvorlage</a></p>
-
-    <!-- So funktioniert es -->
-    <div class="sec-head" id="so-funktioniert-es">
-      <p class="kicker">Und so entsteht eine neue Seite</p>
-      <h2>In vier Schritten</h2>
-    </div>
-    <div class="how">
-      <ol>
-        <li>Im <b>Prompt-Generator</b> Fach, Stufe und die didaktischen Achsen wählen.</li>
-        <li>Prompt kopieren, einen neuen Claude-Chat öffnen und einfügen.</li>
-        <li>Das <b>Material</b> (Dokument, PDF, Foliensatz) oder eine kurze <b>Themenbeschreibung</b> dazugeben und abschicken.</li>
-        <li>Die fertige HTML-Datei herunterladen – offline nutzbar, ins Moodle ladbar, als PDF druckbar.</li>
-      </ol>
-    </div>
-
-
-    <!-- Beispiele: Lernseiten -->
-    <div class="sec-head" id="beispiele-lernseiten" style="margin-top:3.4rem;padding-top:2rem;border-top:2px solid var(--line-strong)">
-      <p class="kicker">Beispiele · Teil 1</p>
-      <h2>Lernseiten aus dem Generator</h2>
-      <p>Drei Beispiele zum Ausprobieren, alle 14 auf der Übersichtsseite. Jedes zeigt, was ein Prompt aus dem Generator zusammen mit eigenem Material ergibt.</p>
-    </div>
-    <div class="grid">
-      <a class="tile" href="dosisberechnung-pharma.html">
-        <div class="top"><span class="ic" style="background:var(--cream)">💊</span><h3>Dosisberechnung</h3></div>
-        <p>Von mg/kg zur ml-Menge. Vertiefung: Dosierungsfehler erkennen, bevor sie zum Kunden gelangen.</p>
-        <span class="foot">Öffnen →</span>
-      </a>
-      <a class="tile" href="franzoesisch-voci-game.html">
-        <div class="top"><span class="ic" style="background:var(--cream)">🎮</span><h3>Voci-Mission (Spiel)</h3></div>
-        <p>Vokabeltraining in vier Levels: erkennen → erinnern → schreiben → anwenden. Mit Punkten und Serie.</p>
-        <span class="foot">Öffnen →</span>
-      </a>
-      <a class="tile" href="pflegedokumentation.html">
-        <div class="top"><span class="ic" style="background:var(--cream)">🩺</span><h3>Pflegedokumentation</h3></div>
-        <p>Beobachtung, Aussage oder Interpretation? Formulierungen sicher unterscheiden und korrekt dokumentieren.</p>
-        <span class="foot">Öffnen →</span>
-      </a>
-      <a class="tile tool-tile" href="lernseiten-beispiele.html">
-        <span class="badge new">14 Beispiele</span>
-        <div class="top"><span class="ic" style="background:var(--ochre);color:var(--navy)">▦</span><h3>Alle Lernseiten-Beispiele</h3></div>
-        <p>Mathematik, Pharma, IT-Sicherheit, KI, Französisch und Pflege: alle Beispielseiten nach Fachbereich.</p>
-        <span class="foot">Übersicht öffnen →</span>
-      </a>
-    </div>
-
-    <!-- Beispiele: Bilder -->
-    <div class="sec-head" id="beispiele-bilder" style="margin-top:3.4rem;padding-top:2rem;border-top:2px solid var(--line-strong)">
-      <p class="kicker">Beispiele · Teil 2</p>
-      <h2>Bilder für Lernaufgaben</h2>
-      <p>KI-generierte Bilder, die eine Lernaufgabe tragen: Lernziel, Prompt, Bild und Arbeitsauftrag in einem. Alle Bilder sind fiktiv und gekennzeichnet. Gebaut mit dem Bildprompt-Generator.</p>
-    </div>
-    <div class="grid">
-      <a class="tile" href="bild-beispiele.html#backstube">
-        <span class="badge new">Beschreiben</span>
-        <div class="top"><span class="ic" style="background:var(--cream)">🥖</span><h3>Backstube</h3></div>
-        <p>Drei Arbeitsschritte in einer Szene. Tätigkeiten beschreiben, Beobachtung von Vermutung trennen.</p>
-        <span class="foot">Ansehen →</span>
-      </a>
-      <a class="tile" href="bild-beispiele.html#pflege">
-        <span class="badge new">Beschreiben · Prüfen</span>
-        <div class="top"><span class="ic" style="background:var(--cream)">🩺</span><h3>Blutdruckmessung</h3></div>
-        <p>Pflege HF: Pflegehandlung und Hygienemassnahmen beschreiben. Das Bild selbst wird zur fachlichen Prüfaufgabe.</p>
-        <span class="foot">Ansehen →</span>
-      </a>
-      <a class="tile" href="bild-beispiele.html#wasserschaden">
-        <span class="badge new">Kritisch prüfen</span>
-        <div class="top"><span class="ic" style="background:var(--cream)">💬</span><h3>Chat-Nachricht prüfen</h3></div>
-        <p>«Die Prüfung fällt aus!» mit Bild im Klassenchat. Behauptung, Quelle, Kontext und Belege prüfen, bevor man weiterleitet.</p>
-        <span class="foot">Ansehen →</span>
-      </a>
-      <a class="tile tool-tile" href="bild-beispiele.html">
-        <span class="badge new">6 Beispiele</span>
-        <div class="top"><span class="ic" style="background:var(--ochre);color:var(--navy)">▦</span><h3>Alle Bilder für Lernaufgaben</h3></div>
-        <p>Backstube, Pflege, Chat-Nachricht, Französisch, Deutsch und ABU: jedes mit Lernziel, Prompt, Bild und Arbeitsauftrag.</p>
-        <span class="foot">Übersicht öffnen →</span>
-      </a>
-    </div>
-    <p class="more">Eigenes Bild-Rezept bauen: <a href="bild-generator.html">Bildprompt-Generator</a></p>
-
   </div>
-</main>
+</section>
 
-<footer>
+<section class="sec navy quote">
   <div class="wrap">
-    <span>© EDUTECSOL GmbH · Differenzierte Lernseiten für Schweizer Schulen</span>
-    <span><a href="/zugang">Zugang &amp; Preise</a> · <a href="/agb">AGB</a> · <a href="/datenschutz">Datenschutz</a> · <a href="mailto:info@edutecsol.ch">info@edutecsol.ch</a></span>
+    <blockquote>«Produkt ohne Prozess <span>stirbt.</span>»</blockquote>
+    <p>Technik wird erst dann Unterricht, wenn sie didaktisch strukturiert und einbettbar ist. Deshalb bauen Lernseiten auf Differenzierung, Selbstkontrolle und einem Arbeitsauftrag auf, nicht auf einem Chatfenster.</p>
+  </div>
+</section>
+
+<section class="sec" id="was-ist-lernwege">
+  <div class="wrap sec-grid">
+    <div class="sec-head">
+      <p class="kicker">Was Lernwege ist</p>
+      <h2>Zwei Dinge für den Unterricht</h2>
+      <p>Interaktive Lernseiten und KI-Bilder mit Lernauftrag. Beides aus dem Material, das du schon hast.</p>
+    </div>
+    <ul class="rows">
+      <li>
+        <h3 class="t">Lernseiten mit drei Zugängen<small>Für Lernende</small></h3>
+        <div>
+          <p>Ein Thema, drei Wege: A mit Unterstützung, B Standard, C Vertiefung. Jede Aufgabe mit Selbstkontrolle und sofortiger Rückmeldung, für die Lehrperson ein ausklappbarer Bereich mit Lösungen.</p>
+          <p>Jede Seite ist eine einzelne HTML-Datei. Sie läuft lokal und ohne Internet, in Teams, per Freigabelink mit QR-Code oder als SCORM-Paket in Moodle. Dazu ein Word-Arbeitsblatt zum Drucken und Anpassen.</p>
+        </div>
+      </li>
+      <li>
+        <h3 class="t">Bilder, die eine Aufgabe tragen<small>Bildprompt-Generator</small></h3>
+        <div>
+          <p>Lernziel und Bildbeschreibung rein, Prompt und Arbeitsauftrag raus. Mit Stolperstein-Check und Vier-Satz-Planung. Das Bild selbst erzeugst du im geschützten Bereich oder in deinem eigenen Bildwerkzeug.</p>
+        </div>
+      </li>
+      <li>
+        <h3 class="t">Teilen im Kollegium<small>Mit Zugang</small></h3>
+        <div>
+          <p>Eigene Sammlung mit Suche und Filter nach Fach und Stufe. Lernseiten nur für dich, für deine Schule oder im gemeinsamen Pool freigeben. Die KI wählst du pro Seite: Claude, ChatGPT oder ein Open-Source-Modell bei Infomaniak mit Verarbeitung in der Schweiz.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="sec paper" id="so-funktioniert-es">
+  <div class="wrap">
+    <div class="sec-head center">
+      <p class="kicker">So entsteht eine Seite</p>
+      <h2>Vier Schritte, keine Vorkenntnisse</h2>
+      <p>Im geschützten Bereich direkt, oder kostenlos mit dem Prompt-Generator und deinem eigenen KI-Chat.</p>
+    </div>
+    <div class="steps">
+      <div><p class="n">01</p><h3>Material geben</h3><p>PDF, Word, Foliensatz oder eine kurze Themenbeschreibung. Mehr braucht es nicht.</p></div>
+      <div><p class="n">02</p><h3>Achsen wählen</h3><p>Fach, Stufe und die didaktischen Achsen: Differenzierungsart, Sprache, Twist-Typ, Niveau.</p></div>
+      <div><p class="n">03</p><h3>Seite erzeugen</h3><p>Die KI baut die Lernseite mit den drei Zugängen, Selbstkontrolle und Lösungen. Dauert wenige Minuten.</p></div>
+      <div><p class="n">04</p><h3>Einsetzen</h3><p>Als HTML herunterladen, per Link oder QR-Code teilen, in Moodle laden oder als Word drucken.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="beispiele">
+  <div class="wrap">
+    <div class="sec-head" style="margin-bottom:2rem">
+      <p class="kicker">Beispiele</p>
+      <h2>Aus sechs Fachbereichen</h2>
+      <p>Alle mit dem Prompt-Generator und eigenem Material entstanden. Öffnen, ausprobieren, als Vorlage für das eigene Fach nehmen.</p>
+    </div>
+    <div class="examples">
+      <a class="ex" href="statistik-lagemasse.html"><img class="shot" src="img/beispiele/statistik-lagemasse.jpg" alt="Lernseite Mittelwert, Median und Modus" loading="lazy" width="960" height="600"><p class="k">Mathematik · Berufsmaturität</p><h3 class="t">Mittelwert, Median und Modus</h3><p>Lagemasse berechnen und beurteilen, welches Mass die Daten am ehrlichsten beschreibt.</p></a>
+      <a class="ex" href="franzoesisch-voci-game.html"><img class="shot" src="img/beispiele/franzoesisch-voci-game.jpg" alt="Lernseite Voci-Mission Französisch" loading="lazy" width="960" height="600"><p class="k">Französisch · Spiel</p><h3 class="t">Voci-Mission</h3><p>Vokabeltraining in vier Levels: erkennen, erinnern, schreiben, anwenden. Mit Punkten und Serie.</p></a>
+      <a class="ex" href="dosisberechnung-pharma.html"><img class="shot" src="img/beispiele/dosisberechnung-pharma.jpg" alt="Lernseite Dosisberechnung" loading="lazy" width="960" height="600"><p class="k">Pharma-Assistenz</p><h3 class="t">Dosisberechnung</h3><p>Von mg/kg zur ml-Menge. Vertiefung: Dosierungsfehler erkennen, bevor sie zur Kundschaft gelangen.</p></a>
+      <a class="ex" href="pflegedokumentation.html"><img class="shot" src="img/beispiele/pflegedokumentation.jpg" alt="Lernseite Pflegedokumentation" loading="lazy" width="960" height="600"><p class="k">Pflege</p><h3 class="t">Pflegedokumentation</h3><p>Beobachtung, Aussage oder Interpretation? Formulierungen unterscheiden und korrekt dokumentieren.</p></a>
+      <a class="ex" href="it-security-malware.html"><img class="shot" src="img/beispiele/it-security-malware.jpg" alt="Lernseite Malware und Sicherheit" loading="lazy" width="960" height="600"><p class="k">IT-Sicherheit</p><h3 class="t">Malware und Sicherheit</h3><p>Malware-Arten zuordnen, Szenarien einschätzen. Vertiefung: eine Phishing-Mail entlarven.</p></a>
+      <a class="ex" href="ki-geschichte.html"><img class="shot" src="img/beispiele/ki-geschichte.jpg" alt="Lernseite Geschichte der KI" loading="lazy" width="960" height="600"><p class="k">Künstliche Intelligenz</p><h3 class="t">Geschichte der KI</h3><p>Meilensteine einordnen. Vertiefung: nach welchem Prinzip ein System arbeitet.</p></a>
+    </div>
+    <div class="more-links">
+      <a class="link arrow" href="lernseiten-beispiele.html">Alle 14 Lernseiten</a>
+      <a class="link arrow" href="bild-beispiele.html">6 Bilder für Lernaufgaben</a>
+    </div>
+
+    <div class="sec-head" style="margin-top:4rem">
+      <p class="kicker">Bilder für Lernaufgaben</p>
+      <h2>Nicht nur schön, sondern gebaut für eine Aufgabe</h2>
+      <p>KI-Bilder mit Lernziel, Prompt und Arbeitsauftrag. Alle fiktiv und als solche gekennzeichnet.</p>
+    </div>
+    <div class="pics">
+      <a href="bild-beispiele.html#backstube"><img src="bilder/klein/backstube.jpg" alt="Backstube mit drei Arbeitsschritten" loading="lazy"><p class="t">Backstube</p><span>Beschreiben: Beobachtung von Vermutung trennen</span></a>
+      <a href="bild-beispiele.html#pflege"><img src="bilder/klein/pflege-blutdruck.jpg" alt="Blutdruckmessung in der Pflege" loading="lazy"><p class="t">Blutdruckmessung</p><span>Prüfen: Pflegehandlung und Hygiene beurteilen</span></a>
+      <a href="bild-beispiele.html#wasserschaden"><img src="bilder/klein/wasserschaden-schulzimmer.jpg" alt="Chat-Nachricht mit Bild eines Wasserschadens" loading="lazy"><p class="t">Chat-Nachricht prüfen</p><span>Kritisch prüfen: Behauptung, Quelle, Kontext</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="sec paper" id="werkzeuge">
+  <div class="wrap sec-grid">
+    <div class="sec-head">
+      <p class="kicker">Werkzeuge</p>
+      <h2>Kostenlos anfangen, ohne Konto</h2>
+      <p>Die Generatoren bauen den Prompt. Den schickst du mit deinem Material an deinen KI-Chat. Wer es ohne Umweg will, erzeugt die Seite im geschützten Bereich.</p>
+    </div>
+    <ul class="rows">
+      <li>
+        <h3 class="t">Prompt-Generator<small>Kostenlos</small></h3>
+        <div><p>Vier didaktische Achsen und Schnellstart-Vorlagen für Mathematik BM, Pharma, IT-Security und DaZ. Prompt kopieren, im eigenen KI-Chat verwenden.</p><a class="link arrow" href="prompt-generator-v2.html">Öffnen</a> &nbsp;·&nbsp; <a class="link" href="prompt-generator.html">Basis-Version</a> &nbsp;·&nbsp; <a class="link" href="master-prompt.html">Textvorlage</a></div>
+      </li>
+      <li>
+        <h3 class="t">Bildprompt-Generator<small>Kostenlos</small></h3>
+        <div><p>Bilder für Lernaufgaben beschreiben: Lernziel, Motiv, Bildaufbau, Anforderungen. Mit Arbeitsauftrag und Stolperstein-Check.</p><a class="link arrow" href="bild-generator.html">Öffnen</a></div>
+      </li>
+      <li>
+        <h3 class="t">Lernseite direkt erzeugen<small>Mit Zugang</small></h3>
+        <div><p>Material hochladen, Achsen wählen, fertige Lernseite erhalten. Mit Sammlung, Freigabelink, Word- und Moodle-Export und Bildern direkt auf der Plattform.</p><a class="link arrow" href="/zugang">Zugang &amp; Preise</a></div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="sec price" id="preise">
+  <div class="wrap">
+    <div>
+      <p class="kicker">Zugang</p>
+      <p class="big">CHF 8 im Monat oder CHF 60 im Jahr. So viel wie ein Kaffee.</p>
+      <ul>
+        <li>Pro Monat 10 Lernseiten mit Claude, 10 mit ChatGPT und 30 mit Infomaniak</li>
+        <li>Eigene Sammlung, Freigabelink mit QR-Code, gemeinsamer Pool</li>
+        <li>Word-Arbeitsblatt, SCORM-Paket, Moodle-Anbindung</li>
+        <li>Jederzeit auf das Ende der Laufzeit kündbar. Zahlung über Payrexx, Schweiz</li>
+      </ul>
+      <div class="cta" style="display:flex;gap:.7rem;flex-wrap:wrap"><a class="btn terra arrow" href="/zugang">Zugang lösen</a><a class="btn ghost" href="/login">Anmelden</a></div>
+    </div>
+    <div class="side">
+      <h3>Für Schulen und Teams</h3>
+      <p class="muted" style="margin:.3rem 0 .8rem">Zugänge für alle Lehrpersonen einer Institution auf Rechnung. Anmeldung mit dem Microsoft-365-Schulkonto, Teilen nur innerhalb der eigenen Schule.</p>
+      <a class="link arrow" href="mailto:info@edutecsol.ch">Angebot anfragen</a>
+    </div>
+  </div>
+</section>
+
+<footer class="lw-footer">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <a class="wordmark" href="/"><span class="name">Lernwege</span><span class="by">von EDUTECSOL</span></a>
+        <p style="margin:.9rem 0 0;max-width:36ch">Differenzierte, interaktive Lernseiten für Schweizer Schulen. Gehostet in Frankfurt, KI auf Wunsch in der Schweiz.</p>
+      </div>
+      <div>
+        <h4>Lernwege</h4>
+        <a href="lernseiten-beispiele.html">Beispiele</a>
+        <a href="prompt-generator-v2.html">Prompt-Generator</a>
+        <a href="bild-generator.html">Bildprompt-Generator</a>
+        <a href="/zugang">Zugang &amp; Preise</a>
+      </div>
+      <div>
+        <h4>Konto</h4>
+        <a href="/login">Anmelden</a>
+        <a href="/app">Mein Bereich</a>
+        <a href="/zugang">Zugang lösen</a>
+      </div>
+      <div>
+        <h4>EDUTECSOL GmbH</h4>
+        <a href="https://www.edutecsol.ch" rel="noopener">edutecsol.ch</a>
+        <a href="mailto:info@edutecsol.ch">info@edutecsol.ch</a>
+        <a href="/datenschutz">Datenschutz</a>
+        <a href="/agb">AGB</a>
+      </div>
+    </div>
+    <div class="bottom">
+      <span>© EDUTECSOL GmbH, Unterägeri</span>
+      <span>Digitale Schulentwicklung · <a href="/datenschutz">Datenschutz</a> · <a href="/agb">AGB</a></span>
+    </div>
   </div>
 </footer>
 
 <script>
 (function(){
-  const links=[...document.querySelectorAll('.subnav a[href^="#"]:not(.up)')];
-  const targets=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
-  if(!targets.length||!('IntersectionObserver' in window))return;
-  const setActive=id=>links.forEach(a=>a.classList.toggle('is-active',a.getAttribute('href')==='#'+id));
-  const io=new IntersectionObserver(entries=>{
-    entries.forEach(e=>{ if(e.isIntersecting) setActive(e.target.id); });
-  },{rootMargin:'-20% 0px -70% 0px'});
-  targets.forEach(t=>io.observe(t));
+  var frame=document.getElementById('demo-frame'), open=document.getElementById('demo-open');
+  var tabs=[].slice.call(document.querySelectorAll('.demo .tabs button'));
+  tabs.forEach(function(b){
+    b.addEventListener('click',function(){
+      tabs.forEach(function(x){x.classList.remove('on');x.setAttribute('aria-selected','false');});
+      b.classList.add('on');b.setAttribute('aria-selected','true');
+      frame.src=b.getAttribute('data-src');open.href=b.getAttribute('data-src');
+    });
+  });
+  var menu=document.querySelector('.menu');
+  if(menu){menu.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){menu.removeAttribute('open');});});}
 })();
 </script>
 
