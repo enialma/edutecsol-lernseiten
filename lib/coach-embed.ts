@@ -6,6 +6,10 @@ export const COACH_MARKER = "<!-- lernwege-coach -->";
 export function withCoach(html: string, token: string, name: string): string {
   if (html.includes(COACH_MARKER)) return html;
   const safeName = name.replace(/[<>&"']/g, "");
+  const generic = safeName.toLowerCase() === "coach";
+  const btnLabel = generic ? "Frag den Coach" : `Frag ${safeName}`;
+  const headLabel = generic ? "Dein Lerncoach" : `${safeName} · Lerncoach`;
+  const ariaLabel = generic ? "Lerncoach" : `Lerncoach ${safeName}`;
   const block = `${COACH_MARKER}
 <style id="lw-coach-css">
 #lw-coach-btn{position:fixed;right:18px;bottom:18px;z-index:9998;font:600 15px/1.2 system-ui,-apple-system,"Segoe UI",Arial,sans-serif;background:#B84816;color:#fff;border:0;border-radius:999px;padding:12px 18px 12px 14px;cursor:pointer;box-shadow:0 10px 24px -8px rgba(30,50,70,.5);display:inline-flex;align-items:center;gap:8px}
@@ -20,8 +24,8 @@ export function withCoach(html: string, token: string, name: string): string {
 #lw-coach-frame{flex:1;border:0;width:100%;background:#FBF8F1}
 @media print{#lw-coach-btn,#lw-coach-panel{display:none!important}}
 </style>
-<button id="lw-coach-btn" type="button" aria-haspopup="dialog" aria-controls="lw-coach-panel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 21l1.9-5.4A8 8 0 1 1 21 12z"/></svg>Frag ${safeName}</button>
-<div id="lw-coach-panel" role="dialog" aria-label="Lerncoach ${safeName}"><div id="lw-coach-head"><div>${safeName} · Lerncoach<small>Fragt nach, verrät nichts. Nichts wird gespeichert.</small></div><button id="lw-coach-close" type="button" aria-label="Schliessen">×</button></div><iframe id="lw-coach-frame" title="Lerncoach ${safeName}"></iframe></div>
+<button id="lw-coach-btn" type="button" aria-haspopup="dialog" aria-controls="lw-coach-panel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 21l1.9-5.4A8 8 0 1 1 21 12z"/></svg>${btnLabel}</button>
+<div id="lw-coach-panel" role="dialog" aria-label="${ariaLabel}"><div id="lw-coach-head"><div>${headLabel}<small>Fragt nach, verrät nichts. Nichts wird gespeichert.</small></div><button id="lw-coach-close" type="button" aria-label="Schliessen">×</button></div><iframe id="lw-coach-frame" title="${ariaLabel}"></iframe></div>
 <script>
 (function(){
   var TOKEN=${JSON.stringify(token)};

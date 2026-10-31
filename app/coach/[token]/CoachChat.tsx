@@ -6,7 +6,7 @@ type Kontext = { reiter: string; aufgabe: string; eingabe: string };
 
 export default function CoachChat({ token, name, title, initial }: { token: string; name: string; title: string; initial: Kontext }) {
   const [kontext, setKontext] = useState<Kontext>(initial);
-  const [msgs, setMsgs] = useState<Msg[]>([{ role: "assistant", content: `Hallo, ich bin ${name}. Ich verrate keine Lösungen, aber ich helfe dir, selbst draufzukommen. Woran arbeitest du gerade, und wo hängst du?` }]);
+  const [msgs, setMsgs] = useState<Msg[]>([{ role: "assistant", content: `${name.toLowerCase() === "coach" ? "Hallo, ich bin dein Coach." : `Hallo, ich bin ${name}.`} Ich verrate keine Lösungen, aber ich helfe dir, selbst draufzukommen. Woran arbeitest du gerade, und wo hängst du?` }]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,7 +62,7 @@ export default function CoachChat({ token, name, title, initial }: { token: stri
             }}>{m.content}</div>
           </div>
         ))}
-        {busy && <p className="small-note" style={{ margin: ".2rem 0 0" }}>{name} überlegt …</p>}
+        {busy && <p className="small-note" style={{ margin: ".2rem 0 0" }}>{name.toLowerCase() === "coach" ? "Der Coach" : name} überlegt …</p>}
         {error && <div className="msg err" style={{ marginTop: ".4rem" }}>{error}</div>}
       </div>
       <form onSubmit={(e) => { e.preventDefault(); send(); }} style={{ borderTop: "1px solid var(--line)", padding: ".6rem .8rem .7rem", background: "#fff" }}>

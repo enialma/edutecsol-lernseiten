@@ -4,7 +4,7 @@ import { chat, providerReady, type ChatMsg } from "@/lib/ai";
 import { getPageByToken } from "@/lib/pages";
 import {
   cleanReply, coachAllowedFor, coachSystemPrompt, coachUsage, logCoachTopic, logCoachUsage, rateLimited,
-  COACH_LIMIT_MONTH, COACH_LIMIT_PAGE_DAY, COACH_MAX_INPUT, COACH_MAX_TURNS, COACH_NAME, type CoachStil, type Kontext,
+  COACH_LIMIT_MONTH, COACH_LIMIT_PAGE_DAY, COACH_MAX_INPUT, COACH_MAX_TURNS, COACH_DER_GROSS, type CoachStil, type Kontext,
 } from "@/lib/coach";
 
 export const runtime = "nodejs";
@@ -19,12 +19,12 @@ export async function POST(req: Request) {
   const token = String(body.token ?? "");
   const page = await getPageByToken(token);
   if (!page) return json({ error: "Diese Lernseite ist nicht mehr freigegeben." }, 404);
-  if (!page.coach || !page.owner_coach || !coachAllowedFor(page)) return json({ error: `${COACH_NAME} ist auf dieser Seite nicht eingeschaltet.` }, 403);
+  if (!page.coach || !page.owner_coach || !coachAllowedFor(page)) return json({ error: `${COACH_DER_GROSS} ist auf dieser Seite nicht eingeschaltet.` }, 403);
 
   const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unbekannt";
   if (rateLimited(`${ip}:${page.id}`)) return json({ error: "Kurze Pause: Du hast in der letzten Stunde sehr viele Fragen gestellt. Versuch es später nochmals." }, 429);
   const usage = await coachUsage(page.id, page.user_id);
-  if (usage.today >= COACH_LIMIT_PAGE_DAY) return json({ error: `${COACH_NAME} hat für heute auf dieser Seite genug geholfen. Morgen geht es weiter.` }, 429);
+  if (usage.today >= COACH_LIMIT_PAGE_DAY) return json({ error: `${COACH_DER_GROSS} hat für heute auf dieser Seite genug geholfen. Morgen geht es weiter.` }, 429);
   if (usage.month >= COACH_LIMIT_MONTH) return json({ error: `Das Monatskontingent des Coachs ist aufgebraucht. Bitte der Lehrperson melden.` }, 429);
 
   const raw = Array.isArray(body.messages) ? body.messages : [];
@@ -47,6 +47,6 @@ export async function POST(req: Request) {
     return json({ reply: text });
   } catch (e) {
     console.error("coach fehlgeschlagen", e);
-    return json({ error: `${COACH_NAME} ist gerade nicht erreichbar. Versuch es in einer Minute nochmals.` }, 502);
+    return json({ error: `${COACH_DER_GROSS} ist gerade nicht erreichbar. Versuch es in einer Minute nochmals.` }, 502);
   }
 }

@@ -8,7 +8,7 @@ import { DIFFART_LABELS, NIVEAU_LABELS, SPRACHE_LABELS, TWIST_LABELS, type GenPa
 import Topbar from "../../../Topbar";
 import Footer from "../../../Footer";
 import { coachAction, copyAction, deletePageAction, renameAction, shareAction, visibilityAction } from "../actions";
-import { coachAllowedFor, coachTopicsForPage, coachUsageForPage, defaultStilFor, COACH_NAME, COACH_STIL_LABELS } from "@/lib/coach";
+import { coachAllowedFor, coachTopicsForPage, coachUsageForPage, defaultStilFor, COACH_DEN, COACH_DER_GROSS, COACH_NAME, COACH_STIL_LABELS, IS_GENERIC } from "@/lib/coach";
 import { getMoodleBase } from "@/lib/moodle";
 import CopyButton from "./CopyButton";
 import MoodleCard from "./MoodleCard";
@@ -129,7 +129,7 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
           {canEdit && coachOk && (
             <div className="card" style={{ marginBottom: "1rem" }}>
               <p className="kicker">Für Lernende · Zusatzoption</p>
-              <h3 style={{ margin: "0 0 .4rem" }}>{COACH_NAME}, der Lerncoach</h3>
+              <h3 style={{ margin: "0 0 .4rem" }}>{IS_GENERIC ? "Der Lerncoach" : `${COACH_NAME}, der Lerncoach`}</h3>
               {!page.owner_coach ? (
                 <p className="small-note">
                   Der Lerncoach ist für dein Konto nicht freigeschaltet. Er beantwortet Fragen der Lernenden auf der Seite mit Gegenfragen und gestufter Hilfe, ohne Lösungen zu verraten.
@@ -138,7 +138,7 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
               ) : (
                 <>
                   <p className="small-note">
-                    Erscheint als Knopf «Frag {COACH_NAME}» auf der Seite, wenn Lernende sie über den Freigabelink öffnen. Kennt Aufgaben und deine Lösungen, verrät sie aber nicht.
+                    Erscheint als Knopf «Frag {COACH_DEN}» auf der Seite, wenn Lernende sie über den Freigabelink öffnen. Kennt Aufgaben und deine Lösungen, verrät sie aber nicht.
                     Gespräche werden nicht gespeichert. {page.share_token ? "" : "Dazu braucht die Seite einen Freigabelink."}
                     {coachUse ? ` Diesen Monat ${coachUse.month} Nachrichten, insgesamt ${coachUse.total}.` : ""}
                   </p>
@@ -171,7 +171,7 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
                   )}
                   {coachTopics.length > 0 && (
                     <div style={{ marginTop: ".9rem" }}>
-                      <p className="small-note" style={{ margin: "0 0 .3rem" }}>Fragen an {COACH_NAME} in diesem Monat, nach Teil oder Zugang (anonym, ohne Inhalte):</p>
+                      <p className="small-note" style={{ margin: "0 0 .3rem" }}>Fragen an {COACH_DEN} in diesem Monat, nach Teil oder Zugang (anonym, ohne Inhalte):</p>
                       <table style={{ maxWidth: 420 }}>
                         <tbody>
                           {coachTopics.map((t) => <tr key={t.reiter}><td>{t.reiter}</td><td style={{ textAlign: "right", width: 60 }}>{t.n}</td></tr>)}

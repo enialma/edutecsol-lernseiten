@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { prepareSignup } from "@/lib/billing";
 import { LIMITS } from "@/lib/quota";
 import { CHF, createCheckout, payrexxReady, PLANS, type Plan } from "@/lib/payrexx";
-import { COACH_LIMIT_MONTH, COACH_NAME } from "@/lib/coach";
+import { COACH_LIMIT_MONTH, COACH_NAME, IS_GENERIC } from "@/lib/coach";
 import Topbar from "../Topbar";
 import Footer from "../Footer";
 
@@ -69,7 +69,7 @@ export default async function ZugangPage({ searchParams }: { searchParams: Promi
                 <li>Eigene Sammlung, Freigabelink mit QR-Code, gemeinsamer Pool</li>
                 <li>Word-Arbeitsblatt, SCORM-Paket und Moodle-Anbindung</li>
                 <li>Verlängert sich automatisch, jederzeit auf das Ende der Laufzeit kündbar</li>
-                <li><b>Zusatzoption Lerncoach «{COACH_NAME}»:</b> Lernende stellen auf deinen Lernseiten Fragen, der Coach antwortet mit Gegenfragen und gestufter Hilfe, ohne Lösungen zu verraten. Bis {COACH_LIMIT_MONTH} Nachrichten pro Monat. Im Monatsabo {CHF("month_coach")}, im Jahresabo {CHF("year_coach")}.</li>
+                <li><b>Zusatzoption Lerncoach{IS_GENERIC ? "" : ` «${COACH_NAME}»`}:</b> Lernende stellen auf deinen Lernseiten Fragen, der Coach antwortet mit Gegenfragen und gestufter Hilfe, ohne Lösungen zu verraten. Bis {COACH_LIMIT_MONTH} Nachrichten pro Monat. Im Monatsabo {CHF("month_coach")}, im Jahresabo {CHF("year_coach")}.</li>
               </ul>
               {ready ? (
                 <form action={buy}>
