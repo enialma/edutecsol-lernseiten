@@ -1,6 +1,8 @@
 // Prompt-Baukasten – portiert aus public/prompt-generator-v2.html (gleiche Achsen, gleiche Textbausteine).
 // Unterschied: Ausgabe ist immer genau eine HTML-Datei (kein Word/PDF), da der Server die Seite direkt speichert.
 
+import { designBasisPrompt } from "./design-basis";
+
 export type Diffart = "niveau" | "lerntyp" | "interesse" | "sozialform";
 export type Sprache = "standard" | "einfach" | "glossar" | "zweisprachig";
 export type Twist = "auto" | "ausreisser" | "vergleich" | "grenzfall" | "fehler" | "methoden" | "transfer";
@@ -120,7 +122,9 @@ AUSGABE-VERTRAG (zwingend):
 - Sprache: Schweizer Standarddeutsch (kein ß).
 - Setze im <head> ein <title> mit dem Thema und ein <meta name="description"> mit einer Zeile zur Kernaufgabe.
 - Struktur für den Druck: jeder Zugang ist ein eigenes Element mit role="tabpanel"; der Lehrpersonen-Bereich ist ein <details class="lehrperson">. Der PDF-Button öffnet vor window.print() alle Zugänge und alle <details> und setzt sie danach zurück. Druck-CSS: @page { size: A4 portrait; margin: 14mm }, Bedienelemente ausgeblendet, jeder Zugang beginnt auf einer neuen Seite, Rahmen und Überschriften in den EDUTECSOL-Farben (Navy #1E3246, Terra #B84816, Ocker #F1A51A), keine grossflächigen farbigen Hintergründe, keine Seitenumbrüche innerhalb von Aufgaben oder Grafiken.
-- Die abschliessende Notiz (gewähltes Thema, Differenzierungsart, Twist) gehört in einen HTML-Kommentar direkt vor </html>: <!-- NOTIZ: ... -->`;
+- Die abschliessende Notiz (gewähltes Thema, Differenzierungsart, Twist) gehört in einen HTML-Kommentar direkt vor </html>: <!-- NOTIZ: ... -->
+
+${designBasisPrompt()}`;
 }
 
 /** User-Prompt aus den Achsen + Material. */
@@ -191,7 +195,7 @@ Eine einzige, voll funktionsfähige HTML-Seite (eine Datei, ohne externe Abhäng
 - PDF-Button oben («Als PDF herunterladen»): blendet für den Export alle Zugänge und den Lehrpersonen-Bereich ein und löst den Druckdialog aus; eigene @media-print-CSS blendet Reiter/Buttons aus; Fallback, der die Seite in einem neuen Tab öffnet, falls der Druckdialog blockiert ist.
 
 §GESTALTUNG
-Ruhiges, altersgerechtes Design für die Zielstufe; themenpassende Visualisierung als Leitidee; responsiv bis Mobile, Tastaturbedienbarkeit, sichtbarer Fokus. Keine generische KI-Optik (keine cremefarbenen Hintergründe, keine Akzentstreifen).
+Halte dich an die DESIGNBASIS aus dem System-Prompt (CSS unverändert, Grundgerüst, Klassen). Eigenes CSS nur für die themenpassende Visualisierung der Kernaufgabe (SVG oder HTML, in den Farbvariablen). Responsiv bis Mobile, Tastaturbedienbarkeit, sichtbarer Fokus. Keine zusätzlichen Farben, Schatten, Verläufe oder Emojis.
 
 §QUALITÄTSPRÜFUNG VOR DER AUSGABE
 - Rechne alle Lösungen selbst nach; die Feedback-Logik jedes Eingabefelds muss exakt zu den richtigen Werten passen.
