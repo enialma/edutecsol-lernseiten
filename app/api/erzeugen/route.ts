@@ -38,7 +38,7 @@ export async function POST(req: Request) {
   }
 
   const params: GenParams = {
-    typ: pick(fd.get("typ"), ["lernseite", "pruefung", "spiel"] as const, "lernseite"),
+    typ: pick(fd.get("typ"), ["lernseite", "pruefung", "spiel", "hilfe"] as const, "lernseite"),
     dauer: (Number(fd.get("dauer")) === 20 ? 20 : Number(fd.get("dauer")) === 45 ? 45 : 30) as 20 | 30 | 45,
     fach: String(fd.get("fach") ?? "").trim(),
     stufe: String(fd.get("stufe") ?? "").trim(),
@@ -85,7 +85,7 @@ export async function POST(req: Request) {
           material = { name: "", text: materialText, truncated: false, kind: "text" };
         }
 
-        send(`▸ ${params.typ === "pruefung" ? "Prüfungsvorbereitung" : params.typ === "spiel" ? "Lernspiel" : "Lernseite"} wird mit ${PROVIDER_LABELS[provider]}${modellOverride ? ` (${modellOverride})` : ""} erzeugt – das dauert ein bis drei Minuten …\n`);
+        send(`▸ ${params.typ === "pruefung" ? "Prüfungsvorbereitung" : params.typ === "spiel" ? "Lernspiel" : params.typ === "hilfe" ? "Lernhilfe" : "Lernseite"} wird mit ${PROVIDER_LABELS[provider]}${modellOverride ? ` (${modellOverride})` : ""} erzeugt – das dauert ein bis drei Minuten …\n`);
         let chars = 0;
         let lastTick = Date.now();
         const tStart = Date.now();

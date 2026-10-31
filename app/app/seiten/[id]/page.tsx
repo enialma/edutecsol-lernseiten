@@ -154,7 +154,7 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
             <summary style={{ cursor: "pointer", fontWeight: 600 }}>Details zur Erzeugung</summary>
             <table style={{ marginTop: ".8rem" }}>
               <tbody>
-                <tr><th>Typ</th><td>{p.typ === "pruefung" ? `Prüfungsvorbereitung (Übungsprüfung ${p.dauer ?? 30} Minuten)` : p.typ === "spiel" ? "Lernspiel (vier Levels)" : "Lernseite"}</td></tr>
+                <tr><th>Typ</th><td>{p.typ === "pruefung" ? `Prüfungsvorbereitung (Übungsprüfung ${p.dauer ?? 30} Minuten)` : p.typ === "spiel" ? "Lernspiel (vier Levels)" : p.typ === "hilfe" ? "Lernhilfe (Merkblatt, Lernkarten, Glossar)" : "Lernseite"}</td></tr>
                 {(p.typ ?? "lernseite") === "lernseite" && <tr><th>Differenzierung</th><td>{p.diffart ? DIFFART_LABELS[p.diffart] : "–"}{p.anzahl ? `, ${p.anzahl} Zugänge` : ""}</td></tr>}
                 <tr><th>Sprache</th><td>{p.sprache ? SPRACHE_LABELS[p.sprache] : "–"}{p.zweitsprache ? ` (${p.zweitsprache})` : ""}</td></tr>
                 {(p.typ ?? "lernseite") === "lernseite" && <tr><th>Twist</th><td>{p.twist ? TWIST_LABELS[p.twist] : "–"}</td></tr>}

@@ -6,7 +6,7 @@ type ProviderOpt = { id: string; label: string; model: string; used: number; lim
 type Preset = { id: string; label: string; fach?: string; stufe?: string; diffart?: string; anzahl?: number; sprache?: string; twist?: string; niveau?: string };
 type Bild = { id: number; title: string };
 
-const TYP = [["lernseite", "Lernseite"], ["pruefung", "Prüfungsvorbereitung"], ["spiel", "Lernspiel"]];
+const TYP = [["lernseite", "Lernseite"], ["pruefung", "Prüfungsvorbereitung"], ["spiel", "Lernspiel"], ["hilfe", "Lernhilfe"]];
 const DAUER = [["20", "20 Minuten"], ["30", "30 Minuten"], ["45", "45 Minuten"]];
 const DIFFART = [["niveau", "nach Niveau (Hilfe)"], ["lerntyp", "nach Lerntyp"], ["interesse", "nach Berufsfeld"], ["sozialform", "nach Sozialform"]];
 const SPRACHE = [["standard", "Standard"], ["einfach", "vereinfachte Sprache"], ["glossar", "Fachbegriffe mit Glossar"], ["zweisprachig", "Schlüsselbegriffe zweisprachig"]];
@@ -36,7 +36,8 @@ export default function Form({ providers, presets, bilder, initialBild, isAdmin 
   const set = (k: keyof State, v: string | number) => setS((p) => ({ ...p, [k]: v }));
   const pruefung = s.typ === "pruefung";
   const spiel = s.typ === "spiel";
-  const lernseite = !pruefung && !spiel;
+  const hilfe = s.typ === "hilfe";
+  const lernseite = !pruefung && !spiel && !hilfe;
 
   function applyPreset(p: Preset) {
     setS((prev) => ({
@@ -102,7 +103,9 @@ export default function Form({ providers, presets, bilder, initialBild, isAdmin 
           ? "Aus dem Prüfungsstoff entstehen drei Teile: Lernziele checken, Übungsprüfung mit Timer und Note, Lücken schliessen mit Lernplan. Dazu ein Lehrpersonen-Bereich mit Lösungen und Punkteschlüssel."
           : spiel
             ? "Vier Levels (Erkennen, Erinnern, Anwenden, Meistern) mit 24 bis 28 Aufgaben aus dem Material, Punkten, Serie, Leben und Bestleistung. Dazu die Aufgabenliste für die Lehrperson."
-            : "Eine Kernaufgabe mit mehreren Zugängen, Selbstkontrolle und Lehrpersonen-Bereich."}
+            : hilfe
+              ? "Merkblatt auf einer A4-Seite, 16 bis 24 Lernkarten zum Umdrehen mit Gewusst/Nochmals, Glossar mit Suche. Alles druckbar. Mit «vereinfachte Sprache» oder «zweisprachig» auch als Nachteilsausgleich."
+              : "Eine Kernaufgabe mit mehreren Zugängen, Selbstkontrolle und Lehrpersonen-Bereich."}
       </p>
 
       <div className="row" style={{ margin: ".8rem 0 .6rem", alignItems: "center" }}>
@@ -191,7 +194,7 @@ export default function Form({ providers, presets, bilder, initialBild, isAdmin 
       )}
 
       <div style={{ marginTop: "1.3rem", display: "flex", gap: ".8rem", alignItems: "center", flexWrap: "wrap" }}>
-        <button className="btn terra" disabled={busy || exhausted}>{busy ? "Wird erzeugt …" : pruefung ? "Prüfungsvorbereitung erzeugen" : spiel ? "Lernspiel erzeugen" : "Lernseite erzeugen"}</button>
+        <button className="btn terra" disabled={busy || exhausted}>{busy ? "Wird erzeugt …" : pruefung ? "Prüfungsvorbereitung erzeugen" : spiel ? "Lernspiel erzeugen" : hilfe ? "Lernhilfe erzeugen" : "Lernseite erzeugen"}</button>
         {busy && <span className="small-note">Bitte Fenster offen lassen. Dauer: Lernseite ein bis drei Minuten, Prüfungsvorbereitung bis zu acht Minuten.</span>}
       </div>
 

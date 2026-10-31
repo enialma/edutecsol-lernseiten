@@ -8,7 +8,7 @@ export type Sprache = "standard" | "einfach" | "glossar" | "zweisprachig";
 export type Twist = "auto" | "ausreisser" | "vergleich" | "grenzfall" | "fehler" | "methoden" | "transfer";
 export type Niveau = "reproduzieren" | "anwenden" | "beurteilen";
 /** Seitentyp: klassische Lernseite oder Prüfungsvorbereitung (weitere Typen folgen). */
-export type Typ = "lernseite" | "pruefung" | "spiel";
+export type Typ = "lernseite" | "pruefung" | "spiel" | "hilfe";
 export type Dauer = 20 | 30 | 45;
 
 export type GenParams = {
@@ -34,6 +34,7 @@ export const TYP_LABELS: Record<Typ, string> = {
   lernseite: "Lernseite",
   pruefung: "Prüfungsvorbereitung",
   spiel: "Lernspiel",
+  hilfe: "Lernhilfe",
 };
 export const DIFFART_LABELS: Record<Diffart, string> = {
   niveau: "nach Niveau (Hilfe)",
@@ -143,6 +144,7 @@ ${designBasisPrompt(typ)}`;
 export function userPrompt(p: GenParams, material: { name?: string; text: string } | null): string {
   if ((p.typ ?? "lernseite") === "pruefung") return pruefungPrompt(p, material);
   if (p.typ === "spiel") return spielPrompt(p, material);
+  if (p.typ === "hilfe") return hilfePrompt(p, material);
   const fach = p.fach.trim() || "[Fach/Kontext]";
   const stufe = p.stufe.trim() || "[Zielstufe]";
   const thema = (p.thema ?? "").trim();
@@ -350,6 +352,70 @@ Halte dich an die DESIGNBASIS aus dem System-Prompt (CSS unverändert, Grundger�
 - Die Punkte- und Freischaltlogik funktioniert für alle vier Levels; «Nochmals spielen» setzt Punkte, Serie, Leben und Levels zurück.
 - Kontrolliere alle Texte auf Tipp- und Flüchtigkeitsfehler; Schweizer Standarddeutsch; knapp formulieren.
 - Die Notiz am Ende nennt Thema, Anzahl Aufgaben je Level.${materialBlock}`;
+}
+
+/** User-Prompt für den Seitentyp «Lernhilfe»: Merkblatt, Lernkarten, Glossar. */
+function hilfePrompt(p: GenParams, material: { name?: string; text: string } | null): string {
+  const fach = p.fach.trim() || "[Fach/Kontext]";
+  const stufe = p.stufe.trim() || "[Zielstufe]";
+  const thema = (p.thema ?? "").trim();
+  const extra = (p.extra ?? "").trim();
+  const hasMaterial = !!material && material.text.trim().length > 0;
+  const themaLine = thema
+    ? `- Thema: ${thema}`
+    : hasMaterial
+      ? "- Thema: leer – die Lernhilfe deckt das Material ab"
+      : "- Thema: leer – wähle ein typisches Thema für Fach und Stufe";
+  const extraLine = extra ? `\n- Zusatzwunsch: ${extra}` : "";
+  const dateiLine = hasMaterial
+    ? `- Material: ${material?.name ? `«${material.name}», ` : ""}Textauszug unten (= Stoff der Lernhilfe)`
+    : "- Material: keine Datei – arbeite allein mit den Angaben oben";
+  const spr = spracheText(p);
+  const materialBlock = hasMaterial ? `\n\n§MATERIAL (Textauszug)\n<<<\n${material!.text.trim()}\n>>>` : "";
+
+  return `§ROLLE
+Du bist Fachdidaktiker:in für ${fach} auf der Stufe ${stufe} und Frontend-Entwickler:in. Du baust eine Lernhilfe, mit der Lernende den Stoff selbstständig verstehen, wiederholen und nachschlagen.
+
+§ANGABEN
+- Fach/Kontext: ${fach}
+- Zielstufe: ${stufe}
+${themaLine}${extraLine}
+${dateiLine}
+
+§AUFGABE
+Erstelle aus dem Stoff eine interaktive Lernhilfe mit drei Teilen (Reiter A, B, C): Merkblatt, Lernkarten, Glossar. Alle Inhalte stammen aus dem Material; erfinde nichts darüber hinaus. Fehlt auslesbarer Inhalt, wähle ein typisches Thema für Fach und Stufe und vermerke das in der Notiz.
+
+§TEIL A – MERKBLATT (Reiter A, druckbar auf eine A4-Seite)
+- Kernaussagen: 5 bis 8 kurze Sätze, die den Stoff tragen.
+- Regeln und Formeln: jede im .formel-Block mit einem Satz, wann sie gilt.
+- «So gehe ich vor»: Schritt-für-Schritt-Rahmen (.steps) für das zentrale Verfahren oder die zentrale Denkbewegung, mit einem durchgerechneten oder durchgespielten Mini-Beispiel.
+- Typische Fehler: drei Stolpersteine mit dem richtigen Weg (.hint).
+
+§TEIL B – LERNKARTEN (Reiter B)
+- 16 bis 24 Karten als JavaScript-Datenfeld (frage, antwort, thema). Vorderseite Frage oder Begriff, Rückseite Antwort in höchstens zwei Sätzen.
+- Klick oder Enter dreht die Karte (.fc mit Klasse flipped). Unter jeder Karte zwei Knöpfe «Gewusst» und «Nochmals»; Zähler oben (gewusst / nochmals / offen).
+- Knöpfe: «Mischen», «Nur Nochmals üben», «Alle zurücksetzen». Stand bleibt im Browser (localStorage, Schlüssel aus dem Titel).
+- Druck: alle Karten als Raster mit Frage und Antwort sichtbar (Rückseite unter der Vorderseite), keine Umbrüche innerhalb einer Karte.
+
+§TEIL C – GLOSSAR (Reiter C)
+- 12 bis 20 Fachbegriffe alphabetisch als Definitionsliste (.gloss, dt/dd): Begriff, Erklärung in einfacher Sprache, ein Beispiel aus dem Material.
+- Suchfeld (.search) filtert live beim Tippen; Treffer bleiben sichtbar, der Rest wird ausgeblendet.
+- Bei zweisprachiger Vorgabe steht die Übersetzung direkt nach dem Begriff.
+
+§LEHRPERSON
+Ausklappbarer Bereich (details.lehrperson): Einsatzvorschläge (Vorbereitung, Wiederholung, Nachteilsausgleich), welche Teile des Materials abgedeckt sind, Hinweis zur Anpassung der Karten und des Glossars im Datenfeld.
+${spr ? "\n§" + spr + "\n" : ""}
+§AUSGABEFORMAT – INTERAKTIVE WEBSITE
+Eine einzige, voll funktionsfähige HTML-Seite (eine Datei, ohne externe Abhängigkeiten, offline lauffähig), drei Reiter nach der Designbasis. PDF-Button oben («Als PDF drucken»): blendet alle Teile ein, druckt Merkblatt, Kartenraster und Glossar, Knöpfe und Suchfeld ausgeblendet; Fallback, der die Seite in einem neuen Tab öffnet, falls der Druckdialog blockiert ist.
+
+§GESTALTUNG
+Halte dich an die DESIGNBASIS aus dem System-Prompt (CSS unverändert, Grundgerüst für Lernhilfe, Klassen). Eigenes CSS nur für Kleinigkeiten. Responsiv bis Mobile, Tastaturbedienbarkeit, sichtbarer Fokus. Keine zusätzlichen Farben, Schatten, Verläufe oder Emojis.
+
+§QUALITÄTSPRÜFUNG VOR DER AUSGABE
+- Merkblatt fachlich korrekt und vollständig für den Stoff; Formeln und Regeln geprüft.
+- Karten: jede Antwort eindeutig und kurz; Glossar alphabetisch; Suche funktioniert ohne Gross-/Kleinschreibung.
+- Kontrolliere alle Texte auf Tipp- und Flüchtigkeitsfehler; Schweizer Standarddeutsch; knapp formulieren.
+- Die Notiz am Ende nennt Thema, Anzahl Karten und Glossarbegriffe.${materialBlock}`;
 }
 
 /** Zieht die reine HTML-Datei aus einer Modellantwort (entfernt Codezäune und Text ausserhalb). */

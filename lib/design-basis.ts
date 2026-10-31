@@ -106,7 +106,26 @@ th{background:var(--cream);font-size:.76rem;letter-spacing:.06em;text-transform:
 .pairs{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
 .order .choice::before{content:attr(data-n) " ";color:var(--terra);font-weight:600}
 .next{display:flex;justify-content:space-between;align-items:center;gap:.8rem;flex-wrap:wrap;margin-top:1rem;min-height:2.4rem}
-.msg-level{background:var(--cream);border-radius:var(--r);padding:.7rem .9rem;margin:.6rem 0;font-size:.95rem}`;
+.msg-level{background:var(--cream);border-radius:var(--r);padding:.7rem .9rem;margin:.6rem 0;font-size:.95rem}
+/* Lernhilfe */
+.merk{columns:2;column-gap:2rem}@media(max-width:700px){.merk{columns:1}}
+.merk>*{break-inside:avoid}
+.formel{font-family:ui-monospace,Menlo,Consolas,monospace;background:var(--cream);border:1px solid var(--line);border-radius:var(--r);padding:.35rem .7rem;display:inline-block;margin:.2rem 0}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.8rem;margin:.8rem 0}
+.fc{perspective:1000px;min-height:160px;cursor:pointer}
+.fc .in{position:relative;min-height:160px;height:100%;transition:transform .4s;transform-style:preserve-3d}
+.fc.flipped .in{transform:rotateY(180deg)}
+.fc .f,.fc .b{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:#fff;border:1px solid var(--line-strong);border-radius:var(--r-lg);padding:1rem;display:flex;align-items:center;justify-content:center;text-align:center}
+.fc .f{font-family:var(--serif);font-size:1.1rem}
+.fc .b{transform:rotateY(180deg);background:var(--cream);font-size:.95rem}
+.fc.known .f,.fc.known .b{border-color:var(--ok)}
+.fc.again .f,.fc.again .b{border-color:var(--terra)}
+.fc-actions{display:flex;gap:.4rem;justify-content:center;margin-top:.4rem}
+.fc-actions .btn{padding:.35rem .7rem;font-size:.8rem}
+.gloss{margin:0}.gloss dt{font-weight:600;margin-top:.8rem;font-family:var(--serif);font-size:1.05rem}.gloss dt small{font-family:var(--sans);font-weight:400;color:var(--ink-soft);margin-left:.4rem}
+.gloss dd{margin:.1rem 0 0;color:var(--ink-soft)}.gloss dd em{color:var(--ink);font-style:normal}
+.search{margin:.4rem 0 .8rem}
+@media print{.fc .in{transform:none!important}.fc .f,.fc .b{position:static;transform:none;backface-visibility:visible}.fc .b{margin-top:.3rem}.cards{grid-template-columns:1fr 1fr}.fc{break-inside:avoid}.fc-actions,.search{display:none}}`;
 
 /** Grundgerüst Lernseite (Klassen aus DESIGN_CSS). */
 export const DESIGN_SKELETON = `<body><div class="wrap">
@@ -145,6 +164,17 @@ export const DESIGN_SKELETON_SPIEL = `<body><div class="wrap">
 <p class="foot">Lernspiel erzeugt mit Lernwege (EDUTECSOL). Fach · Stufe · Datum.</p>
 </div></body>`;
 
+/** Grundgerüst Lernhilfe (Klassen aus DESIGN_CSS). */
+export const DESIGN_SKELETON_HILFE = `<body><div class="wrap">
+<header class="top"><div><p class="eyebrow">Fach · Stufe · Lernhilfe</p><h1>Titel: Thema</h1><p class="lead">Ein Satz: Wofür die Lernhilfe dient. Merkblatt, Lernkarten, Glossar.</p></div><button class="btn ghost pdf" type="button">Als PDF drucken</button></header>
+<div class="tabs" role="tablist"><button class="tab active" role="tab" aria-selected="true" aria-controls="p-a" id="t-a"><span class="tname">A · Merkblatt</span><span class="tsub">Das Wichtigste auf einer Seite</span></button><button class="tab" role="tab" aria-selected="false" aria-controls="p-b" id="t-b"><span class="tname">B · Lernkarten</span><span class="tsub">… Karten zum Umdrehen</span></button><button class="tab" role="tab" aria-selected="false" aria-controls="p-c" id="t-c"><span class="tname">C · Glossar</span><span class="tsub">… Begriffe, mit Suche</span></button></div>
+<section class="panel show" id="p-a" role="tabpanel" aria-labelledby="t-a"><div class="card merk"><h2>Kernaussagen</h2><ol class="steps"><li>…</li></ol><h2>Regeln und Formeln</h2><p><span class="formel">…</span> gilt, wenn …</p><h2>So gehe ich vor</h2><ol class="steps"><li>…</li></ol><div class="hint"><strong>Beispiel:</strong> …</div><h2>Typische Fehler</h2><div class="hint">…</div></div></section>
+<section class="panel" id="p-b" role="tabpanel" aria-labelledby="t-b"><div class="hud"><div class="stat"><b id="n-gewusst">0</b><span>gewusst</span></div><div class="stat"><b id="n-nochmals">0</b><span>nochmals</span></div><div class="stat"><b id="n-offen">0</b><span>offen</span></div></div><p class="pick"><button class="btn ghost" type="button" id="mischen">Mischen</button> <button class="btn ghost" type="button" id="nur-nochmals">Nur Nochmals üben</button> <button class="btn ghost" type="button" id="reset-karten">Alle zurücksetzen</button></p><div class="cards" id="karten"><div class="fc" tabindex="0" data-i="0"><div class="in"><div class="f">Frage</div><div class="b">Antwort</div></div></div></div></section>
+<section class="panel" id="p-c" role="tabpanel" aria-labelledby="t-c"><div class="card"><input class="search" id="suche" type="text" placeholder="Begriff suchen …" aria-label="Glossar durchsuchen"><dl class="gloss" id="glossar"><dt>Begriff<small>Übersetzung (nur falls zweisprachig)</small></dt><dd>Erklärung in einfacher Sprache. <em>Beispiel:</em> …</dd></dl></div></section>
+<details class="lehrperson"><summary>Für die Lehrperson: Einsatz, Abdeckung, Anpassung</summary><div>…</div></details>
+<p class="foot">Lernhilfe erzeugt mit Lernwege (EDUTECSOL). Fach · Stufe · Datum.</p>
+</div></body>`;
+
 /** Setzt die Designbasis in eine erzeugte Seite ein: in den Platzhalter <style id="lw-basis">, sonst als erstes Element im <head>.
  *  Spart dem Modell rund 6000 Zeichen Ausgabe und garantiert, dass das CSS exakt der Basis entspricht. */
 export function injectDesignBasis(html: string): string {
@@ -158,13 +188,15 @@ export function injectDesignBasis(html: string): string {
 }
 
 /** Abschnitt für den System-Prompt. */
-export function designBasisPrompt(typ: "lernseite" | "pruefung" | "spiel" = "lernseite"): string {
-  const skeleton = typ === "pruefung" ? DESIGN_SKELETON_PRUEFUNG : typ === "spiel" ? DESIGN_SKELETON_SPIEL : DESIGN_SKELETON;
+export function designBasisPrompt(typ: "lernseite" | "pruefung" | "spiel" | "hilfe" = "lernseite"): string {
+  const skeleton = typ === "pruefung" ? DESIGN_SKELETON_PRUEFUNG : typ === "spiel" ? DESIGN_SKELETON_SPIEL : typ === "hilfe" ? DESIGN_SKELETON_HILFE : DESIGN_SKELETON;
   const extra = typ === "pruefung"
     ? `- Timer: Start/Stopp per Knopf, Anzeige mm:ss, nach Ablauf Klasse over (nur Anzeige). Auswertung: Klassen ok/err auf allen Feldern, .loesung je Aufgabe und .score sichtbar (Klasse show), .meter-Breite = Prozent.`
     : typ === "spiel"
       ? `- Spielfläche #stage wird je Aufgabe neu gefüllt; gewählte Option Klasse sel, nach Prüfung ok/err; gelöste Paare Klasse done; Reihenfolge mit data-n; Level-Reiter: locked bis freigeschaltet, done nach Abschluss; am Ende .score mit Klasse show, #stage ausblenden.`
-      : `- Der Aha-Moment des obersten Zugangs steht in einem .aha-Block, der erst nach Klick auf einen .btn erscheint.`;
+      : typ === "hilfe"
+        ? `- Lernkarten: Klick/Enter auf .fc schaltet Klasse flipped; «Gewusst» setzt Klasse known, «Nochmals» Klasse again; Zähler im .hud; Glossar-Suche blendet nicht passende dt/dd-Paare aus (hidden).`
+        : `- Der Aha-Moment des obersten Zugangs steht in einem .aha-Block, der erst nach Klick auf einen .btn erscheint.`;
   return `DESIGNBASIS (zwingend):
 - Das folgende CSS ist die Designbasis. Gib es NICHT aus: schreibe als erstes Element im <head> nur den Platzhalter <style id="lw-basis">/* Designbasis wird beim Speichern eingesetzt */</style>; die Plattform setzt das CSS dort ein. Ergänze danach ein zweites <style> nur für die themenspezifische Visualisierung und Kleinigkeiten. Keine anderen Farben als die Variablen (--navy, --terra, --ochre, --cream, --ok, --err); keine Schatten, keine Verläufe, keine Emojis als Icons.
 <style>
