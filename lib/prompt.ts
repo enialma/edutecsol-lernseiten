@@ -3,7 +3,7 @@
 
 import { designBasisPrompt } from "./design-basis";
 
-export type Diffart = "niveau" | "lerntyp" | "interesse" | "sozialform" | "hilfestufe";
+export type Diffart = "niveau" | "lerntyp" | "interesse" | "sozialform";
 export type Sprache = "standard" | "einfach" | "glossar" | "zweisprachig";
 export type Twist = "auto" | "ausreisser" | "vergleich" | "grenzfall" | "fehler" | "methoden" | "transfer";
 export type Niveau = "reproduzieren" | "anwenden" | "beurteilen";
@@ -41,7 +41,6 @@ export const DIFFART_LABELS: Record<Diffart, string> = {
   lerntyp: "nach Lerntyp",
   interesse: "nach Berufsfeld",
   sozialform: "nach Sozialform",
-  hilfestufe: "nach Hilfestufe (gleicher Lösungsweg)",
 };
 export const SPRACHE_LABELS: Record<Sprache, string> = {
   standard: "Standard",
@@ -77,33 +76,8 @@ function labelsFor(art: Diffart, n: number): string[] {
     lerntyp: ["visuell/grafisch", "rechnerisch/formal", "sprachlich/erklärend", "handlungsorientiert"],
     interesse: ["Berufsfeld 1", "Berufsfeld 2", "Berufsfeld 3", "Berufsfeld 4"],
     sozialform: ["Einzelarbeit", "Partnerarbeit", "Gruppenauftrag", "Plenum"],
-    hilfestufe: ["Mit Beispiel", "Mit Hinweisen", "Ohne Hilfe", "Transfer"],
   };
   return m[art].slice(0, n);
-}
-
-/**
- * Regeln für die einzelnen Zugänge. Bei «Hilfestufe» bleibt der Lösungsweg in allen Zugängen identisch und nur die
- * Unterstützung nimmt ab (Idee aus der Berufsbildung: vorgerechnetes Beispiel → einzelne Hinweise → ohne Hilfe);
- * der Twist entfällt dort. Sonst die bisherigen Regeln mit Vertiefung im obersten Zugang.
- */
-function zugangRegeln(p: GenParams): string {
-  if (p.diffart === "hilfestufe") {
-    const n = p.anzahl;
-    const rules = [
-      "- Zugang A «Mit Beispiel»: zuerst ein vollständig vorgerechnetes Parallelbeispiel mit anderen Zahlen, aber exakt demselben Lösungsweg und derselben Schrittfolge, jeder Schritt in einem Satz kommentiert. Danach die Kernaufgabe als Rechen- bzw. Lösungsrahmen zum Ausfüllen mit denselben Schritten wie im Beispiel (interaktiv mit grünem Häkchen bei korrekter und einem Hinweis bei falscher Eingabe). Ergebnis der Kernaufgabe nicht nennen.",
-      "- Zugang B «Mit Hinweisen»: dieselbe Kernaufgabe, kein Beispiel. Je Lösungsschritt ein aufklappbarer Hinweis (Hinweis 1, 2, 3 …), der den Schritt benennt und die passende Regel oder Formel nennt, ihn aber nicht ausführt. Hinweise erst auf Klick sichtbar, mit Zähler «Hinweise genutzt».",
-      "- Zugang C «Ohne Hilfe»: dieselbe Kernaufgabe nur mit Eingabefeld, Ergebnisprüfung und Selbstcheck-Liste mit vier abhakbaren Fragen.",
-      "- Zugang D «Transfer»: dieselbe Methode auf eine neue, berufsnahe Situation, ohne Hilfe; eine Begründungsfrage, warum derselbe Lösungsweg hier passt.",
-    ].slice(0, n);
-    rules.push("- Der Lösungsweg (Schrittfolge, Formeln, Darstellung) ist in allen Zugängen wörtlich derselbe; nur die Unterstützung ändert sich. Im Lehrpersonen-Bereich den gemeinsamen Lösungsweg einmal vollständig ausweisen und je Zugang nur angeben, welche Hilfen enthalten sind.");
-    return rules.join("\n");
-  }
-  return [
-    "- Erster/einfachster Zugang «Mit Unterstützung»: kurze Erklärung der Fachbegriffe; ein Rechen- bzw. Zuordnungsrahmen zum Ausfüllen (interaktiv mit grünem Häkchen bei korrekter und einem Hinweis bei falscher Eingabe, ohne die Lösung zu verraten); drei Leitfragen; ein Satzanfang für den Ergebnissatz. Weder Rechnung noch Ergebnis vollständig nennen.",
-    "- Mittlerer Zugang «Eigenständig»: gleiche Kernaufgabe ohne Hilfen; Möglichkeit zur Ergebnisprüfung; Selbstcheck-Liste mit vier abhakbaren Fragen.",
-    "- " + twistText(p),
-  ].join("\n");
 }
 
 function diffartText(p: GenParams): string {
@@ -114,7 +88,6 @@ function diffartText(p: GenParams): string {
     lerntyp: `Differenziere nach LERNTYP: Alle Zugänge behandeln dieselbe Kernaufgabe auf gleichem Anforderungsniveau, aber über verschiedene Zugangskanäle. Erstelle ${n} Zugänge: ${L}. Jeder Zugang löst dieselbe Aufgabe, betont aber seinen Kanal (Grafik/Diagramm vs. Formel/Rechnung vs. sprachliche Erklärung vs. konkrete Handlung).`,
     interesse: `Differenziere nach BERUFSFELD/INTERESSE: dieselbe mathematische bzw. fachliche Kompetenz, eingebettet in unterschiedliche berufliche Kontexte. Erstelle ${n} Zugänge (${L}) und ersetze die Platzhalter-Berufsfelder durch zur Zielstufe passende Felder. Die Rechen-/Denkstruktur ist in allen Zugängen identisch, nur das Anwendungsbeispiel unterscheidet sich.`,
     sozialform: `Differenziere nach SOZIALFORM: dieselbe Kernaufgabe, aber unterschiedliche Bearbeitungsform. Erstelle ${n} Zugänge: ${L}. Formuliere je einen passenden Arbeitsauftrag (allein / zu zweit mit Rollen / in der Gruppe mit Teilaufgaben) und ergänze bei Partner-/Gruppenzugängen eine kurze Anleitung zur Zusammenarbeit.`,
-    hilfestufe: `Differenziere nach HILFESTUFE: Alle Zugänge enthalten exakt dieselbe Kernaufgabe mit denselben Zahlen, demselben Lösungsweg (gleiches Rechen- bzw. Lösungsschema, gleiche Schrittfolge) und denselben Erfolgskriterien. Unterschiedlich ist einzig die Unterstützung, die von Zugang zu Zugang abnimmt. Erstelle ${n} Zugänge: ${L}.`,
   };
   return map[p.diffart];
 }
@@ -225,7 +198,9 @@ ${niveauText(p)}
 §DIFFERENZIERUNG
 ${diffartText(p)}
 - Die Lernenden bearbeiten nur ihren gewählten Zugang (per Reiter-Klick).
-${zugangRegeln(p)}
+- Erster/einfachster Zugang «Mit Unterstützung»: kurze Erklärung der Fachbegriffe; ein Rechen- bzw. Zuordnungsrahmen zum Ausfüllen (interaktiv mit grünem Häkchen bei korrekter und einem Hinweis bei falscher Eingabe, ohne die Lösung zu verraten); drei Leitfragen; ein Satzanfang für den Ergebnissatz. Weder Rechnung noch Ergebnis vollständig nennen.
+- Mittlerer Zugang «Eigenständig»: gleiche Kernaufgabe ohne Hilfen; Möglichkeit zur Ergebnisprüfung; Selbstcheck-Liste mit vier abhakbaren Fragen.
+- ${twistText(p)}
 ${spr ? "\n§" + spr + "\n" : ""}
 §AUSGABEFORMAT – INTERAKTIVE WEBSITE
 Eine einzige, voll funktionsfähige HTML-Seite (eine Datei, ohne externe Abhängigkeiten, offline lauffähig):

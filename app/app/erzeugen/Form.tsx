@@ -8,7 +8,7 @@ type Bild = { id: number; title: string };
 
 const TYP = [["lernseite", "Lernseite"], ["pruefung", "Prüfungsvorbereitung"], ["spiel", "Lernspiel"], ["hilfe", "Lernhilfe"]];
 const DAUER = [["20", "20 Minuten"], ["30", "30 Minuten"], ["45", "45 Minuten"]];
-const DIFFART = [["niveau", "nach Niveau (Hilfe)"], ["hilfestufe", "nach Hilfestufe (gleicher Lösungsweg)"], ["lerntyp", "nach Lerntyp"], ["interesse", "nach Berufsfeld"], ["sozialform", "nach Sozialform"]];
+const DIFFART = [["niveau", "nach Niveau (Hilfe)"], ["lerntyp", "nach Lerntyp"], ["interesse", "nach Berufsfeld"], ["sozialform", "nach Sozialform"]];
 const SPRACHE = [["standard", "Standard"], ["einfach", "vereinfachte Sprache"], ["glossar", "Fachbegriffe mit Glossar"], ["zweisprachig", "Schlüsselbegriffe zweisprachig"]];
 const TWIST = [["auto", "passend wählen"], ["ausreisser", "Ausreisser/Robustheit"], ["vergleich", "Fälle vergleichen"], ["grenzfall", "Grenzfall"], ["fehler", "Fehler erkennen"], ["methoden", "Methoden vergleichen"], ["transfer", "Transfer/Anwendung"]];
 const NIVEAU = [["reproduzieren", "reproduzieren"], ["anwenden", "anwenden"], ["beurteilen", "beurteilen"]];
@@ -135,9 +135,6 @@ export default function Form({ providers, presets, bilder, initialBild, isAdmin 
         <>
           <label>Differenzierungsart</label>
           <Seg k="diffart" opts={DIFFART} />
-          {s.diffart === "hilfestufe" && (
-            <p className="small-note" style={{ margin: ".3rem 0 0" }}>Gleiche Aufgabe, gleicher Lösungsweg in allen Zugängen; nur die Hilfe nimmt ab: vorgerechnetes Beispiel → einzelne Hinweise → ohne Hilfe (→ Transfer). Ohne Twist.</p>
-          )}
           <label>Anzahl Zugänge</label>
           <div className="seg">{[2, 3, 4].map((n) => <button type="button" key={n} className={s.anzahl === n ? "on" : ""} onClick={() => set("anzahl", n)} disabled={busy}>{n}</button>)}</div>
         </>
@@ -149,12 +146,8 @@ export default function Form({ providers, presets, bilder, initialBild, isAdmin 
       )}
       {lernseite && (
         <>
-          {s.diffart !== "hilfestufe" && (
-            <>
-              <label>Twist in der Vertiefung</label>
-              <Seg k="twist" opts={TWIST} />
-            </>
-          )}
+          <label>Twist in der Vertiefung</label>
+          <Seg k="twist" opts={TWIST} />
           <label>Anforderungsniveau</label>
           <Seg k="niveau" opts={NIVEAU} />
         </>

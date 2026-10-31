@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     stufe: String(fd.get("stufe") ?? "").trim(),
     thema: String(fd.get("thema") ?? "").trim(),
     extra: String(fd.get("extra") ?? "").trim(),
-    diffart: pick(fd.get("diffart"), ["niveau", "lerntyp", "interesse", "sozialform", "hilfestufe"] as const, "niveau"),
+    diffart: pick(fd.get("diffart"), ["niveau", "lerntyp", "interesse", "sozialform"] as const, "niveau"),
     anzahl: (Number(fd.get("anzahl")) === 2 ? 2 : Number(fd.get("anzahl")) === 4 ? 4 : 3) as 2 | 3 | 4,
     sprache: pick(fd.get("sprache"), ["standard", "einfach", "glossar", "zweisprachig"] as const, "standard"),
     zweitsprache: String(fd.get("zweitsprache") ?? "").trim(),
