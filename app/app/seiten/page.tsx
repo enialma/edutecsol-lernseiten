@@ -94,6 +94,7 @@ export default async function SeitenPage({ searchParams }: { searchParams: Promi
                   <span className="row" style={{ gap: ".3rem" }}>
                     <span className="badge">{p.fach}{p.stufe ? ` · ${p.stufe}` : ""}</span>
                     {(p.params as { typ?: string })?.typ === "pruefung" && <span className="badge" style={{ background: "var(--cream)", color: "var(--terra)" }}>Prüfungsvorbereitung</span>}
+                    {(p.params as { typ?: string })?.typ === "spiel" && <span className="badge" style={{ background: "var(--cream)", color: "var(--terra)" }}>Lernspiel</span>}
                     {p.share_token && <span className="badge ok">Link</span>}
                     {p.school && <span className="badge new">Schule</span>}
                     {p.pool && <span className="badge new">Pool</span>}

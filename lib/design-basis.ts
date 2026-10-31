@@ -90,7 +90,23 @@ th{background:var(--cream);font-size:.76rem;letter-spacing:.06em;text-transform:
 .meter i{display:block;height:100%;background:var(--terra);width:0;transition:width .4s}
 .loesung{display:none;margin-top:.6rem;padding:.6rem .9rem;background:var(--cream);border-radius:var(--r);font-size:.92rem}
 .loesung.show{display:block}
-.plan td:first-child{font-weight:600;white-space:nowrap}`;
+.plan td:first-child{font-weight:600;white-space:nowrap}
+/* Lernspiel */
+.hud{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.6rem;margin:0 0 .8rem}
+.stat{background:#fff;border:1px solid var(--line-strong);border-radius:var(--r-lg);padding:.55rem .8rem;text-align:center}
+.stat b{display:block;font-family:var(--serif);font-size:1.5rem;line-height:1.1}
+.stat span{font-size:.74rem;color:var(--ink-soft)}
+.tab.locked{opacity:.45;cursor:not-allowed}
+.tab.done .tname::after{content:" ✓";color:var(--ok)}
+.q{font-family:var(--serif);font-size:1.35rem;line-height:1.3;margin:.2rem 0 .8rem}
+.choices.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+@media(max-width:560px){.choices.grid2{grid-template-columns:1fr}}
+.choice.sel{border-color:var(--navy);background:var(--cream)}
+.choice.done{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);pointer-events:none}
+.pairs{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.order .choice::before{content:attr(data-n) " ";color:var(--terra);font-weight:600}
+.next{display:flex;justify-content:space-between;align-items:center;gap:.8rem;flex-wrap:wrap;margin-top:1rem;min-height:2.4rem}
+.msg-level{background:var(--cream);border-radius:var(--r);padding:.7rem .9rem;margin:.6rem 0;font-size:.95rem}`;
 
 /** Grundgerüst Lernseite (Klassen aus DESIGN_CSS). */
 export const DESIGN_SKELETON = `<body><div class="wrap">
@@ -117,6 +133,18 @@ export const DESIGN_SKELETON_PRUEFUNG = `<body><div class="wrap">
 <p class="foot">Prüfungsvorbereitung erzeugt mit Lernwege (EDUTECSOL). Fach · Stufe · Datum.</p>
 </div></body>`;
 
+/** Grundgerüst Lernspiel (Klassen aus DESIGN_CSS). */
+export const DESIGN_SKELETON_SPIEL = `<body><div class="wrap">
+<header class="top"><div><p class="eyebrow">Fach · Stufe · Lernspiel</p><h1>Titel des Spiels</h1><p class="lead">Ein Satz: Was man hier trainiert. Vier Levels, Punkte, Serie.</p></div><div><button class="btn ghost" type="button" id="restart">Neu starten</button> <button class="btn ghost pdf" type="button">Aufgabenliste als PDF</button></div></header>
+<div class="hud"><div class="stat"><b id="punkte">0</b><span>Punkte</span></div><div class="stat"><b id="serie">0</b><span>Serie</span></div><div class="stat"><b id="leben">3</b><span>Leben</span></div><div class="stat"><b id="pos">1/7</b><span>Aufgabe</span></div></div>
+<div class="meter"><i id="fortschritt"></i></div>
+<div class="tabs" role="tablist"><button class="tab active" role="tab" aria-selected="true" aria-controls="p-1" id="t-1" data-level="1"><span class="tname">1 · Erkennen</span><span class="tsub">Auswahl</span></button><button class="tab locked" role="tab" aria-selected="false" aria-controls="p-2" id="t-2" data-level="2"><span class="tname">2 · Erinnern</span><span class="tsub">Eingabe</span></button><button class="tab locked" role="tab" aria-selected="false" aria-controls="p-3" id="t-3" data-level="3"><span class="tname">3 · Anwenden</span><span class="tsub">Zuordnen</span></button><button class="tab locked" role="tab" aria-selected="false" aria-controls="p-4" id="t-4" data-level="4"><span class="tname">4 · Meistern</span><span class="tsub">Reihenfolge, Transfer</span></button></div>
+<section class="card" id="stage" aria-live="polite"><p class="eyebrow" id="level-label">Level 1 · Erkennen</p><p class="q" id="frage">…</p><div class="choices grid2" id="antworten">… (Level 1/3/4: .choice-Knöpfe; Level 2: .field mit input; Zuordnen: .pairs; Reihenfolge: .choices.order)</div><div class="next"><span class="feedback" id="feedback"></span><button class="btn terra" type="button" id="weiter" hidden>Weiter</button></div></section>
+<div class="score" id="ende"><div class="nums"><div><b id="ende-punkte">0</b><span>Punkte</span></div><div><b id="ende-best">0</b><span>Bestleistung</span></div><div><b id="ende-quote">0 %</b><span>richtig</span></div></div><table><thead><tr><th>Level</th><th>richtig</th><th>falsch</th></tr></thead><tbody id="ende-tabelle"></tbody></table><p><button class="btn terra" type="button" id="nochmals">Nochmals spielen</button></p></div>
+<details class="lehrperson"><summary>Für die Lehrperson: alle Aufgaben mit Lösungen, Einsatz im Unterricht</summary><div><table><thead><tr><th>Level</th><th>Aufgabe</th><th>Lösung</th></tr></thead><tbody id="loesungen"></tbody></table><h3>Einsatz</h3><ul class="steps"><li>…</li></ul></div></details>
+<p class="foot">Lernspiel erzeugt mit Lernwege (EDUTECSOL). Fach · Stufe · Datum.</p>
+</div></body>`;
+
 /** Setzt die Designbasis in eine erzeugte Seite ein: in den Platzhalter <style id="lw-basis">, sonst als erstes Element im <head>.
  *  Spart dem Modell rund 6000 Zeichen Ausgabe und garantiert, dass das CSS exakt der Basis entspricht. */
 export function injectDesignBasis(html: string): string {
@@ -130,17 +158,19 @@ export function injectDesignBasis(html: string): string {
 }
 
 /** Abschnitt für den System-Prompt. */
-export function designBasisPrompt(typ: "lernseite" | "pruefung" = "lernseite"): string {
-  const skeleton = typ === "pruefung" ? DESIGN_SKELETON_PRUEFUNG : DESIGN_SKELETON;
+export function designBasisPrompt(typ: "lernseite" | "pruefung" | "spiel" = "lernseite"): string {
+  const skeleton = typ === "pruefung" ? DESIGN_SKELETON_PRUEFUNG : typ === "spiel" ? DESIGN_SKELETON_SPIEL : DESIGN_SKELETON;
   const extra = typ === "pruefung"
     ? `- Timer: Start/Stopp per Knopf, Anzeige mm:ss, nach Ablauf Klasse over (nur Anzeige). Auswertung: Klassen ok/err auf allen Feldern, .loesung je Aufgabe und .score sichtbar (Klasse show), .meter-Breite = Prozent.`
-    : `- Der Aha-Moment des obersten Zugangs steht in einem .aha-Block, der erst nach Klick auf einen .btn erscheint.`;
+    : typ === "spiel"
+      ? `- Spielfläche #stage wird je Aufgabe neu gefüllt; gewählte Option Klasse sel, nach Prüfung ok/err; gelöste Paare Klasse done; Reihenfolge mit data-n; Level-Reiter: locked bis freigeschaltet, done nach Abschluss; am Ende .score mit Klasse show, #stage ausblenden.`
+      : `- Der Aha-Moment des obersten Zugangs steht in einem .aha-Block, der erst nach Klick auf einen .btn erscheint.`;
   return `DESIGNBASIS (zwingend):
 - Das folgende CSS ist die Designbasis. Gib es NICHT aus: schreibe als erstes Element im <head> nur den Platzhalter <style id="lw-basis">/* Designbasis wird beim Speichern eingesetzt */</style>; die Plattform setzt das CSS dort ein. Ergänze danach ein zweites <style> nur für die themenspezifische Visualisierung und Kleinigkeiten. Keine anderen Farben als die Variablen (--navy, --terra, --ochre, --cream, --ok, --err); keine Schatten, keine Verläufe, keine Emojis als Icons.
 <style>
 ${DESIGN_CSS}
 </style>
-- Baue die Seite nach diesem Grundgerüst (Klassen beibehalten, Inhalte ersetzen${typ === "pruefung" ? "" : ", Anzahl Zugänge gemäss Auftrag"}):
+- Baue die Seite nach diesem Grundgerüst (Klassen beibehalten, Inhalte ersetzen${typ === "lernseite" ? ", Anzahl Zugänge gemäss Auftrag" : ""}):
 ${skeleton}
 - Reiter: Klick setzt .active auf dem Reiter und .show auf dem zugehörigen Panel, aria-selected entsprechend; Pfeiltasten wechseln den Reiter.
 - Rückmeldung: richtige Eingabe → Klasse ok auf dem Feld und Text im .feedback (z. B. «Richtig»); falsche → Klasse err und ein Hinweis ohne Lösung. Auswahlaufgaben mit .choices/.choice analog (gewählt = Klasse on).

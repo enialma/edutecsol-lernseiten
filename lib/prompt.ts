@@ -8,7 +8,7 @@ export type Sprache = "standard" | "einfach" | "glossar" | "zweisprachig";
 export type Twist = "auto" | "ausreisser" | "vergleich" | "grenzfall" | "fehler" | "methoden" | "transfer";
 export type Niveau = "reproduzieren" | "anwenden" | "beurteilen";
 /** Seitentyp: klassische Lernseite oder Prüfungsvorbereitung (weitere Typen folgen). */
-export type Typ = "lernseite" | "pruefung";
+export type Typ = "lernseite" | "pruefung" | "spiel";
 export type Dauer = 20 | 30 | 45;
 
 export type GenParams = {
@@ -33,6 +33,7 @@ export type GenParams = {
 export const TYP_LABELS: Record<Typ, string> = {
   lernseite: "Lernseite",
   pruefung: "Prüfungsvorbereitung",
+  spiel: "Lernspiel",
 };
 export const DIFFART_LABELS: Record<Diffart, string> = {
   niveau: "nach Niveau (Hilfe)",
@@ -141,6 +142,7 @@ ${designBasisPrompt(typ)}`;
 /** User-Prompt aus den Achsen + Material. */
 export function userPrompt(p: GenParams, material: { name?: string; text: string } | null): string {
   if ((p.typ ?? "lernseite") === "pruefung") return pruefungPrompt(p, material);
+  if (p.typ === "spiel") return spielPrompt(p, material);
   const fach = p.fach.trim() || "[Fach/Kontext]";
   const stufe = p.stufe.trim() || "[Zielstufe]";
   const thema = (p.thema ?? "").trim();
@@ -284,6 +286,70 @@ Halte dich an die DESIGNBASIS aus dem System-Prompt (CSS unverändert, Grundger�
 - Jede Aufgabe ist genau einem Lernziel zugeordnet; die Lernziel-Tabelle in der Auswertung summiert korrekt.
 - Kontrolliere alle Texte auf Tipp- und Flüchtigkeitsfehler; Schweizer Standarddeutsch.
 - Die Notiz am Ende nennt Prüfungsstoff, Anzahl Lernziele und Aufgaben.${materialBlock}`;
+}
+
+/** User-Prompt für den Seitentyp «Lernspiel»: vier Levels, Punkte, Serie, Leben, Bestleistung. */
+function spielPrompt(p: GenParams, material: { name?: string; text: string } | null): string {
+  const fach = p.fach.trim() || "[Fach/Kontext]";
+  const stufe = p.stufe.trim() || "[Zielstufe]";
+  const thema = (p.thema ?? "").trim();
+  const extra = (p.extra ?? "").trim();
+  const hasMaterial = !!material && material.text.trim().length > 0;
+  const themaLine = thema
+    ? `- Thema: ${thema}`
+    : hasMaterial
+      ? "- Thema: leer – nimm die Begriffe, Regeln und Zusammenhänge aus dem Material"
+      : "- Thema: leer – wähle ein spielbares Thema aus Fach und Stufe (Begriffe, Regeln, Zuordnungen)";
+  const extraLine = extra ? `\n- Zusatzwunsch: ${extra}` : "";
+  const dateiLine = hasMaterial
+    ? `- Material: ${material?.name ? `«${material.name}», ` : ""}Textauszug unten (= Spielinhalt)`
+    : "- Material: keine Datei – arbeite allein mit den Angaben oben";
+  const spr = spracheText(p);
+  const materialBlock = hasMaterial ? `\n\n§MATERIAL (Textauszug)\n<<<\n${material!.text.trim()}\n>>>` : "";
+
+  return `§ROLLE
+Du bist Fachdidaktiker:in für ${fach} auf der Stufe ${stufe} und Frontend-Entwickler:in. Du baust ein Lernspiel, das Wissen festigt, nicht nur abfragt.
+
+§ANGABEN
+- Fach/Kontext: ${fach}
+- Zielstufe: ${stufe}
+${themaLine}${extraLine}
+${dateiLine}
+
+§AUFGABE
+Erstelle aus dem Inhalt ein interaktives Lernspiel mit vier Levels, Punkten, Serie, Leben und Bestleistung. Alle Aufgaben stammen aus dem Material; erfinde keine Inhalte ausserhalb. Fehlt auslesbarer Inhalt, wähle ein typisches, spielbares Thema für Fach und Stufe und vermerke das in der Notiz.
+
+§SPIELINHALT
+- 24 bis 28 Aufgaben als JavaScript-Datenfeld (Array von Objekten mit level, typ, frage, optionen/paare/reihenfolge, loesung, erklaerung), aus dem das Spiel und die Lehrpersonen-Liste gleichermassen gespeist werden.
+- Level 1 «Erkennen»: Multiple Choice mit vier Optionen, eine richtig, plausible Ablenker.
+- Level 2 «Erinnern»: Eingabe (Begriff, Zahl, Formelteil); Prüfung tolerant gegenüber Gross-/Kleinschreibung, Leerzeichen und sinnvollen Schreibvarianten (Liste erlaubter Antworten).
+- Level 3 «Anwenden»: Zuordnen von Paaren per Klick (Begriff ↔ Erklärung, Fall ↔ Regel) oder Szenario mit Auswahl.
+- Level 4 «Meistern»: Reihenfolge bilden (Schritte, Grössen, Zeitpunkte) oder Transferfrage mit Auswahl; nach der Antwort eine kurze Erklärung (.hint).
+- 6 bis 7 Aufgaben je Level; die Reihenfolge innerhalb eines Levels wird bei jedem Start gemischt.
+
+§SPIELMECHANIK
+- Punkte: richtig beim ersten Versuch 10, beim zweiten 5; ab drei richtigen Antworten in Serie +5 Bonus. Serie bricht bei Fehler ab.
+- Leben: drei pro Level (Anzeige als Zähler im .hud); bei null Leben wird das Level mit kurzer Meldung neu gestartet.
+- Freischaltung: das nächste Level öffnet ab 70 Prozent richtig im aktuellen Level; gesperrte Reiter tragen Klasse locked.
+- Fortschritt: .meter zeigt Aufgabe x von y im Level; .hud zeigt Punkte, Serie, Leben, Aufgabe.
+- Nach jeder Antwort: Rückmeldung in .feedback, Knopf «Weiter»; bei Fehler kein Verraten der Lösung vor dem zweiten Versuch.
+- Ende: .score mit Gesamtpunkten, richtig/falsch je Level, Bestleistung (localStorage, Schlüssel aus dem Titel) und Knopf «Nochmals spielen»; «Neu starten» oben setzt alles zurück.
+- Reines JavaScript ohne Bibliotheken, keine Netzwerkzugriffe; Tastatur: Ziffern 1 bis 4 wählen Optionen, Enter bestätigt.
+
+§LEHRPERSON
+Ausklappbarer Bereich (details.lehrperson): alle Aufgaben mit Lösungen nach Level als Tabelle, drei Vorschläge für den Einsatz (Einzeltraining, Partnerduell, Wettkampf in Gruppen mit Zeitlimit), Hinweis zur Anpassung der Aufgaben im Datenfeld.
+${spr ? "\n§" + spr + "\n" : ""}
+§AUSGABEFORMAT – INTERAKTIVE WEBSITE
+Eine einzige, voll funktionsfähige HTML-Seite (eine Datei, ohne externe Abhängigkeiten, offline lauffähig), Levels als Reiter nach der Designbasis, PDF-Button für die Aufgabenliste (blendet den Lehrpersonen-Bereich ein und druckt; Spielfläche und Knöpfe ausgeblendet).
+
+§GESTALTUNG
+Halte dich an die DESIGNBASIS aus dem System-Prompt (CSS unverändert, Grundgerüst für Lernspiel, Klassen). Eigenes CSS nur für Kleinigkeiten. Responsiv bis Mobile, Tastaturbedienbarkeit, sichtbarer Fokus. Keine zusätzlichen Farben, Schatten, Verläufe oder Emojis; Freude entsteht durch Rhythmus, Rückmeldung und Fortschritt, nicht durch Dekoration.
+
+§QUALITÄTSPRÜFUNG VOR DER AUSGABE
+- Jede Aufgabe hat genau eine eindeutige Lösung; bei Eingaben sind alle sinnvollen Schreibweisen erlaubt.
+- Die Punkte- und Freischaltlogik funktioniert für alle vier Levels; «Nochmals spielen» setzt Punkte, Serie, Leben und Levels zurück.
+- Kontrolliere alle Texte auf Tipp- und Flüchtigkeitsfehler; Schweizer Standarddeutsch; knapp formulieren.
+- Die Notiz am Ende nennt Thema, Anzahl Aufgaben je Level.${materialBlock}`;
 }
 
 /** Zieht die reine HTML-Datei aus einer Modellantwort (entfernt Codezäune und Text ausserhalb). */

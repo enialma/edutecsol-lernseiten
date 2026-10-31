@@ -6,7 +6,7 @@ type ProviderOpt = { id: string; label: string; model: string; used: number; lim
 type Preset = { id: string; label: string; fach?: string; stufe?: string; diffart?: string; anzahl?: number; sprache?: string; twist?: string; niveau?: string };
 type Bild = { id: number; title: string };
 
-const TYP = [["lernseite", "Lernseite"], ["pruefung", "Prüfungsvorbereitung"]];
+const TYP = [["lernseite", "Lernseite"], ["pruefung", "Prüfungsvorbereitung"], ["spiel", "Lernspiel"]];
 const DAUER = [["20", "20 Minuten"], ["30", "30 Minuten"], ["45", "45 Minuten"]];
 const DIFFART = [["niveau", "nach Niveau (Hilfe)"], ["lerntyp", "nach Lerntyp"], ["interesse", "nach Berufsfeld"], ["sozialform", "nach Sozialform"]];
 const SPRACHE = [["standard", "Standard"], ["einfach", "vereinfachte Sprache"], ["glossar", "Fachbegriffe mit Glossar"], ["zweisprachig", "Schlüsselbegriffe zweisprachig"]];
@@ -35,6 +35,8 @@ export default function Form({ providers, presets, bilder, initialBild, isAdmin 
   const [error, setError] = useState<string | null>(null);
   const set = (k: keyof State, v: string | number) => setS((p) => ({ ...p, [k]: v }));
   const pruefung = s.typ === "pruefung";
+  const spiel = s.typ === "spiel";
+  const lernseite = !pruefung && !spiel;
 
   function applyPreset(p: Preset) {
     setS((prev) => ({
@@ -98,7 +100,9 @@ export default function Form({ providers, presets, bilder, initialBild, isAdmin 
       <p className="small-note" style={{ margin: ".4rem 0 .2rem" }}>
         {pruefung
           ? "Aus dem Prüfungsstoff entstehen drei Teile: Lernziele checken, Übungsprüfung mit Timer und Note, Lücken schliessen mit Lernplan. Dazu ein Lehrpersonen-Bereich mit Lösungen und Punkteschlüssel."
-          : "Eine Kernaufgabe mit mehreren Zugängen, Selbstkontrolle und Lehrpersonen-Bereich."}
+          : spiel
+            ? "Vier Levels (Erkennen, Erinnern, Anwenden, Meistern) mit 24 bis 28 Aufgaben aus dem Material, Punkten, Serie, Leben und Bestleistung. Dazu die Aufgabenliste für die Lehrperson."
+            : "Eine Kernaufgabe mit mehreren Zugängen, Selbstkontrolle und Lehrpersonen-Bereich."}
       </p>
 
       <div className="row" style={{ margin: ".8rem 0 .6rem", alignItems: "center" }}>
@@ -110,10 +114,10 @@ export default function Form({ providers, presets, bilder, initialBild, isAdmin 
         <div><label>Fach / Kontext *</label><input value={s.fach} onChange={(e) => set("fach", e.target.value)} required disabled={busy} placeholder="z. B. Mathematik" /></div>
         <div><label>Zielstufe *</label><input value={s.stufe} onChange={(e) => set("stufe", e.target.value)} required disabled={busy} placeholder="z. B. Berufsmaturität" /></div>
       </div>
-      <label>{pruefung ? "Prüfungsthema (optional – leer = der ganze Stoff aus dem Material)" : "Thema (optional – leer = KI wählt aus dem Material)"}</label>
-      <input value={s.thema} onChange={(e) => set("thema", e.target.value)} disabled={busy} placeholder={pruefung ? "z. B. Semesterprüfung Statistik" : "z. B. Dosisberechnung"} />
+      <label>{pruefung ? "Prüfungsthema (optional – leer = der ganze Stoff aus dem Material)" : spiel ? "Spielthema (optional – leer = Begriffe und Regeln aus dem Material)" : "Thema (optional – leer = KI wählt aus dem Material)"}</label>
+      <input value={s.thema} onChange={(e) => set("thema", e.target.value)} disabled={busy} placeholder={pruefung ? "z. B. Semesterprüfung Statistik" : spiel ? "z. B. Fachbegriffe Anatomie" : "z. B. Dosisberechnung"} />
 
-      <label>{pruefung ? "Prüfungsstoff: Datei (PDF, Word, PowerPoint, Text · max. 4 MB)" : "Material: Datei (PDF, Word, PowerPoint, Text · max. 4 MB)"}</label>
+      <label>{pruefung ? "Prüfungsstoff: Datei (PDF, Word, PowerPoint, Text · max. 4 MB)" : spiel ? "Spielinhalt: Datei (PDF, Word, PowerPoint, Text · max. 4 MB)" : "Material: Datei (PDF, Word, PowerPoint, Text · max. 4 MB)"}</label>
       <input type="file" ref={fileRef} accept=".pdf,.docx,.pptx,.txt,.md" disabled={busy} />
       <label>… oder Themenbeschreibung / Textauszug</label>
       <textarea rows={4} value={s.material} onChange={(e) => set("material", e.target.value)} disabled={busy} placeholder="Wird ignoriert, wenn eine Datei hochgeladen ist." />
@@ -124,20 +128,20 @@ export default function Form({ providers, presets, bilder, initialBild, isAdmin 
           <Seg k="dauer" opts={DAUER} />
           <p className="small-note" style={{ margin: ".3rem 0 0" }}>20 Minuten entsprechen 20 Punkten, 30 Minuten 30 Punkten, 45 Minuten 40 Punkten. Note nach Schweizer Skala, 60 Prozent ergibt eine 4.</p>
         </>
-      ) : (
+      ) : lernseite ? (
         <>
           <label>Differenzierungsart</label>
           <Seg k="diffart" opts={DIFFART} />
           <label>Anzahl Zugänge</label>
           <div className="seg">{[2, 3, 4].map((n) => <button type="button" key={n} className={s.anzahl === n ? "on" : ""} onClick={() => set("anzahl", n)} disabled={busy}>{n}</button>)}</div>
         </>
-      )}
+      ) : null}
       <label>Sprache</label>
       <Seg k="sprache" opts={SPRACHE} />
       {s.sprache === "zweisprachig" && (
         <input value={s.zweitsprache} onChange={(e) => set("zweitsprache", e.target.value)} disabled={busy} placeholder="Zweite Sprache, z. B. Portugiesisch" style={{ marginTop: ".4rem" }} />
       )}
-      {!pruefung && (
+      {lernseite && (
         <>
           <label>Twist in der Vertiefung</label>
           <Seg k="twist" opts={TWIST} />
@@ -146,9 +150,9 @@ export default function Form({ providers, presets, bilder, initialBild, isAdmin 
         </>
       )}
       <label>Zusatzwunsch (optional)</label>
-      <input value={s.extra} onChange={(e) => set("extra", e.target.value)} disabled={busy} placeholder={pruefung ? "z. B. ohne Taschenrechner, Schwerpunkt Formeln" : "z. B. Beispiel aus der Hotellerie"} />
+      <input value={s.extra} onChange={(e) => set("extra", e.target.value)} disabled={busy} placeholder={pruefung ? "z. B. ohne Taschenrechner, Schwerpunkt Formeln" : spiel ? "z. B. nur Fachbegriffe, Zeitlimit pro Aufgabe" : "z. B. Beispiel aus der Hotellerie"} />
 
-      {bilder.length > 0 && !pruefung && (
+      {bilder.length > 0 && lernseite && (
         <>
           <label>Bild einbinden (optional)</label>
           <select value={s.bild} onChange={(e) => set("bild", Number(e.target.value))} disabled={busy}>
@@ -187,7 +191,7 @@ export default function Form({ providers, presets, bilder, initialBild, isAdmin 
       )}
 
       <div style={{ marginTop: "1.3rem", display: "flex", gap: ".8rem", alignItems: "center", flexWrap: "wrap" }}>
-        <button className="btn terra" disabled={busy || exhausted}>{busy ? "Wird erzeugt …" : pruefung ? "Prüfungsvorbereitung erzeugen" : "Lernseite erzeugen"}</button>
+        <button className="btn terra" disabled={busy || exhausted}>{busy ? "Wird erzeugt …" : pruefung ? "Prüfungsvorbereitung erzeugen" : spiel ? "Lernspiel erzeugen" : "Lernseite erzeugen"}</button>
         {busy && <span className="small-note">Bitte Fenster offen lassen. Dauer: Lernseite ein bis drei Minuten, Prüfungsvorbereitung bis zu acht Minuten.</span>}
       </div>
 
