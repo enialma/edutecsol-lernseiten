@@ -112,6 +112,7 @@ export default async function AppHome({ searchParams }: { searchParams: Promise<
           {billing.subscriptionId ? (
             <div className="card" style={{ marginTop: "1.6rem" }}>
               <p style={{ marginTop: 0 }}>Dein Abo läuft und verlängert sich automatisch{billing.validUntil ? ` (bezahlt bis ${billing.validUntil})` : ""}.</p>
+              <p className="small-note">Zusatzoption Lerncoach für Lernende: im Abo «mit Lerncoach» enthalten. Wechsel vom laufenden Abo per Mail an <a href="mailto:info@edutecsol.ch">info@edutecsol.ch</a>, wir schalten frei und passen die Abrechnung an.</p>
               <details>
                 <summary>Abo kündigen</summary>
                 <form action={cancel}>

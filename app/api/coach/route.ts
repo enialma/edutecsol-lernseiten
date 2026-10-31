@@ -3,7 +3,7 @@
 import { chat, providerReady, type ChatMsg } from "@/lib/ai";
 import { getPageByToken } from "@/lib/pages";
 import {
-  cleanReply, coachAllowedFor, coachSystemPrompt, coachUsage, logCoachUsage, rateLimited,
+  cleanReply, coachAllowedFor, coachSystemPrompt, coachUsage, logCoachTopic, logCoachUsage, rateLimited,
   COACH_LIMIT_MONTH, COACH_LIMIT_PAGE_DAY, COACH_MAX_INPUT, COACH_MAX_TURNS, COACH_NAME, type CoachStil, type Kontext,
 } from "@/lib/coach";
 
@@ -42,6 +42,7 @@ export async function POST(req: Request) {
   try {
     const r = await chat(provider, { system: coachSystemPrompt(page, stil, body.kontext ?? {}), messages, maxTokens: 300, signal: req.signal });
     await logCoachUsage(page.id, r.inputTokens, r.outputTokens).catch(() => {});
+    await logCoachTopic(page.id, body.kontext?.reiter).catch(() => {});
     const text = cleanReply(r.text) || "Erzähl mir, was du bis jetzt gemacht hast. Wo genau hängst du?";
     return json({ reply: text });
   } catch (e) {

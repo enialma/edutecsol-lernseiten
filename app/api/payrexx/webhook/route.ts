@@ -1,6 +1,6 @@
 // Payrexx meldet Zahlungen hierher: erste Zahlung schaltet das Konto frei, jede weitere verlängert es.
 import { activateSubscription, clearSubscription, userBySubscription } from "@/lib/billing";
-import { AMOUNT, getTransaction, parseReference, periodEnd, webhookKeyOk } from "@/lib/payrexx";
+import { getTransaction, hasCoach, parseReference, periodEnd, planByAmount, webhookKeyOk } from "@/lib/payrexx";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -42,8 +42,8 @@ export async function POST(req: Request) {
         // Erste Zahlung trägt unsere Referenz; Verlängerungen werden über die Abo-Nummer zugeordnet
         const ref = parseReference(tx.referenceId);
         const userId = ref?.userId ?? (await userBySubscription(subscriptionId))?.id;
-        const plan = ref?.plan ?? (tx.amount >= AMOUNT.year ? "year" : "month");
-        if (userId) await activateSubscription(userId, subscriptionId, periodEnd(tx.validUntil, plan));
+        const plan = ref?.plan ?? planByAmount(tx.amount);
+        if (userId) await activateSubscription(userId, subscriptionId, periodEnd(tx.validUntil, plan), hasCoach(plan));
       }
     } else if (hook.subscriptionId && ["cancelled", "failed"].includes(hook.subscriptionStatus)) {
       await clearSubscription(hook.subscriptionId);

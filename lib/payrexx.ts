@@ -1,12 +1,25 @@
 // Payrexx-Anbindung für das Einzelpersonen-Abo – bewusst ohne SDK, nur die drei benötigten REST-Aufrufe.
 import { createHash, timingSafeEqual } from "node:crypto";
 
-export type Plan = "month" | "year";
+/** Abo-Varianten: Basis oder mit Zusatzoption KI-Lerncoach (month_coach / year_coach). */
+export type Plan = "month" | "year" | "month_coach" | "year_coach";
+export const PLANS: readonly Plan[] = ["month", "year", "month_coach", "year_coach"];
+export const isYearly = (p: Plan) => p === "year" || p === "year_coach";
+export const hasCoach = (p: Plan) => p === "month_coach" || p === "year_coach";
 
-// Preise in Rappen, inklusive MWST
-export const AMOUNT: Record<Plan, number> = { month: 800, year: 6000 };
-const INTERVAL: Record<Plan, string> = { month: "P1M", year: "P1Y" };
-const PURPOSE: Record<Plan, string> = { month: "EDUTECSOL Lernwege – Monatsabo", year: "EDUTECSOL Lernwege – Jahresabo" };
+// Preise in Rappen, inklusive MWST; Coach-Varianten über Umgebungsvariablen anpassbar
+const rp = (v: string | undefined, fallback: number) => (v && /^\d+$/.test(v) ? Number(v) : fallback);
+export const AMOUNT: Record<Plan, number> = {
+  month: 800, year: 6000,
+  month_coach: rp(process.env.PRICE_MONTH_COACH, 1200),
+  year_coach: rp(process.env.PRICE_YEAR_COACH, 9000),
+};
+export const CHF = (plan: Plan) => `CHF ${Math.round(AMOUNT[plan] / 100)}`;
+const INTERVAL: Record<Plan, string> = { month: "P1M", year: "P1Y", month_coach: "P1M", year_coach: "P1Y" };
+const PURPOSE: Record<Plan, string> = {
+  month: "EDUTECSOL Lernwege – Monatsabo", year: "EDUTECSOL Lernwege – Jahresabo",
+  month_coach: "EDUTECSOL Lernwege – Monatsabo mit Lerncoach", year_coach: "EDUTECSOL Lernwege – Jahresabo mit Lerncoach",
+};
 
 export function payrexxReady() {
   return !!(process.env.PAYREXX_INSTANCE && process.env.PAYREXX_API_KEY && process.env.PAYREXX_WEBHOOK_KEY);
@@ -24,11 +37,21 @@ async function call(method: "GET" | "POST" | "DELETE", path: string, params?: Re
 }
 
 /** Referenz auf der Zahlung: verbindet sie mit dem Konto und der gewählten Laufzeit. */
-const reference = (userId: number, plan: Plan) => `lw-${userId}-${plan === "month" ? "m" : "y"}`;
+const CODE: Record<Plan, string> = { month: "m", year: "y", month_coach: "mc", year_coach: "yc" };
+const reference = (userId: number, plan: Plan) => `lw-${userId}-${CODE[plan]}`;
 
 export function parseReference(ref: unknown): { userId: number; plan: Plan } | null {
-  const m = /^lw-(\d+)-([my])$/.exec(String(ref ?? ""));
-  return m ? { userId: Number(m[1]), plan: m[2] === "m" ? "month" : "year" } : null;
+  const m = /^lw-(\d+)-(mc|yc|m|y)$/.exec(String(ref ?? ""));
+  if (!m) return null;
+  const plan = (Object.keys(CODE) as Plan[]).find((p) => CODE[p] === m[2]) ?? "year";
+  return { userId: Number(m[1]), plan };
+}
+
+/** Plan aus dem bezahlten Betrag ableiten (Verlängerungen tragen keine Referenz). */
+export function planByAmount(amount: number): Plan {
+  const exact = PLANS.find((p) => AMOUNT[p] === amount);
+  if (exact) return exact;
+  return amount >= AMOUNT.year ? "year" : "month";
 }
 
 /** Bezahlseite für ein Abo; gibt die Adresse zurück, auf die weitergeleitet wird. */
@@ -78,7 +101,7 @@ export function periodEnd(validUntil: string | null, plan: Plan): number {
   const given = validUntil ? Date.parse(validUntil) : NaN;
   if (given > Date.now()) return Math.floor(given / 1000);
   const d = new Date();
-  if (plan === "month") d.setMonth(d.getMonth() + 1);
+  if (!isYearly(plan)) d.setMonth(d.getMonth() + 1);
   else d.setFullYear(d.getFullYear() + 1);
   return Math.floor(d.getTime() / 1000);
 }

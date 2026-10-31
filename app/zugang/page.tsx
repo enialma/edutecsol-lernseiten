@@ -3,7 +3,8 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { prepareSignup } from "@/lib/billing";
 import { LIMITS } from "@/lib/quota";
-import { createCheckout, payrexxReady } from "@/lib/payrexx";
+import { CHF, createCheckout, payrexxReady, PLANS, type Plan } from "@/lib/payrexx";
+import { COACH_LIMIT_MONTH, COACH_NAME } from "@/lib/coach";
 import Topbar from "../Topbar";
 import Footer from "../Footer";
 
@@ -15,7 +16,7 @@ async function buy(fd: FormData) {
   const email = String(fd.get("email") ?? "").trim();
   const name = String(fd.get("name") ?? "").trim();
   const password = String(fd.get("password") ?? "");
-  const plan = fd.get("plan") === "month" ? "month" : "year";
+  const plan: Plan = (PLANS as readonly string[]).includes(String(fd.get("plan"))) ? (String(fd.get("plan")) as Plan) : "year";
   const fail = (m: string) => redirect(`/zugang?fehler=${encodeURIComponent(m)}`);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) fail("Bitte eine gültige E-Mail-Adresse angeben.");
   if (password && password.length < 8) fail("Das Passwort braucht mindestens 8 Zeichen.");
@@ -68,6 +69,7 @@ export default async function ZugangPage({ searchParams }: { searchParams: Promi
                 <li>Eigene Sammlung, Freigabelink mit QR-Code, gemeinsamer Pool</li>
                 <li>Word-Arbeitsblatt, SCORM-Paket und Moodle-Anbindung</li>
                 <li>Verlängert sich automatisch, jederzeit auf das Ende der Laufzeit kündbar</li>
+                <li><b>Zusatzoption Lerncoach «{COACH_NAME}»:</b> Lernende stellen auf deinen Lernseiten Fragen, der Coach antwortet mit Gegenfragen und gestufter Hilfe, ohne Lösungen zu verraten. Bis {COACH_LIMIT_MONTH} Nachrichten pro Monat. Im Monatsabo {CHF("month_coach")}, im Jahresabo {CHF("year_coach")}.</li>
               </ul>
               {ready ? (
                 <form action={buy}>
@@ -75,6 +77,8 @@ export default async function ZugangPage({ searchParams }: { searchParams: Promi
                   <select name="plan" defaultValue="year">
                     <option value="year">Jahresabo – CHF 60 pro Jahr</option>
                     <option value="month">Monatsabo – CHF 8 pro Monat</option>
+                    <option value="year_coach">Jahresabo mit Lerncoach – {CHF("year_coach")} pro Jahr</option>
+                    <option value="month_coach">Monatsabo mit Lerncoach – {CHF("month_coach")} pro Monat</option>
                   </select>
                   <label>E-Mail *</label>
                   <input name="email" type="email" required autoComplete="email" />

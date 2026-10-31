@@ -125,6 +125,15 @@ export function ready(): Promise<void> {
       )`);
       // KI-Lerncoach (Zusatzoption pro Lehrperson; pro Seite ein-/ausschaltbar; Zähler ohne Gesprächsinhalte)
       await sql.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS coach BOOLEAN NOT NULL DEFAULT FALSE`);
+      await sql.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS coach_paid BOOLEAN NOT NULL DEFAULT FALSE`);
+      // Anonyme Auswertung: Anzahl Coach-Fragen je Seite, Tag und Reiter/Zugang (keine Inhalte)
+      await sql.query(`CREATE TABLE IF NOT EXISTS coach_topics (
+        page_id  INTEGER NOT NULL REFERENCES pages(id) ON DELETE CASCADE,
+        day      DATE NOT NULL,
+        reiter   TEXT NOT NULL,
+        n        INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (page_id, day, reiter)
+      )`);
       await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS coach BOOLEAN NOT NULL DEFAULT FALSE`);
       await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS coach_stil TEXT NOT NULL DEFAULT 'gestuft'`);
       await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS coach_provider TEXT NOT NULL DEFAULT 'infomaniak'`);

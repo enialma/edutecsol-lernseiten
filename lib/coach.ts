@@ -27,7 +27,12 @@ async function q(sql: string, params: unknown[] = []) {
 /** Für welche Seitentypen der Coach angeboten wird. */
 export function coachAllowedFor(page: Pick<PageFull, "params">): boolean {
   const typ = (page.params as { typ?: string })?.typ ?? "lernseite";
-  return typ === "lernseite" || typ === "pruefung";
+  return typ === "lernseite" || typ === "pruefung" || typ === "hilfe";
+}
+
+/** Vorgeschlagener Stil je Seitentyp: Lernhilfe = Erklär-Coach, sonst gestufte Hilfe. */
+export function defaultStilFor(page: Pick<PageFull, "params">): CoachStil {
+  return ((page.params as { typ?: string })?.typ ?? "lernseite") === "hilfe" ? "erklaer" : "gestuft";
 }
 
 const strip = (s: string) =>
@@ -57,7 +62,9 @@ export function coachSystemPrompt(page: PageFull, stil: CoachStil, k: Kontext): 
       : "STIL «gestufte Hilfe»: Hilf in drei Stufen, pro Nachricht höchstens eine Stufe weiter: 1) Verständnisfrage (Was ist gegeben, was gesucht, was bedeutet der Begriff?), 2) Strategiehinweis (Welche Regel, Formel oder Vorgehensweise passt, und warum?), 3) kleinster nächster Teilschritt als Frage («Was ergibt … , wenn du …?»). Nie mehr als einen Schritt vorwegnehmen, nie das Resultat.";
   const pruefung = typ === "pruefung"
     ? "\nDiese Seite ist eine Prüfungsvorbereitung. In der Übungsprüfung (Teil B) hilfst du nicht bei Aufgaben; verweise auf Teil A und C und auf die Auswertung. In Teil A und C arbeitest du normal."
-    : "";
+    : typ === "hilfe"
+      ? "\nDiese Seite ist eine Lernhilfe mit Merkblatt, Lernkarten und Glossar. Erkläre Begriffe und Regeln des Merkblatts und Glossars in einfachen Worten mit eigenen Beispielen. Die Antwort einer Lernkarte sagst du nie vor; frage stattdessen, was die Person schon weiss, und gib einen Hinweis auf den passenden Merkblatt-Abschnitt."
+      : "";
   return `Du bist «${COACH_NAME}», der Lerncoach auf der Lernseite «${page.title}» (${page.fach ?? ""}${page.stufe ? ", " + page.stufe : ""}).
 Du begleitest Lernende beim Lösen der Aufgaben dieser Seite.
 
@@ -107,6 +114,26 @@ export async function coachUsage(pageId: number, ownerId: number): Promise<{ tod
     [pageId, ownerId]
   );
   return { today: Number(rows[0]?.today ?? 0), month: Number(rows[0]?.month ?? 0) };
+}
+
+/** Anonyme Auswertung: Zähler je Reiter/Zugang (kein Inhalt). */
+export async function logCoachTopic(pageId: number, reiter: string | undefined) {
+  const r = (reiter ?? "").replace(/\s+/g, " ").trim().slice(0, 80) || "ohne Angabe";
+  await q(
+    `INSERT INTO coach_topics (page_id, day, reiter, n) VALUES ($1, CURRENT_DATE, $2, 1)
+     ON CONFLICT (page_id, day, reiter) DO UPDATE SET n = coach_topics.n + 1`,
+    [pageId, r]
+  );
+}
+
+/** Fragen je Reiter/Zugang in diesem Monat (für die Detailseite der Lehrperson). */
+export async function coachTopicsForPage(pageId: number): Promise<{ reiter: string; n: number }[]> {
+  const rows = await q(
+    `SELECT reiter, SUM(n)::int AS n FROM coach_topics WHERE page_id = $1 AND day >= date_trunc('month', CURRENT_DATE)
+     GROUP BY reiter ORDER BY n DESC, reiter`,
+    [pageId]
+  );
+  return rows.map((r) => ({ reiter: String(r.reiter), n: Number(r.n) }));
 }
 
 /** Monatsverbrauch je Seite (für die Detailseite der Lehrperson). */

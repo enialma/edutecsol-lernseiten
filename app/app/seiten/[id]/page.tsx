@@ -8,7 +8,7 @@ import { DIFFART_LABELS, NIVEAU_LABELS, SPRACHE_LABELS, TWIST_LABELS, type GenPa
 import Topbar from "../../../Topbar";
 import Footer from "../../../Footer";
 import { coachAction, copyAction, deletePageAction, renameAction, shareAction, visibilityAction } from "../actions";
-import { coachAllowedFor, coachUsageForPage, COACH_NAME, COACH_STIL_LABELS } from "@/lib/coach";
+import { coachAllowedFor, coachTopicsForPage, coachUsageForPage, defaultStilFor, COACH_NAME, COACH_STIL_LABELS } from "@/lib/coach";
 import { getMoodleBase } from "@/lib/moodle";
 import CopyButton from "./CopyButton";
 import MoodleCard from "./MoodleCard";
@@ -28,6 +28,7 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
   const moodleBase = canEdit ? await getMoodleBase(userId) : null;
   const coachOk = coachAllowedFor(page);
   const coachUse = canEdit && coachOk ? await coachUsageForPage(page.id) : null;
+  const coachTopics = canEdit && coachOk && page.coach ? await coachTopicsForPage(page.id) : [];
   const p = page.params as Partial<GenParams>;
   const slug = page.title.toLowerCase().replace(/[^a-z0-9äöü]+/g, "-").replace(/^-|-$/g, "") || "lernseite";
 
@@ -146,7 +147,7 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
                     <input type="hidden" name="on" value="1" />
                     <div style={{ flex: "1 1 200px" }}>
                       <label style={{ margin: "0 0 .2rem" }}>Stil</label>
-                      <select name="stil" defaultValue={page.coach_stil}>
+                      <select name="stil" defaultValue={page.coach ? page.coach_stil : defaultStilFor(page)}>
                         {Object.entries(COACH_STIL_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                       </select>
                     </div>
@@ -167,6 +168,16 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
                       <input type="hidden" name="provider" value={page.coach_provider} />
                       <button className="btn small ghost" style={{ color: "var(--err)" }}>Coach ausschalten</button>
                     </form>
+                  )}
+                  {coachTopics.length > 0 && (
+                    <div style={{ marginTop: ".9rem" }}>
+                      <p className="small-note" style={{ margin: "0 0 .3rem" }}>Fragen an {COACH_NAME} in diesem Monat, nach Teil oder Zugang (anonym, ohne Inhalte):</p>
+                      <table style={{ maxWidth: 420 }}>
+                        <tbody>
+                          {coachTopics.map((t) => <tr key={t.reiter}><td>{t.reiter}</td><td style={{ textAlign: "right", width: 60 }}>{t.n}</td></tr>)}
+                        </tbody>
+                      </table>
+                    </div>
                   )}
                 </>
               )}

@@ -42,14 +42,15 @@ export async function prepareSignup(emailRaw: string, name: string, password: st
 }
 
 /** Nach der ersten Zahlung: Konto freischalten und Gültigkeit setzen. Unbefristete Konten bleiben unbefristet. */
-export async function activateSubscription(userId: number, subscriptionId: string, periodEnd: number) {
+export async function activateSubscription(userId: number, subscriptionId: string, periodEnd: number, coach = false) {
   await q(
     `UPDATE users SET payrexx_subscription_id = $2,
        valid_until = CASE WHEN NOT pending AND valid_until IS NULL THEN NULL
                           ELSE GREATEST(COALESCE(valid_until, CURRENT_DATE), to_timestamp($3)::date + ${GRACE_DAYS}) END,
-       active = (active OR pending), pending = FALSE
+       active = (active OR pending), pending = FALSE,
+       coach = (coach OR $4::boolean), coach_paid = $4::boolean
      WHERE id = $1`,
-    [userId, subscriptionId, periodEnd]
+    [userId, subscriptionId, periodEnd, coach]
   );
 }
 
@@ -61,7 +62,8 @@ export async function userBySubscription(subscriptionId: string): Promise<{ id: 
 
 /** Abo beendet: Der Zugang läuft zum bereits gesetzten Datum aus. */
 export async function clearSubscription(subscriptionId: string) {
-  await q(`UPDATE users SET payrexx_subscription_id = NULL WHERE payrexx_subscription_id = $1`, [subscriptionId]);
+  // Mit dem Abo endet auch die bezahlte Coach-Option; manuell (Admin) freigeschaltete Coach-Rechte bleiben
+  await q(`UPDATE users SET payrexx_subscription_id = NULL, coach = (coach AND NOT coach_paid), coach_paid = FALSE WHERE payrexx_subscription_id = $1`, [subscriptionId]);
 }
 
 export async function billingOf(userId: number): Promise<{ subscriptionId: string | null; validUntil: string | null }> {

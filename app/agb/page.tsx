@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { LIMIT_BILDER, LIMITS } from "@/lib/quota";
+import { CHF } from "@/lib/payrexx";
+import { COACH_LIMIT_MONTH } from "@/lib/coach";
 import Topbar from "../Topbar";
 import Footer from "../Footer";
 
@@ -35,6 +37,7 @@ export default function AgbPage() {
             <li>Erzeugen differenzierter, interaktiver Lernseiten mit KI, pro Kalendermonat bis zu {LIMITS.claude} Lernseiten mit Claude, {LIMITS.openai} mit ChatGPT und {LIMITS.infomaniak} mit Infomaniak. Nicht genutzte Kontingente verfallen am Monatsende.</li>
             <li>Erzeugen von Bildern für Lernaufgaben mit KI, pro Kalendermonat bis zu {LIMIT_BILDER} Bilder (Erzeugen und Nachbessern zählen je einmal).</li>
             <li>Eigene Sammlung, Freigabelinks für Lernende, Teilen mit Kolleginnen und Kollegen.</li>
+            <li>Zusatzoption KI-Lerncoach (nur in den Abos «mit Lerncoach»): Lernende können auf freigegebenen Lernseiten Fragen stellen; der Coach gibt Hinweise und Gegenfragen, keine Lösungen. Bis zu {COACH_LIMIT_MONTH} Nachrichten pro Kalendermonat und Konto; Gespräche werden nicht gespeichert.</li>
             <li>Export als HTML-Datei, Word-Arbeitsblatt und SCORM-Paket sowie die Anbindung an Moodle, soweit das jeweilige Moodle sie unterstützt.</li>
           </ul>
           <p>
@@ -51,7 +54,7 @@ export default function AgbPage() {
 
           <h2>4. Preise und Zahlung</h2>
           <ul>
-            <li>Monatsabo: CHF 8 pro Monat. Jahresabo: CHF 60 pro Jahr. Beide Preise verstehen sich inklusive Schweizer Mehrwertsteuer.</li>
+            <li>Monatsabo: CHF 8 pro Monat. Jahresabo: CHF 60 pro Jahr. Mit Lerncoach: {CHF("month_coach")} pro Monat bzw. {CHF("year_coach")} pro Jahr. Beide Preise verstehen sich inklusive Schweizer Mehrwertsteuer.</li>
             <li>Die Zahlung erfolgt im Voraus für die jeweilige Laufzeit über den Schweizer Zahlungsdienstleister Payrexx (TWINT, PostFinance, Kreditkarte). EDUTECSOL erhält und speichert keine Kartendaten.</li>
             <li>Preisänderungen werden mindestens 30 Tage im Voraus per E-Mail angekündigt und gelten frühestens ab der nächsten Laufzeit. Sie können vorher kündigen.</li>
           </ul>
