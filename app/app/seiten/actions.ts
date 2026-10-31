@@ -12,7 +12,9 @@ export async function coachAction(fd: FormData) {
   const id = Number(fd.get("id"));
   const stil = ["streng", "gestuft", "erklaer"].includes(String(fd.get("stil"))) ? String(fd.get("stil")) : "gestuft";
   const provider = fd.get("provider") === "claude" ? "claude" : "infomaniak";
-  await setCoach(id, userId, isAdmin, { on: fd.get("on") === "1", stil, provider });
+  const on = fd.get("on") === "1";
+  const n = await setCoach(id, userId, isAdmin, { on, stil, provider });
+  console.log("coachAction", { id, userId, isAdmin, on, stil, provider, rawOn: fd.get("on"), updated: n });
   revalidatePath(`/app/seiten/${id}`);
 }
 

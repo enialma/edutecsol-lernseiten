@@ -142,6 +142,7 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
                   </p>
                   <form action={coachAction} className="row" style={{ alignItems: "flex-end" }}>
                     <input type="hidden" name="id" value={page.id} />
+                    <input type="hidden" name="on" value="1" />
                     <div style={{ flex: "1 1 200px" }}>
                       <label style={{ margin: "0 0 .2rem" }}>Stil</label>
                       <select name="stil" defaultValue={page.coach_stil}>
@@ -155,9 +156,17 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
                         <option value="claude">Claude (USA)</option>
                       </select>
                     </div>
-                    <button name="on" value="1" className={`btn small ${page.coach ? "" : "ghost"}`}>{page.coach ? "Eingeschaltet · speichern" : "Einschalten"}</button>
-                    {page.coach && <button name="on" value="0" className="btn small ghost" style={{ color: "var(--err)" }}>Ausschalten</button>}
+                    <button className={`btn small ${page.coach ? "" : "ghost"}`}>{page.coach ? "Eingeschaltet · Änderungen speichern" : "Einschalten"}</button>
                   </form>
+                  {page.coach && (
+                    <form action={coachAction} style={{ marginTop: ".5rem" }}>
+                      <input type="hidden" name="id" value={page.id} />
+                      <input type="hidden" name="on" value="0" />
+                      <input type="hidden" name="stil" value={page.coach_stil} />
+                      <input type="hidden" name="provider" value={page.coach_provider} />
+                      <button className="btn small ghost" style={{ color: "var(--err)" }}>Coach ausschalten</button>
+                    </form>
+                  )}
                 </>
               )}
             </div>

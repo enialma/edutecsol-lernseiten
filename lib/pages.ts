@@ -45,9 +45,10 @@ const META = `p.id, p.user_id, p.title, p.fach, p.stufe, p.thema, p.params, p.ma
   u.email AS owner_email, u.name AS owner_name, i.name AS owner_institution`;
 
 /** Coach-Einstellungen einer Seite (nur Besitzerin oder Admin). */
-export async function setCoach(id: number, userId: number, isAdmin: boolean, s: { on: boolean; stil: string; provider: string }) {
-  await q(`UPDATE pages SET coach = $4, coach_stil = $5, coach_provider = $6 WHERE id = $1 AND ($2 OR user_id = $3)`,
+export async function setCoach(id: number, userId: number, isAdmin: boolean, s: { on: boolean; stil: string; provider: string }): Promise<number> {
+  const rows = await q(`UPDATE pages SET coach = $4, coach_stil = $5, coach_provider = $6 WHERE id = $1 AND ($2::boolean OR user_id = $3) RETURNING id, coach`,
     [id, isAdmin, userId, s.on, s.stil, s.provider]);
+  return rows.length;
 }
 const FROM = `FROM pages p JOIN users u ON u.id = p.user_id LEFT JOIN institutions i ON i.id = u.institution_id`;
 // Für die eigene Schule freigegeben: Autorin und betrachtende Person gehören zur selben Institution ($n = userId)
