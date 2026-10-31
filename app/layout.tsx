@@ -12,7 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="de-CH">
       <head>
         {/* Gemeinsames Designsystem mit den statischen Seiten (public/lw.css, selbst gehostete Schriften) */}
-        <link rel="preload" href="/fonts/fraunces-latin-wght-normal.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="stylesheet" href="/lw.css" />
       </head>
       <body>{children}</body>

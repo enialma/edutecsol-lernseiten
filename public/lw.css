@@ -1,10 +1,10 @@
 /* Lernwege Designsystem (Etappe 1, Oktober 2026)
    Gemeinsame Basis für die statischen Seiten (public/*.html) und die Next-App (per <link> in app/layout.tsx).
-   Richtung: editorial, wie ein modernes Lehrmittel. Serife Fraunces für Titel, Arial Nova für Text.
+   Richtung: editorial, wie ein modernes Lehrmittel. Serife Source Serif 4 für Titel, Arial Nova für Text.
    Schriften werden selbst gehostet (public/fonts), keine externen Aufrufe. */
 
-@font-face{font-family:"Fraunces";font-style:normal;font-weight:100 900;font-display:swap;src:url("/fonts/fraunces-latin-wght-normal.woff2") format("woff2")}
-@font-face{font-family:"Fraunces";font-style:italic;font-weight:100 900;font-display:swap;src:url("/fonts/fraunces-latin-wght-italic.woff2") format("woff2")}
+@font-face{font-family:"Source Serif 4";font-style:normal;font-weight:200 900;font-display:swap;src:url("/fonts/source-serif-4-latin-wght-normal.woff2") format("woff2")}
+@font-face{font-family:"Source Serif 4";font-style:italic;font-weight:200 900;font-display:swap;src:url("/fonts/source-serif-4-latin-wght-italic.woff2") format("woff2")}
 
 :root{
   --navy:#1E3246;--terra:#B84816;--ochre:#F1A51A;--cream:#F6EFE2;
@@ -12,7 +12,7 @@
   --line:#E2DBCB;--line-strong:#CDC4AD;--card:#fff;
   --navy-soft:#2B4259;--terra-deep:#9A3A10;
   --ok:#2F8F6F;--err:#B8321A;
-  --serif:"Fraunces",Georgia,"Times New Roman",serif;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
   --sans:"Arial Nova Light","Arial Nova",Arial,ui-sans-serif,system-ui,sans-serif;
   --r:8px;--r-lg:12px;
   --wrap:1120px;
