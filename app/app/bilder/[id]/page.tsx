@@ -156,12 +156,13 @@ export default async function BildPage({ params }: { params: Promise<{ id: strin
                     ? `Nur Lehrpersonen von «${img.owner_institution}» können dieses Bild ansehen und kopieren.`
                     : "Nur du siehst dieses Bild."}
                 </p>
-                <form action={visibilityImageAction} className="row">
-                  <input type="hidden" name="id" value={img.id} />
-                  <button name="v" value="private" className={`btn small ${visibility === "private" ? "" : "ghost"}`}>Nur ich</button>
-                  {img.owner_institution && <button name="v" value="school" className={`btn small ${visibility === "school" ? "" : "ghost"}`}>Meine Schule</button>}
-                  <button name="v" value="all" className={`btn small ${visibility === "all" ? "" : "ghost"}`}>Alle (Pool)</button>
-                </form>
+                <div className="row">
+                  <form action={visibilityImageAction}><input type="hidden" name="id" value={img.id} /><input type="hidden" name="v" value="private" /><button className={`btn small ${visibility === "private" ? "" : "ghost"}`}>Nur ich</button></form>
+                  {img.owner_institution && (
+  <form action={visibilityImageAction}><input type="hidden" name="id" value={img.id} /><input type="hidden" name="v" value="school" /><button className={`btn small ${visibility === "school" ? "" : "ghost"}`}>Meine Schule</button></form>
+                  )}
+                  <form action={visibilityImageAction}><input type="hidden" name="id" value={img.id} /><input type="hidden" name="v" value="all" /><button className={`btn small ${visibility === "all" ? "" : "ghost"}`}>Alle (Pool)</button></form>
+                </div>
                 {isAdmin && (
                   <>
                     <h3 style={{ margin: "1.2rem 0 .4rem" }}>Öffentliche Bilder-Seite</h3>

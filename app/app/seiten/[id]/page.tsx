@@ -108,12 +108,13 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
                     ? `Nur Lehrpersonen von «${page.owner_institution}» können diese Seite ansehen und kopieren.`
                     : "Nur du siehst diese Seite."}
                 </p>
-                <form action={visibilityAction} className="row">
-                  <input type="hidden" name="id" value={page.id} />
-                  <button name="v" value="private" className={`btn small ${visibility === "private" ? "" : "ghost"}`}>Nur ich</button>
-                  {page.owner_institution && <button name="v" value="school" className={`btn small ${visibility === "school" ? "" : "ghost"}`}>Meine Schule</button>}
-                  <button name="v" value="all" className={`btn small ${visibility === "all" ? "" : "ghost"}`}>Alle (Pool)</button>
-                </form>
+                <div className="row">
+                  <form action={visibilityAction}><input type="hidden" name="id" value={page.id} /><input type="hidden" name="v" value="private" /><button className={`btn small ${visibility === "private" ? "" : "ghost"}`}>Nur ich</button></form>
+                  {page.owner_institution && (
+  <form action={visibilityAction}><input type="hidden" name="id" value={page.id} /><input type="hidden" name="v" value="school" /><button className={`btn small ${visibility === "school" ? "" : "ghost"}`}>Meine Schule</button></form>
+                  )}
+                  <form action={visibilityAction}><input type="hidden" name="id" value={page.id} /><input type="hidden" name="v" value="all" /><button className={`btn small ${visibility === "all" ? "" : "ghost"}`}>Alle (Pool)</button></form>
+                </div>
                 <h3 style={{ margin: "1.2rem 0 .4rem" }}>Titel</h3>
                 <form action={renameAction} className="row">
                   <input type="hidden" name="id" value={page.id} />
