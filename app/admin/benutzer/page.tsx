@@ -1,6 +1,7 @@
 import { LIMIT_BILDER, LIMITS, usageByUser } from "@/lib/quota";
 import { listInstitutions, listUsers } from "@/lib/users";
 import Topbar from "../../Topbar";
+import Footer from "../../Footer";
 import {
   createInstitutionAction, createUserAction, deleteInstitutionAction, deleteUserAction, renameInstitutionAction,
   setInstitutionAction, setPasswordAction, toggleActiveAction,
@@ -176,6 +177,7 @@ export default async function BenutzerPage() {
           </div>
         </div>
       </main>
+      <Footer />
     </>
   );
 }

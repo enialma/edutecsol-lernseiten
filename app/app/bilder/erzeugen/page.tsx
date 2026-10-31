@@ -3,6 +3,7 @@ import { PRESETS } from "@/lib/bildprompt";
 import { availableImageProviders, IMAGE_PROVIDER_LABELS, INFOMANIAK_IMAGE_MODEL, OPENAI_IMAGE_MODEL } from "@/lib/imagegen";
 import { imageQuotaFor } from "@/lib/quota";
 import Topbar from "../../../Topbar";
+import Footer from "../../../Footer";
 import Form from "./Form";
 
 export const dynamic = "force-dynamic";
@@ -33,6 +34,7 @@ export default async function BildErzeugenPage({ searchParams }: { searchParams:
           )}
         </div>
       </main>
+      <Footer />
     </>
   );
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LIMIT_BILDER, LIMITS } from "@/lib/quota";
 import Topbar from "../Topbar";
+import Footer from "../Footer";
 
 const STAND = "4. Oktober 2026";
 // MWST-Nummer der EDUTECSOL GmbH (Format CHE-123.456.789 MWST); leer = wird nicht angezeigt
@@ -13,7 +14,7 @@ export default function AgbPage() {
     <>
       <Topbar />
       <main>
-        <div className="wrap" style={{ maxWidth: 820 }}>
+        <div className="wrap legal" style={{ maxWidth: 820 }}>
           <p className="kicker">Rechtliches</p>
           <h1>Allgemeine Geschäftsbedingungen</h1>
           <p className="lead">Für den geschützten Bereich von lernwege.edutecsol.ch. Stand: {STAND}.</p>
@@ -118,6 +119,7 @@ export default function AgbPage() {
           <p style={{ marginTop: "2rem" }}><Link href="/zugang">← Zum Zugang</Link></p>
         </div>
       </main>
+      <Footer />
     </>
   );
 }

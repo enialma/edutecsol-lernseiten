@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Topbar from "../Topbar";
+import Footer from "../Footer";
 
 export const metadata = { title: "Datenschutz – Lernwege EDUTECSOL" };
 
@@ -10,7 +11,7 @@ export default function DatenschutzPage() {
     <>
       <Topbar />
       <main>
-        <div className="wrap" style={{ maxWidth: 820 }}>
+        <div className="wrap legal" style={{ maxWidth: 820 }}>
           <p className="kicker">Rechtliches</p>
           <h1>Datenschutz</h1>
           <p className="lead">
@@ -133,6 +134,7 @@ export default function DatenschutzPage() {
           <p style={{ marginTop: "2rem" }}><Link href="/">← Zur Startseite</Link> · <Link href="/agb">AGB</Link></p>
         </div>
       </main>
+      <Footer />
     </>
   );
 }

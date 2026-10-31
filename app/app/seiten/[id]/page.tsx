@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 import { getPage } from "@/lib/pages";
 import { DIFFART_LABELS, NIVEAU_LABELS, SPRACHE_LABELS, TWIST_LABELS, type GenParams } from "@/lib/prompt";
 import Topbar from "../../../Topbar";
+import Footer from "../../../Footer";
 import { copyAction, deletePageAction, renameAction, shareAction, visibilityAction } from "../actions";
 import { getMoodleBase } from "@/lib/moodle";
 import CopyButton from "./CopyButton";
@@ -176,6 +177,7 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
           )}
         </div>
       </main>
+      <Footer />
     </>
   );
 }

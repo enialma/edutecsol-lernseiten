@@ -4,6 +4,7 @@ import { PRESETS } from "@/lib/prompt";
 import { quotaFor } from "@/lib/quota";
 import { listImages } from "@/lib/images";
 import Topbar from "../../Topbar";
+import Footer from "../../Footer";
 import Form from "./Form";
 
 export const dynamic = "force-dynamic";
@@ -39,6 +40,7 @@ export default async function ErzeugenPage({ searchParams }: { searchParams: Pro
           )}
         </div>
       </main>
+      <Footer />
     </>
   );
 }

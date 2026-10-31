@@ -4,6 +4,7 @@ import { EINSATZ_LABELS, type Einsatz } from "@/lib/bildprompt";
 import { listImages, type ImageListMode } from "@/lib/images";
 import { getInstitutionOf } from "@/lib/users";
 import Topbar from "../../Topbar";
+import Footer from "../../Footer";
 
 export const dynamic = "force-dynamic";
 
@@ -75,6 +76,7 @@ export default async function BilderPage({ searchParams }: { searchParams: Promi
           )}
         </div>
       </main>
+      <Footer />
     </>
   );
 }

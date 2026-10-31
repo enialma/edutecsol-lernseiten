@@ -43,3 +43,24 @@ tr:last-child td{border-bottom:none}
 input[type=file]{padding:.45rem;background:#fff}
 footer{background:var(--navy);color:#C3CCD6;padding:1.6rem 0;font-size:.85rem}
 footer a{color:var(--ochre);text-decoration:none}
+
+/* Etappe 3: App-Seiten */
+main h2{font-size:clamp(1.4rem,2.2vw,1.8rem);margin:2rem 0 .7rem}
+main .card h2{font-size:1.35rem;margin:0 0 .6rem}
+.legal h2{font-size:1.3rem;margin:2.2rem 0 .6rem}
+.legal p,.legal li{max-width:72ch}
+.legal .card h2{font-size:1.25rem}
+.dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin:1.6rem 0 2.4rem}
+.action{display:flex;flex-direction:column;text-decoration:none;color:#fff;background:var(--navy);border-radius:var(--r-lg);padding:1.5rem 1.6rem;min-height:200px;transition:background .15s,transform .15s}
+.action:hover{background:var(--navy-soft);transform:translateY(-2px)}
+.action .k{font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ochre);font-weight:600;margin:0 0 .5rem}
+.action h2{font-family:var(--serif);font-weight:500;font-size:1.7rem;line-height:1.1;margin:0 0 .5rem;color:#fff}
+.action p{color:#C3CCD6;margin:0 0 1rem;flex:1;font-size:.95rem}
+.action .go{color:var(--ochre);font-weight:600}
+.action.terra{background:var(--terra)}
+.action.terra:hover{background:var(--terra-deep)}
+.action.terra p{color:#FFE4D6}
+.action.terra .go,.action.terra .k{color:#fff}
+.quota{margin:2.4rem 0 0;padding-top:1.4rem;border-top:1px solid var(--line-strong)}
+.quota h2{margin:0 0 .2rem;font-size:1.35rem}
+.quota .facts{border-top:0;padding-top:.6rem;margin-top:.4rem;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}

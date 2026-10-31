@@ -4,6 +4,7 @@ import { filterValues, listPages, type ListMode } from "@/lib/pages";
 import { getInstitutionOf } from "@/lib/users";
 import { BEISPIELE, missingBeispiele } from "@/lib/beispiele";
 import Topbar from "../../Topbar";
+import Footer from "../../Footer";
 import { importBeispieleAction } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -108,6 +109,7 @@ export default async function SeitenPage({ searchParams }: { searchParams: Promi
           )}
         </div>
       </main>
+      <Footer />
     </>
   );
 }

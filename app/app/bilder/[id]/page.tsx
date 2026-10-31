@@ -7,6 +7,7 @@ import { imageProviderReady } from "@/lib/imagegen";
 import { getImageMeta, imageFamily } from "@/lib/images";
 import { imageQuotaFor } from "@/lib/quota";
 import Topbar from "../../../Topbar";
+import Footer from "../../../Footer";
 import { copyImageAction, deleteImageAction, exampleImageAction, renameImageAction, shareImageAction, visibilityImageAction } from "../actions";
 import CopyText from "./CopyText";
 import EditForm from "./EditForm";
@@ -215,6 +216,7 @@ export default async function BildPage({ params }: { params: Promise<{ id: strin
           )}
         </div>
       </main>
+      <Footer />
     </>
   );
 }
