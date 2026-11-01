@@ -63,7 +63,7 @@ export default async function ZugangPage({ searchParams }: { searchParams: Promi
             <div className="card">
               <p className="kicker">Einzelperson</p>
               <h2 style={{ marginTop: 0 }}>CHF 8 pro Monat oder CHF 60 pro Jahr</h2>
-              <p className="small-note" style={{ marginTop: "-.4rem" }}>Preise inklusive Mehrwertsteuer.</p>
+              <p className="small-note" style={{ marginTop: "-.4rem" }}>Einführungspreise, gültig für Bestellungen bis 31. Januar 2027. Preise inklusive Mehrwertsteuer.</p>
               <ul>
                 <li>Pro Monat {LIMITS.claude} Lernseiten mit Claude, {LIMITS.openai} mit ChatGPT und {LIMITS.infomaniak} mit Infomaniak (Schweiz)</li>
                 <li>Eigene Sammlung, Freigabelink mit QR-Code, gemeinsamer Pool</li>

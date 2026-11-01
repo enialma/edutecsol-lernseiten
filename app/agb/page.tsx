@@ -54,7 +54,7 @@ export default function AgbPage() {
 
           <h2>4. Preise und Zahlung</h2>
           <ul>
-            <li>Monatsabo: CHF 8 pro Monat. Jahresabo: CHF 60 pro Jahr. Mit Lerncoach: {CHF("month_coach")} pro Monat bzw. {CHF("year_coach")} pro Jahr. Beide Preise verstehen sich inklusive Schweizer Mehrwertsteuer.</li>
+            <li>Monatsabo: CHF 8 pro Monat. Jahresabo: CHF 60 pro Jahr. Mit Lerncoach: {CHF("month_coach")} pro Monat bzw. {CHF("year_coach")} pro Jahr. Beide Preise verstehen sich inklusive Schweizer Mehrwertsteuer. Es handelt sich um Einführungspreise, die für Bestellungen bis 31. Januar 2027 gelten.</li>
             <li>Die Zahlung erfolgt im Voraus für die jeweilige Laufzeit über den Schweizer Zahlungsdienstleister Payrexx (TWINT, PostFinance, Kreditkarte). EDUTECSOL erhält und speichert keine Kartendaten.</li>
             <li>Preisänderungen werden mindestens 30 Tage im Voraus per E-Mail angekündigt und gelten frühestens ab der nächsten Laufzeit. Sie können vorher kündigen.</li>
           </ul>
