@@ -5,7 +5,7 @@ import { COACH_LIMIT_MONTH } from "@/lib/coach";
 import Topbar from "../Topbar";
 import Footer from "../Footer";
 
-const STAND = "4. Oktober 2026";
+const STAND = "1. November 2026";
 // MWST-Nummer der EDUTECSOL GmbH (Format CHE-123.456.789 MWST); leer = wird nicht angezeigt
 const MWST_NR = "CHE-484.488.885 MWST";
 
@@ -36,7 +36,7 @@ export default function AgbPage() {
           <ul>
             <li>Erzeugen differenzierter, interaktiver Lernseiten mit KI, pro Kalendermonat bis zu {LIMITS.claude} Lernseiten mit Claude, {LIMITS.openai} mit ChatGPT und {LIMITS.infomaniak} mit Infomaniak. Nicht genutzte Kontingente verfallen am Monatsende.</li>
             <li>Erzeugen von Bildern für Lernaufgaben mit KI, pro Kalendermonat bis zu {LIMIT_BILDER} Bilder (Erzeugen und Nachbessern zählen je einmal).</li>
-            <li>Eigene Sammlung, Freigabelinks für Lernende, Teilen mit Kolleginnen und Kollegen.</li>
+            <li>Eigene Sammlung, Freigabelinks und Klassenlinks für Lernende, Teilen mit Kolleginnen und Kollegen. Das Abo ist personenbezogen für eine Lehrperson. Lernende nutzen freigegebene Lernseiten und Klassenlinks ohne eigenes Konto und ohne Kosten.</li>
             <li>Zusatzoption KI-Lerncoach (nur in den Abos «mit Lerncoach»): Lernende können auf freigegebenen Lernseiten Fragen stellen; der Coach gibt Hinweise und Gegenfragen, keine Lösungen. Bis zu {COACH_LIMIT_MONTH} Nachrichten pro Kalendermonat und Konto; Gespräche werden nicht gespeichert.</li>
             <li>Export als HTML-Datei, Word-Arbeitsblatt und SCORM-Paket sowie die Anbindung an Moodle, soweit das jeweilige Moodle sie unterstützt.</li>
           </ul>

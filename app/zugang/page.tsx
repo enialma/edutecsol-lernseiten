@@ -65,6 +65,7 @@ export default async function ZugangPage({ searchParams }: { searchParams: Promi
               <h2 style={{ marginTop: 0 }}>CHF 8 pro Monat oder CHF 60 pro Jahr</h2>
               <p className="small-note" style={{ marginTop: "-.4rem" }}>Einführungspreise, gültig für Bestellungen bis 31. Januar 2027. Preise inklusive Mehrwertsteuer.</p>
               <ul>
+                <li><b>Das Abo gilt für eine Lehrperson.</b> Lernende brauchen kein Konto und zahlen nichts, sie öffnen die Seiten über den Freigabelink oder den Klassenlink</li>
                 <li>Pro Monat {LIMITS.claude} Lernseiten mit Claude, {LIMITS.openai} mit ChatGPT und {LIMITS.infomaniak} mit Infomaniak (Schweiz)</li>
                 <li>Eigene Sammlung, Freigabelink mit QR-Code, gemeinsamer Pool</li>
                 <li>Word-Arbeitsblatt, SCORM-Paket und Moodle-Anbindung</li>

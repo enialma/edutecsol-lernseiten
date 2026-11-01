@@ -68,6 +68,9 @@
   /* Preis-Band */
   .price .wrap{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(1.5rem,4vw,4rem);align-items:center}
   .price .wrap > *{min-width:0}
+  .steps.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+  @media (max-width:900px){.steps.three{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:480px){.steps.three{grid-template-columns:1fr}}
   .price .big{font-family:var(--serif);font-weight:500;font-size:clamp(1.8rem,3.4vw,2.7rem);line-height:1.1;letter-spacing:-.01em;margin:0 0 .8rem}
   .price ul{margin:0 0 1.3rem;padding-left:1.1rem;color:var(--ink-soft)}
   .price li{margin:.25rem 0}
@@ -190,7 +193,7 @@
       <li>
         <h3 class="t">Dazu<small>Bilder, Sammlung, Ausgabe</small></h3>
         <div>
-          <p><b>Bilder mit Lernauftrag</b> direkt erzeugen und in Lernseiten einbinden. <b>Sammlung</b> mit Suche, teilen mit der eigenen Schule oder im Pool aller Lehrpersonen. <b>Ausgabe</b> als Datei, per Freigabelink mit QR-Code, als Word-Arbeitsblatt, als SCORM-Paket oder direkt in einen Moodle-Kurs.</p>
+          <p><b>Bilder mit Lernauftrag</b> direkt erzeugen und in Lernseiten einbinden. <b>Sammlung</b> mit Suche, teilen mit der eigenen Schule oder im Pool aller Lehrpersonen. <b>Ausgabe</b> als Datei, per Freigabelink mit QR-Code, als Word-Arbeitsblatt, als SCORM-Paket oder direkt in einen Moodle-Kurs. <b>Klassenlink:</b> eine Adresse für alle freigegebenen Seiten einer Klasse, ohne Konto für die Lernenden.</p>
         </div>
       </li>
     </ul>
@@ -233,6 +236,21 @@
       <div><p class="n">02</p><h3>Wählen, was entsteht</h3><p>Lernseite, Prüfungsvorbereitung, Lernspiel oder Lernhilfe. Dazu Fach, Stufe, Sprache und bei Lernseiten die didaktischen Achsen.</p></div>
       <div><p class="n">03</p><h3>Erzeugen</h3><p>Die KI baut die Seite im Lernwege-Design mit Selbstkontrolle und Lehrpersonen-Bereich. Ein bis acht Minuten, je nach Typ.</p></div>
       <div><p class="n">04</p><h3>Einsetzen</h3><p>Per Link oder QR-Code teilen, in Moodle legen, als Word drucken oder die Datei weitergeben. Auf Wunsch den Coach dazuschalten.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="zu-den-lernenden">
+  <div class="wrap">
+    <div class="sec-head center">
+      <p class="kicker">So kommen die Seiten zu den Lernenden</p>
+      <h2>Kein Konto, keine Kosten für Lernende</h2>
+      <p>Das Abo gehört der Lehrperson. Lernende öffnen die Seiten im Browser, auf dem Handy oder am Schul-PC, ohne Anmeldung.</p>
+    </div>
+    <div class="steps three">
+      <div><p class="n">01</p><h3>Freigeben</h3><p>In deiner Sammlung bei einer Seite auf «Freigeben» klicken. Du erhältst einen Link und einen QR-Code.</p></div>
+      <div><p class="n">02</p><h3>Weitergeben</h3><p>Link in Moodle, Teams oder per Mail verschicken, QR-Code an die Wand projizieren oder aufs Arbeitsblatt drucken.</p></div>
+      <div><p class="n">03</p><h3>Klassenlink</h3><p>Für eine ganze Klasse eine Adresse anlegen, die alle freigegebenen Seiten zeigt. Jederzeit erweitern oder zurückziehen, Lernende müssen nichts merken.</p></div>
     </div>
   </div>
 </section>
@@ -301,6 +319,7 @@
       <p class="big">CHF 8 im Monat oder CHF 60 im Jahr. Mit Coach CHF 12 oder CHF 90.</p>
       <p class="small-note" style="margin:-.4rem 0 .9rem">Einführungspreise, gültig für Bestellungen bis 31. Januar 2027. Inklusive Mehrwertsteuer.</p>
       <ul>
+        <li><b>Das Abo gilt für eine Lehrperson.</b> Lernende brauchen kein Konto und zahlen nichts, sie öffnen die Seiten über den Freigabelink oder den Klassenlink</li>
         <li>Pro Monat 10 Seiten mit Claude, 10 mit ChatGPT und 30 mit Infomaniak, alle vier Typen</li>
         <li>Eigene Sammlung, Freigabelink mit QR-Code, gemeinsamer Pool</li>
         <li>Word-Arbeitsblatt, SCORM-Paket, Moodle-Anbindung</li>
