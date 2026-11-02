@@ -7,7 +7,7 @@
 @font-face{font-family:"Source Serif 4";font-style:italic;font-weight:200 900;font-display:swap;src:url("/fonts/source-serif-4-latin-wght-italic.woff2") format("woff2")}
 
 :root{
-  --navy:#1E3246;--terra:#B84816;--ochre:#F1A51A;--cream:#F8F9FA;--bg:#F2F4F6;--menu:#F6EFE2;
+  --navy:#1E3246;--terra:#B84816;--ochre:#F1A51A;--cream:#F2F4F6;--bg:#FFFFFF;--menu:rgba(255,255,255,.92);
   --paper:#F7F8FA;--ink:#1E3246;--ink-soft:#5B6572;--ink-faint:#8A93A0;
   --line:#E1E4E8;--line-strong:#C9CED5;--card:#fff;
   --navy-soft:#2B4259;--terra-deep:#9A3A10;
@@ -61,7 +61,7 @@ hr.rule{border:0;border-top:1px solid var(--line-strong);margin:0}
   .menu[open] summary{background:var(--navy);color:#fff;border-color:var(--navy)}
   .menu .panel{position:absolute;right:0;top:calc(100% + .5rem);min-width:230px;background:#fff;border:1px solid var(--line-strong);border-radius:var(--r-lg);box-shadow:var(--shadow);padding:.5rem;display:flex;flex-direction:column}
   .menu .panel a,.menu .panel button{display:block;padding:.6rem .8rem;color:var(--ink);text-decoration:none;border-radius:var(--r);font:inherit;font-size:.95rem;background:none;border:0;text-align:left;cursor:pointer;width:100%}
-  .menu .panel a:hover{background:var(--bg)}
+  .menu .panel a:hover{background:var(--cream)}
   .menu .panel .who{padding:.4rem .8rem .2rem;font-size:.8rem;color:var(--ink-soft)}
 }
 
