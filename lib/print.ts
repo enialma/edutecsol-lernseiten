@@ -28,7 +28,7 @@ const PRINT_CSS = `
   input[type="text"], input[type="number"], textarea, select { border: none !important; border-bottom: 1px solid #333 !important; background: #fff !important; box-shadow: none !important; }
   input[type="checkbox"], input[type="radio"] { -webkit-appearance: checkbox; appearance: auto; }
   .feedback, .hint, .ok, .check-ok, .correct { color: #111 !important; }
-  /* CI-Farben: Navy #1E3246, Terra #B84816, Ocker #F1A51A, Creme #F9EEE5, Grau #F2F3F5 */
+  /* CI-Farben: Navy #1E3246, Terra #B84816, Ocker #F1A51A, Grau #F2F3F5, Hellgrau #F8F9FA */
   h1, h2, h3, h4 { color: #1E3246 !important; }
   h1 { font-size: 20pt !important; border-bottom: 2pt solid #B84816 !important; padding-bottom: 4pt !important; }
   h2 { font-size: 15pt !important; margin-top: 14pt !important; }
@@ -44,7 +44,7 @@ const PRINT_CSS = `
   blockquote, .hinweis, .tipp, .info { border-left: 3pt solid #F1A51A !important; border-top: 0 !important; border-right: 0 !important; border-bottom: 0 !important; padding-left: 8pt !important; background: transparent !important; }
   table { border-collapse: collapse !important; }
   td, th { border: 1pt solid #1E3246 !important; padding: .25rem .5rem !important; }
-  th { background: #F9EEE5 !important; color: #1E3246 !important; }
+  th { background: #EEF0F3 !important; color: #1E3246 !important; }
   a { color: #B84816 !important; text-decoration: none !important; }
   svg { max-width: 100% !important; height: auto !important; }
   img { max-width: 100% !important; }

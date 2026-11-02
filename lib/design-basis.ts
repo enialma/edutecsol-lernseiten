@@ -1,10 +1,10 @@
 // Designbasis für erzeugte Lernseiten (Etappe 4 der Design-Modernisierung, Oktober 2026).
 // Das Modell übernimmt dieses CSS unverändert als erstes <style>-Element und baut die Seite nach dem Grundgerüst.
 // Offline-tauglich: keine Webfonts, keine externen Dateien. Schriften: Serife für Titel (Georgia-Stapel), Sans für Text.
-// Farben wie die Plattform lernwege.edutecsol.ch: Navy, Terra, Ocker, Creme.
+// Farben wie die Plattform lernwege.edutecsol.ch: Navy, Terra, Ocker; Flaechen hellgrau (kein Creme/Orange mehr, 02.11.2026).
 // Nach Änderungen: node scripts/sync-design-basis.mjs (überträgt die Basis in den statischen Prompt-Generator).
 
-export const DESIGN_CSS = `:root{--paper:#F2F3F5;--card:#FFFFFF;--ink:#1E3246;--ink-soft:#5B6572;--line:#E1E4E8;--line-strong:#C9CED5;--navy:#1E3246;--terra:#B84816;--terra-deep:#9A3A10;--ochre:#F1A51A;--cream:#F9EEE5;--ok:#2F8F6F;--ok-soft:#DFF3EA;--err:#B8321A;--err-soft:#FBE6E1;--serif:Georgia,"Iowan Old Style","Palatino Linotype",Palatino,"Times New Roman",serif;--sans:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;--r:8px;--r-lg:12px}
+export const DESIGN_CSS = `:root{--paper:#F2F3F5;--card:#FFFFFF;--ink:#1E3246;--ink-soft:#5B6572;--line:#E1E4E8;--line-strong:#C9CED5;--navy:#1E3246;--terra:#B84816;--terra-deep:#9A3A10;--ochre:#F1A51A;--cream:#F8F9FA;--ok:#2F8F6F;--ok-soft:#DFF3EA;--err:#B8321A;--err-soft:#FBE6E1;--serif:Georgia,"Iowan Old Style","Palatino Linotype",Palatino,"Times New Roman",serif;--sans:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;--r:8px;--r-lg:12px}
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;padding:clamp(1rem,4vw,2.5rem) 1rem 4rem}
 .wrap{max-width:820px;margin:0 auto}
