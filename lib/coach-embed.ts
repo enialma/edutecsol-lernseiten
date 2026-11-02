@@ -15,13 +15,13 @@ export function withCoach(html: string, token: string, name: string): string {
 #lw-coach-btn{position:fixed;right:18px;bottom:18px;z-index:9998;font:600 15px/1.2 system-ui,-apple-system,"Segoe UI",Arial,sans-serif;background:#B84816;color:#fff;border:0;border-radius:999px;padding:12px 18px 12px 14px;cursor:pointer;box-shadow:0 10px 24px -8px rgba(30,50,70,.5);display:inline-flex;align-items:center;gap:8px}
 #lw-coach-btn:hover{background:#9A3A10}
 #lw-coach-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-#lw-coach-panel{position:fixed;right:18px;bottom:18px;z-index:9999;width:min(400px,calc(100vw - 36px));height:min(620px,calc(100vh - 36px));background:#fff;border:1px solid #CDC4AD;border-radius:14px;box-shadow:0 24px 60px -20px rgba(30,50,70,.55);display:none;flex-direction:column;overflow:hidden}
+#lw-coach-panel{position:fixed;right:18px;bottom:18px;z-index:9999;width:min(400px,calc(100vw - 36px));height:min(620px,calc(100vh - 36px));background:#fff;border:1px solid #C9CED5;border-radius:14px;box-shadow:0 24px 60px -20px rgba(30,50,70,.55);display:none;flex-direction:column;overflow:hidden}
 #lw-coach-panel.open{display:flex}
 #lw-coach-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px 10px 16px;background:#1E3246;color:#fff;font:600 14px system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
 #lw-coach-head small{display:block;font-weight:400;color:#C3CCD6;font-size:12px}
 #lw-coach-close{background:transparent;border:0;color:#fff;font-size:20px;line-height:1;cursor:pointer;padding:4px 8px;border-radius:6px}
 #lw-coach-close:hover{background:rgba(255,255,255,.12)}
-#lw-coach-frame{flex:1;border:0;width:100%;background:#FBF8F1}
+#lw-coach-frame{flex:1;border:0;width:100%;background:#F2F3F5}
 @media print{#lw-coach-btn,#lw-coach-panel{display:none!important}}
 </style>
 <button id="lw-coach-btn" type="button" aria-haspopup="dialog" aria-controls="lw-coach-panel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 21l1.9-5.4A8 8 0 1 1 21 12z"/></svg>${btnLabel}</button>

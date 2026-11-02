@@ -29,7 +29,7 @@ async function resolveImages(root: HTMLElement): Promise<Map<string, EmbeddedIma
   return map;
 }
 
-const NAVY = "1E3246", TERRA = "B84816", OCHRE = "F1A51A", CREAM = "F6EFE2", SOFT = "5B6572";
+const NAVY = "1E3246", TERRA = "B84816", OCHRE = "F1A51A", CREAM = "F9EEE5", SOFT = "5B6572";
 const LINE = "________________";
 
 export type DocxMeta = { title: string; fach?: string | null; stufe?: string | null; created?: string };
