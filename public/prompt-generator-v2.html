@@ -34,9 +34,28 @@
   .group:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0;}
   .group>.glab{display:block;font-size:.85rem;font-weight:700;margin-bottom:.15rem;}
   .group>.ghint{font-size:.78rem;color:var(--ink-soft);margin:0 0 .55rem;}
-  label.field{display:block;margin:0 0 .9rem;}
-  label.field .lab{display:block;font-size:.85rem;font-weight:600;margin-bottom:.35rem;}
-  label.field .hint{font-weight:400;color:var(--ink-soft);font-size:.8rem;}
+  .field{display:block;margin:0 0 .9rem;}
+  .field .lab{display:block;font-size:.85rem;font-weight:600;margin-bottom:.35rem;}
+  .field .hint{font-weight:400;color:var(--ink-soft);font-size:.8rem;}
+  /* Info-Kreis ganz rechts auf Höhe der Überschrift; Erklärung erscheint nur beim Darüberfahren (oder Tastaturfokus) */
+  .field .lab.has-info,.group>.glab.has-info{display:flex;align-items:center;gap:.4rem;}
+  .info-wrap{position:relative;margin-left:auto;flex:none;display:inline-flex;}
+  .info-btn{width:1.35rem;height:1.35rem;padding:0;border-radius:50%;border:1.5px solid var(--navy);background:#fff;color:var(--navy);font:inherit;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:help;}
+  .info-wrap:hover .info-btn,.info-btn:focus-visible{background:var(--navy);color:#fff;}
+  /* Eigene Berufsfelder: «+» im Kreis öffnet ein Eingabefeld, «×» entfernt ein eigenes Feld */
+  .seg .add-btn{width:1.9rem;height:1.9rem;padding:0;border-radius:50%;border:1.5px solid var(--navy);color:var(--navy);font-size:1.05rem;line-height:1;display:inline-flex;align-items:center;justify-content:center;align-self:center;}
+  .seg .add-btn:hover,.seg .add-btn[aria-expanded="true"]{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .seg .del-btn{margin-left:-.35rem;padding:.4rem .45rem;color:var(--ink-soft);}
+  .seg .del-btn:hover{color:var(--err);border-color:var(--err);}
+  .add-row{display:flex;gap:.4rem;margin-top:.5rem;}
+  .add-row input{flex:1;}
+  .info-btn:focus-visible{outline:2px solid var(--terra);outline-offset:2px;}
+  .info-box{display:none;position:absolute;right:0;top:100%;z-index:20;width:min(22rem,calc(100vw - 3rem));margin-top:.35rem;font-size:.8rem;font-weight:400;letter-spacing:normal;text-transform:none;line-height:1.45;color:var(--ink);background:#fff;border:1px solid var(--line-strong);border-radius:var(--r);padding:.6rem .8rem;box-shadow:var(--shadow);}
+  .info-wrap:hover .info-box,.info-wrap:focus-within .info-box{display:block;}
+  .info-box dl{margin:0;}
+  .info-box dt{font-weight:600;}
+  .info-box dd{margin:0 0 .35rem;color:var(--ink-soft);}
+  .info-box p{margin:.4rem 0 0;color:var(--ink-soft);}
   input[type=text],textarea{width:100%;font:inherit;font-size:.95rem;padding:.55rem .7rem;border:1px solid var(--line-strong);border-radius:var(--r);background:#fff;color:var(--ink);}
   input[type=text]:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
   textarea{resize:vertical;min-height:2.5rem;}
@@ -55,6 +74,8 @@
   .out pre details.basis summary{cursor:pointer;color:#C3CCD6;font-style:italic;white-space:normal;padding:.35rem .6rem;border:1px dashed #4A5F76;border-radius:6px;}
   .out pre details.basis summary:hover{color:#fff;border-color:#8fd0b4;}
   .out pre details.basis[open] summary{margin-bottom:.4rem;}
+  /* Prompt-Fenster scrollt mit (unter der 64px hohen Menüleiste), nur bei zwei Spalten */
+  @media(min-width:821px){.out{position:sticky;top:calc(65px + 1rem);}.out pre{max-height:calc(100vh - 65px - 13rem);}}
   .actions{display:flex;gap:.6rem;margin-top:.8rem;flex-wrap:wrap;}
   
   .btn.primary{background:var(--terra);border-color:var(--terra);color:#fff;}.btn.primary:hover{background:var(--terra-deep);border-color:var(--terra-deep);}
@@ -113,17 +134,25 @@
           <input type="text" id="fach" placeholder="z. B. Pharma-Fachrechnen"></label>
         <label class="field"><span class="lab">Zielstufe</span>
           <input type="text" id="stufe" placeholder="z. B. Berufsmaturität · FaGe · Sek II · Erwachsene"></label>
-        <label class="field"><span class="lab">Thema <span class="hint">(optional – leer = KI wählt aus dem Material)</span></span>
+        <label class="field"><span class="lab">Thema <span class="hint">(optional: leer = KI wählt aus dem Material)</span></span>
           <input type="text" id="thema" placeholder="z. B. Dosisberechnung, oder «Folie 12–14»"></label>
-        <label class="field"><span class="lab">Material / Quelle</span>
+        <div class="field"><span class="lab">Ausgabeformat(e) <span class="hint">(Mehrfachauswahl, mindestens eines)</span></span>
+          <div class="seg" id="formate">
+            <button data-v="web" class="on">🖥 Interaktive Website</button>
+            <button data-v="word" class="on">📄 Word (.docx)</button>
+            <button data-v="pdf" class="on">🖨 PDF</button>
+          </div>
+          <!-- <p class="ghint" style="margin-top:.4rem;">Website = zum Üben am Gerät mit Selbstkontrolle. Word = bearbeitbares Arbeitsblatt. PDF = druckfertig. Word/PDF je als getrenntes Aufgaben- und Lösungsblatt.</p> -->
+        </div>
+        <div class="field"><span class="lab">Material / Quelle</span>
           <div class="seg" id="quelle">
             <button data-v="pptx" class="on">Folien (PPTX)</button>
             <button data-v="pdf">PDF</button>
             <button data-v="word">Word</button>
             <button data-v="text">nur diese Beschreibung</button>
           </div>
-          <p class="ghint" style="margin-top:.4rem;">Was hängst du an? Bei «nur diese Beschreibung» arbeitet die KI allein mit deinen Angaben – ohne Datei.</p>
-        </label>
+          <!--<p class="ghint" style="margin-top:.4rem;">Was hängst du an? Bei «nur diese Beschreibung» arbeitet die KI allein mit deinen Angaben – ohne Datei.</p> -->
+        </div>
       </div>
 
       <!-- Achse 1: Differenzierungsart -->
@@ -134,12 +163,22 @@
           <button data-v="niveau" class="on">nach Niveau (Hilfe)</button>
           <button data-v="lerntyp">nach Lerntyp</button>
           <button data-v="interesse">nach Berufsfeld</button>
-          <button data-v="sozialform">nach Sozialform</button>
         </div>
-        <label class="field" style="margin-top:.7rem;"><span class="lab">Anzahl Zugänge</span>
-          <div class="steps" id="anzahl">
-            <button data-v="2">2</button><button data-v="3" class="on">3</button><button data-v="4">4</button>
-          </div></label>
+        <div class="field" style="margin-top:.7rem;"><span class="lab">Zugänge <span class="hint">(Mehrfachauswahl, mindestens einer)</span></span>
+          <div class="seg" id="zugaenge"></div>
+        </div>
+      </div>
+
+      <!-- Sozialform -->
+      <div class="group">
+        <span class="glab">Sozialform</span>
+        <p class="ghint">Wie wird die Aufgabe bearbeitet? Mehrfachauswahl, mindestens eine.</p>
+        <div class="seg" id="sozialform">
+          <button data-v="einzel" class="on">Einzelarbeit</button>
+          <button data-v="partner">Partnerarbeit</button>
+          <button data-v="gruppe">Gruppenarbeit</button>
+          <button data-v="plenum">Plenum</button>
+        </div>
       </div>
 
       <!-- Achse 2: Sprache -->
@@ -159,7 +198,7 @@
       <!-- Achse 3: Twist-Typ -->
       <div class="group">
         <span class="glab">Twist der Vertiefung</span>
-        <p class="ghint">Die zusätzliche Denkanforderung im obersten Zugang.</p>
+        <p class="ghint">Die zusätzliche Denkanforderung in der Vertiefung bzw. am Schluss jedes Zugangs.</p>
         <div class="seg" id="twist">
           <button data-v="auto" class="on">passend wählen</button>
           <button data-v="ausreisser">Ausreisser/Robustheit</button>
@@ -182,17 +221,9 @@
         </div>
       </div>
 
-      <!-- Achse 5: Ausgabeformate -->
+      <!-- Zusatzwunsch -->
       <div class="group">
-        <span class="glab">Ausgabeformat(e)</span>
-        <p class="ghint">Was soll entstehen? Mehrfachauswahl möglich – mindestens eines.</p>
-        <div class="seg" id="formate">
-          <button data-v="web" class="on">🖥 Interaktive Website</button>
-          <button data-v="word" class="on">📄 Word (.docx)</button>
-          <button data-v="pdf" class="on">🖨 PDF</button>
-        </div>
-        <p class="ghint" style="margin-top:.5rem;">Website = zum Üben am Gerät mit Selbstkontrolle. Word = bearbeitbares Arbeitsblatt. PDF = druckfertig. Word/PDF je als getrenntes Aufgaben- und Lösungsblatt.</p>
-        <label class="field" style="margin-top:.7rem;"><span class="lab">Zusatzwunsch <span class="hint">(optional – frei)</span></span>
+        <label class="field"><span class="lab">Zusatzwunsch <span class="hint">(optional)</span></span>
           <textarea id="extra" placeholder="z. B. besonders alltagsnahes Beispiel, glatte Zahlen"></textarea></label>
       </div>
     </div>
@@ -221,10 +252,21 @@
   /* DESIGNBASIS-START (automatisch aus lib/design-basis.ts, nicht von Hand ändern) */
   const DESIGNBASIS = "§DESIGNBASIS (für die Website, zwingend)\n- Übernimm dieses CSS unverändert als erstes <style>-Element im <head>; ergänze danach ein zweites <style> nur für die themenspezifische Visualisierung und Kleinigkeiten. Keine anderen Farben als die Variablen (--navy, --terra, --ochre, --cream, --ok, --err); keine Schatten, keine Verläufe, keine Emojis als Icons.\n<style>\n:root{--paper:#F2F3F5;--card:#FFFFFF;--ink:#1E3246;--ink-soft:#5B6572;--line:#E1E4E8;--line-strong:#C9CED5;--navy:#1E3246;--terra:#B84816;--terra-deep:#9A3A10;--ochre:#F1A51A;--cream:#F8F9FA;--ok:#2F8F6F;--ok-soft:#DFF3EA;--err:#B8321A;--err-soft:#FBE6E1;--serif:Georgia,\"Iowan Old Style\",\"Palatino Linotype\",Palatino,\"Times New Roman\",serif;--sans:system-ui,-apple-system,\"Segoe UI\",Arial,sans-serif;--r:8px;--r-lg:12px}\n*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}\nbody{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;padding:clamp(1rem,4vw,2.5rem) 1rem 4rem}\n.wrap{max-width:820px;margin:0 auto}\n.eyebrow{font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;color:var(--terra);font-weight:600;margin:0 0 .5rem}\nh1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.15;color:var(--ink);letter-spacing:-.01em}\nh1{font-size:clamp(1.8rem,5vw,2.5rem);margin:0 0 .5rem}\nh2{font-size:1.35rem;margin:0 0 .7rem}\nh3{font-size:1.1rem;margin:1.1rem 0 .4rem}\n.lead{font-size:1.05rem;color:var(--ink-soft);margin:0 0 1.4rem;max-width:62ch}\n.top{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;margin-bottom:1.6rem}\n.top>div{flex:1 1 320px;min-width:0}\n.btn{font:inherit;font-size:.9rem;font-weight:600;background:var(--navy);color:#fff;border:1px solid var(--navy);border-radius:var(--r);padding:.6rem 1.1rem;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem}\n.btn:hover{background:#2B4259;border-color:#2B4259}\n.btn.ghost{background:#fff;color:var(--ink);border-color:var(--line-strong)}\n.btn.ghost:hover{border-color:var(--terra);color:var(--terra)}\n.btn.terra{background:var(--terra);border-color:var(--terra)}\n.btn.terra:hover{background:var(--terra-deep);border-color:var(--terra-deep)}\n.core{background:var(--card);border:1px solid var(--line-strong);border-radius:var(--r-lg);padding:1.4rem 1.5rem;margin:0 0 1.8rem}\n.core .task{font-family:var(--serif);font-size:1.08rem}\n.data{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.05rem;background:var(--cream);border:1px solid var(--line);border-radius:var(--r);padding:.7rem 1rem;margin:.6rem 0 1rem;letter-spacing:.04em;overflow-x:auto}\n.viz{margin:1rem 0 .4rem}\n.pick{font-size:.85rem;color:var(--ink-soft);margin:0 0 .6rem}\n.tabs{display:flex;gap:.6rem;flex-wrap:wrap;margin:0 0 1.4rem}\n.tab{flex:1 1 200px;text-align:left;cursor:pointer;background:var(--card);border:1px solid var(--line-strong);border-radius:var(--r-lg);padding:.85rem 1rem;font:inherit;color:var(--ink);transition:border-color .15s,background .15s}\n.tab:hover{border-color:var(--terra)}\n.tab:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--terra);outline-offset:2px}\n.tab .tname{display:block;font-family:var(--serif);font-size:1.08rem;font-weight:600}\n.tab .tsub{display:block;font-size:.8rem;color:var(--ink-soft);margin-top:.15rem}\n.tab.active{border-color:var(--terra);background:#fff;box-shadow:inset 0 0 0 1px var(--terra)}\n.tab.active .tname{color:var(--terra)}\n.panel{display:none}\n.panel.show{display:block;animation:rise .3s ease}\n@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}\n.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:1.2rem 1.4rem;margin:0 0 1rem}\n.aufgabe{border-left:3px solid var(--terra);padding:.1rem 0 .1rem 1rem;margin:0 0 1rem;font-family:var(--serif);font-size:1.04rem}\n.hint{background:var(--cream);border-left:3px solid var(--ochre);border-radius:0 var(--r) var(--r) 0;padding:.6rem .9rem;margin:.6rem 0;font-size:.92rem}\n.steps{margin:0;padding-left:1.25rem}.steps li{margin:.35rem 0}\n.field{display:grid;grid-template-columns:minmax(140px,1fr) minmax(120px,160px) auto;gap:.5rem .8rem;align-items:center;margin:.5rem 0}\n@media(max-width:560px){.field{grid-template-columns:1fr}}\n.field label{font-weight:600;font-size:.92rem}\ninput[type=text],input[type=number],select,textarea{font:inherit;width:100%;padding:.5rem .7rem;border:1px solid var(--line-strong);border-radius:var(--r);background:#fff;color:var(--ink)}\ninput.ok,select.ok,textarea.ok{border-color:var(--ok);background:var(--ok-soft)}\ninput.err,select.err,textarea.err{border-color:var(--err)}\n.feedback{font-size:.88rem;min-height:1.2em}\n.feedback.ok{color:var(--ok);font-weight:600}\n.feedback.err{color:var(--err)}\n.choices{display:flex;flex-wrap:wrap;gap:.5rem;margin:.5rem 0}\n.choice{font:inherit;font-size:.92rem;background:#fff;border:1px solid var(--line-strong);border-radius:var(--r);padding:.5rem .9rem;cursor:pointer;color:var(--ink)}\n.choice:hover{border-color:var(--terra)}\n.choice.on{border-color:var(--navy);background:var(--cream)}\n.choice.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}\n.choice.err{background:var(--err-soft);border-color:var(--err);color:var(--err)}\n.check{list-style:none;margin:.5rem 0 0;padding:0}\n.check li{display:flex;gap:.6rem;align-items:flex-start;padding:.4rem 0;border-top:1px solid var(--line)}\n.check li:first-child{border-top:0}\n.check input{width:auto;margin-top:.3rem;accent-color:var(--terra)}\n.reveal{margin-top:.8rem}\n.aha{background:var(--navy);color:#fff;border-radius:var(--r-lg);padding:1rem 1.2rem;margin:.8rem 0}\n.aha h3{color:var(--ochre);margin:0 0 .4rem}\n.lehrperson{margin-top:2rem;border:1px solid var(--terra);border-radius:var(--r-lg);background:#fff}\n.lehrperson>summary{cursor:pointer;padding:.9rem 1.2rem;font-weight:600;color:var(--terra);list-style:none}\n.lehrperson>summary::-webkit-details-marker{display:none}\n.lehrperson>summary::before{content:\"+\";display:inline-block;width:1.2rem;font-family:var(--serif)}\n.lehrperson[open]>summary::before{content:\"–\"}\n.lehrperson>div{padding:0 1.2rem 1.2rem;border-top:1px solid var(--line)}\ntable{width:100%;border-collapse:collapse;font-size:.92rem;background:#fff}\nth,td{text-align:left;padding:.45rem .6rem;border-bottom:1px solid var(--line);vertical-align:top}\nth{background:var(--cream);font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}\n.foot{margin-top:2.5rem;font-size:.78rem;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:.8rem}\n.sr{position:absolute;left:-9999px}\n/* Prüfungsvorbereitung */\n.exam-head{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;padding:.8rem 1rem;border:1px solid var(--line-strong);border-radius:var(--r-lg);background:#fff;margin:0 0 1rem}\n.timer{font-family:var(--serif);font-size:1.6rem;font-variant-numeric:tabular-nums;letter-spacing:.02em}\n.timer.over{color:var(--err)}\n.pts{float:right;font-size:.78rem;color:var(--ink-soft);border:1px solid var(--line);border-radius:999px;padding:.1rem .55rem;margin-left:.6rem}\n.score{display:none;background:var(--navy);color:#fff;border-radius:var(--r-lg);padding:1.1rem 1.3rem;margin:1rem 0}\n.score.show{display:block}\n.score .nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.8rem;margin:.3rem 0 .8rem}\n.score b{display:block;font-family:var(--serif);font-size:2rem;line-height:1;color:var(--ochre)}\n.score span{font-size:.82rem;color:#C3CCD6}\n.score table{background:transparent;color:#fff}.score th{background:transparent;color:#C3CCD6}.score td,.score th{border-color:#3A5068}\n.meter{height:8px;background:var(--cream);border-radius:999px;overflow:hidden;margin:.4rem 0}\n.meter i{display:block;height:100%;background:var(--terra);width:0;transition:width .4s}\n.loesung{display:none;margin-top:.6rem;padding:.6rem .9rem;background:var(--cream);border-radius:var(--r);font-size:.92rem}\n.loesung.show{display:block}\n.plan td:first-child{font-weight:600;white-space:nowrap}\n/* Lernspiel */\n.hud{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.6rem;margin:0 0 .8rem}\n.stat{background:#fff;border:1px solid var(--line-strong);border-radius:var(--r-lg);padding:.55rem .8rem;text-align:center}\n.stat b{display:block;font-family:var(--serif);font-size:1.5rem;line-height:1.1}\n.stat span{font-size:.74rem;color:var(--ink-soft)}\n.tab.locked{opacity:.45;cursor:not-allowed}\n.tab.done .tname::after{content:\" ✓\";color:var(--ok)}\n.q{font-family:var(--serif);font-size:1.35rem;line-height:1.3;margin:.2rem 0 .8rem}\n.choices.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}\n@media(max-width:560px){.choices.grid2{grid-template-columns:1fr}}\n.choice.sel{border-color:var(--navy);background:var(--cream)}\n.choice.done{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);pointer-events:none}\n.pairs{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}\n.order .choice::before{content:attr(data-n) \" \";color:var(--terra);font-weight:600}\n.next{display:flex;justify-content:space-between;align-items:center;gap:.8rem;flex-wrap:wrap;margin-top:1rem;min-height:2.4rem}\n.msg-level{background:var(--cream);border-radius:var(--r);padding:.7rem .9rem;margin:.6rem 0;font-size:.95rem}\n/* Lernhilfe */\n.merk{columns:2;column-gap:2rem}@media(max-width:700px){.merk{columns:1}}\n.merk>*{break-inside:avoid}\n.formel{font-family:ui-monospace,Menlo,Consolas,monospace;background:var(--cream);border:1px solid var(--line);border-radius:var(--r);padding:.35rem .7rem;display:inline-block;margin:.2rem 0}\n.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.8rem;margin:.8rem 0}\n.fc{perspective:1000px;min-height:160px;cursor:pointer}\n.fc .in{position:relative;min-height:160px;height:100%;transition:transform .4s;transform-style:preserve-3d}\n.fc.flipped .in{transform:rotateY(180deg)}\n.fc .f,.fc .b{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:#fff;border:1px solid var(--line-strong);border-radius:var(--r-lg);padding:1rem;display:flex;align-items:center;justify-content:center;text-align:center}\n.fc .f{font-family:var(--serif);font-size:1.1rem}\n.fc .b{transform:rotateY(180deg);background:var(--cream);font-size:.95rem}\n.fc.known .f,.fc.known .b{border-color:var(--ok)}\n.fc.again .f,.fc.again .b{border-color:var(--terra)}\n.fc-actions{display:flex;gap:.4rem;justify-content:center;margin-top:.4rem}\n.fc-actions .btn{padding:.35rem .7rem;font-size:.8rem}\n.gloss{margin:0}.gloss dt{font-weight:600;margin-top:.8rem;font-family:var(--serif);font-size:1.05rem}.gloss dt small{font-family:var(--sans);font-weight:400;color:var(--ink-soft);margin-left:.4rem}\n.gloss dd{margin:.1rem 0 0;color:var(--ink-soft)}.gloss dd em{color:var(--ink);font-style:normal}\n.search{margin:.4rem 0 .8rem}\n@media print{.fc .in{transform:none!important}.fc .f,.fc .b{position:static;transform:none;backface-visibility:visible}.fc .b{margin-top:.3rem}.cards{grid-template-columns:1fr 1fr}.fc{break-inside:avoid}.fc-actions,.search{display:none}}\n</style>\n- Baue die Seite nach diesem Grundgerüst (Klassen beibehalten, Inhalte ersetzen, Anzahl Zugänge gemäss Auftrag):\n<body><div class=\"wrap\">\n<header class=\"top\"><div><p class=\"eyebrow\">Fach · Stufe · Thema</p><h1>Titel der Lernseite</h1><p class=\"lead\">Ein Satz zur Kernaufgabe. Wähle deinen Zugang.</p></div><button class=\"btn ghost pdf\" type=\"button\">Als PDF herunterladen</button></header>\n<section class=\"core\"><h2>Die Kernaufgabe</h2><p class=\"task\">…</p><div class=\"data\">… (nur falls Daten/Werte)</div><div class=\"viz\">… themenpassende Visualisierung (SVG/HTML)</div><ol class=\"steps\"><li>…</li></ol></section>\n<p class=\"pick\">Wähle deinen Zugang:</p>\n<div class=\"tabs\" role=\"tablist\"><button class=\"tab active\" role=\"tab\" aria-selected=\"true\" aria-controls=\"p-a\" id=\"t-a\"><span class=\"tname\">A · Mit Unterstützung</span><span class=\"tsub\">kurze Beschreibung</span></button> …</div>\n<section class=\"panel show\" id=\"p-a\" role=\"tabpanel\" aria-labelledby=\"t-a\"><div class=\"card\"><h2>Zugang A · …</h2><p class=\"aufgabe\">…</p><div class=\"hint\">…</div><div class=\"field\"><label for=\"a1\">…</label><input id=\"a1\" type=\"number\"><span class=\"feedback\" aria-live=\"polite\"></span></div><ul class=\"check\"><li><input type=\"checkbox\" id=\"c1\"><label for=\"c1\">…</label></li></ul></div></section>\n… weitere Zugänge als section.panel (ohne show) …\n<details class=\"lehrperson\"><summary>Für die Lehrperson: Lösungen, Wege, Anschluss</summary><div>…</div></details>\n<p class=\"foot\">Lernseite erzeugt mit Lernwege (EDUTECSOL). Fach · Stufe · Datum.</p>\n</div></body>\n- Reiter: Klick setzt .active auf dem Reiter und .show auf dem zugehörigen Panel, aria-selected entsprechend; Pfeiltasten wechseln den Reiter.\n- Rückmeldung: richtige Eingabe → Klasse ok auf dem Feld und Text im .feedback (z. B. «Richtig»); falsche → Klasse err und ein Hinweis ohne Lösung. Auswahlaufgaben mit .choices/.choice analog.\n- Der Aha-Moment des obersten Zugangs steht in einem .aha-Block, der erst nach Klick auf einen .btn erscheint.";
   /* DESIGNBASIS-END */
+  // Kurze Gestaltungsvorgabe für Word/PDF, angelehnt an die Website und den Word-Export der App (lib/docx.ts); von Hand gepflegt
+  const DRUCKBASIS = `§DRUCKBASIS (für Word und PDF, zwingend)
+- Seite: A4 hoch, Ränder ca. 2 cm; Schrift Arial 11 pt für den Text, Titel fett.
+- Farben wie die Website, sparsam: Navy #1E3246 für Titel, Zwischentitel, Tabellenköpfe und Rahmen; Terra #B84816 nur für kleine Auszeichnungen (Kopfzeile, Hinweise); Ocker #F1A51A nur für dünne Trennlinien. Fliesstext dunkelgrau. Keine farbigen Flächen, Verläufe, Schatten oder Emojis.
+- Kopf: kleine Zeile in Grossbuchstaben in Terra «EDUTECSOL · Fach · Stufe»; darunter Titel in Navy, ca. 20 pt; darunter Thema/Kompetenzziel in Grau; danach eine Zeile «Name: ______  Datum: ______  Zugang: ☐ A ☐ B …» mit dünnem Navy-Rahmen.
+- Jeder Zugang beginnt auf einer neuen Seite und trägt als Überschrift Buchstabe und Name wie auf der Website («A · Mit Unterstützung»).
+- Aufgaben nummeriert; Schreibflächen als Linien oder leere Kästen mit dünnem grauem Rahmen; Hinweise in einem Kasten mit dünnem Rahmen statt farbigem Hintergrund; Tabellen mit Navy-Kopfzeile in Fett.
+- Keine Seitenumbrüche innerhalb einer Aufgabe, Grafik oder Tabelle.
+- Lösungsblatt: eigene Seite mit Titel «Für die Lehrperson: Lösungen» in Terra.
+- Fusszeile klein und grau: «Arbeitsblatt erstellt mit Lernwege (EDUTECSOL)» und Seitenzahl.
+- In Graustufen gedruckt muss alles lesbar bleiben.`;
   const el=id=>document.getElementById(id);
   const state={
     fach:'',stufe:'',thema:'',extra:'',
-    diffart:'niveau',anzahl:'3',sprache:'standard',zweitsprache:'',twist:'auto',niveau:'anwenden',
+    diffart:'niveau',zugaenge:['unterstuetzt','eigenstaendig','vertiefung'],sozialformen:['einzel'],sprache:'standard',zweitsprache:'',twist:'auto',niveau:'anwenden',
     web:true,word:true,pdf:true,quelle:'pptx'
   };
 
@@ -236,9 +278,189 @@
       });
     });
   }
-  wireSeg('diffart','diffart');
+  // ---- Zugänge je Differenzierungsart: info = Erklärung im Info-Kreis, prompt = Beschreibung im Prompt ----
+  const ZUGAENGE={
+    niveau:{label:'NIVEAU (Umfang der Unterstützung)',
+      intro:'Alle Zugänge behandeln dieselbe Kernaufgabe und dieselben Erfolgskriterien; sie unterscheiden sich nur im Grad der Hilfe.',
+      opts:[
+        {v:'unterstuetzt',name:'Mit Unterstützung',info:'Viel Hilfe: Fachbegriffe erklärt, Rechenrahmen zum Ausfüllen, Leitfragen und Satzanfang.',
+          prompt:'kurze Erklärung der Fachbegriffe; ein Rechen- bzw. Zuordnungsrahmen zum Ausfüllen (auf der Website interaktiv mit grünem Häkchen bei korrekter und einem Hinweis bei falscher Eingabe, ohne die Lösung zu verraten; im Arbeitsblatt mit Platz zum Eintragen); drei Leitfragen; ein Satzanfang für den Ergebnissatz. Weder Rechnung noch Ergebnis vollständig nennen.'},
+        {v:'eigenstaendig',name:'Eigenständig',info:'Gleiche Aufgabe ohne Hilfen, mit Ergebnisprüfung und Selbstcheck.',
+          prompt:'gleiche Kernaufgabe ohne Hilfen; Möglichkeit zur Ergebnisprüfung; Selbstcheck-Liste mit vier abhakbaren Fragen.'},
+        {v:'vertiefung',name:'Vertiefung',info:'Kernaufgabe mit Twist, Begründungs- und Transferfrage.',
+          prompt:'Kernaufgabe ohne Hilfen, erweitert um den Twist (siehe TWIST); eine Begründungsfrage und eine Transferfrage in den Berufskontext; ein Button, der den Kernzusammenhang sichtbar macht (Aha-Moment).'},
+        {v:'expert',name:'Expert',info:'Offene Problemstellung ohne vorgegebenen Lösungsweg; Vorgehen selbst wählen und begründen.',
+          prompt:'offene, komplexere Problemstellung zum gleichen Kompetenzziel ohne vorgegebenen Lösungsweg; die Lernenden wählen und begründen ihr Vorgehen selbst und beurteilen die Grenzen ihres Ergebnisses.'}]},
+    lerntyp:{label:'LERNTYP (Zugangskanal)',
+      intro:'Alle Zugänge behandeln dieselbe Kernaufgabe auf gleichem Anforderungsniveau; sie unterscheiden sich nur im Kanal, über den die Aufgabe erschlossen wird.',
+      opts:[
+        {v:'visuell',name:'visuell/grafisch',info:'Über Grafik, Diagramm oder Skizze: ablesen, einzeichnen, zuordnen.',
+          prompt:'die Aufgabe wird über Grafik, Diagramm oder Skizze erschlossen; die Lernenden lesen ab, zeichnen ein oder ordnen zu.'},
+        {v:'rechnerisch',name:'rechnerisch/formal',info:'Über Formel, Tabelle und schrittweisen Rechenweg.',
+          prompt:'die Aufgabe wird über Formel, Tabelle und einen schrittweisen Rechenweg erschlossen.'},
+        {v:'sprachlich',name:'sprachlich/erklärend',info:'Über Text: Vorgehen und Ergebnis in eigenen Worten erklären und begründen.',
+          prompt:'die Aufgabe wird über Text erschlossen; die Lernenden erklären Vorgehen und Ergebnis in eigenen Worten und begründen es.'},
+        {v:'handlung',name:'handlungsorientiert',info:'Über eine konkrete Handlung oder Simulation, Schritt für Schritt wie im Berufsalltag.',
+          prompt:'die Aufgabe wird über eine konkrete Handlung oder Simulation erschlossen, Schritt für Schritt wie im Berufsalltag.'}]},
+    interesse:{label:'BERUFSFELD/INTERESSE',
+      intro:'Alle Zugänge trainieren dieselbe fachliche Kompetenz mit identischer Rechen-/Denkstruktur; nur das berufliche Anwendungsbeispiel unterscheidet sich. Wähle innerhalb jedes Berufsfelds ein Beispiel, das zur Zielstufe passt.',
+      opts:[
+        {v:'gesundheit',name:'Gesundheit & Soziales',info:'Beispiele aus Pflege, Arztpraxis, Apotheke oder Betreuung.',
+          prompt:'Beispiel aus Pflege, Arztpraxis, Apotheke oder Betreuung.'},
+        {v:'technik',name:'Technik & Handwerk',info:'Beispiele aus Werkstatt, Bau, Elektro oder Informatik.',
+          prompt:'Beispiel aus Werkstatt, Bau, Elektro oder Informatik.'},
+        {v:'wirtschaft',name:'Wirtschaft & Verwaltung',info:'Beispiele aus Büro, Buchhaltung oder Logistik.',
+          prompt:'Beispiel aus Büro, Buchhaltung oder Logistik.'},
+        {v:'handel',name:'Handel & Dienstleistung',info:'Beispiele aus Detailhandel, Gastronomie oder Kundenkontakt.',
+          prompt:'Beispiel aus Detailhandel, Gastronomie oder Kundenkontakt.'}]}
+  };
+  const SOZIALFORMEN=[
+    {v:'einzel',name:'Einzelarbeit',prompt:'jede Person bearbeitet die Aufgaben allein; Arbeitsaufträge in der Du-Form, Selbstkontrolle individuell.'},
+    {v:'partner',name:'Partnerarbeit',prompt:'zu zweit mit klaren Rollen (z. B. eine Person rechnet, die andere kontrolliert, nach jeder Teilaufgabe wechseln); kurze Anleitung zur Zusammenarbeit und ein gemeinsamer Ergebnissatz.'},
+    {v:'gruppe',name:'Gruppenarbeit',prompt:'in Gruppen von drei bis vier Personen mit verteilten Teilaufgaben und Rollen; Anleitung zur Zusammenarbeit und ein gemeinsames Ergebnis, das die Gruppe vorstellt.'},
+    {v:'plenum',name:'Plenum',prompt:'gemeinsam mit der ganzen Klasse, von der Lehrperson geführt; Aufgaben in Etappen mit Diskussionsfragen und kurzen Abstimmungen, gut lesbar für die Projektion.'}
+  ];
+  const defaultZugaenge=art=>ZUGAENGE[art].opts.slice(0,3).map(o=>o.v);
+  // Eigene Berufsfelder kommen hinten an die Liste und sind sofort gewählt
+  let eigenNr=0;
+  function addBerufsfeld(name){
+    name=name.trim().slice(0,60);
+    const opts=ZUGAENGE.interesse.opts;
+    if(!name||opts.some(o=>o.name.toLowerCase()===name.toLowerCase())) return false;
+    const v='eigen'+(++eigenNr);
+    opts.push({v,name,custom:true,info:'Eigenes Berufsfeld.',prompt:`Beispiel aus dem Berufsfeld «${name}».`});
+    INFO.zugaenge.opts[v]='Eigenes Berufsfeld.';
+    state.zugaenge=opts.map(o=>o.v).filter(x=>x===v||state.zugaenge.includes(x));
+    return true;
+  }
+  function removeBerufsfeld(v){
+    const opts=ZUGAENGE.interesse.opts, rest=state.zugaenge.filter(x=>x!==v);
+    if(state.zugaenge.includes(v)&&!rest.length) return; // mindestens ein Zugang bleibt
+    opts.splice(opts.findIndex(o=>o.v===v),1);
+    state.zugaenge=rest;
+  }
+  // Knöpfe der Zugänge passend zur Differenzierungsart; Mehrfachauswahl, mindestens einer
+  function renderZugaenge(){
+    const box=el('zugaenge'), opts=ZUGAENGE[state.diffart].opts;
+    box.innerHTML='';
+    opts.forEach(o=>{
+      const b=document.createElement('button');
+      b.type='button';b.dataset.v=o.v;b.textContent=o.name;
+      const on=state.zugaenge.includes(o.v);
+      b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on));
+      b.addEventListener('click',()=>{
+        const was=state.zugaenge.includes(o.v);
+        if(was&&state.zugaenge.length<=1) return;
+        // Reihenfolge der Skala beibehalten, damit A, B, C … der Stufung folgen
+        state.zugaenge=opts.map(x=>x.v).filter(v=>v===o.v?!was:state.zugaenge.includes(v));
+        b.classList.toggle('on',!was);b.setAttribute('aria-pressed',String(!was));render();
+      });
+      box.append(b);
+      if(o.custom){
+        const x=document.createElement('button');
+        x.type='button';x.className='del-btn';x.textContent='×';x.setAttribute('aria-label','«'+o.name+'» entfernen');
+        x.addEventListener('click',()=>{removeBerufsfeld(o.v);renderZugaenge();refreshInfo('zugaenge');render();});
+        box.append(x);
+      }
+    });
+    el('addRow')?.remove();
+    if(state.diffart!=='interesse') return;
+    const plus=document.createElement('button');
+    plus.type='button';plus.className='add-btn';plus.textContent='+';
+    plus.setAttribute('aria-label','Eigenes Berufsfeld hinzufügen');plus.setAttribute('aria-expanded','false');plus.setAttribute('aria-controls','addRow');
+    box.append(plus);
+    const row=document.createElement('div');row.className='add-row';row.id='addRow';row.hidden=true;
+    const inp=document.createElement('input');inp.type='text';inp.placeholder='z. B. Landwirtschaft, Logistik, Kosmetik';inp.setAttribute('aria-label','Eigenes Berufsfeld');
+    const ok=document.createElement('button');ok.type='button';ok.className='btn ghost';ok.textContent='Hinzufügen';
+    const add=()=>{if(addBerufsfeld(inp.value)){renderZugaenge();refreshInfo('zugaenge');render();el('zugaenge').querySelector('.add-btn').focus();}else inp.focus();};
+    ok.addEventListener('click',add);
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add();}if(e.key==='Escape'){row.hidden=true;plus.setAttribute('aria-expanded','false');plus.focus();}});
+    plus.addEventListener('click',()=>{row.hidden=!row.hidden;plus.setAttribute('aria-expanded',String(!row.hidden));if(!row.hidden)inp.focus();});
+    row.append(inp,ok);box.after(row);
+  }
+  renderZugaenge();
+
+  // ---- Info-Kreise: Erklärung je Auswahloption ----
+  const INFO={
+    formate:{opts:{
+      web:'Eine HTML-Datei zum Üben am Gerät: Reiter für die Zugänge, Selbstkontrolle mit grünem Häkchen oder Hinweis, ausklappbare Lösungen für die Lehrperson. Läuft offline.',
+      word:'Bearbeitbares Arbeitsblatt zum Anpassen und Austeilen, mit getrenntem Lösungsblatt.',
+      pdf:'Druckfertiges Arbeitsblatt, schwarz-weiss-tauglich, mit getrenntem Lösungsblatt.'},
+      note:'Jedes gewählte Format ist eine eigene Datei. Mehr Formate heisst: die KI braucht länger.'},
+    quelle:{opts:{
+      pptx:'Du hängst im KI-Chat einen Foliensatz an. Die KI liest ihn aus und wählt daraus ein Thema, falls du keines angibst.',
+      pdf:'Wie bei den Folien, aber mit einem PDF.',
+      word:'Wie bei den Folien, aber mit einer Word-Datei.',
+      text:'Keine Datei. Die KI arbeitet nur mit Fach, Stufe, Thema und Zusatzwunsch und wählt selbst ein passendes Beispiel.'},
+      note:'Die Datei hängst du selbst im KI-Chat an, der Generator lädt nichts hoch.'},
+    diffart:{opts:{
+      niveau:'Alle bearbeiten dieselbe Aufgabe, die Zugänge unterscheiden sich nur in der Hilfe: Mit Unterstützung, Eigenständig, Vertiefung, Expert.',
+      lerntyp:'Dieselbe Aufgabe auf gleichem Niveau, aber über verschiedene Kanäle: grafisch, rechnerisch, sprachlich oder handlungsorientiert.',
+      interesse:'Dieselbe Kompetenz in verschiedenen Berufsfeldern: Gesundheit & Soziales, Technik & Handwerk, Wirtschaft & Verwaltung, Handel & Dienstleistung.'},
+      note:'Darunter wählst du, welche Zugänge entstehen. Bei Berufsfeld fügst du mit «+» eigene Felder hinzu.'},
+    zugaenge:{opts:Object.fromEntries(Object.values(ZUGAENGE).flatMap(z=>z.opts.map(o=>[o.v,o.info]))),
+      note:'Nicht gewählte Zugänge stehen trotzdem als Vergleich im Prompt, damit die KI die gewählten richtig abgrenzt. Mehr Zugänge machen die Erzeugung länger.'},
+    sozialform:{opts:{
+      einzel:'Alle arbeiten allein. Standard.',
+      partner:'Zu zweit mit festen Rollen, die wechseln, und einem gemeinsamen Ergebnis.',
+      gruppe:'Drei bis vier Personen mit verteilten Teilaufgaben und einem gemeinsamen Ergebnis.',
+      plenum:'Die ganze Klasse gemeinsam, von der Lehrperson geführt, mit Diskussionsfragen.'},
+      note:'Bei mehreren Sozialformen entsteht jeder Arbeitsauftrag in jeder gewählten Version; Kernaufgabe und Lösungen bleiben gleich.'},
+    sprache:{opts:{
+      standard:'Keine sprachliche Anpassung.',
+      einfach:'Kurze Sätze, ein Gedanke pro Satz, Fachbegriffe werden bei der ersten Verwendung einfach erklärt.',
+      glossar:'Die Fachsprache bleibt, dazu kommt ein aufklappbares Glossar mit einfachen Erklärungen.',
+      zweisprachig:'Zentrale Begriffe stehen zusätzlich in einer zweiten Sprache, die du darunter einträgst. Der übrige Text bleibt Deutsch.'}},
+    twist:{opts:{
+      auto:'Die KI wählt einen Twist, der zum Thema passt.',
+      ausreisser:'Ein Extremwert kommt dazu. Die Lernenden prüfen, welche Grössen stabil bleiben und welche sich stark ändern.',
+      vergleich:'Mehrere Fälle mit unterschiedlichen Zahlen führen zum gleichen Ergebnis. Die Lernenden erkennen die Regel dahinter.',
+      grenzfall:'Ein Sonderfall, bei dem die einfache Regel nicht reicht und eine genauere Begründung nötig ist.',
+      fehler:'Absichtlich falsche Ergebnisse oder Aussagen, die die Lernenden finden und begründen.',
+      methoden:'Eine zweite Methode wird der gelernten gegenübergestellt. Die Lernenden begründen Vor- und Nachteile.',
+      transfer:'Das Verfahren wird auf eine neue, berufsnahe Situation übertragen.'},
+      note:'Bei Niveau gilt der Twist für Vertiefung und Expert, sonst als Zusatzaufgabe am Schluss jedes Zugangs. Er verlangt mehr Denkarbeit statt mehr Aufgaben.'},
+    niveau:{opts:{
+      reproduzieren:'Verfahren korrekt ausführen und auf gleichartige Aufgaben übertragen.',
+      anwenden:'Verfahren selbstständig in einer sinnvollen Situation anwenden und begründen.',
+      beurteilen:'Ergebnisse und Methoden bewerten, vergleichen und die Wahl begründen.'}}
+  };
+  function infoList(id){
+    const dl=document.createElement('dl');
+    el(id).querySelectorAll('button[data-v]').forEach(b=>{
+      const dt=document.createElement('dt');dt.textContent=b.textContent.trim();
+      const dd=document.createElement('dd');dd.textContent=INFO[id].opts[b.dataset.v]||'';
+      dl.append(dt,dd);
+    });
+    return dl;
+  }
+  // Nach dem Wechsel der Differenzierungsart zeigt der Info-Kreis der Zugänge die neuen Optionen
+  const refreshInfo=id=>el('info-'+id).querySelector('dl').replaceWith(infoList(id));
+  Object.entries(INFO).forEach(([id,info])=>{
+    const seg=el(id), box=seg.closest('.field')||seg.closest('.group'), head=box.querySelector('.lab,.glab');
+    const title=head.firstChild.textContent.trim();
+    const panel=document.createElement('div');
+    panel.className='info-box';panel.id='info-'+id;panel.setAttribute('role','tooltip');
+    panel.append(infoList(id));
+    if(info.note){const p=document.createElement('p');p.textContent=info.note;panel.append(p);}
+    const btn=document.createElement('button');
+    btn.type='button';btn.className='info-btn';btn.textContent='i';
+    btn.setAttribute('aria-label','Erklärung zu «'+title+'»');btn.setAttribute('aria-describedby',panel.id);
+    const wrap=document.createElement('span');wrap.className='info-wrap';wrap.append(btn,panel);
+    head.classList.add('has-info');head.append(wrap);
+  });
+
+  wireSeg('diffart','diffart',()=>{state.zugaenge=defaultZugaenge(state.diffart);renderZugaenge();refreshInfo('zugaenge');});
+  // Sozialform: Mehrfachauswahl, mindestens eine; Reihenfolge wie in SOZIALFORMEN
+  el('sozialform').querySelectorAll('button').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const v=b.dataset.v, was=state.sozialformen.includes(v);
+      if(was&&state.sozialformen.length<=1) return;
+      state.sozialformen=SOZIALFORMEN.map(o=>o.v).filter(x=>x===v?!was:state.sozialformen.includes(x));
+      b.classList.toggle('on',!was);render();
+    });
+  });
   wireSeg('quelle','quelle');
-  wireSeg('anzahl','anzahl');
   wireSeg('sprache','sprache',()=>{el('zweiWrap').style.display=(state.sprache==='zweisprachig')?'block':'none';});
   wireSeg('twist','twist');
   wireSeg('niveau','niveau');
@@ -254,25 +476,46 @@
   ['fach','stufe','thema','extra','zweitsprache'].forEach(k=>el(k).addEventListener('input',()=>{state[k]=el(k).value;render();}));
 
   // ---- Textbausteine je Achse ----
-  function labelsFor(art,n){
-    if(art==='niveau'){
-      const base=['Mit Unterstützung','Eigenständig','Vertiefung','Expert'];
-      return base.slice(0,n);
-    }
-    if(art==='lerntyp') return ['visuell/grafisch','rechnerisch/formal','sprachlich/erklärend','handlungsorientiert'].slice(0,n);
-    if(art==='interesse') return ['Berufsfeld 1','Berufsfeld 2','Berufsfeld 3','Berufsfeld 4'].slice(0,n);
-    if(art==='sozialform') return ['Einzelarbeit','Partnerarbeit','Gruppenauftrag','Plenum'].slice(0,n);
-    return [];
-  }
+  
   function diffartText(){
-    const n=+state.anzahl, L=labelsFor(state.diffart,n).map((x,i)=>String.fromCharCode(65+i)+' – '+x).join(', ');
-    const map={
-      niveau:`Differenziere nach NIVEAU (Umfang der Unterstützung). Alle Zugänge behandeln dieselbe Kernaufgabe und dieselben Erfolgskriterien; sie unterscheiden sich nur im Grad der Hilfe. Erstelle ${n} Zugänge: ${L}.`,
-      lerntyp:`Differenziere nach LERNTYP: Alle Zugänge behandeln dieselbe Kernaufgabe auf gleichem Anforderungsniveau, aber über verschiedene Zugangskanäle. Erstelle ${n} Zugänge: ${L}. Jeder Zugang löst dieselbe Aufgabe, betont aber seinen Kanal (Grafik/Diagramm vs. Formel/Rechnung vs. sprachliche Erklärung vs. konkrete Handlung).`,
-      interesse:`Differenziere nach BERUFSFELD/INTERESSE: dieselbe mathematische bzw. fachliche Kompetenz, eingebettet in unterschiedliche berufliche Kontexte. Erstelle ${n} Zugänge (${L}) und ersetze die Platzhalter-Berufsfelder durch zur Zielstufe passende Felder. Die Rechen-/Denkstruktur ist in allen Zugängen identisch, nur das Anwendungsbeispiel unterscheidet sich.`,
-      sozialform:`Differenziere nach SOZIALFORM: dieselbe Kernaufgabe, aber unterschiedliche Bearbeitungsform. Erstelle ${n} Zugänge: ${L}. Formuliere je einen passenden Arbeitsauftrag (allein / zu zweit mit Rollen / in der Gruppe mit Teilaufgaben) und ergänze bei Partner-/Gruppenzugängen eine kurze Anleitung zur Zusammenarbeit.`
-    };
-    return map[state.diffart];
+    const Z=ZUGAENGE[state.diffart], gew=Z.opts.filter(o=>state.zugaenge.includes(o.v));
+    const letter=o=>String.fromCharCode(65+gew.indexOf(o));
+    // Buchstabe nur bei gewählten Zugängen; Vergleichs-Zugänge ohne Buchstaben
+    const skala=Z.opts.map(o=>gew.includes(o)
+      ?`- ${letter(o)} – ${o.name} (gewählt): ${o.prompt}`
+      :`- ${o.name} (nur zum Vergleich, nicht erstellen): ${o.prompt}`).join('\n');
+    const liste=gew.map(o=>letter(o)+' – '+o.name).join(', ');
+    let twist;
+    if(state.diffart==='niveau'){
+      const hoch=gew.filter(o=>o.v==='vertiefung'||o.v==='expert');
+      const ziel=(hoch.length?hoch:gew.slice(-1)).map(o=>'«'+o.name+'»').join(' und ');
+      twist=`- TWIST (in ${ziel}): ${twistText()}`+(hoch.length?'':' Ergänze dort eine Begründungsfrage und eine Transferfrage in den Berufskontext sowie einen Button, der den Kernzusammenhang sichtbar macht (Aha-Moment).');
+    }else{
+      twist=`- Jeder Zugang: Möglichkeit zur Ergebnisprüfung; Selbstcheck-Liste mit vier abhakbaren Fragen; drei Leitfragen als aufklappbare Hilfe.
+- TWIST (als Zusatzaufgabe am Schluss jedes Zugangs): ${twistText()} Ergänze eine Begründungsfrage und eine Transferfrage in den Berufskontext sowie einen Button, der den Kernzusammenhang sichtbar macht (Aha-Moment).`;
+    }
+    return `Gewählt (${gew.length===1?'1 Zugang':gew.length+' Zugänge'}): ${liste}.
+Differenziere nach ${Z.label}. ${Z.intro}
+Zur Einordnung alle ${Z.opts.length} möglichen Zugänge dieser Differenzierungsart:
+${skala}
+${gew.length===1
+  ?`Erstelle nur den gewählten Zugang: ${liste}. Die übrigen stehen nur als Vergleich hier, damit du den gewählten richtig einordnest.
+- Es gibt nur diesen einen Zugang: auf der Website bleibt die Reiterleiste wie im Grundgerüst, mit genau einem Reiter, der beim Öffnen bereits aktiv ist (Klasse active, aria-selected="true"); sein Panel ist sofort sichtbar (Klasse show). Im Arbeitsblatt ohne Aufteilung.`
+  :`Erstelle nur die ${gew.length} gewählten Zugänge: ${liste}. Die übrigen stehen nur als Vergleich hier, damit du die gewählten richtig voneinander abgrenzt.
+- Die Lernenden bearbeiten nur ihren gewählten Zugang (auf der Website per Reiter-Klick, im Arbeitsblatt als klar getrennte Abschnitte).`}
+${twist}`;
+  }
+  function sozialformText(){
+    const gew=SOZIALFORMEN.filter(o=>state.sozialformen.includes(o.v));
+    const skala=SOZIALFORMEN.map(o=>`- ${o.name} (${gew.includes(o)?'gewählt':'nur zum Vergleich, nicht erstellen'}): ${o.prompt}`).join('\n');
+    const auftrag=gew.length===1
+      ?`Formuliere alle Arbeitsaufträge für ${gew[0].name}; das gilt für alle Zugänge.`
+      :`Erstelle die Arbeitsaufträge in ${gew.length} Versionen: ${gew.map(o=>o.name).join(', ')}. Das gilt für jeden Zugang; Kernaufgabe, Daten und Lösungen bleiben in allen Versionen gleich, nur Arbeitsauftrag und Zusammenarbeit unterscheiden sich.
+- Auf der Website: in jedem Zugang ein Umschalter für die Sozialform, der den passenden Arbeitsauftrag zeigt.
+- Im Arbeitsblatt: je Sozialform ein klar getrennter Abschnitt mit eigenem Arbeitsauftrag.`;
+    return `Zur Einordnung die vier möglichen Sozialformen:
+${skala}
+${auftrag}`;
   }
   function spracheText(){
     const map={
@@ -293,7 +536,7 @@
       methoden:'Twist: Stelle der gelernten Methode eine alternative Methode gegenüber und lass Vor-/Nachteile sowie die Wahl der passenden Methode begründen.',
       transfer:'Twist: Verlange den Transfer auf eine neue, berufsnahe Situation, in der die Lernenden das Verfahren eigenständig anwenden und die Anwendbarkeit beurteilen.'
     };
-    return 'VERTIEFUNG (oberster Zugang): '+map[state.twist]+' Ergänze eine Begründungsfrage und eine Transferfrage in den Berufskontext sowie einen Button, der den Kernzusammenhang sichtbar macht (Aha-Moment).';
+    return map[state.twist];
   }
   function niveauText(){
     const map={
@@ -330,6 +573,7 @@ Erstelle ${bezug}${list} als klassisches Arbeitsblatt zum Austeilen – papierge
 - Ein davon getrenntes Lösungsblatt für die Lehrperson mit vollständigen Rechen-/Begründungswegen (eigene Seite oder klar abgetrennter Abschnitt).
 - Schlicht und gut kopierbar (schwarz-weiss-tauglich). Interaktive Elemente entfallen; wo die Website Feedback gäbe, steht hier Platz zum Rechnen.
 Lege jede Datei als eigenständigen Download an.`);
+      blocks.push(DRUCKBASIS);
     }
     return blocks.join('\n\n');
   }
@@ -346,11 +590,15 @@ Lege jede Datei als eigenständigen Download an.`);
     const dateiLine = isText
       ? '- Material: keine Datei – arbeite allein mit den Angaben oben'
       : `- Material: wird als ${quelleName} mit hochgeladen`;
+    // Was entsteht, je nach gewählten Ausgabeformaten (Website, Word, PDF)
+    const blattFormate=[state.word&&'als bearbeitbare Word-Datei',state.pdf&&'als druckfertiges PDF'].filter(Boolean).join(' und ');
+    const produkt = state.web
+      ? 'eine differenzierte, interaktive Lernseite'+(blattFormate?` sowie ein passendes Arbeitsblatt ${blattFormate}`:'')
+      : `ein differenziertes Arbeitsblatt ${blattFormate}`;
     const aufgabeText = isText
-      ? 'Erstelle aus den Angaben oben eine differenzierte, interaktive Lernseite. Wähle – sofern oben kein Thema vorgegeben ist – ein geeignetes Thema und ein fachlich stimmiges, alltagsnahes Beispiel; weise am Ende kurz darauf hin, dass kein Material vorlag.'
-      : `Lies das hochgeladene Dokument (${quelleName}) aus, wähle das didaktisch geeignetste Thema für eine differenzierte Übung (sofern oben keines vorgegeben ist) und erstelle daraus eine interaktive Lernseite. Nenne zu Beginn kurz das gewählte Thema und warum. Enthält das Material konkreten Aufgabentext oder Daten, verwende diese; stehen dort nur Bilder ohne auslesbaren Text, wähle ein fachlich stimmiges, alltagsnahes Beispiel und weise am Ende darauf hin.`;
+      ? `Erstelle aus den Angaben oben ${produkt}. Wähle – sofern oben kein Thema vorgegeben ist – ein geeignetes Thema und ein fachlich stimmiges, alltagsnahes Beispiel; weise am Ende kurz darauf hin, dass kein Material vorlag.`
+      : `Lies das hochgeladene Dokument (${quelleName}) aus, wähle das didaktisch geeignetste Thema für eine differenzierte Übung (sofern oben keines vorgegeben ist) und erstelle daraus ${produkt}. Nenne zu Beginn kurz das gewählte Thema und warum. Enthält das Material konkreten Aufgabentext oder Daten, verwende diese; stehen dort nur Bilder ohne auslesbaren Text, wähle ein fachlich stimmiges, alltagsnahes Beispiel und weise am Ende darauf hin.`;
     const spr=spracheText();
-    const n=+state.anzahl;
 
     return `§ROLLE
 Du bist Fachdidaktiker:in für ${fach} auf der Stufe ${stufe} und Frontend-Entwickler:in.
@@ -370,22 +618,21 @@ ${niveauText()}
 
 §DIFFERENZIERUNG
 ${diffartText()}
-- Die Lernenden bearbeiten nur ihren gewählten Zugang (auf der Website per Reiter-Klick, im Arbeitsblatt als klar getrennte Abschnitte).
-- Erster/einfachster Zugang «Mit Unterstützung»: kurze Erklärung der Fachbegriffe; ein Rechen- bzw. Zuordnungsrahmen zum Ausfüllen (auf der Website interaktiv mit grünem Häkchen bei korrekter und einem Hinweis bei falscher Eingabe, ohne die Lösung zu verraten; im Arbeitsblatt mit Platz zum Eintragen); drei Leitfragen; ein Satzanfang für den Ergebnissatz. Weder Rechnung noch Ergebnis vollständig nennen.
-- Mittlerer Zugang «Eigenständig»: gleiche Kernaufgabe ohne Hilfen; Möglichkeit zur Ergebnisprüfung; Selbstcheck-Liste mit vier abhakbaren Fragen.
-- ${twistText()}
+
+§SOZIALFORM
+${sozialformText()}
 ${spr?('\n§'+spr+'\n'):''}
 ${ausgabeText()}
 
 §GESTALTUNG
-Für die Website: Halte dich an die DESIGNBASIS oben (CSS unverändert, Grundgerüst, Klassen); eigenes CSS nur für die themenpassende Visualisierung der Kernaufgabe in den Farbvariablen; responsiv bis Mobile, Tastaturbedienbarkeit, sichtbarer Fokus; keine zusätzlichen Farben, Schatten, Verläufe oder Emojis. Für Arbeitsblätter: klare Druckstruktur, gut kopierbar.
+${[state.web&&'Für die Website: Halte dich an die DESIGNBASIS oben (CSS unverändert, Grundgerüst, Klassen); eigenes CSS nur für die themenpassende Visualisierung der Kernaufgabe in den Farbvariablen; responsiv bis Mobile, Tastaturbedienbarkeit, sichtbarer Fokus; keine zusätzlichen Farben, Schatten, Verläufe oder Emojis.',(state.word||state.pdf)&&'Für Arbeitsblätter: Halte dich an die DRUCKBASIS oben; klare Druckstruktur, gut kopierbar, im gleichen Erscheinungsbild wie die Website.'].filter(Boolean).join(' ')}
 
 §QUALITÄTSPRÜFUNG VOR DER AUSGABE
 - Rechne alle Lösungen selbst nach; auf der Website muss die Feedback-Logik jedes Eingabefelds exakt zu den richtigen Werten passen, im Arbeitsblatt müssen die Lösungen auf dem Lehrpersonen-Blatt korrekt sein.
 - Prüfe, dass jede Aufgabe klar zeigt, was wo einzutragen ist (auf der Website: welche Eingabe welche Visualisierung auslöst).
 - Kontrolliere alle Texte (auch Selbstchecks) auf Tipp- und Flüchtigkeitsfehler.
 - Schweizer Standarddeutsch; Selbstcheck-Listen abhakbar.
-Gib am Ende eine kurze Notiz: gewähltes Thema, gewählte Differenzierungsart, genutzter Twist und erzeugte Ausgabeformate.`;
+Gib am Ende eine kurze Notiz: gewähltes Thema, gewählte Differenzierungsart und Zugänge, Sozialform, genutzter Twist und erzeugte Ausgabeformate.`;
   }
 
   function render(){
@@ -414,15 +661,15 @@ Gib am Ende eine kurze Notiz: gewähltes Thema, gewählte Differenzierungsart, g
 
   // Presets
   const presets={
-    mathe:{fach:'Mathematik',stufe:'Berufsmaturität',diffart:'niveau',anzahl:'3',sprache:'standard',twist:'auto',niveau:'anwenden'},
-    pharma:{fach:'Pharma-Fachrechnen',stufe:'Pharma-Assistentinnen (FaGe/EFZ)',diffart:'niveau',anzahl:'3',sprache:'standard',twist:'fehler',niveau:'anwenden'},
-    it:{fach:'IT-Security',stufe:'Sek II / Berufsbildung',diffart:'niveau',anzahl:'3',sprache:'standard',twist:'fehler',niveau:'beurteilen'},
-    daz:{fach:'Mathematik',stufe:'Berufsvorbereitung',diffart:'niveau',anzahl:'3',sprache:'einfach',twist:'auto',niveau:'anwenden'}
+    mathe:{fach:'Mathematik',stufe:'Berufsmaturität',diffart:'niveau',sozialformen:['einzel'],sprache:'standard',twist:'auto',niveau:'anwenden'},
+    pharma:{fach:'Pharma-Fachrechnen',stufe:'Pharma-Assistentinnen (FaGe/EFZ)',diffart:'niveau',sozialformen:['einzel'],sprache:'standard',twist:'fehler',niveau:'anwenden'},
+    it:{fach:'IT-Security',stufe:'Sek II / Berufsbildung',diffart:'niveau',sozialformen:['einzel'],sprache:'standard',twist:'fehler',niveau:'beurteilen'},
+    daz:{fach:'Mathematik',stufe:'Berufsvorbereitung',diffart:'niveau',sozialformen:['einzel'],sprache:'einfach',twist:'auto',niveau:'anwenden'}
   };
   function applyState(){
     el('fach').value=state.fach;el('stufe').value=state.stufe;el('thema').value=state.thema;el('extra').value=state.extra;el('zweitsprache').value=state.zweitsprache;
     const setSeg=(gid,val)=>{el(gid).querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===val));};
-    setSeg('diffart',state.diffart);setSeg('anzahl',state.anzahl);setSeg('sprache',state.sprache);setSeg('twist',state.twist);setSeg('niveau',state.niveau);setSeg('quelle',state.quelle);
+    setSeg('diffart',state.diffart);el('sozialform').querySelectorAll('button').forEach(b=>b.classList.toggle('on',state.sozialformen.includes(b.dataset.v)));renderZugaenge();refreshInfo('zugaenge');setSeg('sprache',state.sprache);setSeg('twist',state.twist);setSeg('niveau',state.niveau);setSeg('quelle',state.quelle);
     el('formate').querySelectorAll('button').forEach(b=>b.classList.toggle('on',!!state[b.dataset.v]));
     el('zweiWrap').style.display=(state.sprache==='zweisprachig')?'block':'none';
     render();
@@ -430,8 +677,9 @@ Gib am Ende eine kurze Notiz: gewähltes Thema, gewählte Differenzierungsart, g
   document.querySelectorAll('.presets button').forEach(b=>{
     b.addEventListener('click',()=>{
       const p=b.dataset.preset;
-      if(p==='reset'){Object.assign(state,{fach:'',stufe:'',thema:'',extra:'',diffart:'niveau',anzahl:'3',sprache:'standard',zweitsprache:'',twist:'auto',niveau:'anwenden',web:true,word:true,pdf:true,quelle:'pptx'});}
+      if(p==='reset'){Object.assign(state,{fach:'',stufe:'',thema:'',extra:'',diffart:'niveau',sozialformen:['einzel'],sprache:'standard',zweitsprache:'',twist:'auto',niveau:'anwenden',web:true,word:true,pdf:true,quelle:'pptx'});}
       else{Object.assign(state,{thema:'',extra:'',zweitsprache:''},presets[p]);}
+      state.zugaenge=defaultZugaenge(state.diffart);
       applyState();
     });
   });
