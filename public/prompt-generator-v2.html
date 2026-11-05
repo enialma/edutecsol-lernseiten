@@ -56,7 +56,9 @@
   .info-box dt{font-weight:600;}
   .info-box dd{margin:0 0 .35rem;color:var(--ink-soft);}
   .info-box p{margin:.4rem 0 0;color:var(--ink-soft);}
-  input[type=text],textarea{width:100%;font:inherit;font-size:.95rem;padding:.55rem .7rem;border:1px solid var(--line-strong);border-radius:var(--r);background:#fff;color:var(--ink);}
+  .check-row{display:flex;align-items:center;gap:.5rem;font-size:.88rem;cursor:pointer;margin:0;}
+  .check-row input{width:1.05rem;height:1.05rem;accent-color:var(--navy);margin:0;}
+  input[type=text],input[type=number],textarea{width:100%;font:inherit;font-size:.95rem;padding:.55rem .7rem;border:1px solid var(--line-strong);border-radius:var(--r);background:#fff;color:var(--ink);}
   input[type=text]:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
   textarea{resize:vertical;min-height:2.5rem;}
   .seg{display:flex;gap:.4rem;flex-wrap:wrap;}
@@ -134,7 +136,7 @@
           <input type="text" id="fach" placeholder="z. B. Pharma-Fachrechnen"></label>
         <label class="field"><span class="lab">Zielstufe</span>
           <input type="text" id="stufe" placeholder="z. B. Berufsmaturität · FaGe · Sek II · Erwachsene"></label>
-        <label class="field"><span class="lab">Thema <span class="hint">(optional: leer = KI wählt aus dem Material)</span></span>
+        <label class="field"><span class="lab">Thema <span class="hint" id="themaHint">(optional: leer = KI wählt aus dem Material)</span></span>
           <input type="text" id="thema" placeholder="z. B. Dosisberechnung, oder «Folie 12–14»"></label>
         <div class="field"><span class="lab">Ausgabeformat(e) <span class="hint">(Mehrfachauswahl, mindestens eines)</span></span>
           <div class="seg" id="formate">
@@ -153,6 +155,17 @@
           </div>
           <!--<p class="ghint" style="margin-top:.4rem;">Was hängst du an? Bei «nur diese Beschreibung» arbeitet die KI allein mit deinen Angaben – ohne Datei.</p> -->
         </div>
+      </div>
+
+      <!-- Aufgaben -->
+      <div class="group">
+        <span class="glab">Aufgaben</span>
+        <p class="ghint">Wie viele Aufgaben pro Zugang, und was soll gefragt werden?</p>
+        <label class="field"><span class="lab">Anzahl Aufgaben pro Zugang <span class="hint">(optional: leer = KI entscheidet)</span></span>
+          <input type="number" id="aufgaben" min="1" max="12" step="1" inputmode="numeric" placeholder="automatisch" style="max-width:9rem"></label>
+        <label class="field"><span class="lab">Aufgaben beschreiben <span class="hint">(optional)</span></span>
+          <textarea id="aufgabenText" placeholder="z. B. 1. Dichte aus Masse und Volumen berechnen, 2. Stoffe anhand der Dichte bestimmen, 3. Fehler in einer Rechnung finden"></textarea></label>
+        <label class="check-row"><input type="checkbox" id="latex"> Formeln in LaTeX <span class="hint">(für Mathematik und Physik)</span></label>
       </div>
 
       <!-- Achse 1: Differenzierungsart -->
@@ -197,7 +210,7 @@
 
       <!-- Achse 3: Twist-Typ -->
       <div class="group">
-        <span class="glab">Twist der Vertiefung</span>
+        <span class="glab">Twist</span>
         <p class="ghint">Die zusätzliche Denkanforderung in der Vertiefung bzw. am Schluss jedes Zugangs.</p>
         <div class="seg" id="twist">
           <button data-v="auto" class="on">passend wählen</button>
@@ -252,12 +265,18 @@
   /* DESIGNBASIS-START (automatisch aus lib/design-basis.ts, nicht von Hand ändern) */
   const DESIGNBASIS = "§DESIGNBASIS (für die Website, zwingend)\n- Übernimm dieses CSS unverändert als erstes <style>-Element im <head>; ergänze danach ein zweites <style> nur für die themenspezifische Visualisierung und Kleinigkeiten. Keine anderen Farben als die Variablen (--navy, --terra, --ochre, --cream, --ok, --err); keine Schatten, keine Verläufe, keine Emojis als Icons.\n<style>\n:root{--paper:#F2F3F5;--card:#FFFFFF;--ink:#1E3246;--ink-soft:#5B6572;--line:#E1E4E8;--line-strong:#C9CED5;--navy:#1E3246;--terra:#B84816;--terra-deep:#9A3A10;--ochre:#F1A51A;--cream:#F8F9FA;--ok:#2F8F6F;--ok-soft:#DFF3EA;--err:#B8321A;--err-soft:#FBE6E1;--serif:Georgia,\"Iowan Old Style\",\"Palatino Linotype\",Palatino,\"Times New Roman\",serif;--sans:system-ui,-apple-system,\"Segoe UI\",Arial,sans-serif;--r:8px;--r-lg:12px}\n*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}\nbody{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;padding:clamp(1rem,4vw,2.5rem) 1rem 4rem}\n.wrap{max-width:820px;margin:0 auto}\n.eyebrow{font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;color:var(--terra);font-weight:600;margin:0 0 .5rem}\nh1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.15;color:var(--ink);letter-spacing:-.01em}\nh1{font-size:clamp(1.8rem,5vw,2.5rem);margin:0 0 .5rem}\nh2{font-size:1.35rem;margin:0 0 .7rem}\nh3{font-size:1.1rem;margin:1.1rem 0 .4rem}\n.lead{font-size:1.05rem;color:var(--ink-soft);margin:0 0 1.4rem;max-width:62ch}\n.top{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;margin-bottom:1.6rem}\n.top>div{flex:1 1 320px;min-width:0}\n.btn{font:inherit;font-size:.9rem;font-weight:600;background:var(--navy);color:#fff;border:1px solid var(--navy);border-radius:var(--r);padding:.6rem 1.1rem;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem}\n.btn:hover{background:#2B4259;border-color:#2B4259}\n.btn.ghost{background:#fff;color:var(--ink);border-color:var(--line-strong)}\n.btn.ghost:hover{border-color:var(--terra);color:var(--terra)}\n.btn.terra{background:var(--terra);border-color:var(--terra)}\n.btn.terra:hover{background:var(--terra-deep);border-color:var(--terra-deep)}\n.core{background:var(--card);border:1px solid var(--line-strong);border-radius:var(--r-lg);padding:1.4rem 1.5rem;margin:0 0 1.8rem}\n.core .task{font-family:var(--serif);font-size:1.08rem}\n.data{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.05rem;background:var(--cream);border:1px solid var(--line);border-radius:var(--r);padding:.7rem 1rem;margin:.6rem 0 1rem;letter-spacing:.04em;overflow-x:auto}\n.viz{margin:1rem 0 .4rem}\n.pick{font-size:.85rem;color:var(--ink-soft);margin:0 0 .6rem}\n.tabs{display:flex;gap:.6rem;flex-wrap:wrap;margin:0 0 1.4rem}\n.tab{flex:1 1 200px;text-align:left;cursor:pointer;background:var(--card);border:1px solid var(--line-strong);border-radius:var(--r-lg);padding:.85rem 1rem;font:inherit;color:var(--ink);transition:border-color .15s,background .15s}\n.tab:hover{border-color:var(--terra)}\n.tab:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--terra);outline-offset:2px}\n.tab .tname{display:block;font-family:var(--serif);font-size:1.08rem;font-weight:600}\n.tab .tsub{display:block;font-size:.8rem;color:var(--ink-soft);margin-top:.15rem}\n.tab.active{border-color:var(--terra);background:#fff;box-shadow:inset 0 0 0 1px var(--terra)}\n.tab.active .tname{color:var(--terra)}\n.panel{display:none}\n.panel.show{display:block;animation:rise .3s ease}\n@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}\n.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:1.2rem 1.4rem;margin:0 0 1rem}\n.aufgabe{border-left:3px solid var(--terra);padding:.1rem 0 .1rem 1rem;margin:0 0 1rem;font-family:var(--serif);font-size:1.04rem}\n.hint{background:var(--cream);border-left:3px solid var(--ochre);border-radius:0 var(--r) var(--r) 0;padding:.6rem .9rem;margin:.6rem 0;font-size:.92rem}\n.steps{margin:0;padding-left:1.25rem}.steps li{margin:.35rem 0}\n.field{display:grid;grid-template-columns:minmax(140px,1fr) minmax(120px,160px) auto;gap:.5rem .8rem;align-items:center;margin:.5rem 0}\n@media(max-width:560px){.field{grid-template-columns:1fr}}\n.field label{font-weight:600;font-size:.92rem}\ninput[type=text],input[type=number],select,textarea{font:inherit;width:100%;padding:.5rem .7rem;border:1px solid var(--line-strong);border-radius:var(--r);background:#fff;color:var(--ink)}\ninput.ok,select.ok,textarea.ok{border-color:var(--ok);background:var(--ok-soft)}\ninput.err,select.err,textarea.err{border-color:var(--err)}\n.feedback{font-size:.88rem;min-height:1.2em}\n.feedback.ok{color:var(--ok);font-weight:600}\n.feedback.err{color:var(--err)}\n.choices{display:flex;flex-wrap:wrap;gap:.5rem;margin:.5rem 0}\n.choice{font:inherit;font-size:.92rem;background:#fff;border:1px solid var(--line-strong);border-radius:var(--r);padding:.5rem .9rem;cursor:pointer;color:var(--ink)}\n.choice:hover{border-color:var(--terra)}\n.choice.on{border-color:var(--navy);background:var(--cream)}\n.choice.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}\n.choice.err{background:var(--err-soft);border-color:var(--err);color:var(--err)}\n.check{list-style:none;margin:.5rem 0 0;padding:0}\n.check li{display:flex;gap:.6rem;align-items:flex-start;padding:.4rem 0;border-top:1px solid var(--line)}\n.check li:first-child{border-top:0}\n.check input{width:auto;margin-top:.3rem;accent-color:var(--terra)}\n.reveal{margin-top:.8rem}\n.aha{background:var(--navy);color:#fff;border-radius:var(--r-lg);padding:1rem 1.2rem;margin:.8rem 0}\n.aha h3{color:var(--ochre);margin:0 0 .4rem}\n.lehrperson{margin-top:2rem;border:1px solid var(--terra);border-radius:var(--r-lg);background:#fff}\n.lehrperson>summary{cursor:pointer;padding:.9rem 1.2rem;font-weight:600;color:var(--terra);list-style:none}\n.lehrperson>summary::-webkit-details-marker{display:none}\n.lehrperson>summary::before{content:\"+\";display:inline-block;width:1.2rem;font-family:var(--serif)}\n.lehrperson[open]>summary::before{content:\"–\"}\n.lehrperson>div{padding:0 1.2rem 1.2rem;border-top:1px solid var(--line)}\ntable{width:100%;border-collapse:collapse;font-size:.92rem;background:#fff}\nth,td{text-align:left;padding:.45rem .6rem;border-bottom:1px solid var(--line);vertical-align:top}\nth{background:var(--cream);font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}\n.foot{margin-top:2.5rem;font-size:.78rem;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:.8rem}\n.sr{position:absolute;left:-9999px}\n/* Prüfungsvorbereitung */\n.exam-head{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;padding:.8rem 1rem;border:1px solid var(--line-strong);border-radius:var(--r-lg);background:#fff;margin:0 0 1rem}\n.timer{font-family:var(--serif);font-size:1.6rem;font-variant-numeric:tabular-nums;letter-spacing:.02em}\n.timer.over{color:var(--err)}\n.pts{float:right;font-size:.78rem;color:var(--ink-soft);border:1px solid var(--line);border-radius:999px;padding:.1rem .55rem;margin-left:.6rem}\n.score{display:none;background:var(--navy);color:#fff;border-radius:var(--r-lg);padding:1.1rem 1.3rem;margin:1rem 0}\n.score.show{display:block}\n.score .nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.8rem;margin:.3rem 0 .8rem}\n.score b{display:block;font-family:var(--serif);font-size:2rem;line-height:1;color:var(--ochre)}\n.score span{font-size:.82rem;color:#C3CCD6}\n.score table{background:transparent;color:#fff}.score th{background:transparent;color:#C3CCD6}.score td,.score th{border-color:#3A5068}\n.meter{height:8px;background:var(--cream);border-radius:999px;overflow:hidden;margin:.4rem 0}\n.meter i{display:block;height:100%;background:var(--terra);width:0;transition:width .4s}\n.loesung{display:none;margin-top:.6rem;padding:.6rem .9rem;background:var(--cream);border-radius:var(--r);font-size:.92rem}\n.loesung.show{display:block}\n.plan td:first-child{font-weight:600;white-space:nowrap}\n/* Lernspiel */\n.hud{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.6rem;margin:0 0 .8rem}\n.stat{background:#fff;border:1px solid var(--line-strong);border-radius:var(--r-lg);padding:.55rem .8rem;text-align:center}\n.stat b{display:block;font-family:var(--serif);font-size:1.5rem;line-height:1.1}\n.stat span{font-size:.74rem;color:var(--ink-soft)}\n.tab.locked{opacity:.45;cursor:not-allowed}\n.tab.done .tname::after{content:\" ✓\";color:var(--ok)}\n.q{font-family:var(--serif);font-size:1.35rem;line-height:1.3;margin:.2rem 0 .8rem}\n.choices.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}\n@media(max-width:560px){.choices.grid2{grid-template-columns:1fr}}\n.choice.sel{border-color:var(--navy);background:var(--cream)}\n.choice.done{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);pointer-events:none}\n.pairs{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}\n.order .choice::before{content:attr(data-n) \" \";color:var(--terra);font-weight:600}\n.next{display:flex;justify-content:space-between;align-items:center;gap:.8rem;flex-wrap:wrap;margin-top:1rem;min-height:2.4rem}\n.msg-level{background:var(--cream);border-radius:var(--r);padding:.7rem .9rem;margin:.6rem 0;font-size:.95rem}\n/* Lernhilfe */\n.merk{columns:2;column-gap:2rem}@media(max-width:700px){.merk{columns:1}}\n.merk>*{break-inside:avoid}\n.formel{font-family:ui-monospace,Menlo,Consolas,monospace;background:var(--cream);border:1px solid var(--line);border-radius:var(--r);padding:.35rem .7rem;display:inline-block;margin:.2rem 0}\n.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.8rem;margin:.8rem 0}\n.fc{perspective:1000px;min-height:160px;cursor:pointer}\n.fc .in{position:relative;min-height:160px;height:100%;transition:transform .4s;transform-style:preserve-3d}\n.fc.flipped .in{transform:rotateY(180deg)}\n.fc .f,.fc .b{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:#fff;border:1px solid var(--line-strong);border-radius:var(--r-lg);padding:1rem;display:flex;align-items:center;justify-content:center;text-align:center}\n.fc .f{font-family:var(--serif);font-size:1.1rem}\n.fc .b{transform:rotateY(180deg);background:var(--cream);font-size:.95rem}\n.fc.known .f,.fc.known .b{border-color:var(--ok)}\n.fc.again .f,.fc.again .b{border-color:var(--terra)}\n.fc-actions{display:flex;gap:.4rem;justify-content:center;margin-top:.4rem}\n.fc-actions .btn{padding:.35rem .7rem;font-size:.8rem}\n.gloss{margin:0}.gloss dt{font-weight:600;margin-top:.8rem;font-family:var(--serif);font-size:1.05rem}.gloss dt small{font-family:var(--sans);font-weight:400;color:var(--ink-soft);margin-left:.4rem}\n.gloss dd{margin:.1rem 0 0;color:var(--ink-soft)}.gloss dd em{color:var(--ink);font-style:normal}\n.search{margin:.4rem 0 .8rem}\n@media print{.fc .in{transform:none!important}.fc .f,.fc .b{position:static;transform:none;backface-visibility:visible}.fc .b{margin-top:.3rem}.cards{grid-template-columns:1fr 1fr}.fc{break-inside:avoid}.fc-actions,.search{display:none}}\n</style>\n- Baue die Seite nach diesem Grundgerüst (Klassen beibehalten, Inhalte ersetzen, Anzahl Zugänge gemäss Auftrag):\n<body><div class=\"wrap\">\n<header class=\"top\"><div><p class=\"eyebrow\">Fach · Stufe · Thema</p><h1>Titel der Lernseite</h1><p class=\"lead\">Ein Satz zur Kernaufgabe. Wähle deinen Zugang.</p></div><button class=\"btn ghost pdf\" type=\"button\">Als PDF herunterladen</button></header>\n<section class=\"core\"><h2>Die Kernaufgabe</h2><p class=\"task\">…</p><div class=\"data\">… (nur falls Daten/Werte)</div><div class=\"viz\">… themenpassende Visualisierung (SVG/HTML)</div><ol class=\"steps\"><li>…</li></ol></section>\n<p class=\"pick\">Wähle deinen Zugang:</p>\n<div class=\"tabs\" role=\"tablist\"><button class=\"tab active\" role=\"tab\" aria-selected=\"true\" aria-controls=\"p-a\" id=\"t-a\"><span class=\"tname\">A · Mit Unterstützung</span><span class=\"tsub\">kurze Beschreibung</span></button> …</div>\n<section class=\"panel show\" id=\"p-a\" role=\"tabpanel\" aria-labelledby=\"t-a\"><div class=\"card\"><h2>Zugang A · …</h2><p class=\"aufgabe\">…</p><div class=\"hint\">…</div><div class=\"field\"><label for=\"a1\">…</label><input id=\"a1\" type=\"number\"><span class=\"feedback\" aria-live=\"polite\"></span></div><ul class=\"check\"><li><input type=\"checkbox\" id=\"c1\"><label for=\"c1\">…</label></li></ul></div></section>\n… weitere Zugänge als section.panel (ohne show) …\n<details class=\"lehrperson\"><summary>Für die Lehrperson: Lösungen, Wege, Anschluss</summary><div>…</div></details>\n<p class=\"foot\">Lernseite erzeugt mit Lernwege (EDUTECSOL). Fach · Stufe · Datum.</p>\n</div></body>\n- Reiter: Klick setzt .active auf dem Reiter und .show auf dem zugehörigen Panel, aria-selected entsprechend; Pfeiltasten wechseln den Reiter.\n- Rückmeldung: richtige Eingabe → Klasse ok auf dem Feld und Text im .feedback (z. B. «Richtig»); falsche → Klasse err und ein Hinweis ohne Lösung. Auswahlaufgaben mit .choices/.choice analog.\n- Der Aha-Moment des obersten Zugangs steht in einem .aha-Block, der erst nach Klick auf einen .btn erscheint.";
   /* DESIGNBASIS-END */
+  // Der Generator erzeugt nur Lernseiten: CSS für Prüfungsvorbereitung, Lernspiel und Lernhilfe weglassen.
+  // Das verkürzt die Ausgabe, weil die KI das CSS unverändert abschreibt. Fehlt eine Marke, bleibt alles drin.
+  const DESIGNBASIS_LERNSEITE = (()=>{
+    const a=DESIGNBASIS.indexOf('/* Prüfungsvorbereitung */'), b=DESIGNBASIS.indexOf('</style>');
+    return a>0&&b>a ? DESIGNBASIS.slice(0,a)+DESIGNBASIS.slice(b) : DESIGNBASIS;
+  })();
   // Kurze Gestaltungsvorgabe für Word/PDF, angelehnt an die Website und den Word-Export der App (lib/docx.ts); von Hand gepflegt
   const DRUCKBASIS = `§DRUCKBASIS (für Word und PDF, zwingend)
 - Seite: A4 hoch, Ränder ca. 2 cm; Schrift Arial 11 pt für den Text, Titel fett.
 - Farben wie die Website, sparsam: Navy #1E3246 für Titel, Zwischentitel, Tabellenköpfe und Rahmen; Terra #B84816 nur für kleine Auszeichnungen (Kopfzeile, Hinweise); Ocker #F1A51A nur für dünne Trennlinien. Fliesstext dunkelgrau. Keine farbigen Flächen, Verläufe, Schatten oder Emojis.
-- Kopf: kleine Zeile in Grossbuchstaben in Terra «EDUTECSOL · Fach · Stufe»; darunter Titel in Navy, ca. 20 pt; darunter Thema/Kompetenzziel in Grau; danach eine Zeile «Name: ______  Datum: ______  Zugang: ☐ A ☐ B …» mit dünnem Navy-Rahmen.
-- Jeder Zugang beginnt auf einer neuen Seite und trägt als Überschrift Buchstabe und Name wie auf der Website («A · Mit Unterstützung»).
+- Kopf: kleine Zeile in Grossbuchstaben in Terra «EDUTECSOL · Fach · Stufe»; darunter Titel in Navy, ca. 20 pt; darunter das Thema in Grau; danach eine Zeile «Name: ______  Datum: ______  Zugang: ☐ A ☐ B …» mit dünnem Navy-Rahmen.
+- Jeder Zugang beginnt auf einer neuen Seite und trägt als Überschrift Buchstabe und Name des Zugangs wie auf der Website (z. B. «A · …»).
 - Aufgaben nummeriert; Schreibflächen als Linien oder leere Kästen mit dünnem grauem Rahmen; Hinweise in einem Kasten mit dünnem Rahmen statt farbigem Hintergrund; Tabellen mit Navy-Kopfzeile in Fett.
 - Keine Seitenumbrüche innerhalb einer Aufgabe, Grafik oder Tabelle.
 - Lösungsblatt: eigene Seite mit Titel «Für die Lehrperson: Lösungen» in Terra.
@@ -265,7 +284,7 @@
 - In Graustufen gedruckt muss alles lesbar bleiben.`;
   const el=id=>document.getElementById(id);
   const state={
-    fach:'',stufe:'',thema:'',extra:'',
+    fach:'',stufe:'',thema:'',extra:'',aufgaben:'',aufgabenText:'',latex:false,
     diffart:'niveau',zugaenge:['unterstuetzt','eigenstaendig','vertiefung'],sozialformen:['einzel'],sprache:'standard',zweitsprache:'',twist:'auto',niveau:'anwenden',
     web:true,word:true,pdf:true,quelle:'pptx'
   };
@@ -283,21 +302,21 @@
     niveau:{label:'NIVEAU (Umfang der Unterstützung)',
       intro:'Alle Zugänge behandeln dieselbe Kernaufgabe und dieselben Erfolgskriterien; sie unterscheiden sich nur im Grad der Hilfe.',
       opts:[
-        {v:'unterstuetzt',name:'Mit Unterstützung',info:'Viel Hilfe: Fachbegriffe erklärt, Rechenrahmen zum Ausfüllen, Leitfragen und Satzanfang.',
-          prompt:'kurze Erklärung der Fachbegriffe; ein Rechen- bzw. Zuordnungsrahmen zum Ausfüllen (auf der Website interaktiv mit grünem Häkchen bei korrekter und einem Hinweis bei falscher Eingabe, ohne die Lösung zu verraten; im Arbeitsblatt mit Platz zum Eintragen); drei Leitfragen; ein Satzanfang für den Ergebnissatz. Weder Rechnung noch Ergebnis vollständig nennen.'},
+        {v:'unterstuetzt',name:'Mit Unterstützung',info:'Viel Hilfe: Fachbegriffe erklärt, Lösungsrahmen zum Ausfüllen, Leitfragen und Satzanfang.',
+          prompt:'kurze Erklärung der Fachbegriffe; ein Lösungs- bzw. Zuordnungsrahmen zum Ausfüllen (mit Selbstkontrolle wie unter AUSGABEFORMAT beschrieben; im Arbeitsblatt mit Platz zum Eintragen); drei Leitfragen; ein Satzanfang für den Ergebnissatz. Weder Lösungsweg noch Ergebnis vollständig nennen.'},
         {v:'eigenstaendig',name:'Eigenständig',info:'Gleiche Aufgabe ohne Hilfen, mit Ergebnisprüfung und Selbstcheck.',
           prompt:'gleiche Kernaufgabe ohne Hilfen; Möglichkeit zur Ergebnisprüfung; Selbstcheck-Liste mit vier abhakbaren Fragen.'},
         {v:'vertiefung',name:'Vertiefung',info:'Kernaufgabe mit Twist, Begründungs- und Transferfrage.',
-          prompt:'Kernaufgabe ohne Hilfen, erweitert um den Twist (siehe TWIST); eine Begründungsfrage und eine Transferfrage in den Berufskontext; ein Button, der den Kernzusammenhang sichtbar macht (Aha-Moment).'},
+          prompt:'Kernaufgabe ohne Hilfen, erweitert um den Twist (siehe TWIST); eine Begründungsfrage und eine Transferfrage in den Berufskontext; ein Aha-Moment, der den Kernzusammenhang sichtbar macht (auf der Website per Button, im Arbeitsblatt als Merksatz).'},
         {v:'expert',name:'Expert',info:'Offene Problemstellung ohne vorgegebenen Lösungsweg; Vorgehen selbst wählen und begründen.',
-          prompt:'offene, komplexere Problemstellung zum gleichen Kompetenzziel ohne vorgegebenen Lösungsweg; die Lernenden wählen und begründen ihr Vorgehen selbst und beurteilen die Grenzen ihres Ergebnisses.'}]},
+          prompt:'offene, komplexere Problemstellung zur gleichen Kernaufgabe ohne vorgegebenen Lösungsweg; die Lernenden wählen und begründen ihr Vorgehen selbst, auf der gewählten Zielebene.'}]},
     lerntyp:{label:'LERNTYP (Zugangskanal)',
       intro:'Alle Zugänge behandeln dieselbe Kernaufgabe auf gleichem Anforderungsniveau; sie unterscheiden sich nur im Kanal, über den die Aufgabe erschlossen wird.',
       opts:[
         {v:'visuell',name:'visuell/grafisch',info:'Über Grafik, Diagramm oder Skizze: ablesen, einzeichnen, zuordnen.',
           prompt:'die Aufgabe wird über Grafik, Diagramm oder Skizze erschlossen; die Lernenden lesen ab, zeichnen ein oder ordnen zu.'},
         {v:'rechnerisch',name:'rechnerisch/formal',info:'Über Formel, Tabelle und schrittweisen Rechenweg.',
-          prompt:'die Aufgabe wird über Formel, Tabelle und einen schrittweisen Rechenweg erschlossen.'},
+          prompt:'die Aufgabe wird über Formel, Tabelle, Schema oder einen schrittweisen Lösungsweg erschlossen.'},
         {v:'sprachlich',name:'sprachlich/erklärend',info:'Über Text: Vorgehen und Ergebnis in eigenen Worten erklären und begründen.',
           prompt:'die Aufgabe wird über Text erschlossen; die Lernenden erklären Vorgehen und Ergebnis in eigenen Worten und begründen es.'},
         {v:'handlung',name:'handlungsorientiert',info:'Über eine konkrete Handlung oder Simulation, Schritt für Schritt wie im Berufsalltag.',
@@ -315,10 +334,10 @@
           prompt:'Beispiel aus Detailhandel, Gastronomie oder Kundenkontakt.'}]}
   };
   const SOZIALFORMEN=[
-    {v:'einzel',name:'Einzelarbeit',prompt:'jede Person bearbeitet die Aufgaben allein; Arbeitsaufträge in der Du-Form, Selbstkontrolle individuell.'},
-    {v:'partner',name:'Partnerarbeit',prompt:'zu zweit mit klaren Rollen (z. B. eine Person rechnet, die andere kontrolliert, nach jeder Teilaufgabe wechseln); kurze Anleitung zur Zusammenarbeit und ein gemeinsamer Ergebnissatz.'},
-    {v:'gruppe',name:'Gruppenarbeit',prompt:'in Gruppen von drei bis vier Personen mit verteilten Teilaufgaben und Rollen; Anleitung zur Zusammenarbeit und ein gemeinsames Ergebnis, das die Gruppe vorstellt.'},
-    {v:'plenum',name:'Plenum',prompt:'gemeinsam mit der ganzen Klasse, von der Lehrperson geführt; Aufgaben in Etappen mit Diskussionsfragen und kurzen Abstimmungen, gut lesbar für die Projektion.'}
+    {v:'einzel',name:'Einzelarbeit',kurz:'alle arbeiten allein.',prompt:'jede Person bearbeitet die Aufgaben allein; Arbeitsaufträge in der Du-Form, Selbstkontrolle individuell.'},
+    {v:'partner',name:'Partnerarbeit',kurz:'zu zweit mit wechselnden Rollen.',prompt:'zu zweit mit klaren Rollen (z. B. eine Person löst, die andere kontrolliert, nach jeder Teilaufgabe wechseln); kurze Anleitung zur Zusammenarbeit und ein gemeinsamer Ergebnissatz.'},
+    {v:'gruppe',name:'Gruppenarbeit',kurz:'drei bis vier Personen mit verteilten Teilaufgaben.',prompt:'in Gruppen von drei bis vier Personen mit verteilten Teilaufgaben und Rollen; Anleitung zur Zusammenarbeit und ein gemeinsames Ergebnis, das die Gruppe vorstellt.'},
+    {v:'plenum',name:'Plenum',kurz:'die ganze Klasse gemeinsam, von der Lehrperson geführt.',prompt:'gemeinsam mit der ganzen Klasse, von der Lehrperson geführt; Aufgaben in Etappen mit Diskussionsfragen und kurzen Abstimmungen, gut lesbar für die Projektion. Bei mehreren Zugängen wählt die Lehrperson im Plenum einen Zugang für alle oder bespricht die Zugänge nacheinander.'}
   ];
   const defaultZugaenge=art=>ZUGAENGE[art].opts.slice(0,3).map(o=>o.v);
   // Eigene Berufsfelder kommen hinten an die Liste und sind sofort gewählt
@@ -460,7 +479,7 @@
       b.classList.toggle('on',!was);render();
     });
   });
-  wireSeg('quelle','quelle');
+  wireSeg('quelle','quelle',()=>{el('themaHint').textContent=state.quelle==='text'?'(optional: leer = KI wählt passend zu Fach und Stufe)':'(optional: leer = KI wählt aus dem Material)';});
   wireSeg('sprache','sprache',()=>{el('zweiWrap').style.display=(state.sprache==='zweisprachig')?'block':'none';});
   wireSeg('twist','twist');
   wireSeg('niveau','niveau');
@@ -473,7 +492,8 @@
       state[k]=!state[k];b.classList.toggle('on',state[k]);render();
     });
   });
-  ['fach','stufe','thema','extra','zweitsprache'].forEach(k=>el(k).addEventListener('input',()=>{state[k]=el(k).value;render();}));
+  ['fach','stufe','thema','extra','zweitsprache','aufgaben','aufgabenText'].forEach(k=>el(k).addEventListener('input',()=>{state[k]=el(k).value;render();}));
+  el('latex').addEventListener('change',()=>{state.latex=el('latex').checked;render();});
 
   // ---- Textbausteine je Achse ----
   
@@ -483,46 +503,77 @@
     // Buchstabe nur bei gewählten Zugängen; Vergleichs-Zugänge ohne Buchstaben
     const skala=Z.opts.map(o=>gew.includes(o)
       ?`- ${letter(o)} – ${o.name} (gewählt): ${o.prompt}`
-      :`- ${o.name} (nur zum Vergleich, nicht erstellen): ${o.prompt}`).join('\n');
+      :`- ${o.name} (nur zum Vergleich, nicht erstellen): ${o.info}`).join('\n');
     const liste=gew.map(o=>letter(o)+' – '+o.name).join(', ');
+    // Aha-Moment als Button nur auf der Website; auf Papier als Merksatz
+    const aha=state.web?'einen Button, der den Kernzusammenhang sichtbar macht (Aha-Moment)'+(state.word||state.pdf?'; im Arbeitsblatt stattdessen ein Merksatz':''):'einen Merksatz, der den Kernzusammenhang festhält';
+    const hilfe=state.web?'drei Leitfragen als aufklappbare Hilfe'+(state.word||state.pdf?' (im Arbeitsblatt als Hinweiskasten)':''):'drei Leitfragen in einem Hinweiskasten';
     let twist;
     if(state.diffart==='niveau'){
       const hoch=gew.filter(o=>o.v==='vertiefung'||o.v==='expert');
-      const ziel=(hoch.length?hoch:gew.slice(-1)).map(o=>'«'+o.name+'»').join(' und ');
-      twist=`- TWIST (in ${ziel}): ${twistText()}`+(hoch.length?'':' Ergänze dort eine Begründungsfrage und eine Transferfrage in den Berufskontext sowie einen Button, der den Kernzusammenhang sichtbar macht (Aha-Moment).');
+      twist=hoch.length
+        ?`- TWIST (in ${hoch.map(o=>'«'+o.name+'»').join(' und ')}): ${twistText()}`
+        :`- TWIST (als freiwillige Zusatzaufgabe am Schluss jedes gewählten Zugangs, ohne die Hilfen dort zu verringern): ${twistText()} Ergänze eine Begründungsfrage und ${aha}.`;
     }else{
-      twist=`- Jeder Zugang: Möglichkeit zur Ergebnisprüfung; Selbstcheck-Liste mit vier abhakbaren Fragen; drei Leitfragen als aufklappbare Hilfe.
-- TWIST (als Zusatzaufgabe am Schluss jedes Zugangs): ${twistText()} Ergänze eine Begründungsfrage und eine Transferfrage in den Berufskontext sowie einen Button, der den Kernzusammenhang sichtbar macht (Aha-Moment).`;
+      twist=`- Jeder Zugang: Möglichkeit zur Ergebnisprüfung; Selbstcheck-Liste mit vier abhakbaren Fragen; ${hilfe}.
+- TWIST (als Zusatzaufgabe am Schluss jedes Zugangs): ${twistText()} Ergänze eine Begründungsfrage und eine Transferfrage in den Berufskontext sowie ${aha}.`;
     }
+    const ordnung = state.diffart==='niveau'
+      ? '- Die Zugänge sind gestuft: von viel Hilfe (Mit Unterstützung) bis ohne Hilfe mit offener Problemstellung (Expert). Wo die Designbasis vom «obersten Zugang» spricht, ist der anspruchsvollste gewählte Zugang gemeint; die Zielebene unter ANFORDERUNGSNIVEAU gilt für alle Zugänge.'
+      : '- Die Zugänge sind gleichwertig und nicht gestuft: es gibt keinen obersten, untersten oder einfachsten Zugang. Bezeichne sie nur mit Buchstabe und Name (z. B. «Zugang A · '+gew[0].name+'»), ohne Wörter wie «Mit Unterstützung», «Vertiefung» oder «Expert». Wo die Designbasis vom «obersten Zugang» spricht, gilt das hier für jeden Zugang.';
     return `Gewählt (${gew.length===1?'1 Zugang':gew.length+' Zugänge'}): ${liste}.
 Differenziere nach ${Z.label}. ${Z.intro}
 Zur Einordnung alle ${Z.opts.length} möglichen Zugänge dieser Differenzierungsart:
 ${skala}
 ${gew.length===1
   ?`Erstelle nur den gewählten Zugang: ${liste}. Die übrigen stehen nur als Vergleich hier, damit du den gewählten richtig einordnest.
-- Es gibt nur diesen einen Zugang: auf der Website bleibt die Reiterleiste wie im Grundgerüst, mit genau einem Reiter, der beim Öffnen bereits aktiv ist (Klasse active, aria-selected="true"); sein Panel ist sofort sichtbar (Klasse show). Im Arbeitsblatt ohne Aufteilung.`
+- Es gibt nur diesen einen Zugang: ${[state.web&&'auf der Website bleibt die Reiterleiste wie im Grundgerüst, mit genau einem Reiter, der beim Öffnen bereits aktiv ist (Klasse active, aria-selected="true"); sein Panel ist sofort sichtbar (Klasse show)',(state.word||state.pdf)&&'im Arbeitsblatt ohne Aufteilung'].filter(Boolean).join('; ')}.`
   :`Erstelle nur die ${gew.length} gewählten Zugänge: ${liste}. Die übrigen stehen nur als Vergleich hier, damit du die gewählten richtig voneinander abgrenzt.
-- Die Lernenden bearbeiten nur ihren gewählten Zugang (auf der Website per Reiter-Klick, im Arbeitsblatt als klar getrennte Abschnitte).`}
-${twist}`;
+- Die Lernenden bearbeiten nur ihren gewählten Zugang (${[state.web&&'auf der Website per Reiter-Klick',(state.word||state.pdf)&&'im Arbeitsblatt als klar getrennte Abschnitte'].filter(Boolean).join(', ')}).`}
+${gew.length>1||state.diffart!=='niveau'?ordnung+'\n':''}${twist}`;
   }
   function sozialformText(){
     const gew=SOZIALFORMEN.filter(o=>state.sozialformen.includes(o.v));
-    const skala=SOZIALFORMEN.map(o=>`- ${o.name} (${gew.includes(o)?'gewählt':'nur zum Vergleich, nicht erstellen'}): ${o.prompt}`).join('\n');
+    const skala=SOZIALFORMEN.map(o=>gew.includes(o)
+      ?`- ${o.name} (gewählt): ${o.prompt}`
+      :`- ${o.name} (nur zum Vergleich, nicht erstellen): ${o.kurz}`).join('\n');
     const auftrag=gew.length===1
       ?`Formuliere alle Arbeitsaufträge für ${gew[0].name}; das gilt für alle Zugänge.`
       :`Erstelle die Arbeitsaufträge in ${gew.length} Versionen: ${gew.map(o=>o.name).join(', ')}. Das gilt für jeden Zugang; Kernaufgabe, Daten und Lösungen bleiben in allen Versionen gleich, nur Arbeitsauftrag und Zusammenarbeit unterscheiden sich.
-- Auf der Website: in jedem Zugang ein Umschalter für die Sozialform, der den passenden Arbeitsauftrag zeigt.
-- Im Arbeitsblatt: je Sozialform ein klar getrennter Abschnitt mit eigenem Arbeitsauftrag.`;
+- Auf der Website: in jedem Zugang oben ein Umschalter für die Sozialform (Knöpfe .choices/.choice aus der Designbasis, aktive Sozialform mit Klasse on), der nur den passenden Arbeitsauftrag zeigt.
+- Im Arbeitsblatt: Aufgaben je Zugang nur einmal; darunter die Arbeitsaufträge der Sozialformen als kurze, beschriftete Kästen.`;
     return `Zur Einordnung die vier möglichen Sozialformen:
 ${skala}
 ${auftrag}`;
   }
+  function aufgabenText(){
+    const n=Math.round(+state.aufgaben);
+    const anzahl=n>=1&&n<=12
+      ?`- Jeder Zugang enthält genau ${n} ${n===1?'Aufgabe':'Aufgaben'} (die Kernaufgabe mitgezählt); der Twist kommt zusätzlich dazu.`
+      :'';
+    const vorgabe=state.aufgabenText.trim()
+      ?`- Vorgaben der Lehrperson zu den Aufgaben (haben Vorrang vor dem Material; passe sie je Zugang an, ohne den Inhalt zu ändern):\n<<<\n${state.aufgabenText.trim()}\n>>>`
+      :'';
+    return [anzahl,vorgabe,
+      '- Jede Aufgabe sagt eindeutig, was gesucht ist, in welcher Form die Antwort erwartet wird (z. B. Zahl mit Einheit, Satz, Auswahl) und wie genau (z. B. auf zwei Dezimalstellen gerundet).',
+      '- Kommen Formeln, Zeichen oder Abkürzungen vor, erkläre jedes Zeichen bei der ersten Verwendung mit Bedeutung und Einheit (z. B. «ρ = Dichte in g/cm³, m = Masse in g»); ein Zeichen bedeutet auf dem ganzen Blatt dasselbe.'
+    ].filter(Boolean).join('\n');
+  }
+  function latexText(){
+    if(!state.latex) return '';
+    return ['Schreibe alle Formeln in LaTeX-Notation und setze sie sauber, nie als Bild.',
+      state.web&&'- Website: ohne externe Bibliothek (offline): jede Formel als MathML (<math>), mit dem LaTeX-Quelltext in <annotation encoding="application/x-tex">.',
+      state.word&&'- Word: jede Formel als Word-Formel (Formeleditor), nicht als Fliesstext.',
+      state.pdf&&'- PDF: Formeln gesetzt wie im Formeleditor.',
+      '- Kannst du Formeln nur als Text ausgeben, nutze LaTeX in $…$ (im Text) bzw. $$…$$ (abgesetzt).'
+    ].filter(Boolean).join('\n');
+  }
   function spracheText(){
     const map={
       standard:'',
-      einfach:'SPRACHE: Verwende durchgehend vereinfachte Sprache (kurze Sätze, ein Gedanke pro Satz, wenig Nebensätze, klare Verben). Erkläre jeden Fachbegriff bei seiner ersten Verwendung in einfachen Worten.',
-      glossar:'SPRACHE: Behalte die Fachsprache bei, ergänze aber ein aufklappbares Glossar mit allen Fachbegriffen und ihren Erklärungen in einfacher Sprache. Markiere Fachbegriffe im Text dezent.',
-      zweisprachig:`SPRACHE: Führe die zentralen Schlüsselbegriffe zusätzlich in ${state.zweitsprache.trim()||'[zweite Sprache einsetzen]'} auf (Fachbegriff Deutsch – Übersetzung), damit Lernende mit dieser Erstsprache den Inhalt sprachlich erschliessen können. Der übrige Text bleibt auf Deutsch.`
+      einfach:'Verwende durchgehend vereinfachte Sprache (kurze Sätze, ein Gedanke pro Satz, wenig Nebensätze, klare Verben). Erkläre jeden Fachbegriff bei seiner ersten Verwendung in einfachen Worten.',
+      glossar:'Behalte die Fachsprache bei, ergänze aber ein Glossar (auf der Website aufklappbar, im Arbeitsblatt am Ende) mit allen Fachbegriffen und ihren Erklärungen in einfacher Sprache. Markiere Fachbegriffe im Text dezent.',
+      zweisprachig:`Führe die zentralen Schlüsselbegriffe zusätzlich in ${state.zweitsprache.trim()||'[zweite Sprache einsetzen]'} auf (Fachbegriff Deutsch – Übersetzung), damit Lernende mit dieser Erstsprache den Inhalt sprachlich erschliessen können. Der übrige Text bleibt auf Deutsch.`
     };
     return map[state.sprache];
   }
@@ -540,9 +591,12 @@ ${auftrag}`;
   }
   function niveauText(){
     const map={
-      reproduzieren:'ANFORDERUNGSNIVEAU: Zielebene «reproduzieren/anwenden» – Verfahren korrekt ausführen und auf gleichartige Aufgaben übertragen. Formuliere die Erfolgskriterien entsprechend.',
+      reproduzieren:'ANFORDERUNGSNIVEAU: Zielebene «reproduzieren» – Verfahren korrekt ausführen und auf gleichartige Aufgaben übertragen. Formuliere die Erfolgskriterien entsprechend.',
       anwenden:'ANFORDERUNGSNIVEAU: Zielebene «anwenden» – das Verfahren in einer sinnvollen Situation selbstständig und mit Begründung anwenden. Formuliere die Erfolgskriterien entsprechend.',
-      beurteilen:'ANFORDERUNGSNIVEAU: Zielebene «beurteilen» – Ergebnisse und Methoden bewerten, vergleichen und die Wahl begründen. Hebe im obersten Zugang die Urteils- und Begründungskompetenz hervor.'
+      beurteilen:'ANFORDERUNGSNIVEAU: Zielebene «beurteilen» – Ergebnisse und Methoden bewerten, vergleichen und die Wahl begründen. '
+        +(state.diffart==='niveau'
+          ?'Hebe in den anspruchsvollsten gewählten Zugängen die Urteils- und Begründungskompetenz hervor.'
+          :'Hebe in jedem Zugang die Urteils- und Begründungskompetenz hervor.')
     };
     return map[state.niveau];
   }
@@ -552,12 +606,12 @@ ${auftrag}`;
     if(state.web){
       blocks.push(`§AUSGABEFORMAT – INTERAKTIVE WEBSITE
 Eine einzige, voll funktionsfähige HTML-Seite (eine Datei, ohne externe Abhängigkeiten, offline lauffähig):
-- Zugangswahl per Klick (Reiter): die Lernenden sehen nur ihren gewählten Zugang.
+- Zugangswahl per Klick (Reiter, wie unter DIFFERENZIERUNG beschrieben): die Lernenden sehen nur ihren gewählten Zugang.
 - Visualisierung der Kernaufgabe als durchgehende Leitidee, passend zum Thema. Jedes Eingabefeld ist sichtbar beschriftet, damit klar ist, wohin es gehört; optionale Hilfslinien/Marker erscheinen erst nach korrekter Eingabe.
-- Interaktive Selbstkontrolle: Eingabefelder/Auswahlbuttons zeigen bei korrekter Eingabe ein grünes Häkchen, bei falscher einen Hinweis, ohne die Lösung zu verraten.
-- Bereich «Für die Lehrperson»: ausklappbar (verborgen bis Klick), mit vollständigen Lösungen und Wegen, getrennt vom Aufgabenteil; ein Satz zum didaktischen Anschluss an die nächsten Folien.
-- PDF-Button oben («Als PDF herunterladen»): blendet für den Export alle Zugänge und den Lehrpersonen-Bereich ein und löst den Druckdialog aus; eigene @media-print-CSS blendet Reiter/Buttons aus; Fallback, der die Seite in einem neuen Tab öffnet, falls der Druckdialog blockiert ist.`);
-      blocks.push(DESIGNBASIS);
+- Interaktive Selbstkontrolle nach dem Muster «Rückmeldung» der Designbasis: bei korrekter Eingabe ein grünes Häkchen, bei falscher ein Hinweis, ohne die Lösung zu verraten.
+- Bereich «Für die Lehrperson»: ausklappbar (verborgen bis Klick), mit vollständigen Lösungen und Wegen, getrennt vom Aufgabenteil; ein Satz zum didaktischen Anschluss ${state.quelle==='pptx'?'an die nächsten Folien':'an den weiteren Unterricht'}.
+- PDF-Button oben («Als PDF herunterladen»): blendet für den Export alle Zugänge und den Lehrpersonen-Bereich ein und löst den Druckdialog aus; eigene @media-print-CSS blendet Reiter/Buttons aus; Fallback, der die Seite in einem neuen Tab öffnet, falls der Druckdialog blockiert ist.${state.pdf?' Dieser Button druckt nur die Website; das PDF-Arbeitsblatt ist eine eigene, papiergerechte Datei.':''}`);
+      blocks.push(DESIGNBASIS_LERNSEITE);
     }
     // Word/PDF-Arbeitsblatt
     const docs=[];
@@ -568,10 +622,10 @@ Eine einzige, voll funktionsfähige HTML-Seite (eine Datei, ohne externe Abhäng
       const bezug=state.web?'zusätzlich zur Website ':'';
       blocks.push(`§AUSGABEFORMAT – ARBEITSBLATT
 Erstelle ${bezug}${list} als klassisches Arbeitsblatt zum Austeilen – papiergerecht gestaltet, nicht als Bildschirm-Abbild:
-- Kopf mit Fach, Thema, Kompetenzziel und Erfolgskriterien.
+- Kopf mit Fach, Thema und Erfolgskriterien.
 - Die Kernaufgabe sowie alle Zugänge (nach der gewählten Differenzierung) mit ausreichend Platz für handschriftliche Lösungen; Selbstcheck-Listen als ankreuzbare Kästchen.
-- Ein davon getrenntes Lösungsblatt für die Lehrperson mit vollständigen Rechen-/Begründungswegen (eigene Seite oder klar abgetrennter Abschnitt).
-- Schlicht und gut kopierbar (schwarz-weiss-tauglich). Interaktive Elemente entfallen; wo die Website Feedback gäbe, steht hier Platz zum Rechnen.
+- Ein davon getrenntes Lösungsblatt für die Lehrperson mit vollständigen Lösungs- und Begründungswegen (eigene Seite oder klar abgetrennter Abschnitt).
+- Schlicht und gut kopierbar (schwarz-weiss-tauglich). Interaktive Elemente entfallen; wo die Website Feedback gäbe, steht hier Platz zum Bearbeiten.
 Lege jede Datei als eigenständigen Download an.`);
       blocks.push(DRUCKBASIS);
     }
@@ -595,10 +649,18 @@ Lege jede Datei als eigenständigen Download an.`);
     const produkt = state.web
       ? 'eine differenzierte, interaktive Lernseite'+(blattFormate?` sowie ein passendes Arbeitsblatt ${blattFormate}`:'')
       : `ein differenziertes Arbeitsblatt ${blattFormate}`;
+    const hatThema=!!state.thema.trim();
     const aufgabeText = isText
-      ? `Erstelle aus den Angaben oben ${produkt}. Wähle – sofern oben kein Thema vorgegeben ist – ein geeignetes Thema und ein fachlich stimmiges, alltagsnahes Beispiel; weise am Ende kurz darauf hin, dass kein Material vorlag.`
-      : `Lies das hochgeladene Dokument (${quelleName}) aus, wähle das didaktisch geeignetste Thema für eine differenzierte Übung (sofern oben keines vorgegeben ist) und erstelle daraus ${produkt}. Nenne zu Beginn kurz das gewählte Thema und warum. Enthält das Material konkreten Aufgabentext oder Daten, verwende diese; stehen dort nur Bilder ohne auslesbaren Text, wähle ein fachlich stimmiges, alltagsnahes Beispiel und weise am Ende darauf hin.`;
+      ? `Erstelle aus den Angaben oben ${produkt}${hatThema?'':' zu einem selbst gewählten, passenden Thema'}, mit einem fachlich stimmigen, alltagsnahen Beispiel.`
+      : `Lies das Material aus${hatThema?'':', wähle daraus das didaktisch geeignetste Thema für eine differenzierte Übung'} und erstelle ${hatThema?'zum angegebenen Thema':'dazu'} ${produkt}. Enthält das Material konkreten Aufgabentext oder Daten, verwende diese; stehen dort nur Bilder ohne auslesbaren Text, wähle ein fachlich stimmiges, alltagsnahes Beispiel.`;
+    const notizExtra=[!hatThema&&'warum du dieses Thema gewählt hast',isText?'dass kein Material vorlag':'ob das Material auslesbaren Text enthielt'].filter(Boolean).join(', ');
     const spr=spracheText();
+    // Antwortformat: was in welcher Reihenfolge kommt, und was bei zu langer Antwort Vorrang hat
+    const dateien=[state.web&&'die Website als eine vollständige HTML-Datei in einem einzigen Codeblock',(state.word||state.pdf)&&`das Arbeitsblatt (${[state.word&&'Word',state.pdf&&'PDF'].filter(Boolean).join(' und ')}) als herunterladbare Datei${state.word&&state.pdf?'en':''}`].filter(Boolean);
+    const antwortText=`- Liefere ${dateien.join(', danach ')}; zum Schluss die kurze Notiz (siehe unten). Keine Einleitung, keine Erklärungen davor oder dazwischen.
+- Prüfe Lösungen${state.web?' und Feedback-Logik':''} still für dich; Rechen- und Begründungswege erscheinen nur ${[state.web&&'im Lehrpersonen-Bereich',(state.word||state.pdf)&&'auf dem Lösungsblatt'].filter(Boolean).join(' bzw. ')}, nicht im Chat.${state.web&&(state.word||state.pdf)?`
+- Wird die Antwort zu lang: Gib zuerst die Website vollständig aus und biete das Arbeitsblatt danach an, statt eine Datei abzubrechen.`:''}${(state.word||state.pdf)?`
+- Kannst du keine Dateien erzeugen, gib das Arbeitsblatt als druckfertiges HTML in einem eigenen Codeblock aus.`:''}`;
 
     return `§ROLLE
 Du bist Fachdidaktiker:in für ${fach} auf der Stufe ${stufe} und Frontend-Entwickler:in.
@@ -612,27 +674,33 @@ ${dateiLine}
 §AUFGABE
 ${aufgabeText}
 
-§KOMPETENZZIEL & KERNAUFGABE
-Leite ein präzises Kompetenzziel ab. Formuliere eine Kernaufgabe mit (1) Berechnung/Bestimmung, (2) nachvollziehbarem Rechen-/Begründungsweg und (3) einem sachlichen Ergebnissatz. Definiere die Erfolgskriterien.
+§ANTWORTFORMAT
+${antwortText}
+
+§KERNAUFGABE
+Formuliere eine Kernaufgabe mit (1) Berechnung, Bestimmung oder fachlicher Analyse – je nach Fach –, (2) nachvollziehbarem Lösungs- bzw. Begründungsweg und (3) einem sachlichen Ergebnissatz. Definiere die Erfolgskriterien.
 ${niveauText()}
 
+§AUFGABEN
+${aufgabenText()}
+${latexText()?'\n§FORMELN (LaTeX)\n'+latexText()+'\n':''}
 §DIFFERENZIERUNG
 ${diffartText()}
 
 §SOZIALFORM
 ${sozialformText()}
-${spr?('\n§'+spr+'\n'):''}
+${spr?('\n§SPRACHE\n'+spr+'\n'):''}
 ${ausgabeText()}
 
 §GESTALTUNG
-${[state.web&&'Für die Website: Halte dich an die DESIGNBASIS oben (CSS unverändert, Grundgerüst, Klassen); eigenes CSS nur für die themenpassende Visualisierung der Kernaufgabe in den Farbvariablen; responsiv bis Mobile, Tastaturbedienbarkeit, sichtbarer Fokus; keine zusätzlichen Farben, Schatten, Verläufe oder Emojis.',(state.word||state.pdf)&&'Für Arbeitsblätter: Halte dich an die DRUCKBASIS oben; klare Druckstruktur, gut kopierbar, im gleichen Erscheinungsbild wie die Website.'].filter(Boolean).join(' ')}
+${[state.web&&'Für die Website: Halte dich an die DESIGNBASIS oben (CSS unverändert, Grundgerüst, Klassen); eigenes CSS nur für die themenpassende Visualisierung der Kernaufgabe in den Farbvariablen; responsiv bis Mobile, Tastaturbedienbarkeit, sichtbarer Fokus.',(state.word||state.pdf)&&'Für Arbeitsblätter: Halte dich an die DRUCKBASIS oben; klare Druckstruktur, gut kopierbar, im gleichen Erscheinungsbild wie die Website.'].filter(Boolean).join(' ')}
 
 §QUALITÄTSPRÜFUNG VOR DER AUSGABE
-- Rechne alle Lösungen selbst nach; auf der Website muss die Feedback-Logik jedes Eingabefelds exakt zu den richtigen Werten passen, im Arbeitsblatt müssen die Lösungen auf dem Lehrpersonen-Blatt korrekt sein.
-- Prüfe, dass jede Aufgabe klar zeigt, was wo einzutragen ist (auf der Website: welche Eingabe welche Visualisierung auslöst).
-- Kontrolliere alle Texte (auch Selbstchecks) auf Tipp- und Flüchtigkeitsfehler.
-- Schweizer Standarddeutsch; Selbstcheck-Listen abhakbar.
-Gib am Ende eine kurze Notiz: gewähltes Thema, gewählte Differenzierungsart und Zugänge, Sozialform, genutzter Twist und erzeugte Ausgabeformate.`;
+- Prüfe alle Lösungen selbst: Rechnungen nachrechnen, fachliche Aussagen auf Richtigkeit prüfen.${state.web?' Auf der Website muss die Feedback-Logik jedes Eingabefelds exakt zu den richtigen Werten passen.':''}${state.word||state.pdf?' Im Arbeitsblatt müssen die Lösungen auf dem Lehrpersonen-Blatt korrekt sein.':''}
+- Prüfe, dass jede Aufgabe klar zeigt, was wo einzutragen ist${state.web?' (auf der Website: welche Eingabe welche Visualisierung auslöst)':''}.
+- Kontrolliere alle Texte (auch Selbstchecks) auf Tipp- und Flüchtigkeitsfehler; Schweizer Standarddeutsch.
+- Zum Schluss, vor der Ausgabe: Lies das gesamte Material noch einmal vollständig durch (${[state.web&&'alle Zugänge und den Lehrpersonen-Bereich der Website',(state.word||state.pdf)&&'Arbeitsblatt und Lösungsblatt'].filter(Boolean).join(', ')}) und prüfe die fachliche Richtigkeit: Fakten, Fachbegriffe, Formeln, Zeichen, Einheiten und Zahlenwerte, und ob Aufgabe, Lösung${state.web?' und Rückmeldung':''} zueinander passen. Korrigiere jeden Fehler, bevor du ausgibst.
+Notiz am Ende (höchstens fünf Zeilen): gewähltes Thema, gewählte Differenzierungsart und Zugänge, Sozialform, genutzter Twist, erzeugte Ausgabeformate, ${notizExtra}.`;
   }
 
   function render(){
@@ -667,9 +735,9 @@ Gib am Ende eine kurze Notiz: gewähltes Thema, gewählte Differenzierungsart un
     daz:{fach:'Mathematik',stufe:'Berufsvorbereitung',diffart:'niveau',sozialformen:['einzel'],sprache:'einfach',twist:'auto',niveau:'anwenden'}
   };
   function applyState(){
-    el('fach').value=state.fach;el('stufe').value=state.stufe;el('thema').value=state.thema;el('extra').value=state.extra;el('zweitsprache').value=state.zweitsprache;
+    el('fach').value=state.fach;el('stufe').value=state.stufe;el('thema').value=state.thema;el('extra').value=state.extra;el('zweitsprache').value=state.zweitsprache;el('aufgaben').value=state.aufgaben;el('aufgabenText').value=state.aufgabenText;el('latex').checked=state.latex;
     const setSeg=(gid,val)=>{el(gid).querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===val));};
-    setSeg('diffart',state.diffart);el('sozialform').querySelectorAll('button').forEach(b=>b.classList.toggle('on',state.sozialformen.includes(b.dataset.v)));renderZugaenge();refreshInfo('zugaenge');setSeg('sprache',state.sprache);setSeg('twist',state.twist);setSeg('niveau',state.niveau);setSeg('quelle',state.quelle);
+    setSeg('diffart',state.diffart);el('sozialform').querySelectorAll('button').forEach(b=>b.classList.toggle('on',state.sozialformen.includes(b.dataset.v)));renderZugaenge();refreshInfo('zugaenge');setSeg('sprache',state.sprache);setSeg('twist',state.twist);setSeg('niveau',state.niveau);setSeg('quelle',state.quelle);el('themaHint').textContent=state.quelle==='text'?'(optional: leer = KI wählt passend zu Fach und Stufe)':'(optional: leer = KI wählt aus dem Material)';
     el('formate').querySelectorAll('button').forEach(b=>b.classList.toggle('on',!!state[b.dataset.v]));
     el('zweiWrap').style.display=(state.sprache==='zweisprachig')?'block':'none';
     render();
@@ -677,8 +745,8 @@ Gib am Ende eine kurze Notiz: gewähltes Thema, gewählte Differenzierungsart un
   document.querySelectorAll('.presets button').forEach(b=>{
     b.addEventListener('click',()=>{
       const p=b.dataset.preset;
-      if(p==='reset'){Object.assign(state,{fach:'',stufe:'',thema:'',extra:'',diffart:'niveau',sozialformen:['einzel'],sprache:'standard',zweitsprache:'',twist:'auto',niveau:'anwenden',web:true,word:true,pdf:true,quelle:'pptx'});}
-      else{Object.assign(state,{thema:'',extra:'',zweitsprache:''},presets[p]);}
+      if(p==='reset'){Object.assign(state,{fach:'',stufe:'',thema:'',extra:'',aufgaben:'',aufgabenText:'',latex:false,diffart:'niveau',sozialformen:['einzel'],sprache:'standard',zweitsprache:'',twist:'auto',niveau:'anwenden',web:true,word:true,pdf:true,quelle:'pptx'});}
+      else{Object.assign(state,{thema:'',extra:'',zweitsprache:'',aufgaben:'',aufgabenText:''},presets[p]);}
       state.zugaenge=defaultZugaenge(state.diffart);
       applyState();
     });
