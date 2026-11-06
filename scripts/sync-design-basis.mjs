@@ -7,15 +7,18 @@ const css = ts.match(/export const DESIGN_CSS = `([\s\S]*?)`;/)[1];
 const skeleton = ts.match(/export const DESIGN_SKELETON = `([\s\S]*?)`;/)[1];
 
 const text = `§DESIGNBASIS (für die Website, zwingend)
-- Übernimm dieses CSS unverändert als erstes <style>-Element im <head>; ergänze danach ein zweites <style> nur für die themenspezifische Visualisierung und Kleinigkeiten. Keine anderen Farben als die Variablen (--navy, --terra, --ochre, --cream, --ok, --err); keine Schatten, keine Verläufe, keine Emojis als Icons.
+- Das erste Style-Element im Head der Seite enthält genau den CSS-Block zwischen CSS-ANFANG und CSS-ENDE, unverändert und vollständig. Es beginnt direkt mit :root{ und enthält keinen Satz aus diesem Prompt. Danach folgt ein zweites Style-Element nur für die themenspezifische Visualisierung und Kleinigkeiten. Keine anderen Farben als die Variablen (--navy, --terra, --ochre, --cream, --ok, --err); keine Schatten, keine Verläufe, keine Emojis als Icons.
+CSS-ANFANG
 <style>
 ${css}
 </style>
+CSS-ENDE
 - Baue die Seite nach diesem Grundgerüst (Klassen beibehalten, Inhalte ersetzen, Anzahl Zugänge gemäss Auftrag):
 ${skeleton}
 - Reiter: Klick setzt .active auf dem Reiter und .show auf dem zugehörigen Panel, aria-selected entsprechend; Pfeiltasten wechseln den Reiter.
 - Rückmeldung: richtige Eingabe → Klasse ok auf dem Feld und Text im .feedback (z. B. «Richtig»); falsche → Klasse err und ein Hinweis ohne Lösung. Auswahlaufgaben mit .choices/.choice analog.
-- Der Aha-Moment des obersten Zugangs steht in einem .aha-Block, der erst nach Klick auf einen .btn erscheint.`;
+- Der Aha-Moment des obersten Zugangs steht in einem .aha-Block, der erst nach Klick auf einen .btn erscheint.
+- Kontrolle vor der Ausgabe: Das erste Style-Element beginnt mit :root{, davor steht kein Text. Fehlt :root, hat die Seite keine Farben.`;
 
 const file = "public/prompt-generator-v2.html";
 let html = readFileSync(file, "utf8");
