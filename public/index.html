@@ -81,8 +81,8 @@
   .sec-head.center{text-align:center;margin:0 auto 2.4rem;max-width:62ch}
   .sec-head.center p{margin:0 auto}
 
-  .kastenlink{display:inline-block;background:var(--navy);color:#fff;border-radius:var(--r);padding:.35rem .75rem;text-decoration:none}
-  .kastenlink:hover,.kastenlink:focus-visible{color:var(--ochre)}
+  /* Knöpfe in den Werkzeug-Zeilen: Schrift wie «Zugang & Preise» oben, nicht die Serifenschrift der Überschrift */
+  .rows .t .btn{font-family:var(--sans)}
 </style>
 </head>
 <body>
@@ -124,7 +124,7 @@
         <a class="btn ghost" href="#werkzeuge">Kostenlos ausprobieren</a>
       </div>
       <div class="facts">
-        <div><b>4 Typen</b><span>Lernseite, Prüfung, Spiel, Lernhilfe</span></div>
+        <div><b>5 Typen</b><span>Lernseite, Arbeitsblatt, Prüfung, Spiel, Lernhilfe</span></div>
         <div><b>Eine Datei</b><span>Offline, Link, Word und Moodle</span></div>
         <div><b>KI nach Wahl</b><span>Claude, ChatGPT oder Infomaniak, Schweiz</span></div>
       </div>
@@ -160,43 +160,72 @@
     <p>Technik wird erst dann Unterricht, wenn sie didaktisch strukturiert und einbettbar ist. Deshalb bauen alle Seiten aus Lernwege auf Differenzierung, Selbstkontrolle und einem klaren Arbeitsauftrag auf, nicht auf einem Chatfenster. Und der Coach fragt nach, statt vorzusagen.</p>
   </div>
 </section>
+<section class="sec paper" id="werkzeuge">
+  <div class="wrap sec-grid">
+    <div class="sec-head">
+      <p class="kicker">Werkzeuge</p>
+      <h2>Kostenlos anfangen, ohne Konto</h2>
+      <p>Die Generatoren bauen den Prompt. Den schickst du mit deinem Material an deinen KI-Chat. Wer es ohne Umweg will, erzeugt die Seite im geschützten Bereich.</p>
+    </div>
+    <ul class="rows">
+      <li>
+        <h3 class="t"><a class="btn arrow" href="prompt-generator-v2.html">Prompt-Generator</a><small>Kostenlos</small></h3>
+        <div><p>Differenzierung mit wählbaren Zugängen, Sozialform, Sprache, Twist und Niveau, dazu Schnellstart-Vorlagen. Prompt kopieren, im eigenen KI-Chat verwenden. Erzeugt eine interaktive Lernseite.</p><!--<a class="link arrow" href="prompt-generator-v2.html">Öffnen</a> &nbsp;·&nbsp; <a class="link" href="prompt-generator.html">Basis-Version</a> &nbsp;·&nbsp; <a class="link" href="master-prompt.html">Textvorlage</a>--></div>
+      </li>
+      <li>
+        <h3 class="t"><a class="btn arrow" href="bild-generator.html">Bildprompt-Generator</a><small>Kostenlos</small></h3>
+        <div><p>Bilder für Lernaufgaben beschreiben: Lernziel, Motiv, Bildaufbau, Anforderungen. Mit Arbeitsauftrag und Stolperstein-Check.</p><!--<a class="link arrow" href="bild-generator.html">Öffnen</a>--></div>
+      </li>
+      <li>
+        <h3 class="t"><a class="btn arrow" href="/zugang">Direkt erzeugen</a><small>Mit Zugang</small></h3>
+        <div><p>Material hochladen, Zugänge, Sozialform und Aufgaben wählen, fertige Seite erhalten: Lernseite, Arbeitsblatt, Prüfungsvorbereitung, Lernspiel oder Lernhilfe. Mit Sammlung, Freigabelink, Word- und Moodle-Export, Bildern und dem Coach als Zusatzoption.</p><!--<a class="link arrow" href="/zugang">Zugang &amp; Preise</a>--></div>
+      </li>
+    </ul>
+  </div>
+</section>
 
 <section class="sec" id="was-entsteht">
   <div class="wrap sec-grid">
     <div class="sec-head">
       <p class="kicker">Was entsteht</p>
-      <h2>Vier Seitentypen aus einem Material</h2>
-      <p>Du lädst Skript, Folien oder PDF hoch, oder beschreibst das Thema. Dann wählst du, was entstehen soll. Jede Seite ist eine einzelne HTML-Datei im gleichen ruhigen Design, läuft offline und bringt einen ausklappbaren Bereich für die Lehrperson mit.</p>
+      <h2>Fünf Seitentypen aus einem Material</h2>
+      <p>Du lädst Skript, Folien oder PDF hoch oder beschreibst das Thema, dann wählst du, was entstehen soll. Jede Seite ist eine einzelne Datei im gleichen ruhigen Design, läuft offline und hat einen ausklappbaren Bereich für die Lehrperson.</p>
     </div>
     <ul class="rows">
       <li>
-        <h3 class="t">Lernseite<small>Drei Zugänge A, B, C</small></h3>
+        <h3 class="t">Lernseite<small>Zugänge frei wählbar</small></h3>
         <div>
-          <p>Eine Kernaufgabe, drei Wege: mit Unterstützung, eigenständig, vertieft mit einem Aha-Moment. Jede Eingabe gibt sofort Rückmeldung, ohne die Lösung zu verraten. Differenzierung nach Niveau, Lerntyp, Berufsfeld oder Sozialform, Sprache wählbar, auch vereinfacht oder zweisprachig.</p>
+          <p>Eine Kernaufgabe, mehrere Wege: du wählst die Zugänge nach Niveau, Lerntyp oder Berufsfeld, dazu Sozialform und Sprache. Jede Eingabe gibt sofort Rückmeldung, ohne die Lösung zu verraten.</p>
+        </div>
+      </li>
+      <li>
+        <h3 class="t">Arbeitsblatt<small>Zum Austeilen</small></h3>
+        <div>
+          <p>Dieselben Zugänge wie die Lernseite, aber für Papier: jeder Zugang auf einer eigenen Seite, mit Schreibplatz, Selbstcheck zum Ankreuzen und Lösungsblatt. Zum Drucken oder als Word.</p>
         </div>
       </li>
       <li>
         <h3 class="t">Prüfungsvorbereitung<small>Lernziele, Übungsprüfung, Lücken schliessen</small></h3>
         <div>
-          <p>Aus dem Prüfungsstoff werden Lernziele mit Gewichtung. Die Lernenden schätzen sich ein, schreiben eine Übungsprüfung mit Timer, Punkten und Note, sehen danach die Lösungswege und bekommen pro Lernziel Merkblock, Beispiel und Übung sowie einen Lernplan für die letzten drei Tage.</p>
+          <p>Aus dem Prüfungsstoff werden Lernziele. Die Lernenden schätzen sich ein, schreiben eine Übungsprüfung mit Timer und Note und schliessen Lücken mit Merkblock, Übung und Lernplan.</p>
         </div>
       </li>
       <li>
         <h3 class="t">Lernspiel<small>Vier Levels</small></h3>
         <div>
-          <p>Erkennen, Erinnern, Anwenden, Meistern: 24 bis 28 Aufgaben aus dem Material, mit Punkten, Serie, Leben und Bestleistung. Fürs Einzeltraining, das Partnerduell oder den Wettkampf in Gruppen.</p>
+          <p>Erkennen, Erinnern, Anwenden, Meistern: 24 bis 28 Aufgaben aus dem Material mit Punkten, Serie und Leben. Fürs Einzeltraining oder den Wettkampf in Gruppen.</p>
         </div>
       </li>
       <li>
         <h3 class="t">Lernhilfe<small>Merkblatt, Lernkarten, Glossar</small></h3>
         <div>
-          <p>Das Wichtigste auf einer A4-Seite, Lernkarten zum Umdrehen mit «Gewusst» und «Nochmals», ein Glossar mit Suche. In vereinfachter Sprache oder zweisprachig auch als Nachteilsausgleich.</p>
+          <p>Das Wichtigste auf einer A4-Seite, Lernkarten zum Umdrehen und ein Glossar mit Suche. In vereinfachter Sprache auch als Nachteilsausgleich.</p>
         </div>
       </li>
       <li>
         <h3 class="t">Dazu<small>Bilder, Sammlung, Ausgabe</small></h3>
         <div>
-          <p><b>Bilder mit Lernauftrag</b> direkt erzeugen und in Lernseiten einbinden. <b>Sammlung</b> mit Suche, teilen mit der eigenen Schule oder im Pool aller Lehrpersonen. <b>Ausgabe</b> als Datei, per Freigabelink mit QR-Code, als Word-Arbeitsblatt, als SCORM-Paket oder direkt in einen Moodle-Kurs. <b>Klassenlink:</b> eine Adresse für alle freigegebenen Seiten einer Klasse, ohne Konto für die Lernenden.</p>
+          <p><b>Bilder</b> mit Lernauftrag, eine <b>Sammlung</b> zum Teilen mit Schule oder Pool, <b>Freigabe- und Klassenlink</b> ohne Konto für Lernende, Export als <b>Word</b>, <b>SCORM</b> oder direkt in <b>Moodle</b>.</p>
         </div>
       </li>
     </ul>
@@ -291,29 +320,7 @@
   </div>
 </section>
 
-<section class="sec paper" id="werkzeuge">
-  <div class="wrap sec-grid">
-    <div class="sec-head">
-      <p class="kicker">Werkzeuge</p>
-      <h2>Kostenlos anfangen, ohne Konto</h2>
-      <p>Die Generatoren bauen den Prompt. Den schickst du mit deinem Material an deinen KI-Chat. Wer es ohne Umweg will, erzeugt die Seite im geschützten Bereich.</p>
-    </div>
-    <ul class="rows">
-      <li>
-        <h3 class="t"><a class="kastenlink" href="prompt-generator-v2.html">Prompt-Generator</a><small>Kostenlos</small></h3>
-        <div><p>Vier didaktische Achsen und Schnellstart-Vorlagen für Mathematik BM, Pharma, IT-Security und DaZ. Prompt kopieren, im eigenen KI-Chat verwenden.</p><a class="link arrow" href="prompt-generator-v2.html">Öffnen</a> &nbsp;·&nbsp; <a class="link" href="prompt-generator.html">Basis-Version</a> &nbsp;·&nbsp; <a class="link" href="master-prompt.html">Textvorlage</a></div>
-      </li>
-      <li>
-        <h3 class="t"><a class="kastenlink" href="bild-generator.html">Bildprompt-Generator</a><small>Kostenlos</small></h3>
-        <div><p>Bilder für Lernaufgaben beschreiben: Lernziel, Motiv, Bildaufbau, Anforderungen. Mit Arbeitsauftrag und Stolperstein-Check.</p><a class="link arrow" href="bild-generator.html">Öffnen</a></div>
-      </li>
-      <li>
-        <h3 class="t"><a class="kastenlink" href="/zugang">Direkt erzeugen</a><small>Mit Zugang</small></h3>
-        <div><p>Material hochladen, Typ und Achsen wählen, fertige Seite erhalten: Lernseite, Prüfungsvorbereitung, Lernspiel oder Lernhilfe. Mit Sammlung, Freigabelink, Word- und Moodle-Export, Bildern und dem Coach als Zusatzoption.</p><a class="link arrow" href="/zugang">Zugang &amp; Preise</a></div>
-      </li>
-    </ul>
-  </div>
-</section>
+
 
 <section class="sec price" id="preise">
   <div class="wrap">
@@ -323,7 +330,7 @@
       <p class="small-note" style="margin:-.4rem 0 .9rem">Einführungspreise, gültig für Bestellungen bis 31. Januar 2027. Inklusive Mehrwertsteuer.</p>
       <ul>
         <li><b>Das Abo gilt für eine Lehrperson.</b> Lernende brauchen kein Konto und zahlen nichts, sie öffnen die Seiten über den Freigabelink oder den Klassenlink</li>
-        <li>Pro Monat 10 Seiten mit Claude, 10 mit ChatGPT und 30 mit Infomaniak, alle vier Typen</li>
+        <li>Pro Monat 10 Seiten mit Claude, 10 mit ChatGPT und 30 mit Infomaniak, alle fünf Typen</li>
         <li>Eigene Sammlung, Freigabelink mit QR-Code, gemeinsamer Pool</li>
         <li>Word-Arbeitsblatt, SCORM-Paket, Moodle-Anbindung</li>
         <li>Jederzeit auf das Ende der Laufzeit kündbar. Zahlung über Payrexx, Schweiz</li>
