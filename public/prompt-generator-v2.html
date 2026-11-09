@@ -37,11 +37,11 @@
   .field{display:block;margin:0 0 .9rem;}
   .field .lab{display:block;font-size:.85rem;font-weight:600;margin-bottom:.35rem;}
   .field .hint{font-weight:400;color:var(--ink-soft);font-size:.8rem;}
-  /* Info-Kreis ganz rechts auf Höhe der Überschrift; Erklärung erscheint nur beim Darüberfahren (oder Tastaturfokus) */
+  /* Info-Kreis ganz rechts auf Höhe der Überschrift; Erklärung per Klick/Tippen (auch Mobile), am Desktop zusätzlich beim Darüberfahren */
   .field .lab.has-info,.group>.glab.has-info{display:flex;align-items:center;gap:.4rem;}
   .info-wrap{position:relative;margin-left:auto;flex:none;display:inline-flex;}
-  .info-btn{width:1.35rem;height:1.35rem;padding:0;border-radius:50%;border:1.5px solid var(--navy);background:#fff;color:var(--navy);font:inherit;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:help;}
-  .info-wrap:hover .info-btn,.info-btn:focus-visible{background:var(--navy);color:#fff;}
+  .info-btn{width:1.35rem;height:1.35rem;padding:0;border-radius:50%;border:1.5px solid var(--navy);background:#fff;color:var(--navy);font:inherit;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;}
+  .info-wrap.open .info-btn,.info-btn:focus-visible{background:var(--navy);color:#fff;}
   /* Eigene Berufsfelder: «+» im Kreis öffnet ein Eingabefeld, «×» entfernt ein eigenes Feld */
   .seg .add-btn{width:1.9rem;height:1.9rem;padding:0;border-radius:50%;border:1.5px solid var(--navy);color:var(--navy);font-size:1.05rem;line-height:1;display:inline-flex;align-items:center;justify-content:center;align-self:center;}
   .seg .add-btn:hover,.seg .add-btn[aria-expanded="true"]{background:var(--navy);color:#fff;border-color:var(--navy);}
@@ -51,7 +51,9 @@
   .add-row input{flex:1;}
   .info-btn:focus-visible{outline:2px solid var(--terra);outline-offset:2px;}
   .info-box{display:none;position:absolute;right:0;top:100%;z-index:20;width:min(22rem,calc(100vw - 3rem));margin-top:.35rem;font-size:.8rem;font-weight:400;letter-spacing:normal;text-transform:none;line-height:1.45;color:var(--ink);background:#fff;border:1px solid var(--line-strong);border-radius:var(--r);padding:.6rem .8rem;box-shadow:var(--shadow);}
-  .info-wrap:hover .info-box,.info-wrap:focus-within .info-box{display:block;}
+  .info-wrap.open .info-box{display:block;}
+  /* Nur mit echter Maus: Touch-Geräte kennen kein Darüberfahren, dort bliebe :hover nach dem Tippen hängen */
+  @media (hover:hover){.info-wrap:hover .info-btn{background:var(--navy);color:#fff;}.info-wrap:hover .info-box{display:block;}}
   .info-box dl{margin:0;}
   .info-box dt{font-weight:600;}
   .info-box dd{margin:0 0 .35rem;color:var(--ink-soft);}
@@ -143,6 +145,12 @@
             <button data-v="pdf">🖨 PDF</button>
           </div>
           <!-- <p class="ghint" style="margin-top:.4rem;">Website = zum Üben am Gerät mit Selbstkontrolle. Word = bearbeitbares Arbeitsblatt. PDF = druckfertig. Word/PDF je als getrenntes Aufgaben- und Lösungsblatt.</p> -->
+        </div>
+        <div class="field"><span class="lab">Layout <span class="hint">(Aussehen von Website und Arbeitsblatt)</span></span>
+          <div class="seg" id="layout">
+            <button data-v="lernwege" class="on">Lernwege-Layout</button>
+            <button data-v="frei">Standard (KI gestaltet)</button>
+          </div>
         </div>
         <div class="field"><span class="lab">Material / Quelle</span>
           <div class="seg" id="quelle">
@@ -254,9 +262,23 @@
   /* DESIGNBASIS-END */
   // Der Generator erzeugt nur Lernseiten: CSS für Prüfungsvorbereitung, Lernspiel und Lernhilfe weglassen.
   // Das verkürzt die Ausgabe, weil die KI das CSS unverändert abschreibt. Fehlt eine Marke, bleibt alles drin.
+  // Die App (lib/prompt.ts) nutzt die volle Fassung; hier wird nur der Generator-Prompt gekürzt.
   const DESIGNBASIS_LERNSEITE = (()=>{
     const a=DESIGNBASIS.indexOf('/* Prüfungsvorbereitung */'), b=DESIGNBASIS.indexOf('</style>');
-    return a>0&&b>a ? DESIGNBASIS.slice(0,a)+DESIGNBASIS.slice(b) : DESIGNBASIS;
+    let d=a>0&&b>a ? DESIGNBASIS.slice(0,a)+DESIGNBASIS.slice(b) : DESIGNBASIS;
+    // Gerüst und Bedienregeln kürzer fassen; Klassen, ids und aria bleiben. Fehlt ein Text, bleibt er wie er ist.
+    [['\r',''],
+     ['- Baue die Seite nach diesem Grundgerüst (Klassen beibehalten, Inhalte ersetzen, Anzahl Zugänge gemäss Auftrag):','- Grundgerüst (Klassen beibehalten, Inhalte ersetzen, Zugänge gemäss Auftrag):'],
+     ['Titel der Lernseite','Titel'],['Ein Satz zur Kernaufgabe. Wähle deinen Zugang.','Ein Satz zur Kernaufgabe.'],
+     ['… (nur falls Daten/Werte)','… (falls Daten)'],['… themenpassende Visualisierung (SVG/HTML)','… Visualisierung (SVG/HTML)'],
+     ['A · Mit Unterstützung','A · Name'],['<span class="tsub">kurze Beschreibung</span>','<span class="tsub">…</span>'],
+     ['- Reiter: Klick setzt .active auf dem Reiter und .show auf dem zugehörigen Panel, aria-selected entsprechend; Pfeiltasten wechseln den Reiter.',
+      '- Reiter: Klick setzt .active (Reiter), .show (Panel) und aria-selected; Pfeiltasten wechseln.'],
+     ['- Rückmeldung: richtige Eingabe → Klasse ok auf dem Feld und Text im .feedback (z. B. «Richtig»); falsche → Klasse err und ein Hinweis ohne Lösung. Auswahlaufgaben mit .choices/.choice analog.',
+      '- Rückmeldung: richtig → Klasse ok am Feld und «Richtig» im .feedback; falsch → Klasse err und Hinweis ohne Lösung; .choices/.choice analog.'],
+     ['- Der Aha-Moment des obersten Zugangs steht in einem .aha-Block','- Der Aha-Moment (siehe DIFFERENZIERUNG) steht in einem .aha-Block']
+    ].forEach(([x,y])=>{d=d.split(x).join(y);});
+    return d;
   })();
   // Kurze Gestaltungsvorgabe für Word/PDF, angelehnt an die Website und den Word-Export der App (lib/docx.ts); von Hand gepflegt
   const DRUCKBASIS = `§DRUCKBASIS (für Word und PDF, zwingend)
@@ -273,7 +295,7 @@
   const state={
     fach:'',stufe:'',thema:'',extra:'',
     diffart:'niveau',zugaenge:['unterstuetzt','eigenstaendig','vertiefung'],sozialformen:['einzel'],sprache:'standard',zweitsprache:'',twist:'auto',niveau:'anwenden',
-    web:true,word:false,pdf:false,quelle:'pptx'
+    web:true,word:false,pdf:false,quelle:'pptx',layout:'lernwege'
   };
 
   function wireSeg(groupId,key,after){
@@ -399,6 +421,10 @@
       word:'Wie bei den Folien, aber mit einer Word-Datei.',
       text:'Keine Datei. Die KI arbeitet nur mit Fach, Stufe, Thema und Zusatzwunsch und wählt selbst ein passendes Beispiel.'},
       note:'Die Datei hängst du selbst im KI-Chat an, der Generator lädt nichts hoch.'},
+    layout:{opts:{
+      lernwege:'Einheitliches Aussehen von Lernwege: feste Farben, Schriften, Reiter und Kästen. Der Prompt enthält dafür die Designbasis (CSS und Seitengerüst).',
+      frei:'Die KI gestaltet Website und Arbeitsblatt selbst. Der Prompt wird deutlich kürzer, das Aussehen ist aber jedes Mal anders.'},
+      note:'Die Erzeugung wird mit «Standard» kaum schneller, weil die KI dann eigenes CSS schreibt.'},
     diffart:{opts:{
       niveau:'Alle bearbeiten dieselbe Aufgabe, die Zugänge unterscheiden sich nur in der Hilfe: Mit Unterstützung, Eigenständig, Vertiefung, Expert.',
       lerntyp:'Dieselbe Aufgabe auf gleichem Niveau, aber über verschiedene Kanäle: grafisch, rechnerisch, sprachlich oder handlungsorientiert.',
@@ -451,10 +477,17 @@
     if(info.note){const p=document.createElement('p');p.textContent=info.note;panel.append(p);}
     const btn=document.createElement('button');
     btn.type='button';btn.className='info-btn';btn.textContent='i';
-    btn.setAttribute('aria-label','Erklärung zu «'+title+'»');btn.setAttribute('aria-describedby',panel.id);
+    btn.setAttribute('aria-label','Erklärung zu «'+title+'»');btn.setAttribute('aria-controls',panel.id);btn.setAttribute('aria-expanded','false');
     const wrap=document.createElement('span');wrap.className='info-wrap';wrap.append(btn,panel);
+    // Klick/Tippen öffnet und schliesst; es ist immer nur eine Erklärung offen
+    btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const auf=!wrap.classList.contains('open');closeInfos();if(auf){wrap.classList.add('open');btn.setAttribute('aria-expanded','true');}});
+    panel.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();});
     head.classList.add('has-info');head.append(wrap);
   });
+  function closeInfos(){document.querySelectorAll('.info-wrap.open').forEach(w=>{w.classList.remove('open');w.querySelector('.info-btn').setAttribute('aria-expanded','false');});}
+  // Schliessen mit Klick/Tippen daneben oder mit Escape
+  document.addEventListener('click',closeInfos);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){const o=document.querySelector('.info-wrap.open .info-btn');closeInfos();if(o)o.focus();}});
 
   wireSeg('diffart','diffart',()=>{state.zugaenge=defaultZugaenge(state.diffart);renderZugaenge();refreshInfo('zugaenge');});
   // Sozialform: Mehrfachauswahl, mindestens eine; Reihenfolge wie in SOZIALFORMEN
@@ -467,6 +500,7 @@
     });
   });
   wireSeg('quelle','quelle',()=>{el('themaHint').textContent=state.quelle==='text'?'(optional: leer = KI wählt passend zu Fach und Stufe)':'(optional: leer = KI wählt aus dem Material)';});
+  wireSeg('layout','layout');
   wireSeg('sprache','sprache',()=>{el('zweiWrap').style.display=(state.sprache==='zweisprachig')?'block':'none';});
   wireSeg('twist','twist');
   wireSeg('niveau','niveau');
@@ -505,7 +539,7 @@
 - TWIST (als Zusatzaufgabe am Schluss jedes Zugangs): ${twistText()} Ergänze eine Begründungsfrage und eine Transferfrage in den Berufskontext sowie ${aha}.`;
     }
     const ordnung = state.diffart==='niveau'
-      ? '- Die Zugänge sind gestuft: von viel Hilfe (Mit Unterstützung) bis ohne Hilfe mit offener Problemstellung (Expert). Wo die Designbasis vom «obersten Zugang» spricht, ist der anspruchsvollste gewählte Zugang gemeint; die Zielebene unter ANFORDERUNGSNIVEAU gilt für alle Zugänge.'
+      ? '- Die Zugänge sind gestuft: von viel Hilfe (Mit Unterstützung) bis ohne Hilfe mit offener Problemstellung (Expert). Die Zielebene unter ANFORDERUNGSNIVEAU gilt für alle Zugänge.'
       : '- Die Zugänge sind gleichwertig und nicht gestuft: es gibt keinen obersten, untersten oder einfachsten Zugang. Bezeichne sie nur mit Buchstabe und Name (z. B. «Zugang A · '+gew[0].name+'»), ohne Wörter wie «Mit Unterstützung», «Vertiefung» oder «Expert». Wo die Designbasis vom «obersten Zugang» spricht, gilt das hier für jeden Zugang.';
     return `Gewählt (${gew.length===1?'1 Zugang':gew.length+' Zugänge'}): ${liste}.
 Differenziere nach ${Z.label}. ${Z.intro}
@@ -526,7 +560,7 @@ ${gew.length>1||state.diffart!=='niveau'?ordnung+'\n':''}${twist}`;
     const auftrag=gew.length===1
       ?`Formuliere alle Arbeitsaufträge für ${gew[0].name}; das gilt für alle Zugänge.`
       :`Erstelle die Arbeitsaufträge in ${gew.length} Versionen: ${gew.map(o=>o.name).join(', ')}. Das gilt für jeden Zugang; Kernaufgabe, Daten und Lösungen bleiben in allen Versionen gleich, nur Arbeitsauftrag und Zusammenarbeit unterscheiden sich.
-- Auf der Website: in jedem Zugang oben ein Umschalter für die Sozialform (Knöpfe .choices/.choice aus der Designbasis, aktive Sozialform mit Klasse on), der nur den passenden Arbeitsauftrag zeigt.
+- Auf der Website: in jedem Zugang oben ein Umschalter für die Sozialform ${state.layout==='lernwege'?'(Knöpfe .choices/.choice aus der Designbasis, aktive Sozialform mit Klasse on)':'(Knöpfe, aktive Sozialform hervorgehoben)'}, der nur den passenden Arbeitsauftrag zeigt.
 - Im Arbeitsblatt: Aufgaben je Zugang nur einmal; darunter die Arbeitsaufträge der Sozialformen als kurze, beschriftete Kästen.`;
     return `Zur Einordnung die vier möglichen Sozialformen:
 ${skala}
@@ -565,17 +599,17 @@ ${auftrag}`;
     return map[state.niveau];
   }
   function ausgabeText(){
-    const blocks=[];
+    const blocks=[], lw=state.layout==='lernwege';
     // Website-Block nur wenn gewählt
     if(state.web){
       blocks.push(`§AUSGABEFORMAT – INTERAKTIVE WEBSITE
 Eine einzige, voll funktionsfähige HTML-Seite (eine Datei, ohne externe Abhängigkeiten, offline lauffähig):
 - Zugangswahl per Klick (Reiter, wie unter DIFFERENZIERUNG beschrieben): die Lernenden sehen nur ihren gewählten Zugang.
 - Visualisierung der Kernaufgabe als durchgehende Leitidee, passend zum Thema. Jedes Eingabefeld ist sichtbar beschriftet, damit klar ist, wohin es gehört; optionale Hilfslinien/Marker erscheinen erst nach korrekter Eingabe.
-- Interaktive Selbstkontrolle nach dem Muster «Rückmeldung» der Designbasis: bei korrekter Eingabe ein grünes Häkchen, bei falscher ein Hinweis, ohne die Lösung zu verraten.
+- Interaktive Selbstkontrolle${lw?' nach dem Muster «Rückmeldung» der Designbasis.':': bei korrekter Eingabe ein grünes Häkchen, bei falscher ein Hinweis, ohne die Lösung zu verraten.'}
 - Bereich «Für die Lehrperson»: ausklappbar (verborgen bis Klick), mit vollständigen Lösungen und Wegen, getrennt vom Aufgabenteil; ein Satz zum didaktischen Anschluss ${state.quelle==='pptx'?'an die nächsten Folien':'an den weiteren Unterricht'}.
 - PDF-Button oben («Als PDF herunterladen»): blendet für den Export alle Zugänge und den Lehrpersonen-Bereich ein und löst den Druckdialog aus; eigene @media-print-CSS blendet Reiter/Buttons aus; Fallback, der die Seite in einem neuen Tab öffnet, falls der Druckdialog blockiert ist.${state.pdf?' Dieser Button druckt nur die Website; das PDF-Arbeitsblatt ist eine eigene, papiergerechte Datei.':''}`);
-      blocks.push(DESIGNBASIS_LERNSEITE);
+      if(lw) blocks.push(DESIGNBASIS_LERNSEITE);
     }
     // Word/PDF-Arbeitsblatt
     const docs=[];
@@ -591,9 +625,15 @@ Erstelle ${bezug}${list} als klassisches Arbeitsblatt zum Austeilen – papierge
 - Ein davon getrenntes Lösungsblatt für die Lehrperson mit vollständigen Lösungs- und Begründungswegen (eigene Seite oder klar abgetrennter Abschnitt).
 - Schlicht und gut kopierbar (schwarz-weiss-tauglich). Interaktive Elemente entfallen; wo die Website Feedback gäbe, steht hier Platz zum Bearbeiten.
 Lege jede Datei als eigenständigen Download an.`);
-      blocks.push(DRUCKBASIS);
+      if(lw) blocks.push(DRUCKBASIS);
     }
     return blocks.join('\n\n');
+  }
+
+  // Lernwege-Layout: Designbasis/Druckbasis verbindlich; Standard: die KI gestaltet selbst
+  function gestaltungText(){
+    if(state.layout==='lernwege') return [state.web&&'Für die Website gilt die DESIGNBASIS oben; dazu responsiv bis Mobile, Tastaturbedienbarkeit, sichtbarer Fokus.',(state.word||state.pdf)&&'Für Arbeitsblätter: Halte dich an die DRUCKBASIS oben; klare Druckstruktur, gut kopierbar, im gleichen Erscheinungsbild wie die Website.'].filter(Boolean).join(' ');
+    return [state.web&&'Für die Website: Gestalte das Design selbst, mit eigenem CSS in einem Style-Element im Head; ruhig und gut lesbar, gute Kontraste, responsiv bis Mobile, Tastaturbedienbarkeit, sichtbarer Fokus.',(state.word||state.pdf)&&'Für Arbeitsblätter: Gestalte das Layout selbst; klare Druckstruktur, gut kopierbar, schwarz-weiss-tauglich'+(state.web?', im gleichen Erscheinungsbild wie die Website':'')+'.'].filter(Boolean).join(' ');
   }
 
   function build(){
@@ -622,7 +662,7 @@ Lege jede Datei als eigenständigen Download an.`);
     // Antwortformat: was in welcher Reihenfolge kommt, und was bei zu langer Antwort Vorrang hat
     const dateien=[state.web&&'die Website als eine vollständige HTML-Datei in einem einzigen Codeblock',(state.word||state.pdf)&&`das Arbeitsblatt (${[state.word&&'Word',state.pdf&&'PDF'].filter(Boolean).join(' und ')}) als herunterladbare Datei${state.word&&state.pdf?'en':''}`].filter(Boolean);
     const antwortText=`- Liefere ${dateien.join(', danach ')}; zum Schluss die kurze Notiz (siehe unten). Keine Einleitung, keine Erklärungen davor oder dazwischen.
-- Prüfe Lösungen${state.web?' und Feedback-Logik':''} still für dich; Rechen- und Begründungswege erscheinen nur ${[state.web&&'im Lehrpersonen-Bereich',(state.word||state.pdf)&&'auf dem Lösungsblatt'].filter(Boolean).join(' bzw. ')}, nicht im Chat.${state.web&&(state.word||state.pdf)?`
+- Prüfe still (siehe QUALITÄTSPRÜFUNG); Rechen- und Begründungswege erscheinen nur ${[state.web&&'im Lehrpersonen-Bereich',(state.word||state.pdf)&&'auf dem Lösungsblatt'].filter(Boolean).join(' bzw. ')}, nicht im Chat.${state.web&&(state.word||state.pdf)?`
 - Wird die Antwort zu lang: Gib zuerst die Website vollständig aus und biete das Arbeitsblatt danach an, statt eine Datei abzubrechen.`:''}${(state.word||state.pdf)?`
 - Kannst du keine Dateien erzeugen, gib das Arbeitsblatt als druckfertiges HTML in einem eigenen Codeblock aus.`:''}`;
 
@@ -656,13 +696,12 @@ ${spr?('\n§SPRACHE\n'+spr+'\n'):''}
 ${ausgabeText()}
 
 §GESTALTUNG
-${[state.web&&'Für die Website: Halte dich an die DESIGNBASIS oben (CSS unverändert, Grundgerüst, Klassen); eigenes CSS nur für die themenpassende Visualisierung der Kernaufgabe in den Farbvariablen; responsiv bis Mobile, Tastaturbedienbarkeit, sichtbarer Fokus.',(state.word||state.pdf)&&'Für Arbeitsblätter: Halte dich an die DRUCKBASIS oben; klare Druckstruktur, gut kopierbar, im gleichen Erscheinungsbild wie die Website.'].filter(Boolean).join(' ')}
+${gestaltungText()}
 
 §QUALITÄTSPRÜFUNG VOR DER AUSGABE
-- Prüfe alle Lösungen selbst: Rechnungen nachrechnen, fachliche Aussagen auf Richtigkeit prüfen.${state.web?' Auf der Website muss die Feedback-Logik jedes Eingabefelds exakt zu den richtigen Werten passen.':''}${state.word||state.pdf?' Im Arbeitsblatt müssen die Lösungen auf dem Lehrpersonen-Blatt korrekt sein.':''}
-- Prüfe, dass jede Aufgabe klar zeigt, was wo einzutragen ist${state.web?' (auf der Website: welche Eingabe welche Visualisierung auslöst)':''}.
-- Kontrolliere alle Texte (auch Selbstchecks) auf Tipp- und Flüchtigkeitsfehler; Schweizer Standarddeutsch.
-- Zum Schluss, vor der Ausgabe: Lies das gesamte Material noch einmal vollständig durch (${[state.web&&'alle Zugänge und den Lehrpersonen-Bereich der Website',(state.word||state.pdf)&&'Arbeitsblatt und Lösungsblatt'].filter(Boolean).join(', ')}) und prüfe die fachliche Richtigkeit: Fakten, Fachbegriffe, Formeln, Zeichen, Einheiten und Zahlenwerte, und ob Aufgabe, Lösung${state.web?' und Rückmeldung':''} zueinander passen. Korrigiere jeden Fehler, bevor du ausgibst.
+- Lies zum Schluss alles vollständig durch (${[state.web&&'alle Zugänge und den Lehrpersonen-Bereich der Website',(state.word||state.pdf)&&'Arbeitsblatt und Lösungsblatt'].filter(Boolean).join(', ')}): Rechnungen nachrechnen; Fakten, Fachbegriffe, Formeln, Zeichen, Einheiten und Zahlenwerte prüfen; Aufgabe, Lösung${state.web?' und Rückmeldung':''} müssen zueinander passen.${state.web?' Auf der Website passt die Feedback-Logik jedes Eingabefelds exakt zu den richtigen Werten, und es ist klar, welche Eingabe welche Visualisierung auslöst.':''}
+- Texte (auch Selbstchecks) ohne Tipp- und Flüchtigkeitsfehler; Schweizer Standarddeutsch.
+- Korrigiere jeden Fehler, bevor du ausgibst.
 Notiz am Ende (höchstens fünf Zeilen): gewähltes Thema, gewählte Differenzierungsart und Zugänge, Sozialform, genutzter Twist, erzeugte Ausgabeformate, ${notizExtra}.`;
   }
 
@@ -700,7 +739,7 @@ Notiz am Ende (höchstens fünf Zeilen): gewähltes Thema, gewählte Differenzie
   function applyState(){
     el('fach').value=state.fach;el('stufe').value=state.stufe;el('thema').value=state.thema;el('extra').value=state.extra;el('zweitsprache').value=state.zweitsprache;
     const setSeg=(gid,val)=>{el(gid).querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===val));};
-    setSeg('diffart',state.diffart);el('sozialform').querySelectorAll('button').forEach(b=>b.classList.toggle('on',state.sozialformen.includes(b.dataset.v)));renderZugaenge();refreshInfo('zugaenge');setSeg('sprache',state.sprache);setSeg('twist',state.twist);setSeg('niveau',state.niveau);setSeg('quelle',state.quelle);el('themaHint').textContent=state.quelle==='text'?'(optional: leer = KI wählt passend zu Fach und Stufe)':'(optional: leer = KI wählt aus dem Material)';
+    setSeg('diffart',state.diffart);el('sozialform').querySelectorAll('button').forEach(b=>b.classList.toggle('on',state.sozialformen.includes(b.dataset.v)));renderZugaenge();refreshInfo('zugaenge');setSeg('sprache',state.sprache);setSeg('twist',state.twist);setSeg('niveau',state.niveau);setSeg('quelle',state.quelle);setSeg('layout',state.layout);el('themaHint').textContent=state.quelle==='text'?'(optional: leer = KI wählt passend zu Fach und Stufe)':'(optional: leer = KI wählt aus dem Material)';
     el('formate').querySelectorAll('button').forEach(b=>b.classList.toggle('on',!!state[b.dataset.v]));
     el('zweiWrap').style.display=(state.sprache==='zweisprachig')?'block':'none';
     render();
@@ -708,7 +747,7 @@ Notiz am Ende (höchstens fünf Zeilen): gewähltes Thema, gewählte Differenzie
   document.querySelectorAll('.presets button').forEach(b=>{
     b.addEventListener('click',()=>{
       const p=b.dataset.preset;
-      if(p==='reset'){Object.assign(state,{fach:'',stufe:'',thema:'',extra:'',diffart:'niveau',sozialformen:['einzel'],sprache:'standard',zweitsprache:'',twist:'auto',niveau:'anwenden',web:true,word:false,pdf:false,quelle:'pptx'});}
+      if(p==='reset'){Object.assign(state,{fach:'',stufe:'',thema:'',extra:'',diffart:'niveau',sozialformen:['einzel'],sprache:'standard',zweitsprache:'',twist:'auto',niveau:'anwenden',web:true,word:false,pdf:false,quelle:'pptx',layout:'lernwege'});}
       else{Object.assign(state,{thema:'',extra:'',zweitsprache:''},presets[p]);}
       state.zugaenge=defaultZugaenge(state.diffart);
       applyState();
