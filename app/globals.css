@@ -32,6 +32,32 @@ tr:last-child td{border-bottom:none}
 .seg button{font:inherit;font-size:.85rem;padding:.4rem .8rem;border:1px solid var(--line-strong);border-radius:var(--r);background:#fff;color:var(--ink);cursor:pointer}
 .seg button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
 .seg button:disabled{opacity:.6;cursor:default}
+/* «Direkt erzeugen»: Feldüberschrift mit Info-Kreis rechts; Erklärung nur beim Darüberfahren (Tastatur: Fokus), nicht klickbar */
+.field-head{display:flex;align-items:center;gap:.5rem;margin:.8rem 0 .25rem}
+.field-head label{margin:0;flex:1}
+/* Etwas grössere Überschriften: «Was soll entstehen?» und «Feinsteuerung» */
+.head-gross{font-size:1rem}
+.info-wrap{position:relative;flex:none;display:inline-flex}
+.info-btn{width:1.35rem;height:1.35rem;padding:0;border-radius:50%;border:1.5px solid var(--navy);background:#fff;color:var(--navy);font:inherit;font-size:.8rem;font-weight:600;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:help}
+.info-wrap:hover .info-btn,.info-btn:focus-visible{background:var(--navy);color:#fff}
+.info-btn:focus-visible{outline:2px solid var(--terra);outline-offset:2px}
+.info-box{display:none;position:absolute;right:0;top:calc(100% + .35rem);z-index:20;width:min(22rem,calc(100vw - 3rem));font-size:.8rem;font-weight:400;line-height:1.45;color:var(--ink);background:#fff;border:1px solid var(--line-strong);border-radius:var(--r);padding:.6rem .8rem;box-shadow:var(--shadow)}
+.info-wrap:hover .info-box,.info-wrap:focus-within .info-box{display:block}
+.info-box dl{margin:0}
+.info-box dt{font-weight:600}
+.info-box dd{margin:0 0 .35rem;color:var(--ink-soft)}
+.info-box p{margin:.4rem 0 0;color:var(--ink-soft)}
+/* Eigene Berufsfelder: «+» im Kreis öffnet ein Eingabefeld, «×» entfernt ein eigenes Feld */
+.seg .add-btn{width:2rem;height:2rem;padding:0;border-radius:50%;border:1.5px solid var(--navy);color:var(--navy);font-size:1.05rem;line-height:1;display:inline-flex;align-items:center;justify-content:center;align-self:center}
+.seg .add-btn:hover,.seg .add-btn[aria-expanded="true"]{background:var(--navy);color:#fff}
+.seg .del-btn{margin-left:-.3rem;padding:.4rem .5rem;color:var(--ink-soft)}
+.seg .del-btn:hover{color:var(--err);border-color:var(--err)}
+.add-row{display:flex;gap:.4rem;margin-top:.5rem;align-items:center}
+.add-row input{flex:1}
+/* «Generierter Prompt»: Textlink über dem Erzeugen-Knopf */
+.prompt-link{display:block;font:inherit;font-size:.92rem;font-weight:600;color:var(--navy);background:none;border:0;padding:0;cursor:pointer;text-decoration:none}
+.prompt-link:hover{text-decoration:underline}
+.prompt-link:focus-visible{outline:2px solid var(--terra);outline-offset:2px}
 .log{background:var(--navy);color:#DFE6EE;border-radius:var(--r);padding:.9rem 1rem;font-size:.82rem;line-height:1.5;white-space:pre-wrap;margin-top:1rem;max-height:220px;overflow:auto}
 .imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem}
 .imgs a{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}

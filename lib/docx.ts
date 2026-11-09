@@ -102,6 +102,13 @@ function runsOf(node: Node, fmt: Fmt, out: ParagraphChild[]): number {
   const el = node as HTMLElement;
   const tag = (el.tagName ?? "").toLowerCase();
   if (tag === "br") { out.push(new TextRun({ break: 1 })); return 0; }
+  // MathML: sonst würden Formeltext und LaTeX-annotation aneinanderkleben. Bevorzugt die LaTeX-Quelle ausgeben.
+  if (tag === "math") {
+    const tex = el.querySelectorAll("annotation").find((a) => /tex/i.test(a.getAttribute("encoding") ?? ""))?.text.trim();
+    const plain = tex || text(el.childNodes.filter((c) => (c as HTMLElement).tagName?.toLowerCase() !== "annotation").map((c) => c.text).join("")).trim();
+    if (plain) out.push(new TextRun({ text: decode(plain), bold: fmt.bold, italics: fmt.italics, color: fmt.color, font: "Consolas" }));
+    return plain.length;
+  }
   const f: Fmt = { ...fmt };
   if (tag === "strong" || tag === "b") f.bold = true;
   if (tag === "em" || tag === "i") f.italics = true;

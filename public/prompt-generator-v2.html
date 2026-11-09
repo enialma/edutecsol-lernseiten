@@ -56,8 +56,6 @@
   .info-box dt{font-weight:600;}
   .info-box dd{margin:0 0 .35rem;color:var(--ink-soft);}
   .info-box p{margin:.4rem 0 0;color:var(--ink-soft);}
-  .check-row{display:flex;align-items:center;gap:.5rem;font-size:.88rem;cursor:pointer;margin:0;}
-  .check-row input{width:1.05rem;height:1.05rem;accent-color:var(--navy);margin:0;}
   input[type=text],input[type=number],textarea{width:100%;font:inherit;font-size:.95rem;padding:.55rem .7rem;border:1px solid var(--line-strong);border-radius:var(--r);background:#fff;color:var(--ink);}
   input[type=text]:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
   textarea{resize:vertical;min-height:2.5rem;}
@@ -141,8 +139,8 @@
         <div class="field"><span class="lab">Ausgabeformat(e) <span class="hint">(Mehrfachauswahl, mindestens eines)</span></span>
           <div class="seg" id="formate">
             <button data-v="web" class="on">🖥 Interaktive Website</button>
-            <button data-v="word" class="on">📄 Word (.docx)</button>
-            <button data-v="pdf" class="on">🖨 PDF</button>
+            <button data-v="word">📄 Word (.docx)</button>
+            <button data-v="pdf">🖨 PDF</button>
           </div>
           <!-- <p class="ghint" style="margin-top:.4rem;">Website = zum Üben am Gerät mit Selbstkontrolle. Word = bearbeitbares Arbeitsblatt. PDF = druckfertig. Word/PDF je als getrenntes Aufgaben- und Lösungsblatt.</p> -->
         </div>
@@ -155,17 +153,6 @@
           </div>
           <!--<p class="ghint" style="margin-top:.4rem;">Was hängst du an? Bei «nur diese Beschreibung» arbeitet die KI allein mit deinen Angaben – ohne Datei.</p> -->
         </div>
-      </div>
-
-      <!-- Aufgaben -->
-      <div class="group">
-        <span class="glab">Aufgaben</span>
-        <p class="ghint">Wie viele Aufgaben pro Zugang, und was soll gefragt werden?</p>
-        <label class="field"><span class="lab">Anzahl Aufgaben pro Zugang <span class="hint">(optional: leer = KI entscheidet)</span></span>
-          <input type="number" id="aufgaben" min="1" max="12" step="1" inputmode="numeric" placeholder="automatisch" style="max-width:9rem"></label>
-        <label class="field"><span class="lab">Aufgaben beschreiben <span class="hint">(optional)</span></span>
-          <textarea id="aufgabenText" placeholder="z. B. A1:..  A2:..  A3:.."></textarea></label>
-        <label class="check-row"><input type="checkbox" id="latex"> Formeln in LaTeX <span class="hint">(für Mathematik und Physik)</span></label>
       </div>
 
       <!-- Achse 1: Differenzierungsart -->
@@ -284,9 +271,9 @@
 - In Graustufen gedruckt muss alles lesbar bleiben.`;
   const el=id=>document.getElementById(id);
   const state={
-    fach:'',stufe:'',thema:'',extra:'',aufgaben:'',aufgabenText:'',latex:false,
+    fach:'',stufe:'',thema:'',extra:'',
     diffart:'niveau',zugaenge:['unterstuetzt','eigenstaendig','vertiefung'],sozialformen:['einzel'],sprache:'standard',zweitsprache:'',twist:'auto',niveau:'anwenden',
-    web:true,word:true,pdf:true,quelle:'pptx'
+    web:true,word:false,pdf:false,quelle:'pptx'
   };
 
   function wireSeg(groupId,key,after){
@@ -492,8 +479,7 @@
       state[k]=!state[k];b.classList.toggle('on',state[k]);render();
     });
   });
-  ['fach','stufe','thema','extra','zweitsprache','aufgaben','aufgabenText'].forEach(k=>el(k).addEventListener('input',()=>{state[k]=el(k).value;render();}));
-  el('latex').addEventListener('change',()=>{state.latex=el('latex').checked;render();});
+  ['fach','stufe','thema','extra','zweitsprache'].forEach(k=>el(k).addEventListener('input',()=>{state[k]=el(k).value;render();}));
 
   // ---- Textbausteine je Achse ----
   
@@ -545,28 +531,6 @@ ${gew.length>1||state.diffart!=='niveau'?ordnung+'\n':''}${twist}`;
     return `Zur Einordnung die vier möglichen Sozialformen:
 ${skala}
 ${auftrag}`;
-  }
-  function aufgabenText(){
-    const n=Math.round(+state.aufgaben);
-    const anzahl=n>=1&&n<=12
-      ?`- Jeder Zugang enthält genau ${n} ${n===1?'Aufgabe':'Aufgaben'} (die Kernaufgabe mitgezählt); der Twist kommt zusätzlich dazu.`
-      :'';
-    const vorgabe=state.aufgabenText.trim()
-      ?`- Vorgaben der Lehrperson zu den Aufgaben (haben Vorrang vor dem Material; passe sie je Zugang an, ohne den Inhalt zu ändern):\n<<<\n${state.aufgabenText.trim()}\n>>>`
-      :'';
-    return [anzahl,vorgabe,
-      '- Jede Aufgabe sagt eindeutig, was gesucht ist, in welcher Form die Antwort erwartet wird (z. B. Zahl mit Einheit, Satz, Auswahl) und wie genau (z. B. auf zwei Dezimalstellen gerundet).',
-      '- Kommen Formeln, Zeichen oder Abkürzungen vor, erkläre jedes Zeichen bei der ersten Verwendung mit Bedeutung und Einheit (z. B. «ρ = Dichte in g/cm³, m = Masse in g»); ein Zeichen bedeutet auf dem ganzen Blatt dasselbe.'
-    ].filter(Boolean).join('\n');
-  }
-  function latexText(){
-    if(!state.latex) return '';
-    return ['Schreibe alle Formeln in LaTeX-Notation und setze sie sauber, nie als Bild.',
-      state.web&&'- Website: ohne externe Bibliothek (offline): jede Formel als MathML (<math>), mit dem LaTeX-Quelltext in <annotation encoding="application/x-tex">.',
-      state.word&&'- Word: jede Formel als Word-Formel (Formeleditor), nicht als Fliesstext.',
-      state.pdf&&'- PDF: Formeln gesetzt wie im Formeleditor.',
-      '- Kannst du Formeln nur als Text ausgeben, nutze LaTeX in $…$ (im Text) bzw. $$…$$ (abgesetzt).'
-    ].filter(Boolean).join('\n');
   }
   function spracheText(){
     const map={
@@ -679,11 +643,10 @@ ${antwortText}
 
 §KERNAUFGABE
 Formuliere eine Kernaufgabe mit (1) Berechnung, Bestimmung oder fachlicher Analyse – je nach Fach –, (2) nachvollziehbarem Lösungs- bzw. Begründungsweg und (3) einem sachlichen Ergebnissatz. Definiere die Erfolgskriterien.
+- Jede Aufgabe sagt eindeutig, was gesucht ist, in welcher Form die Antwort erwartet wird (z. B. Zahl mit Einheit, Satz, Auswahl) und wie genau (z. B. auf zwei Dezimalstellen gerundet).
+- Kommen Formeln, Zeichen oder Abkürzungen vor, erkläre jedes Zeichen bei der ersten Verwendung mit Bedeutung und Einheit (z. B. «ρ = Dichte in g/cm³, m = Masse in g»); ein Zeichen bedeutet auf dem ganzen Blatt dasselbe.
 ${niveauText()}
 
-§AUFGABEN
-${aufgabenText()}
-${latexText()?'\n§FORMELN (LaTeX)\n'+latexText()+'\n':''}
 §DIFFERENZIERUNG
 ${diffartText()}
 
@@ -735,7 +698,7 @@ Notiz am Ende (höchstens fünf Zeilen): gewähltes Thema, gewählte Differenzie
     daz:{fach:'Mathematik',stufe:'Berufsvorbereitung',diffart:'niveau',sozialformen:['einzel'],sprache:'einfach',twist:'auto',niveau:'anwenden'}
   };
   function applyState(){
-    el('fach').value=state.fach;el('stufe').value=state.stufe;el('thema').value=state.thema;el('extra').value=state.extra;el('zweitsprache').value=state.zweitsprache;el('aufgaben').value=state.aufgaben;el('aufgabenText').value=state.aufgabenText;el('latex').checked=state.latex;
+    el('fach').value=state.fach;el('stufe').value=state.stufe;el('thema').value=state.thema;el('extra').value=state.extra;el('zweitsprache').value=state.zweitsprache;
     const setSeg=(gid,val)=>{el(gid).querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===val));};
     setSeg('diffart',state.diffart);el('sozialform').querySelectorAll('button').forEach(b=>b.classList.toggle('on',state.sozialformen.includes(b.dataset.v)));renderZugaenge();refreshInfo('zugaenge');setSeg('sprache',state.sprache);setSeg('twist',state.twist);setSeg('niveau',state.niveau);setSeg('quelle',state.quelle);el('themaHint').textContent=state.quelle==='text'?'(optional: leer = KI wählt passend zu Fach und Stufe)':'(optional: leer = KI wählt aus dem Material)';
     el('formate').querySelectorAll('button').forEach(b=>b.classList.toggle('on',!!state[b.dataset.v]));
@@ -745,8 +708,8 @@ Notiz am Ende (höchstens fünf Zeilen): gewähltes Thema, gewählte Differenzie
   document.querySelectorAll('.presets button').forEach(b=>{
     b.addEventListener('click',()=>{
       const p=b.dataset.preset;
-      if(p==='reset'){Object.assign(state,{fach:'',stufe:'',thema:'',extra:'',aufgaben:'',aufgabenText:'',latex:false,diffart:'niveau',sozialformen:['einzel'],sprache:'standard',zweitsprache:'',twist:'auto',niveau:'anwenden',web:true,word:true,pdf:true,quelle:'pptx'});}
-      else{Object.assign(state,{thema:'',extra:'',zweitsprache:'',aufgaben:'',aufgabenText:''},presets[p]);}
+      if(p==='reset'){Object.assign(state,{fach:'',stufe:'',thema:'',extra:'',diffart:'niveau',sozialformen:['einzel'],sprache:'standard',zweitsprache:'',twist:'auto',niveau:'anwenden',web:true,word:false,pdf:false,quelle:'pptx'});}
+      else{Object.assign(state,{thema:'',extra:'',zweitsprache:''},presets[p]);}
       state.zugaenge=defaultZugaenge(state.diffart);
       applyState();
     });

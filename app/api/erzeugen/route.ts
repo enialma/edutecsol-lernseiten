@@ -7,6 +7,7 @@ import { createPage } from "@/lib/pages";
 import { LIMITS, logGeneration, quotaFor } from "@/lib/quota";
 import { extractHtml, systemPrompt, titleFromHtml, userPrompt, type GenParams } from "@/lib/prompt";
 import { injectDesignBasis } from "@/lib/design-basis";
+import { DIFFART_WAHL, MAX_EIGEN_LEN, MAX_EIGENE, SOZIALFORMEN, zugangOptionen, type Sozialform } from "@/lib/achsen";
 import { TASKS, type Einsatz } from "@/lib/bildprompt";
 import { getImageMeta, setImageShare } from "@/lib/images";
 
@@ -18,6 +19,16 @@ export const dynamic = "force-dynamic";
 
 function pick<T extends string>(v: unknown, allowed: readonly T[], fallback: T): T {
   return (allowed as readonly string[]).includes(String(v)) ? (v as T) : fallback;
+}
+
+/** Mehrfachwert aus dem Formular (JSON-Array von Strings); Ungültiges ergibt eine leere Liste. */
+function list(v: unknown): string[] {
+  try {
+    const a = JSON.parse(String(v ?? "[]"));
+    return Array.isArray(a) ? a.filter((x): x is string => typeof x === "string") : [];
+  } catch {
+    return [];
+  }
 }
 
 export async function POST(req: Request) {
@@ -38,20 +49,55 @@ export async function POST(req: Request) {
   }
 
   const params: GenParams = {
-    typ: pick(fd.get("typ"), ["lernseite", "pruefung", "spiel", "hilfe"] as const, "lernseite"),
+    typ: pick(fd.get("typ"), ["lernseite", "arbeitsblatt", "pruefung", "spiel", "hilfe"] as const, "lernseite"),
     dauer: (Number(fd.get("dauer")) === 20 ? 20 : Number(fd.get("dauer")) === 45 ? 45 : 30) as 20 | 30 | 45,
     fach: String(fd.get("fach") ?? "").trim(),
     stufe: String(fd.get("stufe") ?? "").trim(),
     thema: String(fd.get("thema") ?? "").trim(),
     extra: String(fd.get("extra") ?? "").trim(),
-    diffart: pick(fd.get("diffart"), ["niveau", "lerntyp", "interesse", "sozialform"] as const, "niveau"),
-    anzahl: (Number(fd.get("anzahl")) === 2 ? 2 : Number(fd.get("anzahl")) === 4 ? 4 : 3) as 2 | 3 | 4,
+    diffart: pick(fd.get("diffart"), DIFFART_WAHL, "niveau"),
     sprache: pick(fd.get("sprache"), ["standard", "einfach", "glossar", "zweisprachig"] as const, "standard"),
     zweitsprache: String(fd.get("zweitsprache") ?? "").trim(),
     twist: pick(fd.get("twist"), ["auto", "ausreisser", "vergleich", "grenzfall", "fehler", "methoden", "transfer"] as const, "auto"),
     niveau: pick(fd.get("niveau"), ["reproduzieren", "anwenden", "beurteilen"] as const, "anwenden"),
   };
   if (!params.fach || !params.stufe) return new Response("Fach und Zielstufe sind Pflicht.", { status: 400 });
+
+  // Achsen und Feinsteuerung, nur für Lernseiten: Zugänge, eigene Berufsfelder, Sozialformen, Aufgabenanzahl, Aufgabenvorgaben, LaTeX
+  if (params.typ === "lernseite" || params.typ === "arbeitsblatt") {
+    const diffart = params.diffart as (typeof DIFFART_WAHL)[number];
+    if (diffart === "interesse") {
+      const eigene: string[] = [];
+      for (const raw of list(fd.get("eigeneBerufsfelder"))) {
+        const name = raw.trim();
+        if (!name || eigene.some((e) => e.toLowerCase() === name.toLowerCase())) continue;
+        if (name.length > MAX_EIGEN_LEN) return new Response(`Eigenes Berufsfeld zu lang (max. ${MAX_EIGEN_LEN} Zeichen): «${name.slice(0, 30)}…»`, { status: 400 });
+        eigene.push(name);
+      }
+      if (eigene.length > MAX_EIGENE) return new Response(`Höchstens ${MAX_EIGENE} eigene Berufsfelder.`, { status: 400 });
+      if (eigene.length) params.eigeneBerufsfelder = eigene;
+    }
+    // Nur Zugänge, die zur Differenzierungsart passen, in Skalen-Reihenfolge
+    const gewaehlt = list(fd.get("zugaenge"));
+    const zugaenge = zugangOptionen(diffart, params.eigeneBerufsfelder).map((o) => o.v).filter((v) => gewaehlt.includes(v));
+    if (!zugaenge.length) return new Response("Bitte mindestens einen Zugang wählen.", { status: 400 });
+    params.zugaenge = zugaenge;
+    const sozial = list(fd.get("sozialformen"));
+    const sozialformen = SOZIALFORMEN.map((o) => o.v).filter((v): v is Sozialform => sozial.includes(v));
+    if (!sozialformen.length) return new Response("Bitte mindestens eine Sozialform wählen.", { status: 400 });
+    params.sozialformen = sozialformen;
+
+    const anzahlRaw = String(fd.get("aufgaben") ?? "").trim();
+    if (anzahlRaw) {
+      const n = Number(anzahlRaw);
+      if (!Number.isInteger(n) || n < 1 || n > 12) return new Response("Anzahl Aufgaben: bitte eine ganze Zahl von 1 bis 12 oder leer lassen.", { status: 400 });
+      params.aufgaben = n;
+    }
+    const aufgabenText = String(fd.get("aufgabenText") ?? "").trim();
+    if (aufgabenText.length > 2000) return new Response("Die Aufgabenbeschreibung ist zu lang (max. 2 000 Zeichen).", { status: 400 });
+    if (aufgabenText) params.aufgabenText = aufgabenText;
+    if (fd.get("latex") === "true") params.latex = true;
+  }
 
   // Optional: eigenes Bild als Bildaufgabe einbinden (braucht einen öffentlichen Bildlink)
   const bildId = Number(fd.get("bild") ?? 0);
@@ -85,7 +131,7 @@ export async function POST(req: Request) {
           material = { name: "", text: materialText, truncated: false, kind: "text" };
         }
 
-        send(`▸ ${params.typ === "pruefung" ? "Prüfungsvorbereitung" : params.typ === "spiel" ? "Lernspiel" : params.typ === "hilfe" ? "Lernhilfe" : "Lernseite"} wird mit ${PROVIDER_LABELS[provider]}${modellOverride ? ` (${modellOverride})` : ""} erzeugt – das dauert ein bis drei Minuten …\n`);
+        send(`▸ ${params.typ === "pruefung" ? "Prüfungsvorbereitung" : params.typ === "spiel" ? "Lernspiel" : params.typ === "hilfe" ? "Lernhilfe" : params.typ === "arbeitsblatt" ? "Arbeitsblatt" : "Lernseite"} wird mit ${PROVIDER_LABELS[provider]}${modellOverride ? ` (${modellOverride})` : ""} erzeugt – das dauert ein bis drei Minuten …\n`);
         let chars = 0;
         let lastTick = Date.now();
         const tStart = Date.now();

@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import QRCode from "qrcode";
 import { auth } from "@/auth";
 import { getPage } from "@/lib/pages";
-import { DIFFART_LABELS, NIVEAU_LABELS, SPRACHE_LABELS, TWIST_LABELS, type GenParams } from "@/lib/prompt";
+import { DIFFART_LABELS, NIVEAU_LABELS, SPRACHE_LABELS, TWIST_LABELS, normalizeLernseite, type GenParams } from "@/lib/prompt";
+import { SOZIALFORMEN, zugangOptionen } from "@/lib/achsen";
 import Topbar from "../../../Topbar";
 import Footer from "../../../Footer";
 import { coachAction, copyAction, deletePageAction, pageGruppenAction, renameAction, shareAction, visibilityAction } from "../actions";
@@ -34,6 +35,11 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
   const gruppen = canEdit ? await listGruppen(page.user_id) : [];
   const inGruppen = new Set((canEdit ? (await gruppenOfPages([page.id])).get(page.id) ?? [] : []).map((g) => g.id));
   const p = page.params as Partial<GenParams>;
+  // Achsen der Lernseite, auch für alte Seiten (Anzahl Zugänge, Sozialform als Differenzierungsart)
+  const achsenTyp = ["lernseite", "arbeitsblatt"].includes(p.typ ?? "lernseite");
+  const achsen = normalizeLernseite(p);
+  const zugangNamen = zugangOptionen(achsen.diffart, achsen.eigeneBerufsfelder).filter((o) => achsen.zugaenge.includes(o.v)).map((o) => o.name);
+  const sozialNamen = SOZIALFORMEN.filter((o) => achsen.sozialformen.includes(o.v)).map((o) => o.name);
   const slug = page.title.toLowerCase().replace(/[^a-z0-9äöü]+/g, "-").replace(/^-|-$/g, "") || "lernseite";
 
   const h = await headers();
@@ -252,12 +258,16 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
             <summary style={{ cursor: "pointer", fontWeight: 600 }}>Details zur Erzeugung</summary>
             <table style={{ marginTop: ".8rem" }}>
               <tbody>
-                <tr><th>Typ</th><td>{p.typ === "pruefung" ? `Prüfungsvorbereitung (Übungsprüfung ${p.dauer ?? 30} Minuten)` : p.typ === "spiel" ? "Lernspiel (vier Levels)" : p.typ === "hilfe" ? "Lernhilfe (Merkblatt, Lernkarten, Glossar)" : "Lernseite"}</td></tr>
-                {(p.typ ?? "lernseite") === "lernseite" && <tr><th>Differenzierung</th><td>{p.diffart ? DIFFART_LABELS[p.diffart] : "–"}{p.anzahl ? `, ${p.anzahl} Zugänge` : ""}</td></tr>}
+                <tr><th>Typ</th><td>{p.typ === "pruefung" ? `Prüfungsvorbereitung (Übungsprüfung ${p.dauer ?? 30} Minuten)` : p.typ === "spiel" ? "Lernspiel (vier Levels)" : p.typ === "hilfe" ? "Lernhilfe (Merkblatt, Lernkarten, Glossar)" : p.typ === "arbeitsblatt" ? "Arbeitsblatt" : "Lernseite"}</td></tr>
+                {achsenTyp && <tr><th>Differenzierung</th><td>{DIFFART_LABELS[achsen.diffart]}: {zugangNamen.join(", ")}</td></tr>}
+                {achsenTyp && <tr><th>Sozialform</th><td>{sozialNamen.join(", ")}</td></tr>}
                 <tr><th>Sprache</th><td>{p.sprache ? SPRACHE_LABELS[p.sprache] : "–"}{p.zweitsprache ? ` (${p.zweitsprache})` : ""}</td></tr>
-                {(p.typ ?? "lernseite") === "lernseite" && <tr><th>Twist</th><td>{p.twist ? TWIST_LABELS[p.twist] : "–"}</td></tr>}
-                {(p.typ ?? "lernseite") === "lernseite" && <tr><th>Niveau</th><td>{p.niveau ? NIVEAU_LABELS[p.niveau] : "–"}</td></tr>}
+                {achsenTyp && <tr><th>Twist</th><td>{p.twist ? TWIST_LABELS[p.twist] : "–"}</td></tr>}
+                {achsenTyp && <tr><th>Niveau</th><td>{p.niveau ? NIVEAU_LABELS[p.niveau] : "–"}</td></tr>}
                 {p.extra && <tr><th>Zusatzwunsch</th><td>{p.extra}</td></tr>}
+                {p.aufgaben && <tr><th>Aufgaben</th><td>{p.aufgaben} pro Zugang</td></tr>}
+                {p.aufgabenText && <tr><th>Aufgabenvorgaben</th><td style={{ whiteSpace: "pre-wrap" }}>{p.aufgabenText}</td></tr>}
+                {p.latex && <tr><th>Formeln</th><td>LaTeX (als MathML gesetzt)</td></tr>}
                 {p.bild && <tr><th>Bild</th><td><Link href={`/app/bilder/${p.bild.id}`}>{p.bild.title}</Link> (als Bildaufgabe eingebunden)</td></tr>}
                 <tr><th>Modell</th><td>{page.provider === "beispiel" ? "Beispielseite von der Startseite" : `${page.provider} · ${page.model}`}</td></tr>
                 <tr><th>Tokens</th><td>{page.input_tokens.toLocaleString("de-CH")} ein / {page.output_tokens.toLocaleString("de-CH")} aus{page.duration_ms ? ` · ${Math.round(page.duration_ms / 1000)} s` : ""}</td></tr>
