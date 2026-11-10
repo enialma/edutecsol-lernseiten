@@ -24,12 +24,12 @@ export default async function ErzeugenPage({ searchParams }: { searchParams: Pro
   return (
     <>
       <AppShell active="neu">
-          <p className="kicker">Mein Bereich</p>
-          <h1>Lernseite direkt erzeugen</h1>
-          <p className="lead">
-            Material hochladen oder Thema beschreiben, didaktische Achsen wählen – die fertige interaktive Lernseite
-            landet in deiner Sammlung. Ohne Umweg über einen Chat.
-          </p>
+          <header className="page-head tight">
+            <div>
+              <h1>Neue Seite erzeugen</h1>
+              <p>Material geben, wählen, was entsteht, einstellen, erzeugen. Die fertige Seite liegt danach in deiner Sammlung.</p>
+            </div>
+          </header>
           {providers.length === 0 ? (
             <div className="msg err">Noch kein KI-Anbieter konfiguriert (ANTHROPIC_API_KEY, OPENAI_API_KEY oder INFOMANIAK_TOKEN fehlt).</div>
           ) : (
