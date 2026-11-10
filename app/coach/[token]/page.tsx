@@ -12,7 +12,7 @@ export default async function CoachPage({ params, searchParams }: { params: Prom
   const page = await getPageByToken(token);
   const active = !!page && page.coach && page.owner_coach && coachAllowedFor(page);
   return (
-    <main style={{ padding: 0, minHeight: "100vh", background: "var(--paper)" }}>
+    <main className="cc-main">
       {active ? (
         <CoachChat token={token} name={COACH_NAME} title={page!.title} initial={{ reiter: sp.reiter ?? "", aufgabe: sp.aufgabe ?? "", eingabe: sp.eingabe ?? "" }} />
       ) : (

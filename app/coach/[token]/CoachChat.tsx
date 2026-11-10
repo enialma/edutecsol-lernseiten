@@ -48,31 +48,28 @@ export default function CoachChat({ token, name, title, initial }: { token: stri
     }
   }
 
+  const generic = name.toLowerCase() === "coach";
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-      <div ref={logRef} style={{ flex: 1, overflowY: "auto", padding: "1rem 1rem .5rem" }}>
-        {kontext.reiter && <p className="small-note" style={{ margin: "0 0 .8rem" }}>Du arbeitest an: <b>{kontext.reiter}</b>{kontext.aufgabe ? ` · ${kontext.aufgabe.slice(0, 90)}${kontext.aufgabe.length > 90 ? "…" : ""}` : ""}</p>}
+    <div className="cc">
+      <div ref={logRef} className="cc-log" aria-live="polite">
+        {kontext.reiter && <p className="cc-ctx">Du arbeitest an: <b>{kontext.reiter}</b>{kontext.aufgabe ? ` · ${kontext.aufgabe.slice(0, 90)}${kontext.aufgabe.length > 90 ? "…" : ""}` : ""}</p>}
         {msgs.map((m, i) => (
-          <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start", margin: "0 0 .6rem" }}>
-            <div style={{
-              maxWidth: "88%", padding: ".6rem .85rem", borderRadius: 12, lineHeight: 1.45, fontSize: ".95rem",
-              background: m.role === "user" ? "var(--navy)" : "#fff", color: m.role === "user" ? "#fff" : "var(--ink)",
-              border: m.role === "user" ? "1px solid var(--navy)" : "1px solid var(--line-strong)",
-              borderBottomRightRadius: m.role === "user" ? 4 : 12, borderBottomLeftRadius: m.role === "user" ? 12 : 4,
-            }}>{m.content}</div>
-          </div>
+          <p key={i} className={`cc-msg ${m.role === "user" ? "user" : "bot"}`}>
+            <span className="sr">{m.role === "user" ? "Du: " : "Coach: "}</span>{m.content}
+          </p>
         ))}
-        {busy && <p className="small-note" style={{ margin: ".2rem 0 0" }}>{name.toLowerCase() === "coach" ? "Der Coach" : name} überlegt …</p>}
-        {error && <div className="msg err" style={{ marginTop: ".4rem" }}>{error}</div>}
+        {busy && <p className="cc-ctx">{generic ? "Der Coach" : name} überlegt …</p>}
+        {error && <div className="msg err" role="alert">{error}</div>}
       </div>
-      <form onSubmit={(e) => { e.preventDefault(); send(); }} style={{ borderTop: "1px solid var(--line)", padding: ".6rem .8rem .7rem", background: "#fff" }}>
-        <div style={{ display: "flex", gap: ".5rem", alignItems: "flex-end" }}>
-          <textarea ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} rows={2} maxLength={600} disabled={busy}
-            placeholder="Was hast du bis jetzt versucht?" style={{ flex: 1, minHeight: 0, resize: "none", fontSize: ".95rem" }}
-            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }} aria-label="Deine Nachricht an den Coach" />
-          <button className="btn terra" disabled={busy || !input.trim()} aria-label="Senden">→</button>
+      <form className="cc-form" onSubmit={(e) => { e.preventDefault(); send(); }}>
+        <div className="cc-row">
+          <label htmlFor="cc-input" className="sr">Nachricht an den Coach</label>
+          <textarea id="cc-input" ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} rows={1} maxLength={600} disabled={busy}
+            placeholder="Frage stellen"
+            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }} />
+          <button className="btn terra" disabled={busy || !input.trim()}>Senden</button>
         </div>
-        <p className="small-note" style={{ margin: ".4rem 0 0", fontSize: ".72rem" }}>Nichts wird gespeichert. Keine Namen oder persönlichen Angaben eingeben. Seite: {title}</p>
+        <p className="cc-note">Nichts wird gespeichert. Keine Namen oder persönlichen Angaben eingeben. Seite: {title}</p>
       </form>
     </div>
   );
