@@ -6,8 +6,7 @@ import { EINSATZ_LABELS, TASKS, encodeState, fixes, labelText, normalize, recipe
 import { imageProviderReady } from "@/lib/imagegen";
 import { getImageMeta, imageFamily } from "@/lib/images";
 import { imageQuotaFor } from "@/lib/quota";
-import Topbar from "../../../Topbar";
-import Footer from "../../../Footer";
+import AppShell from "../../../AppShell";
 import { copyImageAction, deleteImageAction, exampleImageAction, renameImageAction, shareImageAction, visibilityImageAction } from "../actions";
 import CopyText from "./CopyText";
 import EditForm from "./EditForm";
@@ -40,9 +39,7 @@ export default async function BildPage({ params }: { params: Promise<{ id: strin
 
   return (
     <>
-      <Topbar />
-      <main>
-        <div className="wrap">
+      <AppShell active="bilder">
           <p className="kicker"><Link href={back[0]}>← {back[1]}</Link></p>
           <h1>{img.title}</h1>
           <p className="lead">
@@ -215,9 +212,7 @@ export default async function BildPage({ params }: { params: Promise<{ id: strin
               <button className="btn ghost" style={{ color: "var(--err)" }}>Bild löschen</button>
             </form>
           )}
-        </div>
-      </main>
-      <Footer />
+              </AppShell>
     </>
   );
 }

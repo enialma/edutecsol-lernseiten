@@ -4,8 +4,7 @@ import { filterValues, listPages, type ListMode } from "@/lib/pages";
 import { getInstitutionOf } from "@/lib/users";
 import { BEISPIELE, missingBeispiele } from "@/lib/beispiele";
 import { gruppenOfPages, listGruppen, type GruppeRef } from "@/lib/gruppen";
-import Topbar from "../../Topbar";
-import Footer from "../../Footer";
+import AppShell from "../../AppShell";
 import { importBeispieleAction } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -34,9 +33,7 @@ export default async function SeitenPage({ searchParams }: { searchParams: Promi
 
   return (
     <>
-      <Topbar />
-      <main>
-        <div className="wrap">
+      <AppShell active="sammlung">
           <p className="kicker">Mein Bereich</p>
           <h1>{mode === "school" ? institution : mode === "pool" ? "Gemeinsamer Pool" : mode === "all" ? "Alle Lernseiten" : "Meine Sammlung"}</h1>
           <p className="lead">
@@ -135,9 +132,7 @@ export default async function SeitenPage({ searchParams }: { searchParams: Promi
               ))}
             </div>
           )}
-        </div>
-      </main>
-      <Footer />
+              </AppShell>
     </>
   );
 }

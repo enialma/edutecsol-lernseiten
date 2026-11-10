@@ -6,8 +6,7 @@ import { auth } from "@/auth";
 import { getPage } from "@/lib/pages";
 import { DIFFART_LABELS, NIVEAU_LABELS, SPRACHE_LABELS, TWIST_LABELS, normalizeLernseite, type GenParams } from "@/lib/prompt";
 import { SOZIALFORMEN, zugangOptionen } from "@/lib/achsen";
-import Topbar from "../../../Topbar";
-import Footer from "../../../Footer";
+import AppShell from "../../../AppShell";
 import { coachAction, copyAction, deletePageAction, pageGruppenAction, renameAction, shareAction, visibilityAction } from "../actions";
 import { gruppenOfPages, listGruppen } from "@/lib/gruppen";
 import { coachAllowedFor, coachTopicsForPage, coachUsageForPage, defaultStilFor, COACH_DEN, COACH_DER_GROSS, COACH_NAME, COACH_STIL_LABELS, IS_GENERIC } from "@/lib/coach";
@@ -49,9 +48,7 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
 
   return (
     <>
-      <Topbar />
-      <main>
-        <div className="wrap">
+      <AppShell active="sammlung">
           <p className="kicker"><Link href={own ? "/app/seiten" : page.pool ? "/app/seiten?modus=pool" : "/app/seiten?modus=schule"}>← {own ? "Meine Sammlung" : page.pool ? "Gemeinsamer Pool" : "Meine Schule"}</Link></p>
           <h1>{page.title}</h1>
           <p className="lead">
@@ -284,9 +281,7 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
               <button className="btn ghost" style={{ color: "var(--err)" }}>Lernseite löschen</button>
             </form>
           )}
-        </div>
-      </main>
-      <Footer />
+              </AppShell>
     </>
   );
 }

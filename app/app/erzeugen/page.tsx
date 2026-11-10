@@ -3,15 +3,14 @@ import { auth } from "@/auth";
 import { PRESETS } from "@/lib/prompt";
 import { quotaFor } from "@/lib/quota";
 import { listImages } from "@/lib/images";
-import Topbar from "../../Topbar";
-import Footer from "../../Footer";
+import AppShell from "../../AppShell";
 import Form from "./Form";
 
 export const dynamic = "force-dynamic";
 
-export default async function ErzeugenPage({ searchParams }: { searchParams: Promise<{ bild?: string }> }) {
+export default async function ErzeugenPage({ searchParams }: { searchParams: Promise<{ bild?: string; typ?: string }> }) {
   const session = await auth();
-  const { bild } = await searchParams;
+  const { bild, typ } = await searchParams;
   const bilder = (await listImages(Number(session!.user.id), "mine")).map((b) => ({ id: b.id, title: b.title + (b.instruction ? " (Variante)" : "") }));
   const quota = await quotaFor(Number(session!.user.id), session!.user.role === "admin");
   const providers = availableProviders().map((p) => ({
@@ -24,9 +23,7 @@ export default async function ErzeugenPage({ searchParams }: { searchParams: Pro
   const presets = Object.entries(PRESETS).map(([id, p]) => ({ id, ...p }));
   return (
     <>
-      <Topbar />
-      <main>
-        <div className="wrap">
+      <AppShell active="neu">
           <p className="kicker">Mein Bereich</p>
           <h1>Lernseite direkt erzeugen</h1>
           <p className="lead">
@@ -36,11 +33,9 @@ export default async function ErzeugenPage({ searchParams }: { searchParams: Pro
           {providers.length === 0 ? (
             <div className="msg err">Noch kein KI-Anbieter konfiguriert (ANTHROPIC_API_KEY, OPENAI_API_KEY oder INFOMANIAK_TOKEN fehlt).</div>
           ) : (
-            <Form providers={providers} presets={presets} bilder={bilder} initialBild={bild ? Number(bild) : 0} isAdmin={session!.user.role === "admin"} />
+            <Form providers={providers} presets={presets} bilder={bilder} initialBild={bild ? Number(bild) : 0} initialTyp={typ} isAdmin={session!.user.role === "admin"} />
           )}
-        </div>
-      </main>
-      <Footer />
+              </AppShell>
     </>
   );
 }

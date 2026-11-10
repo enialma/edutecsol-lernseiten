@@ -95,3 +95,113 @@ main .card h2{font-size:1.35rem;margin:0 0 .6rem}
 .quota{margin:2.4rem 0 0;padding-top:1.4rem;border-top:1px solid var(--line-strong)}
 .quota h2{margin:0 0 .2rem;font-size:1.35rem}
 .quota .facts{border-top:0;padding-top:.6rem;margin-top:.4rem;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+
+/* ===== App-Rahmen (geschützter Bereich): Seitenleiste in Navy, Arbeitsfläche --paper =====
+   Alle Farben kommen aus den Variablen von public/lw.css; Abstufungen entstehen per color-mix daraus. */
+.shell{min-height:100vh;display:flex;background:var(--paper);
+  --on-navy:color-mix(in srgb,var(--paper) 86%,var(--navy));
+  --on-navy-soft:color-mix(in srgb,var(--paper) 62%,var(--navy));
+  --navy-line:color-mix(in srgb,var(--card) 18%,transparent);
+  --hair:color-mix(in srgb,var(--line) 70%,var(--card))}
+.side{flex:0 0 248px;background:var(--navy);color:var(--paper);padding:1.75rem 1rem 1.25rem;display:flex;flex-direction:column;gap:1.75rem;position:sticky;top:0;height:100vh;overflow-y:auto}
+.side-brand{padding:0 .75rem;display:flex;flex-direction:column;gap:.15rem}
+.side-brand .name{font-family:var(--serif);font-weight:600;font-size:1.5rem;letter-spacing:-.01em;line-height:1.1;color:var(--paper);text-decoration:none;align-self:flex-start}
+.side-brand .by{font-size:.75rem;color:var(--on-navy-soft)}
+.side-test{align-self:flex-start;margin-top:.4rem;font-size:.72rem;font-weight:600;padding:.15rem .5rem;border-radius:4px;background:var(--ochre);color:var(--navy)}
+.side-nav{display:flex;flex-direction:column;gap:.25rem}
+.side-nav a{display:flex;align-items:center;gap:.75rem;padding:.6rem .75rem;border-radius:var(--r);text-decoration:none;color:var(--on-navy);font-size:.95rem;min-height:44px}
+.side-nav a:hover{background:color-mix(in srgb,var(--card) 8%,transparent);color:var(--card)}
+.side-nav a.on{background:var(--paper);color:var(--navy);font-weight:600}
+.side-nav svg{flex:none}
+.side-quota{margin-top:auto;padding:1rem .75rem 0;border-top:1px solid var(--navy-line);display:flex;flex-direction:column;gap:.75rem}
+.side-label{font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--on-navy-soft)}
+.q{display:flex;flex-direction:column;gap:.35rem}
+.q-line{display:flex;justify-content:space-between;gap:.75rem;font-size:.82rem}
+.q-bar{height:6px;border-radius:3px;background:color-mix(in srgb,var(--card) 16%,transparent)}
+.q-bar div{height:6px;border-radius:3px;background:var(--paper)}
+.side-note{font-size:.75rem;color:var(--on-navy-soft);line-height:1.4}
+.side-user{display:flex;align-items:center;flex-wrap:wrap;gap:.6rem .75rem;padding:1rem .75rem 0;border-top:1px solid var(--navy-line)}
+.side-user .avatar{flex:none;width:32px;height:32px;border-radius:50%;background:var(--navy-soft);color:var(--card);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:600}
+.side-user .who{flex:1 1 120px;min-width:0;display:flex;flex-direction:column;font-size:.9rem;overflow-wrap:anywhere}
+.side-user .who small{font-size:.75rem;color:var(--on-navy-soft)}
+.side-user form{margin:0;flex:1 1 100%}
+.side-out{font:inherit;font-size:.9rem;width:100%;min-height:44px;padding:.5rem .9rem;border-radius:var(--r);border:1px solid color-mix(in srgb,var(--card) 40%,transparent);background:transparent;color:var(--paper);cursor:pointer}
+.side-out:hover{background:color-mix(in srgb,var(--card) 8%,transparent)}
+.side-foot{display:flex;flex-wrap:wrap;gap:.25rem 1rem;padding:0 .75rem;font-size:.78rem}
+.side-foot a{color:var(--on-navy-soft);text-decoration:none;padding:.35rem 0}
+.side-foot a:hover{color:var(--card);text-decoration:underline}
+main.work{flex:1 1 0;min-width:0;padding:2.5rem clamp(1.25rem,4vw,3.5rem) 4rem}
+.work-in{max-width:1100px}
+/* Fokusrahmen in Ochre, Klickflächen mindestens 44 px */
+.shell a:focus-visible,.shell button:focus-visible,.shell summary:focus-visible{outline:3px solid var(--ochre);outline-offset:2px}
+.shell input:focus,.shell select:focus,.shell textarea:focus{outline:3px solid var(--ochre);outline-offset:1px;border-color:var(--navy)}
+.shell .btn,.shell .seg button{min-height:44px}
+.shell summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
+.shell details > summary{display:list-item;padding:.6rem 0}
+
+/* Seitenkopf und Bausteine der App-Seiten */
+.page-head{display:flex;flex-wrap:wrap;gap:1.25rem;align-items:flex-end;justify-content:space-between;margin:0 0 2.5rem}
+.page-head h1{margin:0}
+.page-head p{margin:.5rem 0 0;color:var(--ink-soft)}
+.btn.cta{font-size:1rem;padding:.85rem 1.4rem;min-height:48px}
+main.work .sec-title{font-size:1.25rem;font-weight:600;margin:0 0 1rem}
+.types{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.75rem}
+.type{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:1.1rem;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:.35rem;min-height:112px;transition:border-color .15s}
+.type:hover{border-color:var(--navy)}
+.type b{font-weight:600;hyphens:auto;overflow-wrap:anywhere}
+.type span{font-size:.875rem;line-height:1.4;color:var(--ink-soft)}
+.cols{display:flex;flex-wrap:wrap;gap:1.75rem;align-items:flex-start;margin-top:2.5rem}
+.cols > .wide{flex:2 1 520px;min-width:0}
+.cols > .narrow{flex:1 1 280px;min-width:0;display:flex;flex-direction:column;gap:1.25rem}
+.box{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
+.box.pad{padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:.75rem;align-items:flex-start}
+.box.soft{background:var(--cream)}
+main.work .box h2{font-size:1.125rem;font-weight:600;margin:0}
+.box-head{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1.1rem 1.5rem;border-bottom:1px solid var(--hair)}
+.box-text,.box-empty{margin:0;font-size:.95rem;line-height:1.5}
+.box-empty{padding:1.5rem;color:var(--ink-soft)}
+.box .more{color:var(--navy);font-size:.9rem;font-weight:600;min-height:44px;display:inline-flex;align-items:center}
+.box .more:hover{color:var(--terra)}
+.lrow{display:flex;flex-wrap:wrap;gap:.4rem 1rem;align-items:center;padding:.85rem 1.5rem;border-bottom:1px solid var(--hair);text-decoration:none;color:var(--ink);min-height:56px}
+.lrow:last-child{border-bottom:0}
+.lrow:hover{background:var(--paper)}
+.lrow-main{flex:1 1 220px;min-width:0;display:flex;flex-direction:column;gap:.1rem}
+.lrow-main b{font-weight:600;font-size:.95rem}
+.lrow-main small{font-size:.82rem;color:var(--ink-soft)}
+.lrow-when{font-size:.82rem;color:var(--ink-soft);min-width:5.5rem;text-align:right}
+.tag{font-size:.8rem;font-weight:600;padding:.2rem .6rem;border-radius:6px;white-space:nowrap}
+.tag.frei{background:color-mix(in srgb,var(--ok) 14%,var(--card));color:color-mix(in srgb,var(--ok) 62%,var(--ink))}
+.tag.priv{background:var(--cream);color:var(--ink-soft)}
+.tag.pool{background:var(--cream);color:var(--navy)}
+.klist{list-style:none;margin:0;padding:0;align-self:stretch;display:flex;flex-direction:column}
+.klist li{display:flex;justify-content:space-between;align-items:center;gap:.75rem;min-height:44px;font-size:.95rem}
+.klist a{color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;min-height:44px}
+.klist a:hover{color:var(--terra);text-decoration:underline}
+.klist span{color:var(--ink-soft);font-size:.875rem;white-space:nowrap}
+.klist.links a{text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line-strong)}
+.box.abo{margin-top:1.75rem}
+.box.row-between{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between}
+
+/* Handy und schmale Fenster: Seitenleiste rutscht nach oben */
+@media (max-width:860px){
+  .shell{flex-direction:column}
+  .side{position:static;height:auto;flex:none;padding:1rem;gap:.75rem;overflow:visible}
+  .side-brand{flex-direction:row;align-items:baseline;gap:.6rem;padding:0 .25rem}
+  .side-test{margin:0}
+  .side-nav{flex-direction:row;flex-wrap:wrap;gap:.25rem}
+  .side-nav a{flex:none;white-space:nowrap;padding:.5rem .7rem;gap:.5rem}
+  .types{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .type{min-height:0}
+  .side-quota{margin-top:0;padding:.75rem .25rem 0;flex-direction:row;flex-wrap:wrap;gap:.25rem 1.25rem}
+  .side-label{flex:1 1 100%}
+  .q-bar,.side-note{display:none}
+  .q-line{gap:.4rem}
+  .side-user{padding:.75rem .25rem 0}
+  .side-user form{flex:0 0 auto}
+  .side-out{width:auto}
+  .side-foot{padding:0 .25rem}
+  main.work{padding:1.5rem 1rem 3rem}
+  .page-head{margin-bottom:1.75rem}
+  .btn.cta{width:100%;justify-content:center}
+  .lrow-when{text-align:left;min-width:0}
+}

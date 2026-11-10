@@ -6,8 +6,7 @@ import { auth } from "@/auth";
 import { getGruppe } from "@/lib/gruppen";
 import { listPages } from "@/lib/pages";
 import { TYP_LABELS, type Typ } from "@/lib/prompt";
-import Topbar from "../../../Topbar";
-import Footer from "../../../Footer";
+import AppShell from "../../../AppShell";
 import CopyButton from "../../seiten/[id]/CopyButton";
 import { addPagesAction, deleteGruppeAction, gruppeShareAction, removePageAction, sharePageFromGruppeAction, updateGruppeAction } from "../actions";
 
@@ -36,9 +35,7 @@ export default async function GruppePage({ params }: { params: Promise<{ id: str
 
   return (
     <>
-      <Topbar />
-      <main>
-        <div className="wrap">
+      <AppShell active="klassen">
           <p className="kicker"><Link href="/app/gruppen">← Klassen und Gruppen</Link></p>
           <h1>{gruppe.name}</h1>
           <p className="lead">
@@ -178,9 +175,7 @@ export default async function GruppePage({ params }: { params: Promise<{ id: str
             <button className="btn ghost" style={{ color: "var(--err)" }}>Gruppe löschen</button>
             <span className="small-note" style={{ marginLeft: ".7rem" }}>Die Lernseiten bleiben in der Sammlung erhalten. Ein Klassenlink dieser Gruppe wird ungültig.</span>
           </form>
-        </div>
-      </main>
-      <Footer />
+              </AppShell>
     </>
   );
 }

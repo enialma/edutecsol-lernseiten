@@ -2,8 +2,7 @@ import { auth } from "@/auth";
 import { PRESETS } from "@/lib/bildprompt";
 import { availableImageProviders, IMAGE_PROVIDER_LABELS, INFOMANIAK_IMAGE_MODEL, OPENAI_IMAGE_MODEL } from "@/lib/imagegen";
 import { imageQuotaFor } from "@/lib/quota";
-import Topbar from "../../../Topbar";
-import Footer from "../../../Footer";
+import AppShell from "../../../AppShell";
 import Form from "./Form";
 
 export const dynamic = "force-dynamic";
@@ -18,9 +17,7 @@ export default async function BildErzeugenPage({ searchParams }: { searchParams:
   const presets = Object.entries(PRESETS).map(([id, p]) => ({ id, label: p.label }));
   return (
     <>
-      <Topbar />
-      <main>
-        <div className="wrap">
+      <AppShell active="bilder">
           <p className="kicker">Mein Bereich</p>
           <h1>Bild direkt erzeugen</h1>
           <p className="lead">
@@ -32,9 +29,7 @@ export default async function BildErzeugenPage({ searchParams }: { searchParams:
           ) : (
             <Form providers={providers} presets={presets} quota={quota} initial={r ?? null} />
           )}
-        </div>
-      </main>
-      <Footer />
+              </AppShell>
     </>
   );
 }

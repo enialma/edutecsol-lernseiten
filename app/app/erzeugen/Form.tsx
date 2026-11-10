@@ -183,11 +183,11 @@ function PromptVorschau({ s, hatDatei }: { s: State; hatDatei: boolean }) {
   );
 }
 
-export default function Form({ providers, presets, bilder, initialBild, isAdmin }: { providers: ProviderOpt[]; presets: Preset[]; bilder: Bild[]; initialBild: number; isAdmin: boolean }) {
+export default function Form({ providers, presets, bilder, initialBild, initialTyp, isAdmin }: { providers: ProviderOpt[]; presets: Preset[]; bilder: Bild[]; initialBild: number; initialTyp?: string; isAdmin: boolean }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const [s, setS] = useState<State>({
-    typ: "lernseite", dauer: "30",
+    typ: TYP.some(([v]) => v === initialTyp) ? (initialTyp as string) : "lernseite", dauer: "30",
     fach: "", stufe: "", thema: "", extra: "", material: "",
     diffart: "niveau", zugaenge: defaultZugaenge("niveau"), eigeneBerufsfelder: [], sozialformen: ["einzel"],
     sprache: "standard", zweitsprache: "", twist: "auto", niveau: "anwenden",

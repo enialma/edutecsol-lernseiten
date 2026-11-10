@@ -1,7 +1,6 @@
 import { LIMIT_BILDER, LIMITS, usageByUser } from "@/lib/quota";
 import { listInstitutions, listUsers } from "@/lib/users";
-import Topbar from "../../Topbar";
-import Footer from "../../Footer";
+import AppShell from "../../AppShell";
 import {
   createInstitutionAction, createUserAction, deleteInstitutionAction, deleteUserAction, renameInstitutionAction,
   setInstitutionAction, setPasswordAction, toggleActiveAction, toggleCoachAction,
@@ -15,9 +14,7 @@ export default async function BenutzerPage() {
   const nf = (n: number) => n.toLocaleString("de-CH");
   return (
     <>
-      <Topbar />
-      <main>
-        <div className="wrap">
+      <AppShell active="benutzer">
           <p className="kicker">Administration</p>
           <h1>Benutzer</h1>
           <p className="lead">
@@ -180,9 +177,7 @@ export default async function BenutzerPage() {
               </tbody>
             </table>
           </div>
-        </div>
-      </main>
-      <Footer />
+              </AppShell>
     </>
   );
 }

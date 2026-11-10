@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { auth } from "@/auth";
 import { listGruppen } from "@/lib/gruppen";
-import Topbar from "../../Topbar";
-import Footer from "../../Footer";
+import AppShell from "../../AppShell";
 import { createGruppeAction } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -14,9 +13,7 @@ export default async function GruppenPage() {
 
   return (
     <>
-      <Topbar />
-      <main>
-        <div className="wrap">
+      <AppShell active="klassen">
           <p className="kicker"><Link href="/app/seiten">← Meine Sammlung</Link></p>
           <h1>Klassen und Gruppen</h1>
           <p className="lead">
@@ -57,9 +54,7 @@ export default async function GruppenPage() {
               ))}
             </div>
           )}
-        </div>
-      </main>
-      <Footer />
+              </AppShell>
     </>
   );
 }

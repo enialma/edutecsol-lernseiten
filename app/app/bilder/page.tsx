@@ -3,8 +3,7 @@ import { auth } from "@/auth";
 import { EINSATZ_LABELS, type Einsatz } from "@/lib/bildprompt";
 import { listImages, type ImageListMode } from "@/lib/images";
 import { getInstitutionOf } from "@/lib/users";
-import Topbar from "../../Topbar";
-import Footer from "../../Footer";
+import AppShell from "../../AppShell";
 
 export const dynamic = "force-dynamic";
 
@@ -24,9 +23,7 @@ export default async function BilderPage({ searchParams }: { searchParams: Promi
 
   return (
     <>
-      <Topbar />
-      <main>
-        <div className="wrap">
+      <AppShell active="bilder">
           <p className="kicker">Mein Bereich</p>
           <h1>{mode === "school" ? institution : mode === "pool" ? "Gemeinsamer Bilder-Pool" : mode === "all" ? "Alle Bilder" : "Meine Bilder"}</h1>
           <p className="lead">
@@ -74,9 +71,7 @@ export default async function BilderPage({ searchParams }: { searchParams: Promi
               })}
             </div>
           )}
-        </div>
-      </main>
-      <Footer />
+              </AppShell>
     </>
   );
 }
