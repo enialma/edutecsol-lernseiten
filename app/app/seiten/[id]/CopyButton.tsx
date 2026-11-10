@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 
-export default function CopyButton({ text }: { text: string }) {
+export default function CopyButton({ text, className = "btn small" }: { text: string; className?: string }) {
   const [done, setDone] = useState(false);
   async function copy() {
     try { await navigator.clipboard.writeText(text); } catch {
@@ -11,5 +11,5 @@ export default function CopyButton({ text }: { text: string }) {
     }
     setDone(true); setTimeout(() => setDone(false), 1600);
   }
-  return <button type="button" className="btn small" onClick={copy}>{done ? "Kopiert ✓" : "Link kopieren"}</button>;
+  return <button type="button" className={className} onClick={copy} aria-live="polite">{done ? "Kopiert ✓" : "Link kopieren"}</button>;
 }
