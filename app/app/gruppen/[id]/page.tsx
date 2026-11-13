@@ -51,7 +51,7 @@ export default async function GruppePage({ params }: { params: Promise<{ id: str
         )}
       </header>
 
-      <div className="detail">
+      <div className="detail grp">
         <div className="detail-main">
           <section className="box" aria-labelledby="h-gs">
             <div className="box-head">
