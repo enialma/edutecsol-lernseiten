@@ -379,3 +379,11 @@ main.cc-main{padding:0;min-height:100vh;background:var(--card)}
 .cc-note{margin:.5rem 0 0;font-size:.72rem;color:var(--ink-soft);line-height:1.4}
 .cc textarea:focus{outline:3px solid var(--ochre);outline-offset:1px;border-color:var(--navy)}
 .cc button:focus-visible{outline:3px solid var(--ochre);outline-offset:2px}
+
+/* ===== Klassen und Gruppen: Übersicht und Detail ===== */
+.cols.top{margin-top:0}
+.soft-count{font-size:.875rem;color:var(--ink-soft)}
+table.ltable.compact{min-width:600px}
+.newg label{margin:0 0 .3rem}
+.newg input{min-height:44px}
+.newg > .btn{align-self:flex-start}

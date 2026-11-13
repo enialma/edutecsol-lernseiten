@@ -57,7 +57,7 @@ export default async function AppShell({ active, children }: { active?: ShellKey
     { k: "start", href: "/app", label: "Übersicht" },
     { k: "neu", href: "/app/erzeugen", label: "Neue Seite" },
     { k: "sammlung", href: "/app/seiten", label: "Sammlung" },
-    { k: "klassen", href: "/app/gruppen", label: "Klassenlinks" },
+    { k: "klassen", href: "/app/gruppen", label: "Klassen und Gruppen" },
     { k: "bilder", href: "/app/bilder", label: "Bilder" },
     ...(isAdmin ? [{ k: "benutzer" as const, href: "/admin/benutzer", label: "Benutzer" }] : []),
   ];
