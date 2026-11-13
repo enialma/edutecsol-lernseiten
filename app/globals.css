@@ -457,3 +457,23 @@ main.work .bsum h2{color:var(--paper);font-size:1.125rem;font-weight:600;margin:
 .facts-list dt{color:var(--ink-soft)}
 .facts-list dd{margin:0}
 .bform{margin-top:1.75rem}
+
+/* ===== Benutzer (Admin) ===== */
+.adm-new{margin:0 0 1.5rem}
+.adm-new .fs{margin:0}
+.adm-new label{margin:.5rem 0 .3rem}
+.adm-new input,.adm-new select{min-height:44px}
+.adm-new .form-acts{margin-top:1rem}
+.inl{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;margin:0}
+.inl select,.inl input{width:auto;min-width:0;flex:1 1 140px;min-height:40px;padding:.35rem .6rem;font-size:.875rem}
+.inl.grow{width:100%}
+.ltable .inl + .inl,.ltable .tags + .inl,.ltable .cell-note + .inl{margin-top:.4rem}
+.cell-note{display:block;margin-top:.3rem;font-size:.8rem;color:var(--ink-soft)}
+table.ltable.adm{min-width:940px}
+.ltable.adm .lacts{flex-direction:column;align-items:flex-end}
+.ltable.adm .inl select,.ltable.adm .inl input{flex:1 1 120px;max-width:170px}
+.ltable.adm td,.ltable.adm tbody th{vertical-align:top}
+.ltable.adm td.r{vertical-align:middle}
+.btn.del{color:var(--err)}
+.btn.del:hover{border-color:var(--err);color:var(--err)}
+.box-note.foot{border-bottom:0;border-top:1px solid var(--hair);background:transparent;color:var(--ink-soft)}
