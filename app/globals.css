@@ -387,3 +387,15 @@ table.ltable.compact{min-width:600px}
 .newg label{margin:0 0 .3rem}
 .newg input{min-height:44px}
 .newg > .btn{align-self:flex-start}
+.detail-main{flex:3 1 560px;min-width:0;display:flex;flex-direction:column;gap:1.25rem}
+.detail-main .box.fold{margin-bottom:0}
+.detail-main .box.fold form{margin:.6rem 0 0;display:flex;flex-direction:column;gap:.75rem;align-items:flex-start}
+.box-note{margin:0;padding:.75rem 1.5rem;border-bottom:1px solid var(--hair);background:var(--cream);font-size:.875rem;line-height:1.5}
+a.tag-link{text-decoration:none;display:inline-flex;align-items:center;min-height:32px}
+a.tag-link:hover{text-decoration:underline}
+a.share-off{display:inline-flex;align-items:center;align-self:flex-start}
+.danger{display:flex;flex-wrap:wrap;gap:.5rem 1rem;align-items:center}
+.danger-note{font-size:.85rem;color:var(--ink-soft)}
+@media (max-width:860px){
+  .detail-main + .detail-side{order:-1}
+}
