@@ -11,84 +11,34 @@
 <link rel="preload" href="/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/lw.css">
 <style>
-  body > .wrap{padding-top:clamp(1.6rem,4vw,3rem);padding-bottom:clamp(3rem,6vw,5rem)}
-  .toc{display:flex;gap:.45rem;flex-wrap:wrap;margin:1.2rem 0 2.4rem}
-  .toc a{font-size:.85rem;font-weight:600;border:1px solid var(--line-strong);background:#fff;color:var(--ink);border-radius:var(--r);padding:.42rem .85rem;text-decoration:none}
-  .toc a:hover{border-color:var(--terra);color:var(--terra)}
-  .toc a.cta{background:var(--navy);color:#fff;border-color:var(--navy)}
-  .toc a.cta:hover{background:var(--navy-soft);color:#fff}
-  .sec-head[id],[id]{scroll-margin-top:5rem}
-
-  :root{
-    --accent:var(--navy);--accent-soft:var(--paper);
-  }
-  .lead{margin-bottom:1.6rem}
-  /* minmax(0,1fr) + min-width:0: die langen CSS-Zeilen der Designbasis im Prompt dürfen die rechte Spalte nicht aufweiten */
-  .layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1.2rem;align-items:start;}
-  .layout>*{min-width:0;}
-  @media(max-width:820px){.layout{grid-template-columns:1fr;}}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:1.4rem 1.5rem;}
-  .card h2{margin:.1rem 0 .3rem;font-size:1.35rem;}
-  .card .sub{font-size:.82rem;color:var(--ink-soft);margin:0 0 1rem;}
-  .group{margin:0 0 1.1rem;padding:0 0 1.1rem;border-bottom:1px solid var(--line);}
-  .group:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0;}
-  .group>.glab{display:block;font-size:.85rem;font-weight:700;margin-bottom:.15rem;}
-  .group>.ghint{font-size:.78rem;color:var(--ink-soft);margin:0 0 .55rem;}
-  .field{display:block;margin:0 0 .9rem;}
-  .field .lab{display:block;font-size:.85rem;font-weight:600;margin-bottom:.35rem;}
-  .field .hint{font-weight:400;color:var(--ink-soft);font-size:.8rem;}
+  /* Seiteneigene Teile; Grundgestaltung kommt aus /werkzeug.css (wird danach geladen) */
+  [id]{scroll-margin-top:5rem}
   /* Info-Kreis ganz rechts auf Höhe der Überschrift; Erklärung per Klick/Tippen (auch Mobile), am Desktop zusätzlich beim Darüberfahren */
-  .field .lab.has-info,.group>.glab.has-info{display:flex;align-items:center;gap:.4rem;}
+  .field .lab.has-info{display:flex;align-items:center;gap:.4rem;}
   .info-wrap{position:relative;margin-left:auto;flex:none;display:inline-flex;}
-  .info-btn{width:1.35rem;height:1.35rem;padding:0;border-radius:50%;border:1.5px solid var(--navy);background:#fff;color:var(--navy);font:inherit;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;}
-  .info-wrap.open .info-btn,.info-btn:focus-visible{background:var(--navy);color:#fff;}
-  /* Eigene Berufsfelder: «+» im Kreis öffnet ein Eingabefeld, «×» entfernt ein eigenes Feld */
-  .seg .add-btn{width:1.9rem;height:1.9rem;padding:0;border-radius:50%;border:1.5px solid var(--navy);color:var(--navy);font-size:1.05rem;line-height:1;display:inline-flex;align-items:center;justify-content:center;align-self:center;}
-  .seg .add-btn:hover,.seg .add-btn[aria-expanded="true"]{background:var(--navy);color:#fff;border-color:var(--navy);}
-  .seg .del-btn{margin-left:-.35rem;padding:.4rem .45rem;color:var(--ink-soft);}
-  .seg .del-btn:hover{color:var(--err);border-color:var(--err);}
+  .info-btn{padding:0;border-radius:50%;border:1.5px solid var(--navy);font:inherit;font-size:.85rem;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;}
   .add-row{display:flex;gap:.4rem;margin-top:.5rem;}
   .add-row input{flex:1;}
-  .info-btn:focus-visible{outline:2px solid var(--terra);outline-offset:2px;}
-  .info-box{display:none;position:absolute;right:0;top:100%;z-index:20;width:min(22rem,calc(100vw - 3rem));margin-top:.35rem;font-size:.8rem;font-weight:400;letter-spacing:normal;text-transform:none;line-height:1.45;color:var(--ink);background:#fff;border:1px solid var(--line-strong);border-radius:var(--r);padding:.6rem .8rem;box-shadow:var(--shadow);}
+  .info-box{display:none;position:absolute;right:0;top:100%;z-index:20;width:min(22rem,calc(100vw - 3rem));margin-top:.35rem;font-weight:400;letter-spacing:normal;text-transform:none;line-height:1.45;color:var(--ink);border:1px solid var(--line-strong);border-radius:var(--r);padding:.6rem .8rem;box-shadow:var(--shadow);}
   .info-wrap.open .info-box{display:block;}
   /* Nur mit echter Maus: Touch-Geräte kennen kein Darüberfahren, dort bliebe :hover nach dem Tippen hängen */
-  @media (hover:hover){.info-wrap:hover .info-btn{background:var(--navy);color:#fff;}.info-wrap:hover .info-box{display:block;}}
+  @media (hover:hover){.info-wrap:hover .info-box{display:block;}}
   .info-box dl{margin:0;}
   .info-box dt{font-weight:600;}
   .info-box dd{margin:0 0 .35rem;color:var(--ink-soft);}
   .info-box p{margin:.4rem 0 0;color:var(--ink-soft);}
-  input[type=text],input[type=number],textarea{width:100%;font:inherit;font-size:.95rem;padding:.55rem .7rem;border:1px solid var(--line-strong);border-radius:var(--r);background:#fff;color:var(--ink);}
-  input[type=text]:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
-  textarea{resize:vertical;min-height:2.5rem;}
-  .seg{display:flex;gap:.4rem;flex-wrap:wrap;}
-  .seg button{font:inherit;font-size:.83rem;border:1px solid var(--line-strong);background:#fff;color:var(--ink);border-radius:var(--r);padding:.4rem .7rem;cursor:pointer;}
-  .seg button:hover{border-color:var(--terra);}
-  .seg button.on{background:var(--accent);color:#fff;border-color:var(--accent);}
-  .steps{display:flex;gap:.4rem;flex-wrap:wrap;}
-  .steps button{font:inherit;font-size:.83rem;border:1px solid var(--line-strong);background:#fff;color:var(--ink);border-radius:var(--r);padding:.4rem .7rem;cursor:pointer;flex:1;min-width:3rem;}
-  .steps button.on{background:var(--accent);color:#fff;border-color:var(--accent);}
-  .out{position:relative;}
-  .out pre{white-space:pre-wrap;overflow-wrap:anywhere;word-wrap:break-word;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.8rem;line-height:1.5;background:var(--navy);color:#E8EBF0;border-radius:var(--r);padding:1.1rem 1.2rem;max-height:64vh;overflow:auto;margin:0;}
+  .out pre{white-space:pre-wrap;overflow-wrap:anywhere;word-wrap:break-word;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.8rem;line-height:1.5;padding:1.1rem 1.2rem;max-height:64vh;overflow:auto;}
   .out pre .ph{color:var(--ochre);}
-  .out pre .sec{color:#8fd0b4;font-weight:700;}
+  .out pre .sec{font-weight:700;}
   .out pre details.basis{margin:.2rem 0 .4rem;}
-  .out pre details.basis summary{cursor:pointer;color:#C3CCD6;font-style:italic;white-space:normal;padding:.35rem .6rem;border:1px dashed #4A5F76;border-radius:6px;}
-  .out pre details.basis summary:hover{color:#fff;border-color:#8fd0b4;}
+  .out pre details.basis summary{cursor:pointer;font-style:italic;white-space:normal;padding:.35rem .6rem;border:1px dashed;border-radius:6px;}
   .out pre details.basis[open] summary{margin-bottom:.4rem;}
-  /* Prompt-Fenster scrollt mit (unter der 64px hohen Menüleiste), nur bei zwei Spalten */
-  @media(min-width:821px){.out{position:sticky;top:calc(65px + 1rem);}.out pre{max-height:calc(100vh - 65px - 13rem);}}
-  .actions{display:flex;gap:.6rem;margin-top:.8rem;flex-wrap:wrap;}
-  
-  .btn.primary{background:var(--terra);border-color:var(--terra);color:#fff;}.btn.primary:hover{background:var(--terra-deep);border-color:var(--terra-deep);}
-  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line-strong);}.btn.ghost:hover{border-color:var(--terra);color:var(--terra);}
-  .copied{color:var(--ok);font-size:.85rem;font-weight:600;align-self:center;opacity:0;transition:opacity .2s;}
+  /* Prompt-Karte bleibt beim Scrollen stehen (unter der 64 px hohen Menüleiste), nur bei zwei Spalten */
+  @media(min-width:821px){.out{position:sticky;top:calc(65px + 1rem);}.out pre{max-height:max(260px,calc(100vh - 65px - 23rem));}}
+  .copied{font-size:.875rem;font-weight:600;opacity:0;transition:opacity .2s;}
   .copied.show{opacity:1;}
-  .presets{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1.1rem;}
-  .presets button{font:inherit;font-size:.8rem;border:1px dashed var(--line-strong);background:#fff;color:var(--ink-soft);border-radius:var(--r);padding:.35rem .7rem;cursor:pointer;}
-  .presets button:hover{border-color:var(--terra);color:var(--terra);}
-  .note{font-size:.88rem;color:var(--ink-soft);margin-top:1.6rem;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:.9rem 1.1rem;}
 </style>
+<link rel="stylesheet" href="/werkzeug.css">
 </head>
 <body>
 <header class="lw-header">
@@ -110,104 +60,108 @@
 
 <div class="wrap">
 
-
-  <p class="kicker">Werkzeug · Lernseiten</p>
-  <h1>Prompt-Generator für differenzierte Lernseiten</h1>
-  <p class="lead">Felder ausfüllen, Prompt kopieren, mit deinem Material (Folien, PDF, Word) oder nur einer Beschreibung an Claude schicken. Neu: vier didaktische Achsen – Differenzierungsart, Sprache, Twist-Typ und Anforderungsniveau.</p>
-
-  <div class="presets">
-    <span style="font-size:.8rem;color:var(--ink-soft);align-self:center;">Schnellstart:</span>
-    <button data-preset="mathe">Mathe BM</button>
-    <button data-preset="pharma">Pharma-Rechnen</button>
-    <button data-preset="it">IT-Security</button>
-    <button data-preset="daz">DaZ-Klasse</button>
-    <button data-preset="reset">Zurücksetzen</button>
-  </div>
+  <nav class="crumb" aria-label="Brotkrumen"><a href="/#werkzeuge">Werkzeuge</a> <span aria-hidden="true">/</span> Prompt-Generator</nav>
+  <header class="wz-head">
+    <h1>Prompt-Generator für differenzierte Lernseiten</h1>
+    <p class="lead">Felder ausfüllen, Prompt kopieren, mit deinem Material (Folien, PDF, Word) oder nur einer Beschreibung an Claude schicken. Neu: vier didaktische Achsen – Differenzierungsart, Sprache, Twist-Typ und Anforderungsniveau.</p>
+  </header>
 
   <div class="layout">
 
     <!-- Eingabe -->
-    <div class="card">
-      <h2>1 · Anpassen</h2>
-      <p class="sub">Pflichtfelder oben, didaktische Feinsteuerung darunter. Voreinstellungen sind gesetzt.</p>
+    <div class="wform">
+      <fieldset class="fs">
+        <legend>Schnellstart</legend>
+        <p class="fs-lead">Ein Beispiel übernehmen und anpassen. Voreinstellungen sind gesetzt.</p>
+        <div class="presets">
+          <button type="button" data-preset="mathe">Mathe BM</button>
+          <button type="button" data-preset="pharma">Pharma-Rechnen</button>
+          <button type="button" data-preset="it">IT-Security</button>
+          <button type="button" data-preset="daz">DaZ-Klasse</button>
+          <button type="button" data-preset="reset">Zurücksetzen</button>
+        </div>
+      </fieldset>
 
-      <div class="group">
+      <fieldset class="group fs">
+        <legend>Grundangaben</legend>
         <label class="field"><span class="lab">Fach / Kontext</span>
           <input type="text" id="fach" placeholder="z. B. Pharma-Fachrechnen"></label>
         <label class="field"><span class="lab">Zielstufe</span>
           <input type="text" id="stufe" placeholder="z. B. Berufsmaturität · FaGe · Sek II · Erwachsene"></label>
         <label class="field"><span class="lab">Thema <span class="hint" id="themaHint">(optional: leer = KI wählt aus dem Material)</span></span>
           <input type="text" id="thema" placeholder="z. B. Dosisberechnung, oder «Folie 12–14»"></label>
-        <div class="field"><span class="lab">Ausgabeformat(e) <span class="hint">(Mehrfachauswahl, mindestens eines)</span></span>
-          <div class="seg" id="formate">
-            <button data-v="web" class="on">🖥 Interaktive Website</button>
-            <button data-v="word">📄 Word (.docx)</button>
-            <button data-v="pdf">🖨 PDF</button>
+      </fieldset>
+
+      <fieldset class="group fs">
+        <legend>Ausgabe und Material</legend>
+        <div class="field"><span class="lab" id="l-formate">Ausgabeformat(e) <span class="hint">(Mehrfachauswahl, mindestens eines)</span></span>
+          <div class="seg" id="formate" role="group" aria-labelledby="l-formate">
+            <button data-v="web" class="on">Interaktive Website</button>
+            <button data-v="word">Word (.docx)</button>
+            <button data-v="pdf">PDF</button>
           </div>
-          <!-- <p class="ghint" style="margin-top:.4rem;">Website = zum Üben am Gerät mit Selbstkontrolle. Word = bearbeitbares Arbeitsblatt. PDF = druckfertig. Word/PDF je als getrenntes Aufgaben- und Lösungsblatt.</p> -->
         </div>
-        <div class="field"><span class="lab">Layout <span class="hint">(Aussehen von Website und Arbeitsblatt)</span></span>
-          <div class="seg" id="layout">
+        <div class="field"><span class="lab" id="l-layout">Layout <span class="hint">(Aussehen von Website und Arbeitsblatt)</span></span>
+          <div class="seg" id="layout" role="group" aria-labelledby="l-layout">
             <button data-v="lernwege" class="on">Lernwege-Layout</button>
             <button data-v="frei">Standard (KI gestaltet)</button>
           </div>
         </div>
-        <div class="field"><span class="lab">Material / Quelle</span>
-          <div class="seg" id="quelle">
+        <div class="field"><span class="lab" id="l-quelle">Material / Quelle</span>
+          <div class="seg" id="quelle" role="group" aria-labelledby="l-quelle">
             <button data-v="pptx" class="on">Folien (PPTX)</button>
             <button data-v="pdf">PDF</button>
             <button data-v="word">Word</button>
             <button data-v="text">nur diese Beschreibung</button>
           </div>
-          <!--<p class="ghint" style="margin-top:.4rem;">Was hängst du an? Bei «nur diese Beschreibung» arbeitet die KI allein mit deinen Angaben – ohne Datei.</p> -->
         </div>
-      </div>
+      </fieldset>
 
       <!-- Achse 1: Differenzierungsart -->
-      <div class="group">
-        <span class="glab">Differenzierungsart</span>
+      <fieldset class="group fs">
+        <legend class="glab">Differenzierungsart</legend>
         <p class="ghint">Wonach unterscheiden sich die Zugänge?</p>
-        <div class="seg" id="diffart">
+        <div class="seg" id="diffart" role="group" aria-label="Differenzierungsart">
           <button data-v="niveau" class="on">nach Niveau (Hilfe)</button>
           <button data-v="lerntyp">nach Lerntyp</button>
           <button data-v="interesse">nach Berufsfeld</button>
         </div>
-        <div class="field" style="margin-top:.7rem;"><span class="lab">Zugänge <span class="hint">(Mehrfachauswahl, mindestens einer)</span></span>
-          <div class="seg" id="zugaenge"></div>
+        <div class="field" style="margin-top:1rem;"><span class="lab" id="l-zugaenge">Zugänge <span class="hint">(Mehrfachauswahl, mindestens einer)</span></span>
+          <div class="seg" id="zugaenge" role="group" aria-labelledby="l-zugaenge"></div>
         </div>
-      </div>
+      </fieldset>
 
       <!-- Sozialform -->
-      <div class="group">
-        <span class="glab">Sozialform</span>
+      <fieldset class="group fs">
+        <legend class="glab">Sozialform</legend>
         <p class="ghint">Wie wird die Aufgabe bearbeitet? Mehrfachauswahl, mindestens eine.</p>
-        <div class="seg" id="sozialform">
+        <div class="seg" id="sozialform" role="group" aria-label="Sozialform">
           <button data-v="einzel" class="on">Einzelarbeit</button>
           <button data-v="partner">Partnerarbeit</button>
           <button data-v="gruppe">Gruppenarbeit</button>
           <button data-v="plenum">Plenum</button>
         </div>
-      </div>
+      </fieldset>
 
       <!-- Achse 2: Sprache -->
-      <div class="group">
-        <span class="glab">Sprachliche Differenzierung</span>
+      <fieldset class="group fs">
+        <legend class="glab">Sprachliche Differenzierung</legend>
         <p class="ghint">Zugang zur Sprache – oft der eigentliche Engpass.</p>
-        <div class="seg" id="sprache">
+        <div class="seg" id="sprache" role="group" aria-label="Sprachliche Differenzierung">
           <button data-v="standard" class="on">Standard</button>
           <button data-v="einfach">vereinfachte Sprache</button>
           <button data-v="glossar">Fachbegriffe mit Glossar</button>
           <button data-v="zweisprachig">Schlüsselbegriffe zweisprachig</button>
         </div>
-        <label class="field" id="zweiWrap" style="margin-top:.7rem;display:none;"><span class="lab">Zweite Sprache <span class="hint">(für zweisprachige Begriffe)</span></span>
+        <label class="field" id="zweiWrap" style="margin-top:1rem;display:none;"><span class="lab">Zweite Sprache <span class="hint">(für zweisprachige Begriffe)</span></span>
           <input type="text" id="zweitsprache" placeholder="z. B. Englisch, Portugiesisch, Tigrinya"></label>
-      </div>
+      </fieldset>
 
       <!-- Achse 3: Twist-Typ -->
-      <div class="group">
-        <span class="glab">Twist</span>
+      <fieldset class="group fs">
+        <legend class="glab">Twist</legend>
         <p class="ghint">Die zusätzliche Denkanforderung in der Vertiefung bzw. am Schluss jedes Zugangs.</p>
-        <div class="seg" id="twist">
+        <div class="seg" id="twist" role="group" aria-label="Twist">
           <button data-v="auto" class="on">passend wählen</button>
           <button data-v="ausreisser">Ausreisser/Robustheit</button>
           <button data-v="vergleich">Fälle vergleichen</button>
@@ -216,42 +170,42 @@
           <button data-v="methoden">Methoden vergleichen</button>
           <button data-v="transfer">Transfer/Anwendung</button>
         </div>
-      </div>
+      </fieldset>
 
       <!-- Achse 4: Anforderungsniveau -->
-      <div class="group">
-        <span class="glab">Anforderungsniveau (Zielebene)</span>
+      <fieldset class="group fs">
+        <legend class="glab">Anforderungsniveau (Zielebene)</legend>
         <p class="ghint">Höchste kognitive Stufe, die die Aufgabe verlangt.</p>
-        <div class="seg" id="niveau">
+        <div class="seg" id="niveau" role="group" aria-label="Anforderungsniveau">
           <button data-v="reproduzieren">reproduzieren</button>
           <button data-v="anwenden" class="on">anwenden</button>
           <button data-v="beurteilen">beurteilen</button>
         </div>
-      </div>
+      </fieldset>
 
       <!-- Zusatzwunsch -->
-      <div class="group">
-        <label class="field"><span class="lab">Zusatzwunsch <span class="hint">(optional)</span></span>
-          <textarea id="extra" placeholder="z. B. besonders alltagsnahes Beispiel, glatte Zahlen"></textarea></label>
-      </div>
+      <fieldset class="group fs">
+        <legend>Zusatzwunsch</legend>
+        <label class="field"><span class="lab">Was soll die KI zusätzlich beachten? <span class="hint">(optional)</span></span>
+          <textarea id="extra" rows="3" placeholder="z. B. besonders alltagsnahes Beispiel, glatte Zahlen"></textarea></label>
+      </fieldset>
     </div>
 
     <!-- Ausgabe -->
-    <div class="card out">
-      <h2>2 · Fertiger Prompt</h2>
+    <section class="out psum" aria-labelledby="h-out">
+      <h2 id="h-out">Fertiger Prompt</h2>
       <p class="sub">Aktualisiert sich live. Orange = noch auszufüllende Platzhalter.</p>
       <pre id="output"></pre>
       <div class="actions">
-        <button class="btn primary" id="copyBtn">📋 Prompt kopieren</button>
-        <button class="btn ghost" id="dlBtn">⬇ Als .txt speichern</button>
-        <span class="copied" id="copied">Kopiert!</span>
+        <button type="button" class="btn terra" id="copyBtn">Prompt kopieren</button>
+        <button type="button" class="btn on-navy" id="dlBtn">Als .txt speichern</button>
+        <span class="copied" id="copied" role="status">Kopiert!</span>
       </div>
-    </div>
+      <p class="note">
+        <b>So geht's:</b> Prompt kopieren → neuen Claude-Chat öffnen → Prompt einfügen → Material dazu hochladen (oder nur die Beschreibung nutzen) → abschicken. Du bekommst eine offline nutzbare HTML-Lernseite mit differenzierten Zugängen, Lösungen für die Lehrperson und PDF-Button.
+      </p>
+    </section>
 
-  </div>
-
-  <div class="note">
-    <b>So geht's:</b> Prompt kopieren → neuen Claude-Chat öffnen → Prompt einfügen → Material dazu hochladen (oder nur die Beschreibung nutzen) → abschicken. Du bekommst eine offline nutzbare HTML-Lernseite mit differenzierten Zugängen, Lösungen für die Lehrperson und PDF-Button.
   </div>
 
 </div>
@@ -802,5 +756,6 @@ Notiz am Ende (höchstens fünf Zeilen): gewähltes Thema, gewählte Differenzie
     </div>
   </div>
 </footer>
+<script src="/werkzeug.js"></script>
 </body>
 </html>
