@@ -2,20 +2,17 @@ import Link from "next/link";
 import { auth, signOut } from "@/auth";
 import { IS_PREVIEW_DB } from "@/lib/db";
 
-export default async function Topbar() {
+// Kopfzeile der öffentlichen Next-Seiten (Zugang, Anmelden, AGB, Datenschutz).
+// Gleiche Menüpunkte wie die statischen Seiten in public/; der geschützte Bereich hat eigene Seitenleiste (AppShell).
+export default async function Topbar({ active }: { active?: "zugang" }) {
   const session = await auth();
   const u = session?.user;
   const links = (
     <>
-      <Link href="/">Startseite</Link>
-      {!u && <Link href="/zugang">Zugang &amp; Preise</Link>}
-      {u && <Link href="/app">Mein Bereich</Link>}
-      {u && <Link href="/app/erzeugen">Erzeugen</Link>}
-      {u && <Link href="/app/seiten">Sammlung</Link>}
-      {u && <Link href="/app/gruppen">Gruppen</Link>}
-      {u && <Link href="/app/bilder">Bilder</Link>}
-      {u?.role === "admin" && <Link href="/admin/benutzer">Benutzer</Link>}
-      {!u && <Link href="/datenschutz">Datenschutz</Link>}
+      <a href="/lernseiten-beispiele.html">Beispiele</a>
+      <a href="/#werkzeuge">Werkzeuge</a>
+      <a href="/#so-funktioniert-es">So funktioniert es</a>
+      <Link href="/zugang" className={active === "zugang" ? "is-active" : undefined} aria-current={active === "zugang" ? "page" : undefined}>Zugang &amp; Preise</Link>
     </>
   );
   const signout = (
@@ -32,7 +29,7 @@ export default async function Topbar() {
           {links}
           {u ? (
             <>
-              <span className="who">{u.name || u.email}</span>
+              <Link href="/app" className="btn small terra">Mein Bereich</Link>
               {signout}
             </>
           ) : (
@@ -42,9 +39,8 @@ export default async function Topbar() {
         <details className="menu">
           <summary>Menü</summary>
           <div className="panel">
-            {u && <span className="who">{u.name || u.email}</span>}
             {links}
-            {u ? signout : <Link href="/login"><b>Anmelden</b></Link>}
+            {u ? <><Link href="/app"><b>Mein Bereich</b></Link>{signout}</> : <Link href="/login"><b>Anmelden</b></Link>}
           </div>
         </details>
       </div>

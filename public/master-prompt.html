@@ -7,20 +7,13 @@
 <link rel="preload" href="/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/lw.css">
 <style>
-  body > .wrap{padding-top:clamp(1.6rem,4vw,3rem);padding-bottom:clamp(3rem,6vw,5rem)}
-  .toc{display:flex;gap:.45rem;flex-wrap:wrap;margin:1.2rem 0 2.4rem}
-  .toc a{font-size:.85rem;font-weight:600;border:1px solid var(--line-strong);background:#fff;color:var(--ink);border-radius:var(--r);padding:.42rem .85rem;text-decoration:none}
-  .toc a:hover{border-color:var(--terra);color:var(--terra)}
-  .toc a.cta{background:var(--navy);color:#fff;border-color:var(--navy)}
-  .toc a.cta:hover{background:var(--navy-soft);color:#fff}
-  .sec-head[id],[id]{scroll-margin-top:5rem}
-
-  .wrap{max-width:860px}
-  .bar{display:flex;align-items:center;gap:.6rem;margin:1.2rem 0 .8rem}
-  pre{white-space:pre-wrap;word-wrap:break-word;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.84rem;line-height:1.55;background:#fff;border:1px solid var(--line-strong);border-radius:var(--r-lg);padding:1.3rem 1.4rem;margin:0}
-  .done{color:var(--ok);font-weight:600;font-size:.85rem;opacity:0;transition:opacity .2s}
+  /* Seiteneigene Teile; Grundgestaltung kommt aus /werkzeug.css (wird danach geladen) */
+  .wrap{max-width:900px}
+  .psum pre{white-space:pre-wrap;word-wrap:break-word;overflow-wrap:anywhere;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.84rem;line-height:1.55;padding:1.3rem 1.4rem}
+  .done{font-size:.875rem;font-weight:600;opacity:0;transition:opacity .2s}
   .done.show{opacity:1}
 </style>
+<link rel="stylesheet" href="/werkzeug.css">
 </head>
 <body>
 <header class="lw-header">
@@ -41,12 +34,15 @@
 </header>
 
 <div class="wrap">
-  <p class="kicker">Werkzeug · Textvorlage</p>
-  <h1>Master-Prompt – Textvorlage</h1>
-  <p class="lead">Nur den Block «ANPASSEN» ausfüllen, den Rest unverändert lassen. Zusammen mit einem Foliensatz an Claude schicken.</p>
-  <div class="bar">
-    <button class="btn" id="copyBtn">Prompt kopieren</button>
-    <span class="done" id="done">Kopiert!</span>
+  <nav class="crumb" aria-label="Brotkrumen"><a href="/#werkzeuge">Werkzeuge</a> <span aria-hidden="true">/</span> Master-Prompt</nav>
+  <header class="wz-head">
+    <h1>Master-Prompt – Textvorlage</h1>
+    <p class="lead">Nur den Block «ANPASSEN» ausfüllen, den Rest unverändert lassen. Zusammen mit einem Foliensatz an Claude schicken.</p>
+  </header>
+  <section class="psum" aria-label="Master-Prompt">
+  <div class="actions">
+    <button type="button" class="btn terra" id="copyBtn">Prompt kopieren</button>
+    <span class="done copied" id="done" role="status">Kopiert!</span>
   </div>
   <pre id="prompt"># MASTER-PROMPT – Differenzierte interaktive Lernseite aus einem Foliensatz
 
@@ -92,6 +88,7 @@ Ruhiges, altersgerechtes Design für die Zielstufe; die themenpassende Visualisi
 
 ■ VORGABEN
 Schweizer Standarddeutsch · keine Fehler: rechne alle Lösungen bzw. prüfe alle Zuordnungen vor der Ausgabe selbst nach und stelle sicher, dass die Feedback-Logik der Eingabefelder exakt zu den richtigen Werten passt · Selbstcheck-Listen abhakbar. Gib mir am Ende eine kurze Notiz, welches Thema du gewählt hast und welchen Twist die Vertiefung nutzt.</pre>
+  </section>
 </div>
 <script>
   document.getElementById('copyBtn').addEventListener('click',async()=>{
