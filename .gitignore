@@ -7,6 +7,7 @@ out/
 .vercel
 *.tsbuildinfo
 next-env.d.ts
+.mcp.json
 
 .vercel
 .env*
