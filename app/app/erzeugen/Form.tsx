@@ -30,25 +30,25 @@ const infoItems = (info: InfoText, opts: string[][]): [string, string][] => opts
 // ---------- Bausteine (auf Modulebene, damit sie beim Tippen nicht neu erzeugt werden und den Fokus behalten) ----------
 
 /** Einfachauswahl als Knopfreihe. */
-function Seg({ value, opts, onPick, disabled }: { value: string; opts: string[][]; onPick: (v: string) => void; disabled: boolean }) {
+function Seg({ label, value, opts, onPick, disabled }: { label: string; value: string; opts: string[][]; onPick: (v: string) => void; disabled: boolean }) {
   return (
-    <div className="seg">
+    <div className="seg" role="radiogroup" aria-label={label}>
       {opts.map(([v, l]) => (
-        <button type="button" key={v} className={value === v ? "on" : ""} onClick={() => onPick(v)} disabled={disabled}>{l}</button>
+        <button type="button" key={v} role="radio" aria-checked={value === v} className={value === v ? "on" : ""} onClick={() => onPick(v)} disabled={disabled}>{l}</button>
       ))}
     </div>
   );
 }
 
 /** Mehrfachauswahl als Knopfreihe; der letzte gewählte Wert lässt sich nicht abwählen. Reihenfolge wie in opts. */
-function MultiSeg({ value, opts, onChange, disabled }: { value: string[]; opts: string[][]; onChange: (v: string[]) => void; disabled: boolean }) {
+function MultiSeg({ label, value, opts, onChange, disabled }: { label: string; value: string[]; opts: string[][]; onChange: (v: string[]) => void; disabled: boolean }) {
   const toggle = (v: string) => {
     const was = value.includes(v);
     if (was && value.length <= 1) return;
     onChange(opts.map(([x]) => x).filter((x) => (x === v ? !was : value.includes(x))));
   };
   return (
-    <div className="seg">
+    <div className="seg" role="group" aria-label={label}>
       {opts.map(([v, l]) => (
         <button type="button" key={v} className={value.includes(v) ? "on" : ""} aria-pressed={value.includes(v)} onClick={() => toggle(v)} disabled={disabled}>{l}</button>
       ))}
@@ -112,7 +112,7 @@ function ZugangWahl({ diffart, gewaehlt, eigene, onChange, disabled }: {
 
   return (
     <>
-      <div className="seg">
+      <div className="seg" role="group" aria-label="Zugänge">
         {opts.map((o) => (
           <Fragment key={o.v}>
             <button type="button" className={gewaehlt.includes(o.v) ? "on" : ""} aria-pressed={gewaehlt.includes(o.v)} onClick={() => toggle(o.v)} disabled={disabled}>{o.name}</button>
@@ -183,11 +183,21 @@ function PromptVorschau({ s, hatDatei }: { s: State; hatDatei: boolean }) {
   );
 }
 
-export default function Form({ providers, presets, bilder, initialBild, isAdmin }: { providers: ProviderOpt[]; presets: Preset[]; bilder: Bild[]; initialBild: number; isAdmin: boolean }) {
+const STEPS = ["Material geben", "Was entsteht", "Einstellungen", "Erzeugen"];
+const TYP_KURZ: Record<string, string> = {
+  lernseite: "Eine Kernaufgabe, mehrere Zugänge",
+  arbeitsblatt: "Dieselben Zugänge, für Papier",
+  pruefung: "Lernziele, Übungsprüfung, Lücken",
+  spiel: "Vier Levels, Punkte und Serie",
+  hilfe: "Merkblatt, Lernkarten, Glossar",
+};
+const label = (opts: string[][], v: string) => opts.find(([x]) => x === v)?.[1] ?? v;
+
+export default function Form({ providers, presets, bilder, initialBild, initialTyp, isAdmin }: { providers: ProviderOpt[]; presets: Preset[]; bilder: Bild[]; initialBild: number; initialTyp?: string; isAdmin: boolean }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const [s, setS] = useState<State>({
-    typ: "lernseite", dauer: "30",
+    typ: TYP.some(([v]) => v === initialTyp) ? (initialTyp as string) : "lernseite", dauer: "30",
     fach: "", stufe: "", thema: "", extra: "", material: "",
     diffart: "niveau", zugaenge: defaultZugaenge("niveau"), eigeneBerufsfelder: [], sozialformen: ["einzel"],
     sprache: "standard", zweitsprache: "", twist: "auto", niveau: "anwenden",
@@ -196,11 +206,12 @@ export default function Form({ providers, presets, bilder, initialBild, isAdmin 
     modell: "",
     aufgaben: "", aufgabenText: "", latex: false,
   });
+  const [step, setStep] = useState(1);
   const [busy, setBusy] = useState(false);
   const [log, setLog] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [promptOpen, setPromptOpen] = useState(false);
-  const [hatDatei, setHatDatei] = useState(false);
+  const [dateiName, setDateiName] = useState("");
   const set = <K extends keyof State>(k: K, v: State[K]) => setS((p) => ({ ...p, [k]: v }));
   const pruefung = s.typ === "pruefung";
   const spiel = s.typ === "spiel";
@@ -208,6 +219,7 @@ export default function Form({ providers, presets, bilder, initialBild, isAdmin 
   const arbeitsblatt = s.typ === "arbeitsblatt";
   // Lernseite und Arbeitsblatt teilen sich die didaktischen Achsen
   const lernseite = !pruefung && !spiel && !hilfe;
+  const rahmenFehlt = !s.fach.trim() || !s.stufe.trim();
 
   function applyPreset(p: Preset) {
     setS((prev) => {
@@ -221,8 +233,24 @@ export default function Form({ providers, presets, bilder, initialBild, isAdmin 
     });
   }
 
+  /** Wechselt den Schritt; «Erzeugen» ist erst erreichbar, wenn Fach und Zielstufe stehen. */
+  function go(n: number) {
+    if (busy) return;
+    if (n === 4 && rahmenFehlt) {
+      setStep(3);
+      setError("Bitte Fach und Zielstufe ausfüllen. Beide stehen unter «Einstellungen» im Abschnitt «Rahmen».");
+      return;
+    }
+    setError(null);
+    setStep(Math.min(4, Math.max(1, n)));
+    window.scrollTo({ top: 0 });
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    // Enter in einem Feld führt zum nächsten Schritt; erzeugt wird erst im letzten
+    if (step < 4) return go(step + 1);
+    if (rahmenFehlt) return go(4);
     setError(null);
     setLog([]);
     setBusy(true);
@@ -259,152 +287,246 @@ export default function Form({ providers, presets, bilder, initialBild, isAdmin 
   }
 
   const current = providers.find((p) => p.id === s.provider) ?? providers[0];
-  // Sprache: bei Lernseite und Arbeitsblatt in der Feinsteuerung, bei den anderen Typen direkt sichtbar
-  const sprache = (
-    <>
-      <FieldHead label="Sprache" info={<InfoKreis id="info-sprache" title="Sprache" items={infoItems(INFO.sprache, SPRACHE)} />} />
-      <Seg value={s.sprache} opts={SPRACHE} onPick={(v) => set("sprache", v)} disabled={busy} />
-      {s.sprache === "zweisprachig" && (
-        <input value={s.zweitsprache} onChange={(e) => set("zweitsprache", e.target.value)} disabled={busy} placeholder="Zweite Sprache, z. B. Portugiesisch" style={{ marginTop: ".4rem" }} />
-      )}
-    </>
-  );
   const exhausted = current.limit !== null && current.used >= current.limit;
+  const typName = label(TYP, s.typ);
+  const zugangNamen = zugangOptionen(s.diffart, s.eigeneBerufsfelder).filter((o) => s.zugaenge.includes(o.v)).map((o) => o.name);
+  const materialText = dateiName ? dateiName : s.material.trim() ? "Textauszug" : s.thema.trim() ? "Nur Thema, ohne Datei" : "Noch nichts angegeben";
+  const erzeugenText = busy ? "Wird erzeugt …" : `${typName} erzeugen`;
 
   return (
-    <form onSubmit={submit} className="card">
-      <FieldHead first gross label="Was soll entstehen?" info={<InfoKreis id="info-typ" title="Was soll entstehen?" items={infoItems(INFO.typ, TYP)} note={INFO.typ.note} />} />
-      <Seg value={s.typ} opts={TYP} onPick={(v) => set("typ", v)} disabled={busy} />
-      <p className="small-note" style={{ margin: ".4rem 0 .2rem" }}>
-        {pruefung
-          ? "Aus dem Prüfungsstoff entstehen drei Teile: Lernziele checken, Übungsprüfung mit Timer und Note, Lücken schliessen mit Lernplan. Dazu ein Lehrpersonen-Bereich mit Lösungen und Punkteschlüssel."
-          : spiel
-            ? "Vier Levels (Erkennen, Erinnern, Anwenden, Meistern) mit 24 bis 28 Aufgaben aus dem Material, Punkten, Serie, Leben und Bestleistung. Dazu die Aufgabenliste für die Lehrperson."
-            : hilfe
-              ? "Merkblatt auf einer A4-Seite, 16 bis 24 Lernkarten zum Umdrehen mit Gewusst/Nochmals, Glossar mit Suche. Alles druckbar. Mit «vereinfachte Sprache» oder «zweisprachig» auch als Nachteilsausgleich."
-              : arbeitsblatt
-                ? "Ein Arbeitsblatt zum Austeilen: Kernaufgabe und Zugänge untereinander, jeder Zugang auf einer neuen Seite, mit Platz zum Bearbeiten und Lösungsblatt. Als Word herunterladen oder drucken."
-                : "Eine Kernaufgabe mit mehreren Zugängen, Selbstkontrolle und Lehrpersonen-Bereich."}
-      </p>
+    <form onSubmit={submit} noValidate>
+      <ol className="wsteps" aria-label="Schritte">
+        {STEPS.map((name, i) => {
+          const n = i + 1;
+          const state = n < step ? "done" : n === step ? "cur" : "todo";
+          return (
+            <li key={name} className={state} aria-current={n === step ? "step" : undefined}>
+              <button type="button" onClick={() => go(n)} disabled={busy}>
+                <span className="n" aria-hidden="true">
+                  {n < step ? (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5 9-10" /></svg>
+                  ) : n}
+                </span>
+                <span><span className="sr">Schritt {n}{n < step ? ", erledigt" : ""}: </span>{name}</span>
+              </button>
+            </li>
+          );
+        })}
+      </ol>
 
-      <div className="row" style={{ margin: ".8rem 0 .6rem", alignItems: "center" }}>
-        <span className="small-note">Schnellstart:</span>
-        {presets.map((p) => <button type="button" key={p.id} className="btn small ghost" onClick={() => applyPreset(p)} disabled={busy}>{p.label}</button>)}
-      </div>
+      {error && <div className="msg err" role="alert" style={{ marginTop: "1.25rem" }}>{error}</div>}
 
-      <div className="form-grid">
-        <div><label>Fach / Kontext *</label><input value={s.fach} onChange={(e) => set("fach", e.target.value)} required disabled={busy} placeholder="z. B. Mathematik" /></div>
-        <div><label>Zielstufe *</label><input value={s.stufe} onChange={(e) => set("stufe", e.target.value)} required disabled={busy} placeholder="z. B. Berufsmaturität" /></div>
-      </div>
-      <label>{pruefung ? "Prüfungsthema (optional – leer = der ganze Stoff aus dem Material)" : spiel ? "Spielthema (optional – leer = Begriffe und Regeln aus dem Material)" : "Thema (optional – leer = KI wählt aus dem Material)"}</label>
-      <input value={s.thema} onChange={(e) => set("thema", e.target.value)} disabled={busy} placeholder={pruefung ? "z. B. Semesterprüfung Statistik" : spiel ? "z. B. Fachbegriffe Anatomie" : "z. B. Dosisberechnung"} />
+      <div className="wiz">
+        <div className="wiz-main">
 
-      <label>{pruefung ? "Prüfungsstoff: Datei (PDF, Word, PowerPoint, Text · max. 4 MB)" : spiel ? "Spielinhalt: Datei (PDF, Word, PowerPoint, Text · max. 4 MB)" : "Material: Datei (PDF, Word, PowerPoint, Text · max. 4 MB)"}</label>
-      <input type="file" ref={fileRef} accept=".pdf,.docx,.pptx,.txt,.md" disabled={busy} onChange={(e) => setHatDatei(!!e.target.files?.length)} />
-      <label>… oder Themenbeschreibung / Textauszug</label>
-      <textarea rows={4} value={s.material} onChange={(e) => set("material", e.target.value)} disabled={busy} placeholder="Wird ignoriert, wenn eine Datei hochgeladen ist." />
+          {/* Schritt 1: Material */}
+          <div hidden={step !== 1}>
+            <fieldset className="fs">
+              <legend>Material</legend>
+              <p className="fs-lead">Lade eine Datei hoch oder füge einen Textauszug ein. Ein Thema allein genügt auch, dann wählt die KI passende Inhalte.</p>
+              <label htmlFor="thema">{pruefung ? "Prüfungsthema (optional, leer = der ganze Stoff aus dem Material)" : spiel ? "Spielthema (optional, leer = Begriffe und Regeln aus dem Material)" : "Thema (optional, leer = KI wählt aus dem Material)"}</label>
+              <input id="thema" value={s.thema} onChange={(e) => set("thema", e.target.value)} disabled={busy} placeholder={pruefung ? "z. B. Semesterprüfung Statistik" : spiel ? "z. B. Fachbegriffe Anatomie" : "z. B. Dosisberechnung"} />
+              <label htmlFor="datei">{pruefung ? "Prüfungsstoff" : spiel ? "Spielinhalt" : "Material"}: Datei (PDF, Word, PowerPoint, Text, höchstens 4 MB)</label>
+              <input id="datei" type="file" ref={fileRef} accept=".pdf,.docx,.pptx,.txt,.md" disabled={busy} onChange={(e) => setDateiName(e.target.files?.[0]?.name ?? "")} />
+              <label htmlFor="material">… oder Themenbeschreibung / Textauszug</label>
+              <textarea id="material" rows={5} value={s.material} onChange={(e) => set("material", e.target.value)} disabled={busy} placeholder="Wird ignoriert, wenn eine Datei hochgeladen ist." />
+            </fieldset>
+          </div>
 
-      {pruefung ? (
-        <>
-          <label>Dauer der Übungsprüfung</label>
-          <Seg value={s.dauer} opts={DAUER} onPick={(v) => set("dauer", v)} disabled={busy} />
-          <p className="small-note" style={{ margin: ".3rem 0 0" }}>20 Minuten entsprechen 20 Punkten, 30 Minuten 30 Punkten, 45 Minuten 40 Punkten. Note nach Schweizer Skala, 60 Prozent ergibt eine 4.</p>
-        </>
-      ) : lernseite ? (
-        <>
-          <FieldHead label="Differenzierungsart" info={<InfoKreis id="info-diffart" title="Differenzierungsart" items={infoItems(INFO.diffart, DIFFART)} note={INFO.diffart.note} />} />
-          <Seg
-            value={s.diffart} opts={DIFFART} disabled={busy}
-            onPick={(v) => setS((p) => (p.diffart === v ? p : { ...p, diffart: v as DiffartWahl, zugaenge: defaultZugaenge(v as DiffartWahl) }))}
-          />
-          <FieldHead
-            label="Zugänge (Mehrfachauswahl, mindestens einer)"
-            info={<InfoKreis id="info-zugaenge" title="Zugänge" items={zugangOptionen(s.diffart, s.eigeneBerufsfelder).map((o) => [o.name, o.info])} note={INFO.zugaenge.note} />}
-          />
-          <ZugangWahl
-            diffart={s.diffart} gewaehlt={s.zugaenge} eigene={s.eigeneBerufsfelder} disabled={busy}
-            onChange={(zugaenge, eigeneBerufsfelder) => setS((p) => ({ ...p, zugaenge, eigeneBerufsfelder }))}
-          />
-          <FieldHead label="Sozialform (Mehrfachauswahl, mindestens eine)" info={<InfoKreis id="info-sozialform" title="Sozialform" items={infoItems(INFO.sozialform, SOZIAL)} note={INFO.sozialform.note} />} />
-          <MultiSeg value={s.sozialformen} opts={SOZIAL} onChange={(v) => set("sozialformen", v)} disabled={busy} />
-        </>
-      ) : null}
-      {!lernseite && sprache}
-      {lernseite && (
-        <>
-          <FieldHead label="Anforderungsniveau" info={<InfoKreis id="info-niveau" title="Anforderungsniveau" items={infoItems(INFO.niveau, NIVEAU)} />} />
-          <Seg value={s.niveau} opts={NIVEAU} onPick={(v) => set("niveau", v)} disabled={busy} />
-          <details style={{ marginTop: ".9rem" }}>
-            <summary className="head-gross" style={{ cursor: "pointer", fontWeight: 600 }}>Feinsteuerung</summary>
-            {sprache}
-            <FieldHead label="Twist" info={<InfoKreis id="info-twist" title="Twist" items={infoItems(INFO.twist, TWIST)} note={INFO.twist.note} />} />
-            <Seg value={s.twist} opts={TWIST} onPick={(v) => set("twist", v)} disabled={busy} />
-            <label htmlFor="aufgaben">Anzahl Aufgaben pro Zugang (leer = KI entscheidet)</label>
-            <input id="aufgaben" type="number" min={1} max={12} step={1} inputMode="numeric" value={s.aufgaben} onChange={(e) => set("aufgaben", e.target.value)} disabled={busy} placeholder="automatisch" style={{ maxWidth: "9rem" }} />
-            <label htmlFor="aufgabenText">Aufgaben beschreiben</label>
-            <textarea id="aufgabenText" rows={3} maxLength={2000} value={s.aufgabenText} onChange={(e) => set("aufgabenText", e.target.value)} disabled={busy} placeholder="z. B. 1. Dichte aus Masse und Volumen berechnen, 2. Stoffe anhand der Dichte bestimmen, 3. Fehler in einer Rechnung finden" />
-            <label style={{ display: "flex", alignItems: "center", gap: ".5rem", fontWeight: 400, cursor: "pointer" }}>
-              <input type="checkbox" checked={s.latex} onChange={(e) => set("latex", e.target.checked)} disabled={busy} style={{ width: "auto", margin: 0 }} />
-              Formeln in LaTeX (für Mathematik und Physik)
-            </label>
-          </details>
-        </>
-      )}
-      <label>Zusatzwunsch (optional)</label>
-      <input value={s.extra} onChange={(e) => set("extra", e.target.value)} disabled={busy} placeholder={pruefung ? "z. B. ohne Taschenrechner, Schwerpunkt Formeln" : spiel ? "z. B. nur Fachbegriffe, Zeitlimit pro Aufgabe" : "z. B. Beispiel aus der Hotellerie"} />
+          {/* Schritt 2: Was entsteht */}
+          <div hidden={step !== 2}>
+            <fieldset className="fs">
+              <legend>Was soll entstehen?</legend>
+              <div className="field-head" style={{ marginTop: 0 }}>
+                <p className="fs-lead" style={{ flex: 1 }}>Wähle den Typ. Aus demselben Material kann jeder der fünf Typen entstehen.</p>
+                <InfoKreis id="info-typ" title="Was soll entstehen?" items={infoItems(INFO.typ, TYP)} note={INFO.typ.note} />
+              </div>
+              <div className="types" role="radiogroup" aria-label="Was soll entstehen?">
+                {TYP.map(([v, l]) => (
+                  <button type="button" key={v} role="radio" aria-checked={s.typ === v} className={`type${s.typ === v ? " on" : ""}`} onClick={() => set("typ", v)} disabled={busy}>
+                    <b>{l}</b>
+                    <span>{TYP_KURZ[v]}</span>
+                  </button>
+                ))}
+              </div>
+              <p className="fs-note">
+                {pruefung
+                  ? "Aus dem Prüfungsstoff entstehen drei Teile: Lernziele checken, Übungsprüfung mit Timer und Note, Lücken schliessen mit Lernplan. Dazu ein Lehrpersonen-Bereich mit Lösungen und Punkteschlüssel."
+                  : spiel
+                    ? "Vier Levels (Erkennen, Erinnern, Anwenden, Meistern) mit 24 bis 28 Aufgaben aus dem Material, Punkten, Serie, Leben und Bestleistung. Dazu die Aufgabenliste für die Lehrperson."
+                    : hilfe
+                      ? "Merkblatt auf einer A4-Seite, 16 bis 24 Lernkarten zum Umdrehen mit Gewusst/Nochmals, Glossar mit Suche. Alles druckbar. Mit «vereinfachte Sprache» oder «zweisprachig» auch als Nachteilsausgleich."
+                      : arbeitsblatt
+                        ? "Ein Arbeitsblatt zum Austeilen: Kernaufgabe und Zugänge untereinander, jeder Zugang auf einer neuen Seite, mit Platz zum Bearbeiten und Lösungsblatt. Als Word herunterladen oder drucken."
+                        : "Eine Kernaufgabe mit mehreren Zugängen, Selbstkontrolle und Lehrpersonen-Bereich."}
+              </p>
+              {pruefung && (
+                <>
+                  <FieldHead label="Dauer der Übungsprüfung" />
+                  <Seg label="Dauer der Übungsprüfung" value={s.dauer} opts={DAUER} onPick={(v) => set("dauer", v)} disabled={busy} />
+                  <p className="fs-note">20 Minuten entsprechen 20 Punkten, 30 Minuten 30 Punkten, 45 Minuten 40 Punkten. Note nach Schweizer Skala, 60 Prozent ergibt eine 4.</p>
+                </>
+              )}
+            </fieldset>
+          </div>
 
-      {bilder.length > 0 && lernseite && (
-        <>
-          <label>Bild einbinden (optional)</label>
-          <select value={s.bild} onChange={(e) => set("bild", Number(e.target.value))} disabled={busy}>
-            <option value={0}>kein Bild</option>
-            {bilder.map((b) => <option key={b.id} value={b.id}>{b.title}</option>)}
-          </select>
-          {s.bild > 0 && (
-            <div className="row" style={{ alignItems: "center", marginTop: ".5rem" }}>
-              <img src={`/app/bilder/${s.bild}/jpg`} alt="" style={{ width: 160, aspectRatio: "16/9", objectFit: "cover", borderRadius: 8, border: "1px solid var(--line)" }} />
-              <span className="small-note" style={{ flex: "1 1 200px" }}>Das Bild kommt als Bildaufgabe mit Arbeitsauftrag in die Lernseite. Es wird dafür per Bildlink freigegeben (ohne Login erreichbar).</span>
+          {/* Schritt 3: Einstellungen */}
+          <div hidden={step !== 3}>
+            <div className="presets">
+              <span className="small-note">Schnellstart:</span>
+              {presets.map((p) => <button type="button" key={p.id} className="btn small ghost" onClick={() => applyPreset(p)} disabled={busy}>{p.label}</button>)}
             </div>
-          )}
-        </>
-      )}
 
-      <label>KI-Anbieter</label>
-      <div className="seg">
-        {providers.map((p) => (
-          <button type="button" key={p.id} className={s.provider === p.id ? "on" : ""} onClick={() => set("provider", p.id)} disabled={busy} title={p.model}>{p.label}</button>
-        ))}
+            <fieldset className="fs">
+              <legend>Rahmen</legend>
+              <div className="form-grid">
+                <div><label htmlFor="fach">Fach / Kontext *</label><input id="fach" value={s.fach} onChange={(e) => set("fach", e.target.value)} required aria-required="true" disabled={busy} placeholder="z. B. Mathematik" /></div>
+                <div><label htmlFor="stufe">Zielstufe *</label><input id="stufe" value={s.stufe} onChange={(e) => set("stufe", e.target.value)} required aria-required="true" disabled={busy} placeholder="z. B. Berufsmaturität" /></div>
+              </div>
+              <FieldHead label="Sprache" info={<InfoKreis id="info-sprache" title="Sprache" items={infoItems(INFO.sprache, SPRACHE)} />} />
+              <Seg label="Sprache" value={s.sprache} opts={SPRACHE} onPick={(v) => set("sprache", v)} disabled={busy} />
+              {s.sprache === "zweisprachig" && (
+                <>
+                  <label htmlFor="zweitsprache">Zweite Sprache</label>
+                  <input id="zweitsprache" value={s.zweitsprache} onChange={(e) => set("zweitsprache", e.target.value)} disabled={busy} placeholder="z. B. Portugiesisch" />
+                </>
+              )}
+              <label htmlFor="extra">Zusatzwunsch (optional)</label>
+              <input id="extra" value={s.extra} onChange={(e) => set("extra", e.target.value)} disabled={busy} placeholder={pruefung ? "z. B. ohne Taschenrechner, Schwerpunkt Formeln" : spiel ? "z. B. nur Fachbegriffe, Zeitlimit pro Aufgabe" : "z. B. Beispiel aus der Hotellerie"} />
+            </fieldset>
+
+            {lernseite && (
+              <fieldset className="fs">
+                <legend>Zugänge</legend>
+                <p className="fs-lead">Eine Kernaufgabe, mehrere Wege. Wonach unterscheiden sich die Zugänge?</p>
+                <FieldHead label="Differenzierungsart" info={<InfoKreis id="info-diffart" title="Differenzierungsart" items={infoItems(INFO.diffart, DIFFART)} note={INFO.diffart.note} />} />
+                <Seg
+                  label="Differenzierungsart" value={s.diffart} opts={DIFFART} disabled={busy}
+                  onPick={(v) => setS((p) => (p.diffart === v ? p : { ...p, diffart: v as DiffartWahl, zugaenge: defaultZugaenge(v as DiffartWahl) }))}
+                />
+                <FieldHead
+                  label="Zugänge (Mehrfachauswahl, mindestens einer)"
+                  info={<InfoKreis id="info-zugaenge" title="Zugänge" items={zugangOptionen(s.diffart, s.eigeneBerufsfelder).map((o) => [o.name, o.info])} note={INFO.zugaenge.note} />}
+                />
+                <ZugangWahl
+                  diffart={s.diffart} gewaehlt={s.zugaenge} eigene={s.eigeneBerufsfelder} disabled={busy}
+                  onChange={(zugaenge, eigeneBerufsfelder) => setS((p) => ({ ...p, zugaenge, eigeneBerufsfelder }))}
+                />
+              </fieldset>
+            )}
+
+            {lernseite && (
+              <fieldset className="fs">
+                <legend>Unterricht</legend>
+                <FieldHead first label="Sozialform (Mehrfachauswahl, mindestens eine)" info={<InfoKreis id="info-sozialform" title="Sozialform" items={infoItems(INFO.sozialform, SOZIAL)} note={INFO.sozialform.note} />} />
+                <MultiSeg label="Sozialform" value={s.sozialformen} opts={SOZIAL} onChange={(v) => set("sozialformen", v)} disabled={busy} />
+                <FieldHead label="Anforderungsniveau" info={<InfoKreis id="info-niveau" title="Anforderungsniveau" items={infoItems(INFO.niveau, NIVEAU)} />} />
+                <Seg label="Anforderungsniveau" value={s.niveau} opts={NIVEAU} onPick={(v) => set("niveau", v)} disabled={busy} />
+                <FieldHead label="Twist" info={<InfoKreis id="info-twist" title="Twist" items={infoItems(INFO.twist, TWIST)} note={INFO.twist.note} />} />
+                <Seg label="Twist" value={s.twist} opts={TWIST} onPick={(v) => set("twist", v)} disabled={busy} />
+                <details className="fein">
+                  <summary>Feinsteuerung: Aufgaben und Formeln</summary>
+                  <label htmlFor="aufgaben">Anzahl Aufgaben pro Zugang (leer = KI entscheidet)</label>
+                  <input id="aufgaben" type="number" min={1} max={12} step={1} inputMode="numeric" value={s.aufgaben} onChange={(e) => set("aufgaben", e.target.value)} disabled={busy} placeholder="automatisch" style={{ maxWidth: "9rem" }} />
+                  <label htmlFor="aufgabenText">Aufgaben beschreiben</label>
+                  <textarea id="aufgabenText" rows={3} maxLength={2000} value={s.aufgabenText} onChange={(e) => set("aufgabenText", e.target.value)} disabled={busy} placeholder="z. B. 1. Dichte aus Masse und Volumen berechnen, 2. Stoffe anhand der Dichte bestimmen, 3. Fehler in einer Rechnung finden" />
+                  <label className="check" style={{ marginTop: ".8rem", fontWeight: 400, minHeight: 44 }}>
+                    <input type="checkbox" checked={s.latex} onChange={(e) => set("latex", e.target.checked)} disabled={busy} />
+                    Formeln in LaTeX (für Mathematik und Physik)
+                  </label>
+                </details>
+              </fieldset>
+            )}
+
+            {bilder.length > 0 && lernseite && (
+              <fieldset className="fs">
+                <legend>Bild</legend>
+                <label htmlFor="bild" style={{ marginTop: 0 }}>Bild einbinden (optional)</label>
+                <select id="bild" value={s.bild} onChange={(e) => set("bild", Number(e.target.value))} disabled={busy}>
+                  <option value={0}>kein Bild</option>
+                  {bilder.map((b) => <option key={b.id} value={b.id}>{b.title}</option>)}
+                </select>
+                {s.bild > 0 && (
+                  <div className="row" style={{ alignItems: "center", marginTop: ".5rem" }}>
+                    <img src={`/app/bilder/${s.bild}/jpg`} alt="" style={{ width: 160, aspectRatio: "16/9", objectFit: "cover", borderRadius: 8, border: "1px solid var(--line)" }} />
+                    <span className="small-note" style={{ flex: "1 1 200px" }}>Das Bild kommt als Bildaufgabe mit Arbeitsauftrag in die Lernseite. Es wird dafür per Bildlink freigegeben (ohne Login erreichbar).</span>
+                  </div>
+                )}
+              </fieldset>
+            )}
+
+            <fieldset className="fs">
+              <legend>KI</legend>
+              <div className="kis" role="radiogroup" aria-label="KI wählen">
+                {providers.map((p) => {
+                  const rest = p.limit === null ? "ohne Limit" : `${Math.max(0, p.limit - p.used)} von ${p.limit} übrig`;
+                  return (
+                    <button type="button" key={p.id} role="radio" aria-checked={s.provider === p.id} className={`ki${s.provider === p.id ? " on" : ""}`} onClick={() => set("provider", p.id)} disabled={busy} title={p.model}>
+                      <b>{p.label}</b>
+                      <small>{rest}</small>
+                    </button>
+                  );
+                })}
+              </div>
+              {isAdmin && (
+                <>
+                  <label htmlFor="modell">Modell (nur Admin, für Modelltests; leer = Standard)</label>
+                  <input id="modell" value={s.modell} onChange={(e) => set("modell", e.target.value)} disabled={busy} placeholder={current.model} />
+                  <p className="fs-note">Exakter Modellname des gewählten Anbieters. Bei falschem Namen zeigt die Fehlermeldung die gültigen Namen.</p>
+                </>
+              )}
+            </fieldset>
+          </div>
+
+          {/* Schritt 4: Erzeugen */}
+          <div hidden={step !== 4}>
+            <fieldset className="fs">
+              <legend>Erzeugen</legend>
+              <p className="fs-lead">
+                Prüfe deine Angaben in der Zusammenfassung. Mit «{typName} erzeugen» geht der Auftrag an {current.label}. Die fertige Seite öffnet sich danach von selbst und liegt in deiner Sammlung.
+              </p>
+              <p className="fs-note">Bitte das Fenster offen lassen. Dauer: Lernseite ein bis drei Minuten, Prüfungsvorbereitung bis zu acht Minuten.</p>
+              {current.limit !== null && (
+                <p className="fs-note" style={{ color: exhausted ? "var(--err)" : undefined }}>
+                  Diesen Monat {current.used} von {current.limit} Lernseiten mit {current.label} erzeugt.
+                  {exhausted ? " Das Kontingent ist aufgebraucht und wird am Monatsersten zurückgesetzt." : ""}
+                </p>
+              )}
+              <button type="button" className="prompt-link" aria-expanded={promptOpen} aria-controls="generierter-prompt" onClick={() => setPromptOpen((o) => !o)}>
+                {promptOpen ? "Generierten Prompt ausblenden" : "Generierter Prompt"}
+              </button>
+              {promptOpen && <PromptVorschau s={s} hatDatei={!!dateiName} />}
+              {log.length > 0 && <pre className="log" aria-live="polite">{log.join("\n")}</pre>}
+            </fieldset>
+          </div>
+        </div>
+
+        <aside className="sum" aria-label="Zusammenfassung">
+          <h2>Deine Seite</h2>
+          <dl>
+            <div><dt>Material</dt><dd>{materialText}</dd></div>
+            {s.thema.trim() && <div><dt>Thema</dt><dd>{s.thema.trim()}</dd></div>}
+            <div><dt>Typ</dt><dd>{typName}{pruefung ? ` · ${s.dauer} Minuten` : ""}</dd></div>
+            <div><dt>Rahmen</dt><dd>{rahmenFehlt ? "Fach und Zielstufe fehlen noch" : `${s.fach.trim()} · ${s.stufe.trim()}`}</dd></div>
+            {lernseite && <div><dt>Zugänge</dt><dd>{label(DIFFART, s.diffart)}: {zugangNamen.join(", ")}</dd></div>}
+            {lernseite && <div><dt>Sozialform</dt><dd>{s.sozialformen.map((v) => label(SOZIAL, v)).join(", ")}</dd></div>}
+            <div><dt>Sprache</dt><dd>{label(SPRACHE, s.sprache)}{s.sprache === "zweisprachig" && s.zweitsprache.trim() ? ` (${s.zweitsprache.trim()})` : ""}</dd></div>
+            <div><dt>KI</dt><dd>{current.label}</dd></div>
+          </dl>
+          <div className="sum-note">
+            Verbraucht 1 Seite von {current.label}.{" "}
+            {current.limit === null ? "Als Admin ohne Limit." : exhausted ? "Das Kontingent ist aufgebraucht." : `Danach: ${current.limit - current.used - 1} übrig.`}
+          </div>
+          <div className="sum-actions">
+            {step < 4 ? (
+              <button type="button" className="btn terra" onClick={() => go(step + 1)}>Weiter zu «{STEPS[step]}»</button>
+            ) : (
+              <button type="submit" className="btn terra" disabled={busy || exhausted}>{erzeugenText}</button>
+            )}
+            {step > 1 && <button type="button" className="sum-back" onClick={() => go(step - 1)} disabled={busy}>Zurück zu «{STEPS[step - 2]}»</button>}
+          </div>
+        </aside>
       </div>
-
-      {isAdmin && (
-        <>
-          <label htmlFor="modell" style={{ marginTop: ".8rem" }}>Modell (nur Admin, für Modelltests; leer = Standard)</label>
-          <input id="modell" value={s.modell} onChange={(e) => set("modell", e.target.value)} disabled={busy} placeholder={current.model} />
-          <p className="small-note" style={{ marginTop: ".3rem" }}>Exakter Modellname des gewählten Anbieters. Bei falschem Namen zeigt die Fehlermeldung die gültigen Namen.</p>
-        </>
-      )}
-
-      {current.limit !== null && (
-        <p className="small-note" style={{ marginTop: ".5rem", color: exhausted ? "var(--err)" : undefined }}>
-          Diesen Monat {current.used} von {current.limit} Lernseiten mit {current.label} erzeugt.
-          {exhausted ? " Das Kontingent ist aufgebraucht und wird am Monatsersten zurückgesetzt." : ""}
-        </p>
-      )}
-
-      <button type="button" className="prompt-link" aria-expanded={promptOpen} aria-controls="generierter-prompt" onClick={() => setPromptOpen((o) => !o)} style={{ marginTop: "1.1rem" }}>
-        {promptOpen ? "Generierten Prompt ausblenden" : "Generierter Prompt"}
-      </button>
-      {promptOpen && <PromptVorschau s={s} hatDatei={hatDatei} />}
-
-      <div style={{ marginTop: "1.3rem", display: "flex", gap: ".8rem", alignItems: "center", flexWrap: "wrap" }}>
-        <button className="btn terra" disabled={busy || exhausted}>{busy ? "Wird erzeugt …" : pruefung ? "Prüfungsvorbereitung erzeugen" : spiel ? "Lernspiel erzeugen" : hilfe ? "Lernhilfe erzeugen" : arbeitsblatt ? "Arbeitsblatt erzeugen" : "Lernseite erzeugen"}</button>
-        {busy && <span className="small-note">Bitte Fenster offen lassen. Dauer: Lernseite ein bis drei Minuten, Prüfungsvorbereitung bis zu acht Minuten.</span>}
-      </div>
-
-      {error && <div className="msg err" style={{ marginTop: "1rem" }}>{error}</div>}
-      {log.length > 0 && (
-        <pre className="log">{log.join("\n")}</pre>
-      )}
     </form>
   );
 }

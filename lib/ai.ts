@@ -28,6 +28,14 @@ export function availableProviders(): Provider[] {
   return (["claude", "openai", "infomaniak"] as Provider[]).filter(providerReady);
 }
 
+/** Anbieter mit Standort Schweiz (Schulmodus «KI nur Schweiz»). */
+export const SWISS_PROVIDERS: readonly Provider[] = ["infomaniak"];
+
+/** Erlaubte und eingerichtete Anbieter für ein Konto; swissOnly kommt von der Institution. */
+export function providersFor(swissOnly: boolean): Provider[] {
+  return availableProviders().filter((p) => !swissOnly || SWISS_PROVIDERS.includes(p));
+}
+
 export const CLAUDE_MODEL = process.env.CLAUDE_MODEL || "claude-opus-5";
 // Leerzeichen und Anführungszeichen aus dem Env-Wert entfernen (häufige Fehler beim Eintragen im Dashboard)
 const clean = (v: string | undefined) => (v ?? "").trim().replace(/^["'`]+|["'`]+$/g, "").trim();

@@ -12,11 +12,16 @@
 <link rel="stylesheet" href="/lw.css">
 <style>
   body > .wrap{padding-top:clamp(1.6rem,4vw,3rem);padding-bottom:clamp(3rem,6vw,5rem)}
-  .toc{display:flex;gap:.45rem;flex-wrap:wrap;margin:1.2rem 0 2.4rem}
-  .toc a{font-size:.85rem;font-weight:600;border:1px solid var(--line-strong);background:#fff;color:var(--ink);border-radius:var(--r);padding:.42rem .85rem;text-decoration:none}
-  .toc a:hover{border-color:var(--terra);color:var(--terra)}
-  .toc a.cta{background:var(--navy);color:#fff;border-color:var(--navy)}
-  .toc a.cta:hover{background:var(--navy-soft);color:#fff}
+  /* Sprungmarken als Chips wie die Typ-Filter in der Sammlung; Generator als Textlink rechts */
+  .toc{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin:1.25rem 0 2.5rem}
+  .toc a{display:inline-flex;align-items:center;min-height:44px;padding:.4rem .95rem;border-radius:999px;font-size:.875rem;text-decoration:none;background:var(--card);color:var(--ink);border:1px solid var(--line-strong)}
+  .toc a:hover{border-color:var(--navy);color:var(--ink)}
+  .toc a[hidden]{display:none}
+  .toc a.cta{margin-left:auto;border:0;background:none;border-radius:0;padding:.4rem 0;font-weight:600;color:var(--navy);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line-strong)}
+  .toc a.cta:hover{color:var(--terra)}
+  @media(max-width:700px){.toc a.cta{margin-left:0}}
+  a:focus-visible,.btn:focus-visible,button:focus-visible{outline:3px solid var(--ochre);outline-offset:2px}
+  .btn{min-height:44px}
   .sec-head[id],[id]{scroll-margin-top:5rem}
 
   .group{padding:2.2rem 0;border-top:1px solid var(--line-strong)}

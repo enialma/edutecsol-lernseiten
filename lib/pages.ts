@@ -35,6 +35,8 @@ export type PageMeta = {
   coach_stil: string;
   coach_provider: string;
   owner_coach: boolean;
+  /** Institution der Autorin im Schulmodus «KI nur Schweiz» (Coach nur Infomaniak) */
+  owner_swiss_only: boolean;
 };
 export type PageFull = PageMeta & { html: string };
 
@@ -42,7 +44,7 @@ const META = `p.id, p.user_id, p.title, p.fach, p.stufe, p.thema, p.params, p.ma
   p.input_tokens, p.output_tokens, p.duration_ms, p.notiz, p.share_token, p.pool, p.school, p.copied_from,
   p.coach, p.coach_stil, p.coach_provider, u.coach AS owner_coach,
   to_char(p.created_at, 'DD.MM.YYYY HH24:MI') AS created_at, length(p.html) AS html_bytes,
-  u.email AS owner_email, u.name AS owner_name, i.name AS owner_institution`;
+  u.email AS owner_email, u.name AS owner_name, i.name AS owner_institution, COALESCE(i.swiss_only, FALSE) AS owner_swiss_only`;
 
 /** Coach-Einstellungen einer Seite (nur Besitzerin oder Admin). */
 export async function setCoach(id: number, userId: number, isAdmin: boolean, s: { on: boolean; stil: string; provider: string }): Promise<number> {

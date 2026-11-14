@@ -6,8 +6,7 @@ import { auth } from "@/auth";
 import { getGruppe } from "@/lib/gruppen";
 import { listPages } from "@/lib/pages";
 import { TYP_LABELS, type Typ } from "@/lib/prompt";
-import Topbar from "../../../Topbar";
-import Footer from "../../../Footer";
+import AppShell from "../../../AppShell";
 import CopyButton from "../../seiten/[id]/CopyButton";
 import { addPagesAction, deleteGruppeAction, gruppeShareAction, removePageAction, sharePageFromGruppeAction, updateGruppeAction } from "../actions";
 
@@ -35,152 +34,167 @@ export default async function GruppePage({ params }: { params: Promise<{ id: str
   const ohneLink = inGruppe.filter((p) => !p.share_token).length;
 
   return (
-    <>
-      <Topbar />
-      <main>
-        <div className="wrap">
-          <p className="kicker"><Link href="/app/gruppen">← Klassen und Gruppen</Link></p>
+    <AppShell active="klassen">
+      <nav className="crumb" aria-label="Brotkrumen"><Link href="/app/gruppen">Klassen und Gruppen</Link> <span aria-hidden="true">/</span> {gruppe.name}</nav>
+      <header className="page-head">
+        <div>
           <h1>{gruppe.name}</h1>
-          <p className="lead">
+          <p>
             {gruppe.beschreibung ? `${gruppe.beschreibung} · ` : ""}
             {inGruppe.length === 1 ? "1 Seite" : `${inGruppe.length} Seiten`}, {gruppe.freigegeben} davon mit Freigabelink
-            {inGruppe.length > 0 && <> · <Link href={`/app/seiten?gruppe=${gruppe.id}`}>in der Sammlung anzeigen</Link></>}
           </p>
-
-          <div className="grid" style={{ marginBottom: "1rem" }}>
-            <div className="card">
-              <p className="kicker">Für Lernende</p>
-              <h3 style={{ margin: "0 0 .4rem" }}>Klassenlink</h3>
-              {link ? (
-                <>
-                  <p className="small-note">
-                    Eine Übersicht aller Seiten dieser Gruppe, die einen Freigabelink haben. Wer den Link hat, braucht kein Login.
-                    Neue Seiten erscheinen automatisch, sobald du sie der Gruppe zuordnest und freigibst.
-                  </p>
-                  <div className="row" style={{ alignItems: "center" }}>
-                    <input readOnly value={link} style={{ flex: "1 1 220px", fontSize: ".85rem" }} />
-                    <CopyButton text={link} />
-                  </div>
-                  <div className="row" style={{ alignItems: "center", marginTop: ".8rem" }}>
-                    {qr && <img src={qr} alt="QR-Code zum Klassenlink" width={120} height={120} style={{ borderRadius: 8, border: "1px solid var(--line)" }} />}
-                    <div className="row" style={{ flexDirection: "column", alignItems: "flex-start" }}>
-                      <a className="btn small ghost" href={link} target="_blank" rel="noopener">Klassenseite ansehen</a>
-                      {qr && <a className="btn small ghost" href={qr} download={`${slug}-qr.png`}>QR-Code speichern</a>}
-                      <form action={gruppeShareAction}>
-                        <input type="hidden" name="id" value={gruppe.id} />
-                        <input type="hidden" name="on" value="0" />
-                        <button className="btn small ghost" style={{ color: "var(--err)" }}>Klassenlink zurückziehen</button>
-                      </form>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p className="small-note">
-                    Noch kein Klassenlink. Er zeigt den Lernenden eine Übersicht aller freigegebenen Seiten dieser Gruppe, ohne Login.
-                    Ein Link für die ganze Klasse statt ein Link pro Seite.
-                  </p>
-                  <form action={gruppeShareAction}>
-                    <input type="hidden" name="id" value={gruppe.id} />
-                    <input type="hidden" name="on" value="1" />
-                    <button className="btn small">Klassenlink erstellen</button>
-                  </form>
-                </>
-              )}
-            </div>
-
-            <div className="card">
-              <p className="kicker">Gruppe</p>
-              <h3 style={{ margin: "0 0 .4rem" }}>Name und Beschreibung</h3>
-              <form action={updateGruppeAction}>
-                <input type="hidden" name="id" value={gruppe.id} />
-                <label style={{ margin: "0 0 .2rem" }}>Name</label>
-                <input name="name" required maxLength={80} defaultValue={gruppe.name} />
-                <label style={{ margin: ".6rem 0 .2rem" }}>Beschreibung</label>
-                <input name="beschreibung" maxLength={300} defaultValue={gruppe.beschreibung ?? ""} placeholder="optional" />
-                <div className="row" style={{ marginTop: ".7rem" }}>
-                  <button className="btn small ghost">Speichern</button>
-                </div>
-              </form>
-            </div>
+        </div>
+        {inGruppe.length > 0 && (
+          <div className="head-acts">
+            <Link className="btn ghost" href={`/app/seiten?gruppe=${gruppe.id}`}>In der Sammlung anzeigen</Link>
           </div>
+        )}
+      </header>
 
-          <h2 style={{ marginTop: "1.6rem" }}>Seiten in dieser Gruppe</h2>
-          {inGruppe.length === 0 ? (
-            <div className="card">Noch keine Seite. Füge unten Seiten aus deiner Sammlung hinzu oder kreuze die Gruppe auf der Detailseite einer Lernseite an.</div>
-          ) : (
-            <>
-              {ohneLink > 0 && link && (
-                <p className="small-note" style={{ margin: "0 0 .6rem" }}>
-                  {ohneLink === 1 ? "1 Seite hat" : `${ohneLink} Seiten haben`} noch keinen Freigabelink und {ohneLink === 1 ? "erscheint" : "erscheinen"} deshalb nicht auf der Klassenseite.
-                </p>
-              )}
-              <div className="table-wrap">
-                <table>
+      <div className="detail grp">
+        <div className="detail-main">
+          <section className="box" aria-labelledby="h-gs">
+            <div className="box-head">
+              <h2 id="h-gs">Seiten in dieser Gruppe</h2>
+              <span className="soft-count">{inGruppe.length === 1 ? "1 Seite" : `${inGruppe.length} Seiten`}</span>
+            </div>
+            {ohneLink > 0 && link && (
+              <p className="box-note">
+                {ohneLink === 1 ? "1 Seite hat" : `${ohneLink} Seiten haben`} noch keinen Freigabelink und {ohneLink === 1 ? "erscheint" : "erscheinen"} deshalb nicht auf der Klassenseite.
+              </p>
+            )}
+            {inGruppe.length === 0 ? (
+              <p className="box-empty">Noch keine Seite. Füge unten Seiten aus deiner Sammlung hinzu oder kreuze die Gruppe auf der Detailseite einer Lernseite an.</p>
+            ) : (
+              <div className="ltable-wrap">
+                <table className="ltable compact">
                   <thead>
-                    <tr><th>Lernseite</th><th>Typ</th><th>Fach · Stufe</th><th>Für Lernende</th><th></th></tr>
+                    <tr><th scope="col">Lernseite</th><th scope="col">Typ</th><th scope="col">Für Lernende</th><th scope="col" className="r">Aktion</th></tr>
                   </thead>
                   <tbody>
-                    {inGruppe.map((p) => (
-                      <tr key={p.id}>
-                        <td><Link href={`/app/seiten/${p.id}`}><b>{p.title}</b></Link><br /><span className="small-note">{p.created_at}</span></td>
-                        <td>{typOf(p.params)}</td>
-                        <td>{p.fach}{p.stufe ? ` · ${p.stufe}` : ""}</td>
-                        <td>
-                          {p.share_token ? (
-                            <a className="badge ok" href={`/s/${p.share_token}`} target="_blank" rel="noopener" style={{ margin: 0, textDecoration: "none" }}>Freigabelink ↗</a>
-                          ) : (
-                            <form action={sharePageFromGruppeAction} className="row" style={{ alignItems: "center" }}>
+                    {inGruppe.map((p) => {
+                      const sub = [p.fach, p.stufe, p.created_at.slice(0, 10)].filter(Boolean).join(" · ");
+                      return (
+                        <tr key={p.id}>
+                          <th scope="row">
+                            <Link className="ltitle" href={`/app/seiten/${p.id}`}><b>{p.title}</b><small>{sub}</small></Link>
+                          </th>
+                          <td>{typOf(p.params)}</td>
+                          <td>
+                            {p.share_token ? (
+                              <a className="tag frei tag-link" href={`/s/${p.share_token}`} target="_blank" rel="noopener">Freigegeben, ansehen</a>
+                            ) : (
+                              <form action={sharePageFromGruppeAction}>
+                                <input type="hidden" name="id" value={gruppe.id} />
+                                <input type="hidden" name="seite" value={p.id} />
+                                <button className="btn small ghost">Freigabelink erstellen</button>
+                              </form>
+                            )}
+                          </td>
+                          <td className="r">
+                            <form action={removePageAction}>
                               <input type="hidden" name="id" value={gruppe.id} />
                               <input type="hidden" name="seite" value={p.id} />
-                              <button className="btn small ghost">Freigabelink erstellen</button>
+                              <button className="btn small ghost" title="Aus der Gruppe entfernen, die Seite bleibt in der Sammlung" aria-label={`${p.title} aus der Gruppe entfernen`}>Entfernen</button>
                             </form>
-                          )}
-                        </td>
-                        <td style={{ textAlign: "right" }}>
-                          <form action={removePageAction}>
-                            <input type="hidden" name="id" value={gruppe.id} />
-                            <input type="hidden" name="seite" value={p.id} />
-                            <button className="btn small ghost" title="Aus der Gruppe entfernen, die Seite bleibt in der Sammlung">Entfernen</button>
-                          </form>
-                        </td>
-                      </tr>
-                    ))}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
-            </>
-          )}
+            )}
+          </section>
 
-          <details className="card" style={{ marginTop: "1rem" }}>
-            <summary style={{ cursor: "pointer", fontWeight: 600 }}>Seiten aus der Sammlung hinzufügen{uebrige.length > 0 ? ` (${uebrige.length} verfügbar)` : ""}</summary>
+          <details className="box fold">
+            <summary>Seiten aus der Sammlung hinzufügen{uebrige.length > 0 ? ` (${uebrige.length} verfügbar)` : ""}</summary>
             {uebrige.length === 0 ? (
-              <p className="small-note" style={{ margin: ".8rem 0 0" }}>Alle deine Seiten liegen bereits in dieser Gruppe{alle.length === 0 ? ", beziehungsweise du hast noch keine Lernseite erzeugt" : ""}.</p>
+              <p className="box-text soft">Alle deine Seiten liegen bereits in dieser Gruppe{alle.length === 0 ? ", beziehungsweise du hast noch keine Lernseite erzeugt" : ""}.</p>
             ) : (
-              <form action={addPagesAction} style={{ marginTop: ".8rem" }}>
+              <form action={addPagesAction}>
                 <input type="hidden" name="id" value={gruppe.id} />
                 <div className="checks">
                   {uebrige.map((p) => (
-                    <label key={p.id} className="check">
+                    <label key={p.id} className="check tall">
                       <input type="checkbox" name="seite" value={p.id} />
                       <span>{p.title}</span>
                       <small>{typOf(p.params)} · {p.fach}{p.stufe ? ` · ${p.stufe}` : ""} · {p.created_at}{p.share_token ? " · Freigabelink" : ""}</small>
                     </label>
                   ))}
                 </div>
-                <button className="btn small">Ausgewählte hinzufügen</button>
+                <button className="btn">Ausgewählte hinzufügen</button>
               </form>
             )}
           </details>
+        </div>
 
-          <form action={deleteGruppeAction} style={{ marginTop: "1.4rem" }}>
+        <div className="detail-side">
+          <section className="share" aria-labelledby="h-kl">
+            <div className="between">
+              <h2 id="h-kl">Klassenlink</h2>
+              <span className="share-state">{link ? "Aktiv" : "Aus"}</span>
+            </div>
+            {link ? (
+              <>
+                <div className="share-row">
+                  {qr && <img src={qr} alt="QR-Code zum Klassenlink" width={96} height={96} />}
+                  <div>
+                    <label htmlFor="klnk">Klassenlink, ohne Konto</label>
+                    <input id="klnk" type="text" readOnly value={link} />
+                  </div>
+                </div>
+                <div className="share-acts">
+                  <CopyButton text={link} className="btn terra" />
+                  {qr && <a className="btn on-navy" href={qr} download={`${slug}-qr.png`}>QR-Code speichern</a>}
+                </div>
+                <a className="share-off" href={link} target="_blank" rel="noopener">Klassenseite ansehen</a>
+                <p className="share-note">
+                  Eine Übersicht aller Seiten dieser Gruppe, die einen Freigabelink haben. Wer den Link hat, braucht kein Login.
+                  Neue Seiten erscheinen automatisch, sobald du sie der Gruppe zuordnest und freigibst.
+                </p>
+                <form action={gruppeShareAction}>
+                  <input type="hidden" name="id" value={gruppe.id} />
+                  <input type="hidden" name="on" value="0" />
+                  <button className="share-off">Klassenlink zurückziehen</button>
+                </form>
+              </>
+            ) : (
+              <>
+                <p className="share-note">
+                  Noch kein Klassenlink. Er zeigt den Lernenden eine Übersicht aller freigegebenen Seiten dieser Gruppe, ohne Login.
+                  Ein Link für die ganze Klasse statt ein Link pro Seite.
+                </p>
+                <form action={gruppeShareAction} className="share-acts">
+                  <input type="hidden" name="id" value={gruppe.id} />
+                  <input type="hidden" name="on" value="1" />
+                  <button className="btn terra">Klassenlink erstellen</button>
+                </form>
+              </>
+            )}
+          </section>
+
+          <form action={updateGruppeAction} className="box pad block newg" aria-labelledby="h-gn">
+            <h2 id="h-gn">Name und Beschreibung</h2>
             <input type="hidden" name="id" value={gruppe.id} />
-            <button className="btn ghost" style={{ color: "var(--err)" }}>Gruppe löschen</button>
-            <span className="small-note" style={{ marginLeft: ".7rem" }}>Die Lernseiten bleiben in der Sammlung erhalten. Ein Klassenlink dieser Gruppe wird ungültig.</span>
+            <div>
+              <label htmlFor="g-name">Name</label>
+              <input id="g-name" name="name" required maxLength={80} defaultValue={gruppe.name} />
+            </div>
+            <div>
+              <label htmlFor="g-besch">Beschreibung</label>
+              <input id="g-besch" name="beschreibung" maxLength={300} defaultValue={gruppe.beschreibung ?? ""} placeholder="optional" />
+            </div>
+            <button className="btn ghost">Speichern</button>
           </form>
         </div>
-      </main>
-      <Footer />
-    </>
+      </div>
+
+      <form action={deleteGruppeAction} className="danger">
+        <input type="hidden" name="id" value={gruppe.id} />
+        <button className="btn ghost">Gruppe löschen</button>
+        <span className="danger-note">Die Lernseiten bleiben in der Sammlung erhalten. Ein Klassenlink dieser Gruppe wird ungültig.</span>
+      </form>
+    </AppShell>
   );
 }

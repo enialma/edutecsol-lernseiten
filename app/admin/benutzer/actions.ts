@@ -1,7 +1,14 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
-import { createInstitution, createUser, deleteInstitution, deleteUser, renameInstitution, setActive, setCoachOption, setInstitution, setPassword } from "@/lib/users";
+import { createInstitution, createUser, deleteInstitution, deleteUser, renameInstitution, setActive, setCoachOption, setInstitution, setPassword, setSwissOnly } from "@/lib/users";
+
+/** Schulmodus «KI nur Schweiz» für eine Institution ein- oder ausschalten. */
+export async function swissOnlyAction(fd: FormData) {
+  await requireAdmin();
+  await setSwissOnly(Number(fd.get("id")), fd.get("on") === "1");
+  revalidatePath("/admin/benutzer");
+}
 
 /** Zusatzoption KI-Lerncoach freischalten oder entziehen. */
 export async function toggleCoachAction(fd: FormData) {

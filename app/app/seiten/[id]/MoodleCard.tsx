@@ -45,9 +45,8 @@ export default function MoodleCard({ pageId, title, connectedBase }: { pageId: n
   });
 
   return (
-    <div className="card" style={{ marginBottom: "1rem" }}>
-      <p className="kicker">Für Moodle</p>
-      <h3 style={{ margin: "0 0 .4rem" }}>Direkt in einen Moodle-Kurs legen</h3>
+    <section className="box pad block" id="moodle" aria-labelledby="h-moodle">
+      <h2 id="h-moodle">Direkt in einen Moodle-Kurs legen</h2>
 
       {!base ? (
         <>
@@ -56,8 +55,8 @@ export default function MoodleCard({ pageId, title, connectedBase }: { pageId: n
             Profil → Einstellungen → Sicherheitsschlüssel, Zeile «Claude MCP Service». Er wird verschlüsselt gespeichert.
           </p>
           <div className="form-grid">
-            <div><label>Moodle-Adresse</label><input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="https://moodle.meineschule.ch" /></div>
-            <div><label>Token</label><input type="password" autoComplete="off" value={token} onChange={(e) => setToken(e.target.value)} /></div>
+            <div><label htmlFor="m-adresse">Moodle-Adresse</label><input id="m-adresse" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="https://moodle.meineschule.ch" /></div>
+            <div><label htmlFor="m-token">Token</label><input id="m-token" type="password" autoComplete="off" value={token} onChange={(e) => setToken(e.target.value)} /></div>
           </div>
           <div style={{ marginTop: ".8rem" }}><button className="btn small" disabled={busy || !address || !token} onClick={connect}>Verbinden</button></div>
         </>
@@ -67,23 +66,23 @@ export default function MoodleCard({ pageId, title, connectedBase }: { pageId: n
             Verbunden mit <b>{base.replace(/^https:\/\//, "")}</b>. Die Lernseite wird als Link/URL-Aktivität mit dem Freigabelink angelegt.{" "}
             <button className="btn small ghost" disabled={busy} onClick={disconnect} style={{ marginLeft: ".4rem" }}>Verbindung trennen</button>
           </p>
-          <label>Kurs-Link oder Kurs-ID</label>
+          <label htmlFor="m-kurs">Kurs-Link oder Kurs-ID</label>
           <div className="row" style={{ alignItems: "center" }}>
-            <input value={course} onChange={(e) => setCourse(e.target.value)} placeholder="https://…/course/view.php?id=30" style={{ flex: "1 1 240px" }} />
+            <input id="m-kurs" value={course} onChange={(e) => setCourse(e.target.value)} placeholder="https://…/course/view.php?id=30" style={{ flex: "1 1 240px" }} />
             <button className="btn small" disabled={busy || !course} onClick={load}>Abschnitte laden</button>
           </div>
           {sections && (
             <>
               <div className="form-grid" style={{ marginTop: ".8rem" }}>
                 <div>
-                  <label>Abschnitt</label>
-                  <select value={sectionnum} onChange={(e) => setSectionnum(Number(e.target.value))}>
+                  <label htmlFor="m-abschnitt">Abschnitt</label>
+                  <select id="m-abschnitt" value={sectionnum} onChange={(e) => setSectionnum(Number(e.target.value))}>
                     {sections.map((s) => <option key={s.sectionnum} value={s.sectionnum}>{s.sectionnum} · {s.name}</option>)}
                   </select>
                 </div>
-                <div><label>Name der Aktivität</label><input value={name} onChange={(e) => setName(e.target.value)} /></div>
+                <div><label htmlFor="m-name">Name der Aktivität</label><input id="m-name" value={name} onChange={(e) => setName(e.target.value)} /></div>
               </div>
-              <div style={{ marginTop: ".8rem" }}><button className="btn small terra" disabled={busy} onClick={create}>In Moodle anlegen</button></div>
+              <div style={{ marginTop: ".8rem" }}><button className="btn small" disabled={busy} onClick={create}>In Moodle anlegen</button></div>
             </>
           )}
         </>
@@ -96,6 +95,6 @@ export default function MoodleCard({ pageId, title, connectedBase }: { pageId: n
           Angelegt. <a href={done} target="_blank" rel="noopener">Kurs in Moodle öffnen</a>
         </p>
       )}
-    </div>
+    </section>
   );
 }

@@ -40,7 +40,7 @@ export default async function ZugangPage({ searchParams }: { searchParams: Promi
 
   return (
     <>
-      <Topbar />
+      <Topbar active="zugang" />
       <main>
         <div className="wrap">
           <p className="kicker">Geschützter Bereich</p>
