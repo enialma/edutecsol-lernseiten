@@ -20,6 +20,16 @@ export function availableImageProviders(): ImageProvider[] {
   return (["openai", "infomaniak"] as ImageProvider[]).filter(imageProviderReady);
 }
 
+/** Erlaubte Bilddienste für ein Konto; im Schulmodus «KI nur Schweiz» nur Infomaniak. */
+export function imageProvidersFor(swissOnly: boolean): ImageProvider[] {
+  return availableImageProviders().filter((p) => !swissOnly || p === "infomaniak");
+}
+
+/** Nachbessern geht nur mit OpenAI, also nicht im Schulmodus «KI nur Schweiz». */
+export function canRefineImages(swissOnly: boolean): boolean {
+  return !swissOnly && imageProviderReady("openai");
+}
+
 export type Quality = "medium" | "high";
 
 export type ImageResult = {

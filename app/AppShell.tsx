@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth, signOut } from "@/auth";
-import { availableProviders, PROVIDER_LABELS } from "@/lib/ai";
+import { PROVIDER_LABELS, providersFor } from "@/lib/ai";
+import { isSwissOnly } from "@/lib/users";
 import { billingOf } from "@/lib/billing";
 import { IS_PREVIEW_DB } from "@/lib/db";
 import { imageQuotaFor, quotaFor } from "@/lib/quota";
@@ -48,7 +49,7 @@ export default async function AppShell({ active, children }: { active?: ShellKey
   const userId = Number(u.id);
   const isAdmin = u.role === "admin";
   const [quota, bilder, billing] = await Promise.all([quotaFor(userId, isAdmin), imageQuotaFor(userId, isAdmin), billingOf(userId)]);
-  const providers = availableProviders();
+  const providers = providersFor(await isSwissOnly(userId));
   const name = u.name || u.email || "";
   const monat = new Date().toLocaleDateString("de-CH", { month: "long", timeZone: "Europe/Zurich" });
   const konto = billing.subscriptionId ? "Abo aktiv" : billing.validUntil ? `Zugang bis ${billing.validUntil}` : isAdmin ? "Admin" : "";

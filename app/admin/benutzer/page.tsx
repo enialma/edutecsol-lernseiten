@@ -4,7 +4,7 @@ import { listInstitutions, listUsers } from "@/lib/users";
 import AppShell from "../../AppShell";
 import {
   createInstitutionAction, createUserAction, deleteInstitutionAction, deleteUserAction, renameInstitutionAction,
-  setInstitutionAction, setPasswordAction, toggleActiveAction, toggleCoachAction,
+  setInstitutionAction, setPasswordAction, swissOnlyAction, toggleActiveAction, toggleCoachAction,
 } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -163,7 +163,7 @@ export default async function BenutzerPage({ searchParams }: { searchParams: Pro
             ) : (
               <div className="ltable-wrap">
                 <table className="ltable compact">
-                  <thead><tr><th scope="col">Name</th><th scope="col">Konten</th><th scope="col" className="r">Aktion</th></tr></thead>
+                  <thead><tr><th scope="col">Name</th><th scope="col">Konten</th><th scope="col">KI nur Schweiz</th><th scope="col" className="r">Aktion</th></tr></thead>
                   <tbody>
                     {institutions.map((i) => (
                       <tr key={i.id}>
@@ -176,6 +176,13 @@ export default async function BenutzerPage({ searchParams }: { searchParams: Pro
                           </form>
                         </th>
                         <td>{i.users}</td>
+                        <td>
+                          <form action={swissOnlyAction}>
+                            <input type="hidden" name="id" value={i.id} />
+                            <input type="hidden" name="on" value={i.swiss_only ? "0" : "1"} />
+                            <button className="switch" role="switch" aria-checked={i.swiss_only} aria-label={`KI nur Schweiz für ${i.name}`}><span><i /></span></button>
+                          </form>
+                        </td>
                         <td className="r">
                           <form action={deleteInstitutionAction}>
                             <input type="hidden" name="id" value={i.id} />
@@ -201,6 +208,10 @@ export default async function BenutzerPage({ searchParams }: { searchParams: Pro
               <p className="box-text soft">
                 Lehrpersonen derselben Institution können Lernseiten nur untereinander freigeben («Meine Schule»). Wird eine
                 Institution gelöscht, bleiben die Konten bestehen; für die Schule freigegebene Seiten sieht dann nur noch die Autorin.
+              </p>
+              <p className="box-text soft">
+                <b>KI nur Schweiz:</b> Konten dieser Institution erzeugen Lernseiten, Bilder und Coach-Antworten nur mit Infomaniak
+                (Standort Schweiz). Claude, ChatGPT und das Nachbessern von Bildern (OpenAI) sind dann ausgeblendet und serverseitig gesperrt.
               </p>
             </form>
           </div>

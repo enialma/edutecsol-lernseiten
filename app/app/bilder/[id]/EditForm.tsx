@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function EditForm({ imageId, suggestions, canEdit, exhausted }: { imageId: number; suggestions: string[]; canEdit: boolean; exhausted: boolean }) {
+export default function EditForm({ imageId, suggestions, canEdit, swissOnly = false, exhausted }: { imageId: number; suggestions: string[]; canEdit: boolean; swissOnly?: boolean; exhausted: boolean }) {
   const router = useRouter();
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
@@ -24,7 +24,7 @@ export default function EditForm({ imageId, suggestions, canEdit, exhausted }: {
     }
   }
 
-  if (!canEdit) return <p className="small-note">Nachbessern braucht den Bilddienst OpenAI (nicht konfiguriert).</p>;
+  if (!canEdit) return <p className="small-note">{swissOnly ? "Nachbessern läuft über OpenAI (USA) und ist an deiner Schule ausgeschaltet. Passe stattdessen das Rezept an und erzeuge neu." : "Nachbessern braucht den Bilddienst OpenAI (nicht konfiguriert)."}</p>;
 
   return (
     <form onSubmit={submit} className="nb-form">

@@ -36,7 +36,10 @@ export async function POST(req: Request) {
   if (!messages.length || messages[messages.length - 1].role !== "user") return json({ error: "Keine Frage erhalten." }, 400);
 
   const stil = (["streng", "gestuft", "erklaer"].includes(page.coach_stil) ? page.coach_stil : "gestuft") as CoachStil;
-  const provider = page.coach_provider === "claude" && providerReady("claude") ? "claude" : providerReady("infomaniak") ? "infomaniak" : providerReady("claude") ? "claude" : null;
+  // Schulmodus «KI nur Schweiz»: nur Infomaniak, auch wenn die Seite früher auf Claude stand
+  const provider = page.owner_swiss_only
+    ? (providerReady("infomaniak") ? "infomaniak" : null)
+    : page.coach_provider === "claude" && providerReady("claude") ? "claude" : providerReady("infomaniak") ? "infomaniak" : providerReady("claude") ? "claude" : null;
   if (!provider) return json({ error: "Kein KI-Anbieter konfiguriert." }, 503);
 
   try {

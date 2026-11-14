@@ -477,3 +477,6 @@ table.ltable.adm{min-width:940px}
 .btn.del{color:var(--err)}
 .btn.del:hover{border-color:var(--err);color:var(--err)}
 .box-note.foot{border-bottom:0;border-top:1px solid var(--hair);background:transparent;color:var(--ink-soft)}
+
+/* Schulmodus «KI nur Schweiz» (14.11.2026) */
+.swiss-note{display:inline-block;margin-top:8px;padding:4px 10px;border:1px solid var(--line-strong);border-radius:var(--r);background:var(--card);color:var(--navy);font-size:.88rem}

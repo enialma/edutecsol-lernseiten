@@ -121,12 +121,22 @@ export async function setInstitution(id: number, institutionId: number | null) {
 }
 
 // ---------- Institutionen ----------
-export type Institution = { id: number; name: string; users: number };
+export type Institution = { id: number; name: string; users: number; swiss_only: boolean };
 
 export async function listInstitutions(): Promise<Institution[]> {
   return (await q(
-    `SELECT i.id, i.name, COUNT(u.id)::int AS users FROM institutions i LEFT JOIN users u ON u.institution_id = i.id GROUP BY i.id, i.name ORDER BY i.name`
+    `SELECT i.id, i.name, i.swiss_only, COUNT(u.id)::int AS users FROM institutions i LEFT JOIN users u ON u.institution_id = i.id GROUP BY i.id, i.name, i.swiss_only ORDER BY i.name`
   )) as Institution[];
+}
+
+/** Schulmodus «KI nur Schweiz»: gilt für alle Konten der Institution. Ohne Institution: false. */
+export async function isSwissOnly(userId: number): Promise<boolean> {
+  const rows = await q(`SELECT i.swiss_only FROM users u JOIN institutions i ON i.id = u.institution_id WHERE u.id = $1`, [userId]);
+  return rows[0]?.swiss_only === true;
+}
+
+export async function setSwissOnly(id: number, on: boolean) {
+  await q(`UPDATE institutions SET swiss_only = $2 WHERE id = $1`, [id, on]);
 }
 
 export async function getInstitutionOf(userId: number): Promise<string | null> {

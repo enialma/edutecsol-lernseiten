@@ -64,6 +64,8 @@ export function ready(): Promise<void> {
       )`);
       await sql.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS institution_id INTEGER REFERENCES institutions(id) ON DELETE SET NULL`);
       await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS school BOOLEAN NOT NULL DEFAULT FALSE`);
+      // Schulmodus «KI nur Schweiz»: Konten dieser Institution nutzen nur Infomaniak (Text, Bild, Coach)
+      await sql.query(`ALTER TABLE institutions ADD COLUMN IF NOT EXISTS swiss_only BOOLEAN NOT NULL DEFAULT FALSE`);
       // Einmalig: bisherige Freitext-Einträge «Schule / Organisation» als Institutionen übernehmen
       const has = await sql.query(`SELECT 1 FROM institutions LIMIT 1`);
       if (has.length === 0) {

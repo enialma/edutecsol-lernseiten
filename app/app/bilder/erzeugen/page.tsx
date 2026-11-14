@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { auth } from "@/auth";
 import { PRESETS } from "@/lib/bildprompt";
-import { availableImageProviders, IMAGE_PROVIDER_LABELS, INFOMANIAK_IMAGE_MODEL, OPENAI_IMAGE_MODEL } from "@/lib/imagegen";
+import { canRefineImages, IMAGE_PROVIDER_LABELS, imageProvidersFor, INFOMANIAK_IMAGE_MODEL, OPENAI_IMAGE_MODEL } from "@/lib/imagegen";
+import { isSwissOnly } from "@/lib/users";
 import { imageQuotaFor } from "@/lib/quota";
 import AppShell from "../../../AppShell";
 import Form from "./Form";
@@ -12,7 +13,8 @@ export default async function BildErzeugenPage({ searchParams }: { searchParams:
   const session = await auth();
   const { r } = await searchParams;
   const quota = await imageQuotaFor(Number(session!.user.id), session!.user.role === "admin");
-  const providers = availableImageProviders().map((p) => ({
+  const swissOnly = await isSwissOnly(Number(session!.user.id));
+  const providers = imageProvidersFor(swissOnly).map((p) => ({
     id: p, label: IMAGE_PROVIDER_LABELS[p], model: p === "openai" ? OPENAI_IMAGE_MODEL : INFOMANIAK_IMAGE_MODEL,
   }));
   const presets = Object.entries(PRESETS).map(([id, p]) => ({ id, label: p.label }));
@@ -24,12 +26,13 @@ export default async function BildErzeugenPage({ searchParams }: { searchParams:
           <h1>Bild direkt erzeugen</h1>
           <p>
             Dasselbe Rezept wie im Bildprompt-Generator: erst die Lernaufgabe, dann das Bild beschreiben. Das fertige
-            Bild landet in deiner Sammlung, mit Arbeitsauftrag und Kennzeichnung, und lässt sich Schritt für Schritt nachbessern.
+            Bild landet in deiner Sammlung, mit Arbeitsauftrag und Kennzeichnung{canRefineImages(swissOnly) ? ", und lässt sich Schritt für Schritt nachbessern" : ""}.
           </p>
+          {swissOnly && <p className="swiss-note">Deine Schule nutzt nur KI mit Standort Schweiz (Infomaniak / Flux). Nachbessern ist deshalb ausgeschaltet.</p>}
         </div>
       </header>
       {providers.length === 0 ? (
-        <div className="msg err">Noch kein Bilddienst konfiguriert (OPENAI_API_KEY fehlt).</div>
+        <div className="msg err">{swissOnly ? "Der Bilddienst von Infomaniak ist gerade nicht eingerichtet. Bitte info@edutecsol.ch melden." : "Noch kein Bilddienst konfiguriert (OPENAI_API_KEY fehlt)."}</div>
       ) : (
         <Form providers={providers} presets={presets} quota={quota} initial={r ?? null} />
       )}

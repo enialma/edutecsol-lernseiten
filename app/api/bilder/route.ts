@@ -2,7 +2,8 @@
 // (JSON {parentId, instruction, quality}). Antwort: {id, title} oder Fehlertext.
 import { auth } from "@/auth";
 import { normalize, promptForModel, titleFor, type BildState } from "@/lib/bildprompt";
-import { availableImageProviders, editImage, generateImage, type ImageProvider, type Quality } from "@/lib/imagegen";
+import { canRefineImages, editImage, generateImage, imageProvidersFor, type ImageProvider, type Quality } from "@/lib/imagegen";
+import { isSwissOnly } from "@/lib/users";
 import { createImage, getImage } from "@/lib/images";
 import { imageQuotaFor, LIMIT_BILDER, logGeneration } from "@/lib/quota";
 
@@ -16,8 +17,11 @@ export async function POST(req: Request) {
   const userId = Number(session.user.id);
   const isAdmin = session.user.role === "admin";
 
-  const providers = availableImageProviders();
-  if (providers.length === 0) return new Response("Kein Bilddienst konfiguriert (OPENAI_API_KEY fehlt).", { status: 503 });
+  const swissOnly = await isSwissOnly(userId);
+  const providers = imageProvidersFor(swissOnly);
+  if (providers.length === 0) {
+    return new Response(swissOnly ? "Deine Schule nutzt nur KI mit Standort Schweiz, und der Bilddienst von Infomaniak ist gerade nicht eingerichtet." : "Kein Bilddienst konfiguriert (OPENAI_API_KEY fehlt).", { status: 503 });
+  }
 
   let body: { state?: unknown; provider?: string; quality?: string; parentId?: number; instruction?: string };
   try { body = await req.json(); } catch { return new Response("Ungültige Anfrage.", { status: 400 }); }
@@ -32,7 +36,8 @@ export async function POST(req: Request) {
 
   try {
     if (body.parentId) {
-      // Nachbessern
+      // Nachbessern (nur OpenAI, daher nicht im Schulmodus «KI nur Schweiz»)
+      if (!canRefineImages(swissOnly)) return new Response(swissOnly ? "Nachbessern läuft über OpenAI (USA) und ist an deiner Schule ausgeschaltet. Passe stattdessen das Rezept an und erzeuge neu." : "Nachbessern braucht OpenAI (OPENAI_API_KEY fehlt).", { status: 403 });
       const parent = await getImage(Number(body.parentId), userId, isAdmin);
       if (!parent) return new Response("Ausgangsbild nicht gefunden.", { status: 404 });
       const instruction = String(body.instruction ?? "").trim().slice(0, 1000);

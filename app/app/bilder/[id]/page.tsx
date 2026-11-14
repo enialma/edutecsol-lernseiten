@@ -3,7 +3,8 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { EINSATZ_LABELS, TASKS, encodeState, fixes, labelText, normalize, recipeLines, type Einsatz } from "@/lib/bildprompt";
-import { imageProviderReady } from "@/lib/imagegen";
+import { canRefineImages } from "@/lib/imagegen";
+import { isSwissOnly } from "@/lib/users";
 import { getImageMeta, imageFamily } from "@/lib/images";
 import { imageQuotaFor } from "@/lib/quota";
 import AppShell from "../../../AppShell";
@@ -25,6 +26,7 @@ export default async function BildPage({ params }: { params: Promise<{ id: strin
   const state = normalize(img.params);
   const family = await imageFamily(img.id, img.parent_id, userId, isAdmin);
   const quota = await imageQuotaFor(userId, isAdmin);
+  const swissOnly = await isSwissOnly(userId);
   const exhausted = quota.limit !== null && quota.used >= quota.limit;
   const einsatz = (img.einsatz ?? state.e) as Einsatz;
   const label = labelText(img.provider === "openai" ? "OpenAI gpt-image" : "Infomaniak Flux", new Date());
@@ -100,7 +102,7 @@ export default async function BildPage({ params }: { params: Promise<{ id: strin
           {canEdit && (
             <section className="box pad block bbox" aria-labelledby="h-nb">
               <h2 id="h-nb">Nachbessern, eine Sache nach der anderen</h2>
-              <EditForm imageId={img.id} suggestions={fixes(state)} canEdit={imageProviderReady("openai")} exhausted={exhausted} />
+              <EditForm imageId={img.id} suggestions={fixes(state)} canEdit={canRefineImages(swissOnly)} swissOnly={swissOnly} exhausted={exhausted} />
             </section>
           )}
 

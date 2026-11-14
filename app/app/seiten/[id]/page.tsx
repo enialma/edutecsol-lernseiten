@@ -177,13 +177,13 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
                       <div>
                         <div className="mini-label" id="l-ki">KI für den Coach</div>
                         <div className="row" role="group" aria-labelledby="l-ki">
-                          {([["infomaniak", "Infomaniak (Schweiz)"], ["claude", "Claude (USA)"]] as const).map(([k, v]) => (
+                          {([["infomaniak", "Infomaniak (Schweiz)"], ["claude", "Claude (USA)"]] as const).filter(([k]) => !page.owner_swiss_only || k === "infomaniak").map(([k, v]) => (
                             <form action={coachAction} key={k}>
                               <input type="hidden" name="id" value={page.id} />
                               <input type="hidden" name="on" value="1" />
                               <input type="hidden" name="stil" value={page.coach_stil} />
                               <input type="hidden" name="provider" value={k} />
-                              <button className={`btn small ${page.coach_provider === k ? "" : "ghost"}`} aria-pressed={page.coach_provider === k}>{v}</button>
+                              <button className={`btn small ${(page.owner_swiss_only ? "infomaniak" : page.coach_provider) === k ? "" : "ghost"}`} aria-pressed={(page.owner_swiss_only ? "infomaniak" : page.coach_provider) === k}>{v}</button>
                             </form>
                           ))}
                         </div>

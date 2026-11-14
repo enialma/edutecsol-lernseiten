@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 import { importBeispiele } from "@/lib/beispiele";
 import { deletePage, duplicatePage, getPage, setCoach, setShare, setVisibility, updateTitle } from "@/lib/pages";
 import { setPageGruppen } from "@/lib/gruppen";
+import { isSwissOnly } from "@/lib/users";
 
 /** Zuordnung einer Seite zu Klassen und Gruppen (Checkboxen «gruppe» auf der Detailseite). */
 export async function pageGruppenAction(fd: FormData) {
@@ -25,7 +26,7 @@ export async function coachAction(fd: FormData) {
   const { userId, isAdmin } = await who();
   const id = Number(fd.get("id"));
   const stil = ["streng", "gestuft", "erklaer"].includes(String(fd.get("stil"))) ? String(fd.get("stil")) : "gestuft";
-  const provider = fd.get("provider") === "claude" ? "claude" : "infomaniak";
+  const provider = fd.get("provider") === "claude" && !(await isSwissOnly(userId)) ? "claude" : "infomaniak";
   const on = fd.get("on") === "1";
   const n = await setCoach(id, userId, isAdmin, { on, stil, provider });
   console.log("coachAction", { id, userId, isAdmin, on, stil, provider, rawOn: fd.get("on"), updated: n });
