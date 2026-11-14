@@ -69,6 +69,8 @@
   .quote p{margin:0;color:#C9D2DC;font-size:1.02rem}
   @media (max-width:820px){.quote .wrap{grid-template-columns:1fr}}
 
+  .free-note{font-size:.88rem;color:var(--ink-soft);margin:.9rem 0 0;max-width:46ch}
+  .free-note b{color:var(--terra)}
   /* Datenschutz-Band */
   .trust{background:var(--cream);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:1.3rem 0}
   .trust .wrap{display:flex;align-items:center;gap:1.5rem}
@@ -132,23 +134,15 @@
   <div class="wrap">
     <a class="wordmark" href="/"><span class="name">Lernwege</span><span class="by">von EDUTECSOL</span></a>
     <nav class="lw-nav" aria-label="Hauptnavigation">
-      <a href="#was-entsteht">Was entsteht</a>
-      <a href="#coach">Coach</a>
-      <a href="#beispiele">Beispiele</a>
-      <a href="#werkzeuge">Werkzeuge</a>
-      <a href="#so-funktioniert-es">So funktioniert es</a>
-      <a href="/zugang">Zugang &amp; Preise</a>
+      <a href="#was-entsteht">Seitentypen</a><a href="#beispiele">Beispiele</a><a href="#coach">Lerncoach</a><a href="/zugang">Preise</a><a href="#fragen">Fragen</a>
+      <a class="btn small ghost" href="#werkzeuge">Kostenlos starten</a>
       <a class="btn small terra" href="/app">Anmelden</a>
     </nav>
     <details class="menu">
       <summary>Menü</summary>
       <div class="panel">
-        <a href="#was-entsteht">Was entsteht</a>
-        <a href="#coach">Coach</a>
-        <a href="#beispiele">Beispiele</a>
-        <a href="#werkzeuge">Werkzeuge</a>
-        <a href="#so-funktioniert-es">So funktioniert es</a>
-        <a href="/zugang">Zugang &amp; Preise</a>
+        <a href="#was-entsteht">Seitentypen</a><a href="#beispiele">Beispiele</a><a href="#coach">Lerncoach</a><a href="/zugang">Preise</a><a href="#fragen">Fragen</a>
+        <a href="#werkzeuge"><b>Kostenlos starten</b></a>
         <a href="/app"><b>Anmelden</b></a>
       </div>
     </details>
@@ -162,9 +156,10 @@
       <h1 class="display">Lernseiten, die eine <em>Lernaufgabe</em> tragen.</h1>
       <p class="lead">Lade Skript, Folien oder PDF hoch: In wenigen Minuten entsteht daraus eine interaktive Lernseite, eine Prüfungsvorbereitung, ein Lernspiel oder eine Lernhilfe, mit Selbstkontrolle für die Lernenden und Lösungen für dich. Auf Wunsch begleitet ein KI-Coach die Lernenden beim Lösen, ohne Lösungen zu verraten.</p>
       <div class="cta">
-        <a class="btn terra arrow" href="/zugang">Zugang &amp; Preise</a>
-        <a class="btn ghost" href="#werkzeuge">Kostenlos ausprobieren</a>
+        <a class="btn terra arrow" href="#werkzeuge">Kostenlos ausprobieren</a>
+        <a class="btn ghost" href="/zugang">Zugang &amp; Preise</a>
       </div>
+      <p class="free-note"><b>Gratis und ohne Anmeldung:</b> Prompt-Generator und Bildprompt-Generator für deinen eigenen KI-Chat. Direkt erzeugen, sammeln und teilen ab CHF 8 im Monat.</p>
       <div class="facts">
         <div><b>5 Typen</b><span>Lernseite, Arbeitsblatt, Prüfung, Spiel, Lernhilfe</span></div>
         <div><b>Eine Datei</b><span>Offline, Link, Word und Moodle</span></div>

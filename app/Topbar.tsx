@@ -9,12 +9,14 @@ export default async function Topbar({ active }: { active?: "zugang" }) {
   const u = session?.user;
   const links = (
     <>
+      <a href="/#was-entsteht">Seitentypen</a>
       <a href="/lernseiten-beispiele.html">Beispiele</a>
-      <a href="/#werkzeuge">Werkzeuge</a>
-      <a href="/#so-funktioniert-es">So funktioniert es</a>
-      <Link href="/zugang" className={active === "zugang" ? "is-active" : undefined} aria-current={active === "zugang" ? "page" : undefined}>Zugang &amp; Preise</Link>
+      <a href="/#coach">Lerncoach</a>
+      <Link href="/zugang" className={active === "zugang" ? "is-active" : undefined} aria-current={active === "zugang" ? "page" : undefined}>Preise</Link>
+      <a href="/#fragen">Fragen</a>
     </>
   );
+  const free = <a href="/#werkzeuge" className="btn small ghost">Kostenlos starten</a>;
   const signout = (
     <form action={async () => { "use server"; await signOut({ redirectTo: "/" }); }}>
       <button className="btn small ghost">Abmelden</button>
@@ -33,14 +35,17 @@ export default async function Topbar({ active }: { active?: "zugang" }) {
               {signout}
             </>
           ) : (
-            <Link href="/login" className="btn small terra">Anmelden</Link>
+            <>
+              {free}
+              <Link href="/login" className="btn small terra">Anmelden</Link>
+            </>
           )}
         </nav>
         <details className="menu">
           <summary>Menü</summary>
           <div className="panel">
             {links}
-            {u ? <><Link href="/app"><b>Mein Bereich</b></Link>{signout}</> : <Link href="/login"><b>Anmelden</b></Link>}
+            {u ? <><Link href="/app"><b>Mein Bereich</b></Link>{signout}</> : <><a href="/#werkzeuge"><b>Kostenlos starten</b></a><Link href="/login"><b>Anmelden</b></Link></>}
           </div>
         </details>
       </div>
