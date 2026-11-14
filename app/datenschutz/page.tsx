@@ -4,7 +4,7 @@ import Footer from "../Footer";
 
 export const metadata = { title: "Datenschutz – Lernwege EDUTECSOL" };
 
-const STAND = "27. Oktober 2026";
+const STAND = "14. November 2026";
 
 export default function DatenschutzPage() {
   return (
@@ -25,6 +25,7 @@ export default function DatenschutzPage() {
               <li><b>Keine Daten von Lernenden.</b> Lernende öffnen Lernseiten ohne Konto. Ihre Eingaben bleiben im Browser und werden nirgends gespeichert.</li>
               <li><b>Hochgeladenes Material wird nicht aufbewahrt.</b> Aus PDF, Word oder PowerPoint wird nur der Text ausgelesen, an die gewählte KI geschickt und danach verworfen.</li>
               <li><b>Drei KI-Anbieter zur Wahl.</b> Claude (Anthropic, Verarbeitung in den USA), ChatGPT (OpenAI, Verarbeitung in den USA) oder ein bei Infomaniak gehostetes Open-Source-Modell (Verarbeitung in der Schweiz). Die Lehrperson entscheidet pro Lernseite.</li>
+              <li><b>Schulmodus «KI nur Schweiz».</b> Auf Wunsch einer Schule nutzen alle ihre Konten nur Infomaniak (Schweiz): für Lernseiten, Bilder und den Lerncoach. Die Anbieter in den USA sind dann gesperrt.</li>
               <li><b>Konten nur für Lehrpersonen.</b> Gespeichert werden E-Mail, Name, Schule und Anmeldezeitpunkte. Kein Tracking, keine Werbung, keine Analyse-Cookies.</li>
               <li><b>KI-Lerncoach ohne Speicherung.</b> Schaltet die Lehrperson den Coach auf einer Lernseite ein, können Lernende ihm Fragen stellen. Die Nachrichten gehen an den gewählten KI-Anbieter (Standard: Infomaniak, Schweiz) und werden von uns nicht gespeichert. Gezählt werden nur Anzahl und Umfang der Nachrichten je Seite und Tag. Lernende sollen keine Namen oder persönlichen Angaben eingeben; der Coach fragt nicht danach.</li>
             </ul>
@@ -87,15 +88,25 @@ export default function DatenschutzPage() {
               <tr><td><b>Vercel Inc.</b></td><td>Hosting der Plattform, Ausführung der Server-Funktionen</td><td>Server-Funktionen in Frankfurt (EU); Vercel ist US-Unternehmen mit Standardvertragsklauseln</td></tr>
               <tr><td><b>Neon Inc.</b></td><td>Datenbank (Konten, Lernseiten)</td><td>Datenbank-Region Frankfurt (EU)</td></tr>
               <tr><td><b>Microsoft Entra ID</b></td><td>Anmeldung mit Microsoft-365-Schulkonto</td><td>Wir erhalten nur E-Mail und Anzeigename. Kein Zugriff auf Mails, Dateien oder Kalender</td></tr>
-              <tr><td><b>Anthropic PBC</b> (Claude)</td><td>KI-Erzeugung der Lernseite, wenn «Claude» gewählt ist</td><td>Verarbeitung in den USA. Über die kommerzielle Schnittstelle; Eingaben werden gemäss Anthropic nicht zum Training der Modelle verwendet und nur kurz zur Missbrauchskontrolle aufbewahrt</td></tr>
+              <tr><td><b>Anthropic PBC</b> (Claude)</td><td>KI-Erzeugung der Lernseite und Antworten des Lerncoachs, wenn «Claude» gewählt ist (nicht im Schulmodus «KI nur Schweiz»)</td><td>Verarbeitung in den USA. Über die kommerzielle Schnittstelle; Eingaben werden gemäss Anthropic nicht zum Training der Modelle verwendet und nur kurz zur Missbrauchskontrolle aufbewahrt</td></tr>
               <tr><td><b>Payrexx AG</b></td><td>Bezahlung des Abos für Einzelpersonen</td><td>Schweizer Unternehmen (Thun). Payrexx erhält E-Mail und Zahlungsdaten. Wir sehen und speichern keine Karten- oder TWINT-Daten, nur eine Abo-Nummer</td></tr>
-              <tr><td><b>OpenAI, L.L.C.</b> (ChatGPT, gpt-image)</td><td>KI-Erzeugung der Lernseite, wenn «ChatGPT» gewählt ist; KI-Erzeugung und Nachbessern von Bildern für Lernaufgaben («Bild direkt erzeugen»)</td><td>Verarbeitung in den USA. Über die kommerzielle Schnittstelle; übermittelt werden nur der Bildprompt und beim Nachbessern das Ausgangsbild. Eingaben werden gemäss OpenAI nicht zum Training der Modelle verwendet</td></tr>
-              <tr><td><b>Infomaniak Network SA</b> (AI Tools)</td><td>KI-Erzeugung der Lernseite, wenn «Infomaniak» gewählt ist</td><td>Verarbeitung in der Schweiz, Schweizer Unternehmen, Open-Source-Modell auf Infomaniak-Servern; Eingaben werden gemäss Infomaniak nicht zum Training verwendet</td></tr>
+              <tr><td><b>OpenAI, L.L.C.</b> (ChatGPT, gpt-image)</td><td>KI-Erzeugung der Lernseite, wenn «ChatGPT» gewählt ist; KI-Erzeugung und Nachbessern von Bildern für Lernaufgaben («Bild direkt erzeugen»); nicht im Schulmodus «KI nur Schweiz»</td><td>Verarbeitung in den USA. Über die kommerzielle Schnittstelle; übermittelt werden nur der Bildprompt und beim Nachbessern das Ausgangsbild. Eingaben werden gemäss OpenAI nicht zum Training der Modelle verwendet</td></tr>
+              <tr><td><b>Infomaniak Network SA</b> (AI Tools)</td><td>KI-Erzeugung der Lernseite, wenn «Infomaniak» gewählt ist; Antworten des Lerncoachs (Standard); Bilder mit Flux, wenn gewählt; im Schulmodus «KI nur Schweiz» der einzige KI-Anbieter</td><td>Verarbeitung in der Schweiz, Schweizer Unternehmen, Open-Source-Modell auf Infomaniak-Servern; Eingaben werden gemäss Infomaniak nicht zum Training verwendet</td></tr>
             </tbody>
           </table>
           <p>
             An die KI-Anbieter geht ausschliesslich der Text des Materials und die didaktischen Einstellungen. Keine Kontodaten, keine E-Mail-Adresse der Lehrperson.
           </p>
+          <div className="card" style={{ marginBottom: "1rem" }}>
+            <h3 style={{ marginTop: 0 }}>Schulmodus «KI nur Schweiz»</h3>
+            <p style={{ margin: 0 }}>
+              Eine Schule kann verlangen, dass für alle ihre Konten nur KI mit Standort Schweiz genutzt wird. Dann laufen das Erzeugen von
+              Lernseiten, das Erzeugen von Bildern und der Lerncoach ausschliesslich über Infomaniak. Claude (Anthropic) und ChatGPT
+              beziehungsweise gpt-image (OpenAI) sind für diese Konten ausgeblendet und auf dem Server gesperrt. Das Nachbessern von Bildern
+              ist dann nicht verfügbar, weil es nur mit OpenAI funktioniert. Konten und Lernseiten liegen weiterhin in der Datenbank in Frankfurt (EU).
+              Den Schulmodus schalten wir auf Anfrage der Schule ein: <a href="mailto:info@edutecsol.ch">info@edutecsol.ch</a>.
+            </p>
+          </div>
 
           <h2>5. Freigabelinks, Schule und Pool</h2>
           <ul>
@@ -108,7 +119,7 @@ export default function DatenschutzPage() {
           <div className="card">
             <ul style={{ margin: 0 }}>
               <li><b>Kein Material mit Personendaten hochladen.</b> Klassenlisten, Noten, Namen von Lernenden oder Mitarbeitenden gehören nicht in das Upload-Feld. Der Text geht an einen KI-Anbieter.</li>
-              <li><b>Bei sensiblen Inhalten Infomaniak wählen.</b> Dann bleibt die Verarbeitung in der Schweiz.</li>
+              <li><b>Bei sensiblen Inhalten Infomaniak wählen.</b> Dann bleibt die Verarbeitung in der Schweiz. Soll das für die ganze Schule gelten, kann die Schule den Schulmodus «KI nur Schweiz» verlangen.</li>
               <li><b>Urheberrecht prüfen.</b> Hochgeladene Lehrmittel müssen für diese Nutzung erlaubt sein. Eigene Unterlagen und kurze Auszüge für den Unterricht sind in der Regel unproblematisch.</li>
               <li><b>Erzeugte Lernseiten fachlich prüfen.</b> KI-Ergebnisse können Fehler enthalten. Vor dem Einsatz Lösungen und Feedback-Logik kontrollieren.</li>
               <li><b>Freigabelinks bewusst weitergeben.</b> Ein Link kann weitergeleitet werden. Für Lernende ist das unkritisch, weil keine Daten erhoben werden.</li>
