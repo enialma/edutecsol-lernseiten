@@ -1,5 +1,6 @@
 // Öffentlicher Freigabelink: Lernende öffnen die Seite ohne Login.
 import { getPageByToken } from "@/lib/pages";
+import { fuerLernende } from "@/lib/loesung";
 import { withPrintCss } from "@/lib/print";
 import { withCoach } from "@/lib/coach-embed";
 import { coachAllowedFor, COACH_NAME } from "@/lib/coach";
@@ -17,7 +18,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ token: 
       { status: 404, headers: { "Content-Type": "text/html; charset=utf-8" } }
     );
   }
-  let html = withPrintCss(page.html);
+  // Lösungen nur, wenn die Lehrperson sie freigegeben hat (bei älteren Seiten unverändert); wirkt beim nächsten Abruf
+  let html = withPrintCss(fuerLernende(page));
   // KI-Lerncoach nur online über den Freigabelink, wenn die Lehrperson die Option hat und ihn auf dieser Seite eingeschaltet hat
   if (page.coach && page.owner_coach && coachAllowedFor(page)) html = withCoach(html, token, COACH_NAME);
   return new Response(html, {

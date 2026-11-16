@@ -139,6 +139,8 @@ export function ready(): Promise<void> {
       await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS coach BOOLEAN NOT NULL DEFAULT FALSE`);
       await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS coach_stil TEXT NOT NULL DEFAULT 'gestuft'`);
       await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS coach_provider TEXT NOT NULL DEFAULT 'infomaniak'`);
+      // Lösungen über den Freigabelink zeigen (Schalter der Lehrperson, nur neue Seitenversionen)
+      await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS loesung_offen BOOLEAN NOT NULL DEFAULT FALSE`);
       await sql.query(`CREATE TABLE IF NOT EXISTS coach_usage (
         page_id       INTEGER NOT NULL REFERENCES pages(id) ON DELETE CASCADE,
         day           DATE NOT NULL,

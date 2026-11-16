@@ -322,6 +322,9 @@ main.work .share h2{color:var(--paper);font-size:1.125rem;font-weight:600;margin
 .btn.on-navy:hover{background:color-mix(in srgb,var(--card) 8%,transparent);color:var(--card);border-color:var(--card)}
 .share-note{margin:0;font-size:.82rem;line-height:1.5;color:var(--on-navy-soft)}
 .share form{margin:0}
+.share-loesung{display:flex;flex-direction:column;gap:.35rem;padding-top:.9rem;border-top:1px solid color-mix(in srgb,var(--card) 20%,transparent)}
+.share-loesung > .between{font-size:.9rem;font-weight:600}
+.share .switch[aria-checked="true"] > span{background:var(--ochre)}
 .share-off{font:inherit;font-size:.875rem;background:none;border:0;padding:0;color:var(--paper);text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:44px}
 .switch{background:none;border:0;padding:0;min-height:44px;min-width:52px;display:flex;align-items:center;cursor:pointer}
 .switch > span{width:52px;height:30px;border-radius:15px;padding:3px;display:flex;justify-content:flex-start;background:var(--ink-faint)}

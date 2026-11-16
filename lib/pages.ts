@@ -37,12 +37,16 @@ export type PageMeta = {
   owner_coach: boolean;
   /** Institution der Autorin im Schulmodus «KI nur Schweiz» (Coach nur Infomaniak) */
   owner_swiss_only: boolean;
+  /** Lösungen über den Freigabelink sichtbar; loesung_version = erzeugt ab 2.10.2026 (Schalter verfügbar, siehe lib/loesung.ts) */
+  loesung_offen: boolean;
+  loesung_version: boolean;
 };
 export type PageFull = PageMeta & { html: string };
 
 const META = `p.id, p.user_id, p.title, p.fach, p.stufe, p.thema, p.params, p.material_name, p.provider, p.model,
   p.input_tokens, p.output_tokens, p.duration_ms, p.notiz, p.share_token, p.pool, p.school, p.copied_from,
   p.coach, p.coach_stil, p.coach_provider, u.coach AS owner_coach,
+  p.loesung_offen, p.created_at >= TIMESTAMPTZ '2026-10-02 00:00 Europe/Zurich' AS loesung_version,
   to_char(p.created_at, 'DD.MM.YYYY HH24:MI') AS created_at, length(p.html) AS html_bytes,
   u.email AS owner_email, u.name AS owner_name, i.name AS owner_institution, COALESCE(i.swiss_only, FALSE) AS owner_swiss_only`;
 
@@ -51,6 +55,10 @@ export async function setCoach(id: number, userId: number, isAdmin: boolean, s: 
   const rows = await q(`UPDATE pages SET coach = $4, coach_stil = $5, coach_provider = $6 WHERE id = $1 AND ($2::boolean OR user_id = $3) RETURNING id, coach`,
     [id, isAdmin, userId, s.on, s.stil, s.provider]);
   return rows.length;
+}
+/** Lösungen über den Freigabelink zeigen oder ausblenden (nur Besitzerin oder Admin). */
+export async function setLoesung(id: number, userId: number, isAdmin: boolean, on: boolean) {
+  await q(`UPDATE pages p SET loesung_offen = $3 WHERE p.id = $1 AND (${canEdit(isAdmin)})`, [id, userId, on]);
 }
 const FROM = `FROM pages p JOIN users u ON u.id = p.user_id LEFT JOIN institutions i ON i.id = u.institution_id`;
 // Für die eigene Schule freigegeben: Autorin und betrachtende Person gehören zur selben Institution ($n = userId)

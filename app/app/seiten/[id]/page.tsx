@@ -7,7 +7,8 @@ import { getPage } from "@/lib/pages";
 import { DIFFART_LABELS, NIVEAU_LABELS, SPRACHE_LABELS, TWIST_LABELS, normalizeLernseite, type GenParams } from "@/lib/prompt";
 import { SOZIALFORMEN, zugangOptionen } from "@/lib/achsen";
 import AppShell from "../../../AppShell";
-import { coachAction, copyAction, deletePageAction, pageGruppenAction, renameAction, shareAction, visibilityAction } from "../actions";
+import { coachAction, copyAction, deletePageAction, loesungAction, pageGruppenAction, renameAction, shareAction, visibilityAction } from "../actions";
+import { loesungSchaltbar } from "@/lib/loesung";
 import { gruppenOfPages, listGruppen } from "@/lib/gruppen";
 import { coachAllowedFor, coachTopicsForPage, coachUsageForPage, defaultStilFor, COACH_DEN, COACH_NAME, COACH_STIL_LABELS, IS_GENERIC } from "@/lib/coach";
 import { getMoodleBase } from "@/lib/moodle";
@@ -30,6 +31,7 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
   const visibility = page.pool ? "all" : page.school && page.owner_institution ? "school" : "private";
   const moodleBase = canEdit ? await getMoodleBase(userId) : null;
   const coachOk = coachAllowedFor(page);
+  const loesungOk = loesungSchaltbar(page);
   const coachUse = canEdit && coachOk ? await coachUsageForPage(page.id) : null;
   const coachTopics = canEdit && coachOk && page.coach ? await coachTopicsForPage(page.id) : [];
   const topicMax = Math.max(1, ...coachTopics.map((t) => t.n));
@@ -126,6 +128,23 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
                     <button className="btn terra">Freigabelink erstellen</button>
                   </form>
                 </>
+              )}
+              {loesungOk && (
+                <div className="share-loesung">
+                  <div className="between">
+                    <span id="l-loe">Lösungen für Lernende</span>
+                    <form action={loesungAction}>
+                      <input type="hidden" name="id" value={page.id} />
+                      <input type="hidden" name="on" value={page.loesung_offen ? "0" : "1"} />
+                      <button className="switch" role="switch" aria-checked={page.loesung_offen} aria-labelledby="l-loe"><span><i /></span></button>
+                    </form>
+                  </div>
+                  <p className="share-note">
+                    {page.loesung_offen
+                      ? "Der Bereich «Für die Lehrperson» ist über den Freigabelink sichtbar."
+                      : "Über den Freigabelink fehlt der Bereich «Für die Lehrperson». Einschalten, und die Lösungen erscheinen beim nächsten Laden unter demselben Link."}
+                  </p>
+                </div>
               )}
             </section>
           )}

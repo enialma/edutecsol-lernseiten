@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { auth } from "@/auth";
 import { importBeispiele } from "@/lib/beispiele";
-import { deletePage, duplicatePage, getPage, setCoach, setShare, setVisibility, updateTitle } from "@/lib/pages";
+import { deletePage, duplicatePage, getPage, setCoach, setLoesung, setShare, setVisibility, updateTitle } from "@/lib/pages";
 import { setPageGruppen } from "@/lib/gruppen";
 import { isSwissOnly } from "@/lib/users";
 
@@ -49,6 +49,14 @@ export async function shareAction(fd: FormData) {
   const { userId, isAdmin } = await who();
   const id = Number(fd.get("id"));
   await setShare(id, userId, isAdmin, fd.get("on") === "1");
+  revalidatePath(`/app/seiten/${id}`);
+}
+
+/** Lösungen über den Freigabelink zeigen oder ausblenden. */
+export async function loesungAction(fd: FormData) {
+  const { userId, isAdmin } = await who();
+  const id = Number(fd.get("id"));
+  await setLoesung(id, userId, isAdmin, fd.get("on") === "1");
   revalidatePath(`/app/seiten/${id}`);
 }
 
