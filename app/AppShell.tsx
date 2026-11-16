@@ -5,6 +5,7 @@ import { isSwissOnly } from "@/lib/users";
 import { billingOf } from "@/lib/billing";
 import { IS_PREVIEW_DB } from "@/lib/db";
 import { imageQuotaFor, quotaFor } from "@/lib/quota";
+import IdleLogout from "./IdleLogout";
 
 // Rahmen des geschützten Bereichs: Seitenleiste in Navy (Navigation, Kontingent, Konto) und Arbeitsfläche.
 // Auf schmalen Bildschirmen rutscht die Seitenleiste nach oben (siehe .shell in globals.css).
@@ -105,6 +106,7 @@ export default async function AppShell({ active, children }: { active?: ShellKey
       <main className="work">
         <div className="work-in">{children}</div>
       </main>
+      <IdleLogout logout={async () => { "use server"; await signOut({ redirectTo: "/login?abgemeldet=1" }); }} />
     </div>
   );
 }

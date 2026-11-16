@@ -480,3 +480,5 @@ table.ltable.adm{min-width:940px}
 
 /* Schulmodus «KI nur Schweiz» (14.11.2026) */
 .swiss-note{display:inline-block;margin-top:8px;padding:4px 10px;border:1px solid var(--line-strong);border-radius:var(--r);background:var(--card);color:var(--navy);font-size:.88rem}
+.idle-warn{position:fixed;left:50%;bottom:1.25rem;transform:translateX(-50%);z-index:100;width:min(26rem,calc(100vw - 2rem));display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1rem;padding:.9rem 1rem;background:var(--card);color:var(--ink);border:1px solid var(--line-strong);border-radius:var(--r);box-shadow:var(--shadow)}
+.idle-warn p{margin:0;flex:1 1 12rem;font-size:.9rem}

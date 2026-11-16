@@ -1,6 +1,7 @@
 // Edge-tauglicher Teil der Auth-Konfiguration (wird auch in der Middleware geladen).
 import type { NextAuthConfig } from "next-auth";
 import MicrosoftEntraID from "next-auth/providers/microsoft-entra-id";
+import { IDLE_MS } from "./lib/idle";
 
 export default {
   providers: [
@@ -21,10 +22,15 @@ export default {
       return true;
     },
     jwt({ token, user }) {
+      const now = Date.now();
       if (user) {
         token.role = user.role;
         token.uid = user.id;
+      } else if (typeof token.seen === "number" && now - token.seen > IDLE_MS) {
+        // Zu lange keine Anfrage (Tab geschlossen, Gerät liegen gelassen): Sitzung verwerfen, Cookie wird gelöscht.
+        return null;
       }
+      token.seen = now;
       return token;
     },
     session({ session, token }) {

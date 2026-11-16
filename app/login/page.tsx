@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { AuthError } from "next-auth";
 import { auth, signIn } from "@/auth";
+import { idleLabel } from "@/lib/idle";
 import Topbar from "../Topbar";
 import Footer from "../Footer";
 
@@ -16,10 +17,10 @@ const ERRORS: Record<string, string> = {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; callbackUrl?: string }>;
+  searchParams: Promise<{ error?: string; callbackUrl?: string; abgemeldet?: string }>;
 }) {
   const session = await auth();
-  const { error, callbackUrl } = await searchParams;
+  const { error, callbackUrl, abgemeldet } = await searchParams;
   // callbackUrl kann relativ (/admin/...) oder absolut (https://lernwege.../admin/...) kommen – nur den Pfad übernehmen.
   let target = "/app";
   if (callbackUrl) {
@@ -54,6 +55,7 @@ export default async function LoginPage({
             <p className="kicker">Geschützter Bereich</p>
             <h1>Anmelden</h1>
             <p className="lead">Zugang für freigeschaltete Lehrpersonen und Schulen.</p>
+            {abgemeldet && !error && <div className="msg ok">Du wurdest nach {idleLabel()} ohne Aktivität automatisch abgemeldet.</div>}
             {error && (
               <div className="msg err">
                 {ERRORS[error] ?? "Anmeldung fehlgeschlagen."}
