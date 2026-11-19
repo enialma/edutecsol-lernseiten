@@ -3,11 +3,11 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import QRCode from "qrcode";
 import { auth } from "@/auth";
-import { getPage, letzteNachbesserung } from "@/lib/pages";
+import { getPage, listFassungen } from "@/lib/pages";
 import { DIFFART_LABELS, NIVEAU_LABELS, SPRACHE_LABELS, TWIST_LABELS, normalizeLernseite, type GenParams } from "@/lib/prompt";
 import { SOZIALFORMEN, zugangOptionen } from "@/lib/achsen";
 import AppShell from "../../../AppShell";
-import { coachAction, copyAction, deletePageAction, loesungAction, pageGruppenAction, renameAction, shareAction, undoNachbessernAction, visibilityAction } from "../actions";
+import { coachAction, copyAction, deletePageAction, loesungAction, pageGruppenAction, renameAction, shareAction, fassungAction, visibilityAction } from "../actions";
 import { loesungSchaltbar } from "@/lib/loesung";
 import { MAX_AUFTRAG } from "@/lib/nachbessern";
 import NachbessernForm from "./NachbessernForm";
@@ -34,9 +34,9 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
   const moodleBase = canEdit ? await getMoodleBase(userId) : null;
   const coachOk = coachAllowedFor(page);
   const loesungOk = loesungSchaltbar(page);
-  const nachbesserung = canEdit ? await letzteNachbesserung(page.id) : null;
-  // Vorschau lädt nach Nachbessern oder Rückgängig neu (andere src)
-  const pv = `${page.html_bytes}-${nachbesserung?.id ?? 0}`;
+  const fassungen = canEdit ? await listFassungen(page.id) : [];
+  // Vorschau lädt nach Nachbessern oder Fassungswechsel neu (andere src)
+  const pv = `${page.html_bytes}-${fassungen.find((f) => f.aktiv)?.id ?? 0}`;
   const coachUse = canEdit && coachOk ? await coachUsageForPage(page.id) : null;
   const coachTopics = canEdit && coachOk && page.coach ? await coachTopicsForPage(page.id) : [];
   const topicMax = Math.max(1, ...coachTopics.map((t) => t.n));
@@ -238,13 +238,29 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
                 Beschreibe, was an der Seite geändert werden soll. Die KI ändert nur diese Stellen, der Rest bleibt gleich. Der Freigabelink bleibt derselbe.
               </p>
               <NachbessernForm pageId={page.id} maxLen={MAX_AUFTRAG} />
-              {nachbesserung && (
-                <div className="nb-undo">
-                  <p className="box-text soft">Zuletzt nachgebessert am {nachbesserung.created_at}: «{nachbesserung.auftrag.length > 120 ? nachbesserung.auftrag.slice(0, 120) + " …" : nachbesserung.auftrag}»</p>
-                  <form action={undoNachbessernAction}>
-                    <input type="hidden" name="id" value={page.id} />
-                    <button className="btn small ghost">Rückgängig</button>
-                  </form>
+              {fassungen.length > 0 && (
+                <div className="nb-fassungen">
+                  <div className="mini-label" id="l-fa">Fassungen, neueste zuerst</div>
+                  <ol aria-labelledby="l-fa">
+                    {fassungen.map((f) => (
+                      <li key={f.id} className={f.aktiv ? "aktiv" : undefined}>
+                        <div className="nb-text">
+                          <small>{f.created_at}{f.aktiv && <span className="tag frei">aktiv</span>}</small>
+                          <span>{f.auftrag ? `«${f.auftrag.length > 140 ? f.auftrag.slice(0, 140) + " …" : f.auftrag}»` : "Fassung vor dem ersten Nachbessern"}</span>
+                        </div>
+                        <div className="nb-acts-row">
+                          <a className="btn small ghost" href={`/app/seiten/${page.id}/html?fassung=${f.id}`} target="_blank" rel="noopener">Ansehen</a>
+                          {!f.aktiv && (
+                            <form action={fassungAction}>
+                              <input type="hidden" name="id" value={page.id} />
+                              <input type="hidden" name="fassung" value={f.id} />
+                              <button className="btn small ghost">Verwenden</button>
+                            </form>
+                          )}
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
                 </div>
               )}
             </section>

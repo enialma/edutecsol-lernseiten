@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { auth } from "@/auth";
 import { importBeispiele } from "@/lib/beispiele";
-import { deletePage, duplicatePage, getPage, setCoach, setLoesung, setShare, setVisibility, undoNachbesserung, updateTitle } from "@/lib/pages";
+import { deletePage, duplicatePage, getPage, setCoach, setLoesung, setFassung, setShare, setVisibility, updateTitle } from "@/lib/pages";
 import { setPageGruppen } from "@/lib/gruppen";
 import { isSwissOnly } from "@/lib/users";
 
@@ -60,11 +60,11 @@ export async function loesungAction(fd: FormData) {
   revalidatePath(`/app/seiten/${id}`);
 }
 
-/** Letzte Nachbesserung zurücknehmen: vorherige Fassung wiederherstellen. */
-export async function undoNachbessernAction(fd: FormData) {
+/** Eine ältere oder neuere Fassung wieder aktivieren (Nachbessern). */
+export async function fassungAction(fd: FormData) {
   const { userId, isAdmin } = await who();
   const id = Number(fd.get("id"));
-  await undoNachbesserung(id, userId, isAdmin);
+  await setFassung(id, userId, isAdmin, Number(fd.get("fassung")));
   revalidatePath(`/app/seiten/${id}`);
 }
 

@@ -160,46 +160,59 @@ export async function duplicatePage(id: number, userId: number, isAdmin: boolean
   });
 }
 
-// ---------- Nachbessern: neue Fassung speichern, vorherige für «Rückgängig» aufbewahren ----------
+// ---------- Nachbessern: alle Fassungen aufbewahren, jede lässt sich wieder aktivieren ----------
 
-const MAX_VERSIONEN = 10;
+const MAX_FASSUNGEN = 20; // dazu immer die Fassung vor dem ersten Nachbessern und die aktive
 const md5 = (s: string) => createHash("md5").update(s, "utf8").digest("hex");
 
-/** Ersetzt das HTML, sofern die Seite seit dem Lesen unverändert ist; die alte Fassung wandert in page_versions. */
+/**
+ * Speichert eine nachgebesserte Fassung und macht sie aktiv, sofern die Seite seit dem Lesen unverändert ist.
+ * Beim ersten Nachbessern wird zuerst die bisherige Seite als Ausgangsfassung (auftrag '') abgelegt, mit dem Erstelldatum der Seite.
+ */
 export async function saveNachbesserung(v: { id: number; altHtml: string; neuHtml: string; auftrag: string; provider: string; model: string; inputTokens: number; outputTokens: number }): Promise<boolean> {
   const rows = await q(
-    `WITH alt AS (SELECT id, html FROM pages WHERE id = $1 AND md5(html) = $2 FOR UPDATE),
-     ins AS (INSERT INTO page_versions (page_id, html, auftrag, provider, model, input_tokens, output_tokens)
-             SELECT id, html, $4, $5, $6, $7, $8 FROM alt)
-     UPDATE pages p SET html = $3 FROM alt WHERE p.id = alt.id RETURNING p.id`,
+    `WITH alt AS (SELECT id, html, provider, model, created_at FROM pages WHERE id = $1 AND md5(html) = $2 FOR UPDATE),
+     start AS (INSERT INTO page_fassungen (page_id, html, auftrag, provider, model, created_at)
+               SELECT id, html, '', provider, model, created_at FROM alt
+               WHERE NOT EXISTS (SELECT 1 FROM page_fassungen WHERE page_id = $1)),
+     neu AS (INSERT INTO page_fassungen (page_id, html, auftrag, provider, model, input_tokens, output_tokens)
+             SELECT id, $3, $4, $5, $6, $7, $8 FROM alt RETURNING id)
+     UPDATE pages p SET html = $3, fassung_id = (SELECT id FROM neu) FROM alt WHERE p.id = alt.id RETURNING p.id`,
     [v.id, md5(v.altHtml), v.neuHtml, v.auftrag, v.provider, v.model, v.inputTokens, v.outputTokens]
   );
   if (!rows.length) return false;
-  await q(`DELETE FROM page_versions WHERE page_id = $1 AND id NOT IN (SELECT id FROM page_versions WHERE page_id = $1 ORDER BY id DESC LIMIT ${MAX_VERSIONEN})`, [v.id]);
+  await q(
+    `DELETE FROM page_fassungen f WHERE f.page_id = $1 AND f.auftrag <> ''
+       AND f.id <> COALESCE((SELECT fassung_id FROM pages WHERE id = $1), 0)
+       AND f.id NOT IN (SELECT id FROM page_fassungen WHERE page_id = $1 ORDER BY created_at DESC, id DESC LIMIT ${MAX_FASSUNGEN})`,
+    [v.id]
+  );
   return true;
 }
 
-export type Nachbesserung = { id: number; auftrag: string; created_at: string; anzahl: number };
+export type Fassung = { id: number; auftrag: string; created_at: string; aktiv: boolean };
 
-/** Letzte Nachbesserung einer Seite (für «Rückgängig») und Anzahl aufbewahrter Fassungen. */
-export async function letzteNachbesserung(pageId: number): Promise<Nachbesserung | null> {
-  const rows = await q(
-    `SELECT id, auftrag, to_char(created_at AT TIME ZONE 'Europe/Zurich', 'DD.MM.YYYY HH24:MI') AS created_at,
-       (SELECT COUNT(*)::int FROM page_versions WHERE page_id = $1) AS anzahl
-     FROM page_versions WHERE page_id = $1 ORDER BY id DESC LIMIT 1`,
+/** Alle Fassungen einer Seite, neueste zuerst; leer, solange die Seite nie nachgebessert wurde. */
+export async function listFassungen(pageId: number): Promise<Fassung[]> {
+  return (await q(
+    `SELECT f.id, f.auftrag, to_char(f.created_at AT TIME ZONE 'Europe/Zurich', 'DD.MM.YYYY HH24:MI') AS created_at, (f.id = p.fassung_id) AS aktiv
+     FROM page_fassungen f JOIN pages p ON p.id = f.page_id WHERE f.page_id = $1 ORDER BY f.created_at DESC, f.id DESC`,
     [pageId]
-  );
-  return (rows[0] as Nachbesserung) ?? null;
+  )) as Fassung[];
 }
 
-/** Stellt die Fassung vor der letzten Nachbesserung wieder her (nur Besitzerin oder Admin). */
-export async function undoNachbesserung(id: number, userId: number, isAdmin: boolean): Promise<boolean> {
+/** HTML einer Fassung (Ansicht für die Lehrperson). */
+export async function getFassungHtml(pageId: number, fassungId: number): Promise<string | null> {
+  const rows = await q(`SELECT html FROM page_fassungen WHERE id = $2 AND page_id = $1`, [pageId, fassungId]);
+  return (rows[0]?.html as string) ?? null;
+}
+
+/** Macht eine ältere oder neuere Fassung wieder zur aktiven Seite; nichts wird gelöscht (nur Besitzerin oder Admin). */
+export async function setFassung(id: number, userId: number, isAdmin: boolean, fassungId: number): Promise<boolean> {
   const rows = await q(
-    `WITH v AS (SELECT pv.id, pv.html FROM page_versions pv JOIN pages p ON p.id = pv.page_id
-                WHERE pv.page_id = $1 AND (${canEdit(isAdmin)}) ORDER BY pv.id DESC LIMIT 1),
-     d AS (DELETE FROM page_versions WHERE id IN (SELECT id FROM v))
-     UPDATE pages p SET html = v.html FROM v WHERE p.id = $1 RETURNING p.id`,
-    [id, userId]
+    `UPDATE pages p SET html = f.html, fassung_id = f.id FROM page_fassungen f
+     WHERE p.id = $1 AND f.id = $3 AND f.page_id = p.id AND (${canEdit(isAdmin)}) RETURNING p.id`,
+    [id, userId, fassungId]
   );
   return rows.length > 0;
 }
