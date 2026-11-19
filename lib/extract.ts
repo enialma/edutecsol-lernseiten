@@ -1,7 +1,7 @@
 // Text aus hochgeladenen Dateien ziehen (PDF, DOCX, PPTX, TXT/MD).
 import JSZip from "jszip";
+import { MAX_UPLOAD_BYTES } from "./limits";
 
-export const MAX_UPLOAD_BYTES = 4 * 1024 * 1024; // Vercel-Limit für Request-Bodies liegt bei 4,5 MB
 export const MAX_MATERIAL_CHARS = 60_000; // ~15k Tokens – reicht für einen Foliensatz oder ein Kapitel
 
 export type Extracted = { name: string; text: string; truncated: boolean; kind: string };

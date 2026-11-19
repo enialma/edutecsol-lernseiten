@@ -3,6 +3,10 @@ import { Fragment, useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { systemPrompt, userPrompt, type GenParams, type Typ } from "@/lib/prompt";
 import { DIFFART_WAHL, EIGEN_PREFIX, INFO, MAX_EIGEN_LEN, MAX_EIGENE, SOZIALFORMEN, defaultZugaenge, zugangOptionen, type DiffartWahl, type InfoText } from "@/lib/achsen";
+import { MAX_UPLOAD_BYTES } from "@/lib/limits";
+
+// Aufrunden, damit eine knapp zu grosse Datei nicht als «4 MB» neben «höchstens 4 MB» erscheint
+const mb = (bytes: number) => (Math.ceil(bytes / 1024 / 1024 * 10) / 10).toLocaleString("de-CH");
 
 type ProviderOpt = { id: string; label: string; model: string; used: number; limit: number | null };
 type Preset = { id: string; label: string; fach?: string; stufe?: string; diffart?: string; zugaenge?: string[]; sozialformen?: string[]; sprache?: string; twist?: string; niveau?: string };
@@ -196,6 +200,7 @@ const label = (opts: string[][], v: string) => opts.find(([x]) => x === v)?.[1] 
 export default function Form({ providers, presets, bilder, initialBild, initialTyp, isAdmin }: { providers: ProviderOpt[]; presets: Preset[]; bilder: Bild[]; initialBild: number; initialTyp?: string; isAdmin: boolean }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
+  const pickRef = useRef<HTMLButtonElement>(null);
   const [s, setS] = useState<State>({
     typ: TYP.some(([v]) => v === initialTyp) ? (initialTyp as string) : "lernseite", dauer: "30",
     fach: "", stufe: "", thema: "", extra: "", material: "",
@@ -212,6 +217,7 @@ export default function Form({ providers, presets, bilder, initialBild, initialT
   const [error, setError] = useState<string | null>(null);
   const [promptOpen, setPromptOpen] = useState(false);
   const [dateiName, setDateiName] = useState("");
+  const [dateiFehler, setDateiFehler] = useState<string | null>(null);
   const set = <K extends keyof State>(k: K, v: State[K]) => setS((p) => ({ ...p, [k]: v }));
   const pruefung = s.typ === "pruefung";
   const spiel = s.typ === "spiel";
@@ -244,6 +250,27 @@ export default function Form({ providers, presets, bilder, initialBild, initialT
     setError(null);
     setStep(Math.min(4, Math.max(1, n)));
     window.scrollTo({ top: 0 });
+  }
+
+  /** Zu grosse Dateien gleich beim Auswählen abweisen, nicht erst beim Erzeugen. */
+  function dateiGewaehlt(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    if (f && f.size > MAX_UPLOAD_BYTES) {
+      e.target.value = "";
+      setDateiName("");
+      setDateiFehler(`Die Datei «${f.name}» ist ${mb(f.size)} MB gross, erlaubt sind höchstens ${mb(MAX_UPLOAD_BYTES)} MB. Tipp: PDF verkleinern oder nur die nötigen Seiten hochladen.`);
+      return;
+    }
+    setDateiFehler(null);
+    setDateiName(f?.name ?? "");
+  }
+
+  /** Gewählte Datei wieder entfernen (× neben dem Dateinamen). */
+  function dateiEntfernen() {
+    if (fileRef.current) fileRef.current.value = "";
+    setDateiName("");
+    setDateiFehler(null);
+    pickRef.current?.focus();
   }
 
   async function submit(e: React.FormEvent) {
@@ -326,8 +353,18 @@ export default function Form({ providers, presets, bilder, initialBild, initialT
               <p className="fs-lead">Lade eine Datei hoch oder füge einen Textauszug ein. Ein Thema allein genügt auch, dann wählt die KI passende Inhalte.</p>
               <label htmlFor="thema">{pruefung ? "Prüfungsthema (optional, leer = der ganze Stoff aus dem Material)" : spiel ? "Spielthema (optional, leer = Begriffe und Regeln aus dem Material)" : "Thema (optional, leer = KI wählt aus dem Material)"}</label>
               <input id="thema" value={s.thema} onChange={(e) => set("thema", e.target.value)} disabled={busy} placeholder={pruefung ? "z. B. Semesterprüfung Statistik" : spiel ? "z. B. Fachbegriffe Anatomie" : "z. B. Dosisberechnung"} />
-              <label htmlFor="datei">{pruefung ? "Prüfungsstoff" : spiel ? "Spielinhalt" : "Material"}: Datei (PDF, Word, PowerPoint, Text, höchstens 4 MB)</label>
-              <input id="datei" type="file" ref={fileRef} accept=".pdf,.docx,.pptx,.txt,.md" disabled={busy} onChange={(e) => setDateiName(e.target.files?.[0]?.name ?? "")} />
+              {/* Natives Dateifeld versteckt: nur der Knopf öffnet die Auswahl, nicht das ganze Feld oder die Beschriftung */}
+              <span className="file-label" id="l-datei">{pruefung ? "Prüfungsstoff" : spiel ? "Spielinhalt" : "Material"}: Datei (PDF, Word, PowerPoint, Text, höchstens {mb(MAX_UPLOAD_BYTES)} MB)</span>
+              <input id="datei" type="file" ref={fileRef} accept=".pdf,.docx,.pptx,.txt,.md" hidden onChange={dateiGewaehlt} />
+              <div className="file-pick">
+                <button type="button" id="b-datei" className="file-btn" ref={pickRef} onClick={() => fileRef.current?.click()} disabled={busy}
+                  aria-labelledby="l-datei b-datei" aria-describedby={dateiFehler ? "n-datei datei-fehler" : "n-datei"}>Datei auswählen</button>
+                <span className="file-chosen">
+                  <span id="n-datei" className="file-name">{dateiName || "Keine Datei ausgewählt"}</span>
+                  {dateiName && <button type="button" className="file-x" onClick={dateiEntfernen} disabled={busy} aria-label={`Datei «${dateiName}» entfernen`} title="Datei entfernen">×</button>}
+                </span>
+              </div>
+              {dateiFehler && <div id="datei-fehler" className="msg err" role="alert">{dateiFehler}</div>}
               <label htmlFor="material">… oder Themenbeschreibung / Textauszug</label>
               <textarea id="material" rows={5} value={s.material} onChange={(e) => set("material", e.target.value)} disabled={busy} placeholder="Wird ignoriert, wenn eine Datei hochgeladen ist." />
             </fieldset>

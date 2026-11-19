@@ -72,6 +72,20 @@ tr:last-child td{border-bottom:none}
 .fixes button:hover{border-color:var(--terra)}
 .preview{width:100%;height:75vh;min-height:520px;border:1px solid var(--line-strong);border-radius:var(--r-lg);background:#fff}
 input[type=file]{padding:.45rem;background:#fff}
+.file-label{display:block;font-size:.88rem;font-weight:600;margin:.8rem 0 .25rem}
+/* Sieht aus wie das native Dateifeld (Box wie input, Systemknopf), aber nur der Knopf öffnet die Auswahl */
+.file-pick{display:flex;align-items:center;gap:.5rem;width:100%;padding:.45rem;border:1px solid var(--line-strong);border-radius:var(--r);background:#fff;color:var(--ink)}
+.file-pick:focus-within{outline:2px solid var(--terra);outline-offset:1px;border-color:var(--terra)}
+.file-pick .file-btn{all:revert;font:inherit;flex:none}
+.file-pick .file-btn:focus{outline:none}
+.file-chosen{display:inline-flex;align-items:center;gap:.25rem;min-width:0}
+.file-name{min-width:0;overflow-wrap:anywhere}
+/* × zum Entfernen: erscheint beim Darüberfahren oder per Tastatur; ohne Maus (Touch) immer sichtbar */
+.file-x{font:inherit;font-size:1.15rem;line-height:1;flex:none;width:28px;height:28px;display:inline-grid;place-items:center;padding:0;border:0;border-radius:50%;background:transparent;color:var(--ink-soft);cursor:pointer;opacity:0;transition:opacity .15s}
+.file-chosen:hover .file-x,.file-x:focus-visible{opacity:1}
+.file-x:hover{background:#F2F3F5;color:var(--err)}
+.file-x:focus-visible{outline:2px solid var(--terra);outline-offset:1px}
+@media (hover:none){.file-x{opacity:1}}
 footer{background:var(--navy);color:#C3CCD6;padding:1.6rem 0;font-size:.85rem}
 footer a{color:var(--ochre);text-decoration:none}
 
