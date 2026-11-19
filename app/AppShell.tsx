@@ -53,6 +53,9 @@ export default async function AppShell({ active, children }: { active?: ShellKey
   const providers = providersFor(await isSwissOnly(userId));
   const name = u.name || u.email || "";
   const monat = new Date().toLocaleDateString("de-CH", { month: "long", timeZone: "Europe/Zurich" });
+  // Nächster Monatserster (Schweizer Zeit), an dem das Kontingent zurückgesetzt wird, z. B. «1.12.2026»
+  const [jahr, mon] = new Date().toLocaleDateString("en-CA", { year: "numeric", month: "numeric", timeZone: "Europe/Zurich" }).split("-").map(Number);
+  const reset = mon === 12 ? `1.1.${jahr + 1}` : `1.${mon + 1}.${jahr}`;
   const konto = billing.subscriptionId ? "Abo aktiv" : billing.validUntil ? `Zugang bis ${billing.validUntil}` : isAdmin ? "Admin" : "";
 
   const nav: { k: ShellKey; href: string; label: string }[] = [
@@ -85,7 +88,7 @@ export default async function AppShell({ active, children }: { active?: ShellKey
           <div className="side-label">Kontingent {monat}</div>
           {providers.map((p) => <QuotaRow key={p} label={PROVIDER_LABELS[p]} used={quota[p].used} limit={quota[p].limit} />)}
           <QuotaRow label="Bilder" used={bilder.used} limit={bilder.limit} />
-          <div className="side-note">{isAdmin ? "Als Admin ohne Limit, gezählt wird trotzdem." : "Genutzt in diesem Monat. Am Monatsersten beginnt es neu."}</div>
+          <div className="side-note">{isAdmin ? "Als Admin ohne Limit, gezählt wird trotzdem." : `Genutzt in diesem Monat. Wird am ${reset} zurückgesetzt.`}</div>
         </section>
 
         <div className="side-user">
