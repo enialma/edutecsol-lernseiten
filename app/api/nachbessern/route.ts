@@ -4,9 +4,9 @@
 import { auth } from "@/auth";
 import { generate, PROVIDER_LABELS, providersFor, type GenResult, type Provider } from "@/lib/ai";
 import { isSwissOnly } from "@/lib/users";
-import { getPage, saveNachbesserung } from "@/lib/pages";
+import { anzahlNachbesserungen, getPage, saveNachbesserung } from "@/lib/pages";
 import { logGeneration } from "@/lib/quota";
-import { MAX_AUFTRAG, NACHBESSERN_SYSTEM, einsetzen, nachbessernRetryUser, nachbessernUser, parseAntwort, pruefeErgebnis } from "@/lib/nachbessern";
+import { MAX_AUFTRAG, MAX_NACHBESSERUNGEN, NACHBESSERN_SYSTEM, einsetzen, nachbessernRetryUser, nachbessernUser, parseAntwort, pruefeErgebnis } from "@/lib/nachbessern";
 
 export const runtime = "nodejs";
 export const maxDuration = 600;
@@ -28,6 +28,10 @@ export async function POST(req: Request) {
   const page = Number.isInteger(id) ? await getPage(id, userId, isAdmin) : null;
   if (!page) return new Response("Seite nicht gefunden.", { status: 404 });
   if (page.user_id !== userId && !isAdmin) return new Response("Nur eigene Seiten lassen sich nachbessern. Kopiere die Seite zuerst in deine Sammlung.", { status: 403 });
+  // Vor dem KI-Aufruf prüfen, damit keine Kosten anfallen; beim Speichern wird nochmals geprüft
+  const limit = isAdmin ? null : MAX_NACHBESSERUNGEN;
+  const grenzeErreicht = `Diese Seite wurde schon ${MAX_NACHBESSERUNGEN}-mal nachgebessert, mehr geht nicht. Du kannst weiterhin eine frühere Fassung verwenden oder eine neue Seite erzeugen.`;
+  if (limit !== null && (await anzahlNachbesserungen(page.id)) >= limit) return new Response(grenzeErreicht, { status: 429 });
 
   // Dieselbe KI wie beim Erzeugen; im Schulmodus «KI nur Schweiz» oder wenn sie nicht eingerichtet ist, die erste erlaubte
   const allowed = providersFor(await isSwissOnly(userId));
@@ -94,9 +98,12 @@ export async function POST(req: Request) {
 
         const ok = await saveNachbesserung({
           id: page.id, altHtml: html, neuHtml: ergebnis.html, auftrag, provider, model: spent.model,
-          inputTokens: spent.inputTokens, outputTokens: spent.outputTokens,
+          inputTokens: spent.inputTokens, outputTokens: spent.outputTokens, limit,
         });
-        if (!ok) throw new Error("Die Seite wurde in der Zwischenzeit geändert. Bitte nochmals nachbessern.");
+        if (!ok) {
+          if (limit !== null && (await anzahlNachbesserungen(page.id)) >= limit) throw new Error(grenzeErreicht);
+          throw new Error("Die Seite wurde in der Zwischenzeit geändert. Bitte nochmals nachbessern.");
+        }
         await logGeneration({ userId, provider, model: spent.model, inputTokens: spent.inputTokens, outputTokens: spent.outputTokens, ok: true, nachbessern: true });
         spent.inputTokens = spent.outputTokens = 0;
         const n = antwort.bloecke.length;

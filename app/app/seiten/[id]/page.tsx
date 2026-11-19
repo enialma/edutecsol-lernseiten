@@ -9,7 +9,7 @@ import { SOZIALFORMEN, zugangOptionen } from "@/lib/achsen";
 import AppShell from "../../../AppShell";
 import { coachAction, copyAction, deletePageAction, loesungAction, pageGruppenAction, renameAction, shareAction, fassungAction, visibilityAction } from "../actions";
 import { loesungSchaltbar } from "@/lib/loesung";
-import { MAX_AUFTRAG } from "@/lib/nachbessern";
+import { MAX_AUFTRAG, MAX_NACHBESSERUNGEN } from "@/lib/nachbessern";
 import NachbessernForm from "./NachbessernForm";
 import { gruppenOfPages, listGruppen } from "@/lib/gruppen";
 import { coachAllowedFor, coachTopicsForPage, coachUsageForPage, defaultStilFor, COACH_DEN, COACH_NAME, COACH_STIL_LABELS, IS_GENERIC } from "@/lib/coach";
@@ -35,6 +35,8 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
   const coachOk = coachAllowedFor(page);
   const loesungOk = loesungSchaltbar(page);
   const fassungen = canEdit ? await listFassungen(page.id) : [];
+  // Fassungen mit Auftrag = gelungene Nachbesserungen (bei höchstens 5 greift das Aufräumen nach 20 nie)
+  const nachbessernRest = isAdmin ? null : Math.max(0, MAX_NACHBESSERUNGEN - fassungen.filter((f) => f.auftrag).length);
   // Vorschau lädt nach Nachbessern oder Fassungswechsel neu (andere src)
   const pv = `${page.html_bytes}-${fassungen.find((f) => f.aktiv)?.id ?? 0}`;
   const coachUse = canEdit && coachOk ? await coachUsageForPage(page.id) : null;
@@ -233,11 +235,23 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
 
           {canEdit && (
             <section className="box pad block" aria-labelledby="h-nb">
-              <h2 id="h-nb">Nachbessern</h2>
-              <p className="box-text soft">
-                Beschreibe, was an der Seite geändert werden soll. Die KI ändert nur diese Stellen, der Rest bleibt gleich. Der Freigabelink bleibt derselbe.
-              </p>
-              <NachbessernForm pageId={page.id} maxLen={MAX_AUFTRAG} />
+              <div className="between">
+                <h2 id="h-nb">Nachbessern</h2>
+                {nachbessernRest !== null && <span className="small-note">noch {nachbessernRest} von {MAX_NACHBESSERUNGEN}</span>}
+              </div>
+              {nachbessernRest === 0 ? (
+                <p className="box-text soft">
+                  Diese Seite wurde schon {MAX_NACHBESSERUNGEN}-mal nachgebessert, mehr geht pro Seite nicht. Unten kannst du weiterhin jede Fassung ansehen und verwenden.
+                </p>
+              ) : (
+                <>
+                  <p className="box-text soft">
+                    Beschreibe, was an der Seite geändert werden soll. Die KI ändert nur diese Stellen, der Rest bleibt gleich. Der Freigabelink bleibt derselbe.
+                    {nachbessernRest !== null && ` Pro Seite geht das ${MAX_NACHBESSERUNGEN}-mal.`}
+                  </p>
+                  <NachbessernForm pageId={page.id} maxLen={MAX_AUFTRAG} />
+                </>
+              )}
               {fassungen.length > 0 && (
                 <div className="nb-fassungen">
                   <div className="mini-label" id="l-fa">Fassungen, neueste zuerst</div>

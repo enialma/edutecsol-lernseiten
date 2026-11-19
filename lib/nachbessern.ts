@@ -3,6 +3,8 @@
 import { anzahlLoesungsbereiche } from "./loesung";
 
 export const MAX_AUFTRAG = 1000;
+/** Gelungene Nachbesserungen pro Lernseite (Admins ohne Grenze); Fassungswechsel zählen nicht. */
+export const MAX_NACHBESSERUNGEN = 5;
 
 export const NACHBESSERN_SYSTEM = `Du überarbeitest eine bestehende Lernseite (eine einzelne HTML-Datei) nach dem Auftrag einer Lehrperson. Du schreibst die Seite nicht neu, sondern gibst nur die nötigen Änderungen als Ersetzungsblöcke aus. Der Server setzt die Blöcke in die Seite ein; alles, was du nicht ersetzt, bleibt Zeichen für Zeichen erhalten.
 

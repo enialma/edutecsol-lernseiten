@@ -169,16 +169,18 @@ const md5 = (s: string) => createHash("md5").update(s, "utf8").digest("hex");
  * Speichert eine nachgebesserte Fassung und macht sie aktiv, sofern die Seite seit dem Lesen unverändert ist.
  * Beim ersten Nachbessern wird zuerst die bisherige Seite als Ausgangsfassung (auftrag '') abgelegt, mit dem Erstelldatum der Seite.
  */
-export async function saveNachbesserung(v: { id: number; altHtml: string; neuHtml: string; auftrag: string; provider: string; model: string; inputTokens: number; outputTokens: number }): Promise<boolean> {
+export async function saveNachbesserung(v: { id: number; altHtml: string; neuHtml: string; auftrag: string; provider: string; model: string; inputTokens: number; outputTokens: number; limit: number | null }): Promise<boolean> {
+  // limit: höchstens so viele Nachbesserungen pro Seite (null = ohne Grenze); hier nochmals geprüft, falls zwei gleichzeitig laufen
   const rows = await q(
-    `WITH alt AS (SELECT id, html, provider, model, created_at FROM pages WHERE id = $1 AND md5(html) = $2 FOR UPDATE),
+    `WITH alt AS (SELECT id, html, provider, model, created_at FROM pages WHERE id = $1 AND md5(html) = $2
+                    AND ($9::int IS NULL OR (SELECT COUNT(*) FROM page_fassungen WHERE page_id = $1 AND auftrag <> '') < $9) FOR UPDATE),
      start AS (INSERT INTO page_fassungen (page_id, html, auftrag, provider, model, created_at)
                SELECT id, html, '', provider, model, created_at FROM alt
                WHERE NOT EXISTS (SELECT 1 FROM page_fassungen WHERE page_id = $1)),
      neu AS (INSERT INTO page_fassungen (page_id, html, auftrag, provider, model, input_tokens, output_tokens)
              SELECT id, $3, $4, $5, $6, $7, $8 FROM alt RETURNING id)
      UPDATE pages p SET html = $3, fassung_id = (SELECT id FROM neu) FROM alt WHERE p.id = alt.id RETURNING p.id`,
-    [v.id, md5(v.altHtml), v.neuHtml, v.auftrag, v.provider, v.model, v.inputTokens, v.outputTokens]
+    [v.id, md5(v.altHtml), v.neuHtml, v.auftrag, v.provider, v.model, v.inputTokens, v.outputTokens, v.limit]
   );
   if (!rows.length) return false;
   await q(
@@ -188,6 +190,12 @@ export async function saveNachbesserung(v: { id: number; altHtml: string; neuHtm
     [v.id]
   );
   return true;
+}
+
+/** Bisherige gelungene Nachbesserungen einer Seite (ohne die Fassung vor dem ersten Nachbessern). */
+export async function anzahlNachbesserungen(pageId: number): Promise<number> {
+  const rows = await q(`SELECT COUNT(*)::int AS n FROM page_fassungen WHERE page_id = $1 AND auftrag <> ''`, [pageId]);
+  return Number(rows[0]?.n ?? 0);
 }
 
 export type Fassung = { id: number; auftrag: string; created_at: string; aktiv: boolean };
