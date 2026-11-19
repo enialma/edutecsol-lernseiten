@@ -23,6 +23,11 @@ function bloecke(html: string): [number, number][] {
   return out;
 }
 
+/** Anzahl sauber abgegrenzter Lehrpersonen-Bereiche (Nachbessern prüft, dass keiner verloren geht). */
+export function anzahlLoesungsbereiche(html: string): number {
+  return bloecke(html).length;
+}
+
 /** Schalter «Lösungen für Lernende» anbieten: neue Seitenversion und ein sauber abgegrenzter Lehrpersonen-Bereich. */
 export function loesungSchaltbar(page: PageFull): boolean {
   return page.loesung_version && bloecke(page.html).length > 0;

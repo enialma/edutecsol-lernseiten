@@ -3,12 +3,14 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import QRCode from "qrcode";
 import { auth } from "@/auth";
-import { getPage } from "@/lib/pages";
+import { getPage, letzteNachbesserung } from "@/lib/pages";
 import { DIFFART_LABELS, NIVEAU_LABELS, SPRACHE_LABELS, TWIST_LABELS, normalizeLernseite, type GenParams } from "@/lib/prompt";
 import { SOZIALFORMEN, zugangOptionen } from "@/lib/achsen";
 import AppShell from "../../../AppShell";
-import { coachAction, copyAction, deletePageAction, loesungAction, pageGruppenAction, renameAction, shareAction, visibilityAction } from "../actions";
+import { coachAction, copyAction, deletePageAction, loesungAction, pageGruppenAction, renameAction, shareAction, undoNachbessernAction, visibilityAction } from "../actions";
 import { loesungSchaltbar } from "@/lib/loesung";
+import { MAX_AUFTRAG } from "@/lib/nachbessern";
+import NachbessernForm from "./NachbessernForm";
 import { gruppenOfPages, listGruppen } from "@/lib/gruppen";
 import { coachAllowedFor, coachTopicsForPage, coachUsageForPage, defaultStilFor, COACH_DEN, COACH_NAME, COACH_STIL_LABELS, IS_GENERIC } from "@/lib/coach";
 import { getMoodleBase } from "@/lib/moodle";
@@ -32,6 +34,9 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
   const moodleBase = canEdit ? await getMoodleBase(userId) : null;
   const coachOk = coachAllowedFor(page);
   const loesungOk = loesungSchaltbar(page);
+  const nachbesserung = canEdit ? await letzteNachbesserung(page.id) : null;
+  // Vorschau lädt nach Nachbessern oder Rückgängig neu (andere src)
+  const pv = `${page.html_bytes}-${nachbesserung?.id ?? 0}`;
   const coachUse = canEdit && coachOk ? await coachUsageForPage(page.id) : null;
   const coachTopics = canEdit && coachOk && page.coach ? await coachTopicsForPage(page.id) : [];
   const topicMax = Math.max(1, ...coachTopics.map((t) => t.n));
@@ -86,7 +91,7 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
             <span>Vorschau, wie Lernende die Seite sehen</span>
             <span>Läuft offline · eine Datei</span>
           </div>
-          <iframe className="preview" src={`/app/seiten/${page.id}/html`} title={`Vorschau: ${page.title}`} />
+          <iframe className="preview" key={pv} src={`/app/seiten/${page.id}/html?v=${pv}`} title={`Vorschau: ${page.title}`} />
         </section>
 
         <div className="detail-side">
@@ -222,6 +227,25 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
                     </>
                   )}
                 </>
+              )}
+            </section>
+          )}
+
+          {canEdit && (
+            <section className="box pad block" aria-labelledby="h-nb">
+              <h2 id="h-nb">Nachbessern</h2>
+              <p className="box-text soft">
+                Beschreibe, was an der Seite geändert werden soll. Die KI ändert nur diese Stellen, der Rest bleibt gleich. Der Freigabelink bleibt derselbe.
+              </p>
+              <NachbessernForm pageId={page.id} maxLen={MAX_AUFTRAG} />
+              {nachbesserung && (
+                <div className="nb-undo">
+                  <p className="box-text soft">Zuletzt nachgebessert am {nachbesserung.created_at}: «{nachbesserung.auftrag.length > 120 ? nachbesserung.auftrag.slice(0, 120) + " …" : nachbesserung.auftrag}»</p>
+                  <form action={undoNachbessernAction}>
+                    <input type="hidden" name="id" value={page.id} />
+                    <button className="btn small ghost">Rückgängig</button>
+                  </form>
+                </div>
               )}
             </section>
           )}

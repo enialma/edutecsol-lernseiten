@@ -27,10 +27,11 @@ export async function imageQuotaFor(userId: number, isAdmin: boolean): Promise<{
   return { used: Number(rows[0]?.n ?? 0), limit: isAdmin ? null : LIMIT_BILDER };
 }
 
-export async function logGeneration(g: { userId: number; provider: string; model?: string | null; inputTokens: number; outputTokens: number; ok: boolean }) {
+/** nachbessern: Nachbesserung einer Lernseite; zählt nicht zum Kontingent, Tokens erscheinen in der Nutzung. */
+export async function logGeneration(g: { userId: number; provider: string; model?: string | null; inputTokens: number; outputTokens: number; ok: boolean; nachbessern?: boolean }) {
   await q(
-    `INSERT INTO generations (user_id, provider, model, input_tokens, output_tokens, ok) VALUES ($1,$2,$3,$4,$5,$6)`,
-    [g.userId, g.provider, g.model ?? null, g.inputTokens, g.outputTokens, g.ok]
+    `INSERT INTO generations (user_id, provider, model, input_tokens, output_tokens, ok, nachbessern) VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+    [g.userId, g.provider, g.model ?? null, g.inputTokens, g.outputTokens, g.ok, g.nachbessern ?? false]
   );
 }
 
@@ -40,7 +41,7 @@ export type Quota = Record<Provider, { used: number; limit: number | null }>;
 export async function quotaFor(userId: number, isAdmin: boolean): Promise<Quota> {
   const rows = await q(
     `SELECT provider, COUNT(*)::int AS n FROM generations
-     WHERE user_id = $1 AND ok AND created_at >= date_trunc('month', NOW()) GROUP BY provider`,
+     WHERE user_id = $1 AND ok AND NOT nachbessern AND created_at >= date_trunc('month', NOW()) GROUP BY provider`,
     [userId]
   );
   const used = (p: Provider) => Number(rows.find((r) => r.provider === p)?.n ?? 0);
@@ -60,15 +61,15 @@ export type Usage = {
 export async function usageByUser(): Promise<Usage[]> {
   return (await q(
     `SELECT u.email, u.name, i.name AS institution,
-       COUNT(g.id) FILTER (WHERE g.ok AND g.provider <> 'bild')::int AS pages,
-       COUNT(g.id) FILTER (WHERE g.ok AND g.provider = 'bild')::int AS bilder,
-       COUNT(g.id) FILTER (WHERE g.ok AND g.provider = 'bild' AND g.created_at >= date_trunc('month', NOW()))::int AS bilder_month,
-       COUNT(g.id) FILTER (WHERE g.ok AND g.provider = 'claude' AND g.created_at >= date_trunc('month', NOW()))::int AS claude_month,
-       COUNT(g.id) FILTER (WHERE g.ok AND g.provider = 'infomaniak' AND g.created_at >= date_trunc('month', NOW()))::int AS infomaniak_month,
-       COUNT(g.id) FILTER (WHERE g.ok AND g.provider = 'claude')::int AS claude,
-       COUNT(g.id) FILTER (WHERE g.ok AND g.provider = 'infomaniak')::int AS infomaniak,
-       COUNT(g.id) FILTER (WHERE g.ok AND g.provider = 'openai' AND g.created_at >= date_trunc('month', NOW()))::int AS openai_month,
-       COUNT(g.id) FILTER (WHERE g.ok AND g.provider = 'openai')::int AS openai,
+       COUNT(g.id) FILTER (WHERE g.ok AND NOT g.nachbessern AND g.provider <> 'bild')::int AS pages,
+       COUNT(g.id) FILTER (WHERE g.ok AND NOT g.nachbessern AND g.provider = 'bild')::int AS bilder,
+       COUNT(g.id) FILTER (WHERE g.ok AND NOT g.nachbessern AND g.provider = 'bild' AND g.created_at >= date_trunc('month', NOW()))::int AS bilder_month,
+       COUNT(g.id) FILTER (WHERE g.ok AND NOT g.nachbessern AND g.provider = 'claude' AND g.created_at >= date_trunc('month', NOW()))::int AS claude_month,
+       COUNT(g.id) FILTER (WHERE g.ok AND NOT g.nachbessern AND g.provider = 'infomaniak' AND g.created_at >= date_trunc('month', NOW()))::int AS infomaniak_month,
+       COUNT(g.id) FILTER (WHERE g.ok AND NOT g.nachbessern AND g.provider = 'claude')::int AS claude,
+       COUNT(g.id) FILTER (WHERE g.ok AND NOT g.nachbessern AND g.provider = 'infomaniak')::int AS infomaniak,
+       COUNT(g.id) FILTER (WHERE g.ok AND NOT g.nachbessern AND g.provider = 'openai' AND g.created_at >= date_trunc('month', NOW()))::int AS openai_month,
+       COUNT(g.id) FILTER (WHERE g.ok AND NOT g.nachbessern AND g.provider = 'openai')::int AS openai,
        COALESCE(SUM(g.input_tokens),0)::int AS input_tokens, COALESCE(SUM(g.output_tokens),0)::int AS output_tokens,
        to_char(MAX(g.created_at), 'DD.MM.YYYY') AS last_page
      FROM users u LEFT JOIN generations g ON g.user_id = u.id LEFT JOIN institutions i ON i.id = u.institution_id

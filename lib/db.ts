@@ -141,6 +141,20 @@ export function ready(): Promise<void> {
       await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS coach_provider TEXT NOT NULL DEFAULT 'infomaniak'`);
       // Lösungen über den Freigabelink zeigen (Schalter der Lehrperson, nur neue Seitenversionen)
       await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS loesung_offen BOOLEAN NOT NULL DEFAULT FALSE`);
+      // Nachbessern: vorherige Fassungen für «Rückgängig» (je Seite die letzten zehn); Protokollzeilen zählen nicht zum Kontingent
+      await sql.query(`CREATE TABLE IF NOT EXISTS page_versions (
+        id            SERIAL PRIMARY KEY,
+        page_id       INTEGER NOT NULL REFERENCES pages(id) ON DELETE CASCADE,
+        html          TEXT NOT NULL,
+        auftrag       TEXT NOT NULL,
+        provider      TEXT NOT NULL,
+        model         TEXT,
+        input_tokens  INTEGER NOT NULL DEFAULT 0,
+        output_tokens INTEGER NOT NULL DEFAULT 0,
+        created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )`);
+      await sql.query(`CREATE INDEX IF NOT EXISTS page_versions_page ON page_versions (page_id, id DESC)`);
+      await sql.query(`ALTER TABLE generations ADD COLUMN IF NOT EXISTS nachbessern BOOLEAN NOT NULL DEFAULT FALSE`);
       await sql.query(`CREATE TABLE IF NOT EXISTS coach_usage (
         page_id       INTEGER NOT NULL REFERENCES pages(id) ON DELETE CASCADE,
         day           DATE NOT NULL,

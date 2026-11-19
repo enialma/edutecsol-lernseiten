@@ -336,6 +336,9 @@ main.work .share h2{color:var(--paper);font-size:1.125rem;font-weight:600;margin
 .btn.on-navy:hover{background:color-mix(in srgb,var(--card) 8%,transparent);color:var(--card);border-color:var(--card)}
 .share-note{margin:0;font-size:.82rem;line-height:1.5;color:var(--on-navy-soft)}
 .share form{margin:0}
+.nb-acts{margin-top:.6rem}
+.nb-undo{margin-top:.9rem;padding-top:.9rem;border-top:1px solid var(--line)}
+.nb-undo p{margin:0 0 .5rem}
 .share-loesung{display:flex;flex-direction:column;gap:.35rem;padding-top:.9rem;border-top:1px solid color-mix(in srgb,var(--card) 20%,transparent)}
 .share-loesung > .between{font-size:.9rem;font-weight:600}
 .share .switch[aria-checked="true"] > span{background:var(--ochre)}
