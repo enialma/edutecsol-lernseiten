@@ -1,11 +1,12 @@
 // Bessert eine bestehende Lernseite nach einem Auftrag der Lehrperson nach: Seite + Auftrag → KI liefert Ersetzungsblöcke →
-// einsetzen und prüfen → speichern (alte Fassung für «Rückgängig»). Gleiche KI wie beim Erzeugen, kein Kontingent.
+// einsetzen und prüfen → speichern (alte Fassung für «Rückgängig»). Gleiche KI wie beim Erzeugen, zählt 0.2 in deren Kontingent.
 // Antwort ist ein Textstream wie bei /api/erzeugen: Fortschrittszeilen, am Ende "@@DONE {json}" oder "@@ERROR text".
 import { auth } from "@/auth";
 import { generate, PROVIDER_LABELS, providersFor, type GenResult, type Provider } from "@/lib/ai";
 import { isSwissOnly } from "@/lib/users";
 import { anzahlNachbesserungen, getPage, saveNachbesserung } from "@/lib/pages";
-import { logGeneration } from "@/lib/quota";
+import { logGeneration, quotaFor } from "@/lib/quota";
+import { KOSTEN_NACHBESSERN, kontZahl, reicht } from "@/lib/kontingent";
 import { MAX_AUFTRAG, MAX_NACHBESSERUNGEN, NACHBESSERN_SYSTEM, einsetzen, nachbessernRetryUser, nachbessernUser, parseAntwort, pruefeErgebnis } from "@/lib/nachbessern";
 
 export const runtime = "nodejs";
@@ -38,6 +39,10 @@ export async function POST(req: Request) {
   const original = page.provider as Provider;
   const provider = allowed.includes(original) ? original : allowed[0];
   if (!provider) return new Response("Kein passender KI-Anbieter eingerichtet.", { status: 503 });
+  // Kontingent: eine Nachbesserung zählt 0.2 einer Lernseite bei dieser KI (Admins ohne Limit)
+  if (!reicht((await quotaFor(userId, isAdmin))[provider], KOSTEN_NACHBESSERN)) {
+    return new Response(`Dein Monatskontingent mit ${PROVIDER_LABELS[provider]} ist aufgebraucht (eine Nachbesserung braucht ${kontZahl(KOSTEN_NACHBESSERN)}). Am Monatsersten wird es zurückgesetzt.`, { status: 429 });
+  }
 
   const enc = new TextEncoder();
   const stream = new ReadableStream<Uint8Array>({

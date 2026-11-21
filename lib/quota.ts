@@ -27,7 +27,7 @@ export async function imageQuotaFor(userId: number, isAdmin: boolean): Promise<{
   return { used: Number(rows[0]?.n ?? 0), limit: isAdmin ? null : LIMIT_BILDER };
 }
 
-/** nachbessern: Nachbesserung einer Lernseite; zählt nicht zum Kontingent, Tokens erscheinen in der Nutzung. */
+/** nachbessern: Nachbesserung einer Lernseite; zählt 0.2 im Kontingent der KI (siehe lib/kontingent.ts). */
 export async function logGeneration(g: { userId: number; provider: string; model?: string | null; inputTokens: number; outputTokens: number; ok: boolean; nachbessern?: boolean }) {
   await q(
     `INSERT INTO generations (user_id, provider, model, input_tokens, output_tokens, ok, nachbessern) VALUES ($1,$2,$3,$4,$5,$6,$7)`,
@@ -37,14 +37,17 @@ export async function logGeneration(g: { userId: number; provider: string; model
 
 export type Quota = Record<Provider, { used: number; limit: number | null }>;
 
-/** Verbrauch im laufenden Kalendermonat – nur gelungene Erzeugungen zählen. */
+// Verbrauch in Fünfteln gezählt (Lernseite 5, Nachbesserung 1), damit keine Rundungsfehler entstehen
+const FUENFTEL = `CASE WHEN g.nachbessern THEN 1 ELSE 5 END`;
+
+/** Verbrauch im laufenden Kalendermonat – nur gelungene Erzeugungen zählen, Nachbesserungen je 0.2. */
 export async function quotaFor(userId: number, isAdmin: boolean): Promise<Quota> {
   const rows = await q(
-    `SELECT provider, COUNT(*)::int AS n FROM generations
-     WHERE user_id = $1 AND ok AND NOT nachbessern AND created_at >= date_trunc('month', NOW()) GROUP BY provider`,
+    `SELECT g.provider, SUM(${FUENFTEL})::int AS f FROM generations g
+     WHERE g.user_id = $1 AND g.ok AND g.created_at >= date_trunc('month', NOW()) GROUP BY g.provider`,
     [userId]
   );
-  const used = (p: Provider) => Number(rows.find((r) => r.provider === p)?.n ?? 0);
+  const used = (p: Provider) => Number(rows.find((r) => r.provider === p)?.f ?? 0) / 5;
   return {
     claude: { used: used("claude"), limit: isAdmin ? null : LIMITS.claude },
     infomaniak: { used: used("infomaniak"), limit: isAdmin ? null : LIMITS.infomaniak },
@@ -57,18 +60,18 @@ export type Usage = {
   claude: number; infomaniak: number; openai: number; bilder: number; bilder_month: number; input_tokens: number; output_tokens: number; last_page: string | null;
 };
 
-/** Erzeugungen und Tokens pro Person. Seiten = gelungene Erzeugungen; Tokens zählen auch misslungene Versuche. */
+/** Erzeugungen und Tokens pro Person. Seiten = gelungene Erzeugungen; *_month = Kontingent (Nachbesserungen je 0.2); Tokens auch misslungene Versuche. */
 export async function usageByUser(): Promise<Usage[]> {
   return (await q(
     `SELECT u.email, u.name, i.name AS institution,
        COUNT(g.id) FILTER (WHERE g.ok AND NOT g.nachbessern AND g.provider <> 'bild')::int AS pages,
        COUNT(g.id) FILTER (WHERE g.ok AND NOT g.nachbessern AND g.provider = 'bild')::int AS bilder,
        COUNT(g.id) FILTER (WHERE g.ok AND NOT g.nachbessern AND g.provider = 'bild' AND g.created_at >= date_trunc('month', NOW()))::int AS bilder_month,
-       COUNT(g.id) FILTER (WHERE g.ok AND NOT g.nachbessern AND g.provider = 'claude' AND g.created_at >= date_trunc('month', NOW()))::int AS claude_month,
-       COUNT(g.id) FILTER (WHERE g.ok AND NOT g.nachbessern AND g.provider = 'infomaniak' AND g.created_at >= date_trunc('month', NOW()))::int AS infomaniak_month,
+       (COALESCE(SUM(${FUENFTEL}) FILTER (WHERE g.ok AND g.provider = 'claude' AND g.created_at >= date_trunc('month', NOW())), 0) / 5.0)::float8 AS claude_month,
+       (COALESCE(SUM(${FUENFTEL}) FILTER (WHERE g.ok AND g.provider = 'infomaniak' AND g.created_at >= date_trunc('month', NOW())), 0) / 5.0)::float8 AS infomaniak_month,
        COUNT(g.id) FILTER (WHERE g.ok AND NOT g.nachbessern AND g.provider = 'claude')::int AS claude,
        COUNT(g.id) FILTER (WHERE g.ok AND NOT g.nachbessern AND g.provider = 'infomaniak')::int AS infomaniak,
-       COUNT(g.id) FILTER (WHERE g.ok AND NOT g.nachbessern AND g.provider = 'openai' AND g.created_at >= date_trunc('month', NOW()))::int AS openai_month,
+       (COALESCE(SUM(${FUENFTEL}) FILTER (WHERE g.ok AND g.provider = 'openai' AND g.created_at >= date_trunc('month', NOW())), 0) / 5.0)::float8 AS openai_month,
        COUNT(g.id) FILTER (WHERE g.ok AND NOT g.nachbessern AND g.provider = 'openai')::int AS openai,
        COALESCE(SUM(g.input_tokens),0)::int AS input_tokens, COALESCE(SUM(g.output_tokens),0)::int AS output_tokens,
        to_char(MAX(g.created_at), 'DD.MM.YYYY') AS last_page

@@ -228,7 +228,8 @@ export default async function BenutzerPage({ searchParams }: { searchParams: Pro
             Mit KI erzeugte Lernseiten pro Person ({total.pages} Seiten, {nf(total.input_tokens)} Eingabe- und{" "}
             {nf(total.output_tokens)} Ausgabe-Tokens). Gelöschte Seiten zählen weiter mit; die Tokens enthalten auch
             misslungene Versuche. Monatskontingent pro Person: {LIMITS.claude} mit Claude, {LIMITS.openai} mit ChatGPT, {LIMITS.infomaniak} mit
-            Infomaniak, {LIMIT_BILDER} Bilder (Admins ohne Limit).
+            Infomaniak, {LIMIT_BILDER} Bilder (Admins ohne Limit). «Monat» zeigt den Verbrauch im Kontingent, eine Nachbesserung zählt 0.2;
+            «Seiten» und «Total» zählen nur neu erzeugte Seiten.
           </p>
           <div className="ltable-wrap">
             <table className="ltable">

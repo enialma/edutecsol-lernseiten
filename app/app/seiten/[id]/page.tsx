@@ -280,7 +280,7 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
                 <>
                   <p className="box-text soft">
                     Beschreibe, was an der Seite geändert werden soll. Die KI ändert nur diese Stellen, der Rest bleibt gleich. Der Freigabelink bleibt derselbe.
-                    {nachbessernRest !== null && ` Pro Seite geht das ${MAX_NACHBESSERUNGEN}-mal.`}
+                    {nachbessernRest !== null && ` Pro Seite geht das ${MAX_NACHBESSERUNGEN}-mal, jede Nachbesserung zählt 0.2 einer Lernseite in deinem Kontingent.`}
                   </p>
                   <NachbessernForm pageId={page.id} maxLen={MAX_AUFTRAG} extra={fassungenKnopf} />
                 </>

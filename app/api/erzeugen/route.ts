@@ -6,6 +6,7 @@ import { isSwissOnly } from "@/lib/users";
 import { extractFromFile, type Extracted } from "@/lib/extract";
 import { createPage } from "@/lib/pages";
 import { LIMITS, logGeneration, quotaFor } from "@/lib/quota";
+import { KOSTEN_SEITE, kontZahl, reicht, restKontingent } from "@/lib/kontingent";
 import { extractHtml, systemPrompt, titleFromHtml, userPrompt, type GenParams } from "@/lib/prompt";
 import { injectDesignBasis } from "@/lib/design-basis";
 import { STANDARD_DESIGN, designWechselbar, istDesign, type DesignId } from "@/lib/designs";
@@ -47,9 +48,11 @@ export async function POST(req: Request) {
   const modellOverride = session.user.role === "admin" ? String(fd.get("modell") ?? "").trim().slice(0, 120) : "";
 
   const quota = (await quotaFor(userId, session.user.role === "admin"))[provider];
-  if (quota.limit !== null && quota.used >= quota.limit) {
+  if (!reicht(quota, KOSTEN_SEITE)) {
     const other = provider === "claude" && allowed.includes("infomaniak") ? " Mit Infomaniak kannst du weiter erzeugen." : "";
-    return new Response(`Dein Monatskontingent von ${LIMITS[provider]} Lernseiten mit ${PROVIDER_LABELS[provider]} ist aufgebraucht. Am Monatsersten wird es zurückgesetzt.${other}`, { status: 429 });
+    const rest = restKontingent(quota) ?? 0;
+    const wie = rest > 0 ? `reicht nicht mehr für eine neue Lernseite (übrig: ${kontZahl(rest)}, genug zum Nachbessern)` : "ist aufgebraucht";
+    return new Response(`Dein Monatskontingent von ${LIMITS[provider]} Lernseiten mit ${PROVIDER_LABELS[provider]} ${wie}. Am Monatsersten wird es zurückgesetzt.${other}`, { status: 429 });
   }
 
   const params: GenParams = {

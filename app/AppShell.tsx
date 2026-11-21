@@ -5,6 +5,7 @@ import { isSwissOnly } from "@/lib/users";
 import { billingOf } from "@/lib/billing";
 import { IS_PREVIEW_DB } from "@/lib/db";
 import { imageQuotaFor, quotaFor } from "@/lib/quota";
+import { kontZahl } from "@/lib/kontingent";
 import IdleLogout from "./IdleLogout";
 
 // Rahmen des geschützten Bereichs: Seitenleiste in Navy (Navigation, Kontingent, Konto) und Arbeitsfläche.
@@ -38,7 +39,7 @@ function QuotaRow({ label, used, limit }: { label: string; used: number; limit: 
   const pct = limit ? Math.min(100, Math.round((used / limit) * 100)) : 0;
   return (
     <div className="q">
-      <div className="q-line"><span>{label}</span><span>{limit === null ? used : `${used} / ${limit}`}</span></div>
+      <div className="q-line"><span>{label}</span><span>{limit === null ? kontZahl(used) : `${kontZahl(used)} / ${limit}`}</span></div>
       {limit !== null && <div className="q-bar" aria-hidden="true"><div style={{ width: `${pct}%` }} /></div>}
     </div>
   );
@@ -88,7 +89,7 @@ export default async function AppShell({ active, children }: { active?: ShellKey
           <div className="side-label">Kontingent {monat}</div>
           {providers.map((p) => <QuotaRow key={p} label={PROVIDER_LABELS[p]} used={quota[p].used} limit={quota[p].limit} />)}
           <QuotaRow label="Bilder" used={bilder.used} limit={bilder.limit} />
-          <div className="side-note">{isAdmin ? "Als Admin ohne Limit, gezählt wird trotzdem." : `Genutzt in diesem Monat. Wird am ${reset} zurückgesetzt.`}</div>
+          <div className="side-note">{isAdmin ? "Als Admin ohne Limit, gezählt wird trotzdem." : `Genutzt in diesem Monat (Nachbessern zählt 0.2). Wird am ${reset} zurückgesetzt.`}</div>
         </section>
 
         <div className="side-user">

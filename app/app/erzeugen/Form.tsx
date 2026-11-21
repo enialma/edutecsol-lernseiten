@@ -5,6 +5,7 @@ import { systemPrompt, userPrompt, type GenParams, type Typ } from "@/lib/prompt
 import { DIFFART_WAHL, EIGEN_PREFIX, INFO, MAX_EIGEN_LEN, MAX_EIGENE, SOZIALFORMEN, defaultZugaenge, zugangOptionen, type DiffartWahl, type InfoText } from "@/lib/achsen";
 import { MAX_UPLOAD_BYTES } from "@/lib/limits";
 import type { Design } from "@/lib/designs";
+import { KOSTEN_SEITE, kontZahl, reicht, restKontingent } from "@/lib/kontingent";
 
 // Aufrunden, damit eine knapp zu grosse Datei nicht als «4 MB» neben «höchstens 4 MB» erscheint
 const mb = (bytes: number) => (Math.ceil(bytes / 1024 / 1024 * 10) / 10).toLocaleString("de-CH");
@@ -223,7 +224,7 @@ export default function Form({ providers, presets, bilder, initialBild, initialT
     fach: "", stufe: "", thema: "", extra: "", material: "",
     diffart: "niveau", zugaenge: defaultZugaenge("niveau"), eigeneBerufsfelder: [], sozialformen: ["einzel"],
     sprache: "standard", zweitsprache: "", twist: "auto", niveau: "anwenden",
-    provider: (providers.find((p) => p.limit === null || p.used < p.limit) ?? providers[0]).id,
+    provider: (providers.find((p) => reicht(p, KOSTEN_SEITE)) ?? providers[0]).id,
     bild: bilder.some((b) => b.id === initialBild) ? initialBild : 0,
     modell: "",
     aufgaben: "", aufgabenText: "", latex: false,
@@ -332,7 +333,8 @@ export default function Form({ providers, presets, bilder, initialBild, initialT
   }
 
   const current = providers.find((p) => p.id === s.provider) ?? providers[0];
-  const exhausted = current.limit !== null && current.used >= current.limit;
+  const exhausted = !reicht(current, KOSTEN_SEITE);
+  const currentRest = restKontingent(current);
   const typName = label(TYP, s.typ);
   const zugangNamen = zugangOptionen(s.diffart, s.eigeneBerufsfelder).filter((o) => s.zugaenge.includes(o.v)).map((o) => o.name);
   const materialText = dateiName ? dateiName : s.material.trim() ? "Textauszug" : s.thema.trim() ? "Nur Thema, ohne Datei" : "Noch nichts angegeben";
@@ -521,7 +523,7 @@ export default function Form({ providers, presets, bilder, initialBild, initialT
               <legend>KI</legend>
               <div className="kis" role="radiogroup" aria-label="KI wählen">
                 {providers.map((p) => {
-                  const rest = p.limit === null ? "ohne Limit" : `${Math.max(0, p.limit - p.used)} von ${p.limit} übrig`;
+                  const rest = p.limit === null ? "ohne Limit" : `${kontZahl(restKontingent(p) ?? 0)} von ${p.limit} übrig`;
                   return (
                     <button type="button" key={p.id} role="radio" aria-checked={s.provider === p.id} className={`ki${s.provider === p.id ? " on" : ""}`} onClick={() => set("provider", p.id)} disabled={busy} title={p.model}>
                       <b>{p.label}</b>
@@ -550,8 +552,8 @@ export default function Form({ providers, presets, bilder, initialBild, initialT
               <p className="fs-note">Bitte das Fenster offen lassen. Dauer: Lernseite ein bis drei Minuten, Prüfungsvorbereitung bis zu acht Minuten.</p>
               {current.limit !== null && (
                 <p className="fs-note" style={{ color: exhausted ? "var(--err)" : undefined }}>
-                  Diesen Monat {current.used} von {current.limit} Lernseiten mit {current.label} erzeugt.
-                  {exhausted ? " Das Kontingent ist aufgebraucht und wird am Monatsersten zurückgesetzt." : ""}
+                  Diesen Monat {kontZahl(current.used)} von {current.limit} Lernseiten mit {current.label} verbraucht (Nachbessern zählt 0.2).
+                  {exhausted ? (currentRest ? ` Der Rest von ${kontZahl(currentRest)} reicht nicht mehr für eine neue Seite, nur noch fürs Nachbessern. Am Monatsersten wird das Kontingent zurückgesetzt.` : " Das Kontingent ist aufgebraucht und wird am Monatsersten zurückgesetzt.") : ""}
                 </p>
               )}
               <button type="button" className="prompt-link" aria-expanded={promptOpen} aria-controls="generierter-prompt" onClick={() => setPromptOpen((o) => !o)}>
@@ -578,7 +580,7 @@ export default function Form({ providers, presets, bilder, initialBild, initialT
           </dl>
           <div className="sum-note">
             Verbraucht 1 Seite von {current.label}.{" "}
-            {current.limit === null ? "Als Admin ohne Limit." : exhausted ? "Das Kontingent ist aufgebraucht." : `Danach: ${current.limit - current.used - 1} übrig.`}
+            {current.limit === null ? "Als Admin ohne Limit." : exhausted ? "Das Kontingent reicht nicht mehr." : `Danach: ${kontZahl((currentRest ?? 0) - KOSTEN_SEITE)} übrig.`}
           </div>
           <div className="sum-actions">
             {step < 4 ? (
