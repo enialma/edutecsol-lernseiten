@@ -329,6 +329,16 @@ table.ltable{min-width:860px;border:0;border-radius:0;font-size:.95rem;backgroun
 .detail-side{flex:2 1 340px;min-width:0;display:flex;flex-direction:column;gap:1.25rem}
 .pv-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.25rem 1rem;padding:.7rem 1.25rem;border-bottom:1px solid var(--hair);background:var(--paper);font-size:.82rem;color:var(--ink-soft)}
 .pv .preview{border:0;border-radius:0;display:block}
+/* Detailseite: Solange Vorschau und Karten nebeneinander stehen (560 + 340 + Abstand), läuft die Vorschau
+   beim Scrollen mit und füllt die Bildschirmhöhe, damit links keine leere Fläche entsteht. Untereinander
+   (schmale Bildschirme) bleibt sie normal im Fluss. */
+.detail:not(.grp){container-type:inline-size}
+/* Einstellungskarten rechts in blassem Blau, damit sie sich von der Vorschau abheben; Felder und Knöpfe darin bleiben weiss */
+.detail:not(.grp) .detail-side .box{background:#EAF1F9;border-color:#D3E0EE}
+@container (min-width:930px){
+  .detail > .pv{position:sticky;top:1.5rem;display:flex;flex-direction:column;height:calc(100vh - 3rem);height:calc(100dvh - 3rem)}
+  .detail > .pv .preview{flex:1 1 auto;height:auto;min-height:0}
+}
 .between{display:flex;justify-content:space-between;align-items:center;gap:.75rem;align-self:stretch}
 .between form{margin:0}
 .box.pad.block{align-items:stretch}
@@ -349,8 +359,21 @@ main.work .share h2{color:var(--paper);font-size:1.125rem;font-weight:600;margin
 .share-note{margin:0;font-size:.82rem;line-height:1.5;color:var(--on-navy-soft)}
 .share form{margin:0}
 .nb-acts{margin-top:.6rem}
-.nb-fassungen{margin-top:.9rem;padding-top:.9rem;border-top:1px solid var(--line)}
-.nb-fassungen ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.5rem;max-height:22rem;overflow:auto}
+.nb-knoepfe{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+/* Kleines Fenster mit den Fassungen (dialog, öffnet über «Fassungen (n)» neben «Nachbessern») */
+.nb-dialog{width:min(560px,calc(100vw - 2rem));max-height:min(80vh,640px);padding:0;border:1px solid var(--line-strong);border-radius:var(--r-lg);background:var(--card);color:var(--ink);box-shadow:0 18px 48px rgba(30,50,70,.25)}
+.nb-dialog::backdrop{background:rgba(30,50,70,.35)}
+.nb-dialog[open]{display:flex;flex-direction:column;overflow:hidden}
+/* Kopf und Hinweis fest, nur die Liste scrollt (auch bei vielen Fassungen, Admins bis 22) */
+.nb-dialog-in{flex:1 1 auto;min-height:0;padding:1rem 1.25rem 1.25rem;display:flex;flex-direction:column;gap:.6rem}
+.nb-dialog-in .nb-fassungen{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.nb-dialog-in .nb-fassungen ol{flex:1 1 auto;min-height:0;max-height:none;overscroll-behavior:contain}
+.nb-dialog-head{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.nb-dialog-head h3{margin:0;font-size:1.05rem}
+.nb-dialog-in .small-note{margin:0}
+.nb-dialog-x{flex:none;width:36px;height:36px;border:1px solid var(--line);border-radius:var(--r);background:var(--card);color:var(--ink);font-size:1.3rem;line-height:1;cursor:pointer}
+.nb-dialog-x:hover{border-color:var(--navy)}
+.nb-fassungen ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.5rem;max-height:calc(min(80vh,640px) - 8rem);overflow:auto}
 .nb-fassungen li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem;padding:.55rem .7rem;border:1px solid var(--line);border-radius:var(--r)}
 .nb-fassungen li.aktiv{border-color:var(--ok)}
 .nb-text{display:flex;flex-direction:column;gap:.15rem;min-width:0;flex:1 1 180px;font-size:.88rem;overflow-wrap:anywhere}

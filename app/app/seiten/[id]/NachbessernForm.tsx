@@ -3,7 +3,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 /** Freier Auftrag der Lehrperson → /api/nachbessern (Textstream wie beim Erzeugen) → Seite neu laden. */
-export default function NachbessernForm({ pageId, maxLen }: { pageId: number; maxLen: number }) {
+/** extra: weitere Knöpfe rechts neben «Nachbessern» (z. B. Fassungen); stehen ausserhalb des Formulars, damit dort eigene Formulare möglich sind. */
+export default function NachbessernForm({ pageId, maxLen, extra }: { pageId: number; maxLen: number; extra?: React.ReactNode }) {
   const router = useRouter();
   const [auftrag, setAuftrag] = useState("");
   const [busy, setBusy] = useState(false);
@@ -54,17 +55,22 @@ export default function NachbessernForm({ pageId, maxLen }: { pageId: number; ma
   }
 
   return (
-    <form onSubmit={submit}>
-      <label htmlFor="auftrag" className="sr">Was soll an der Seite geändert werden?</label>
-      <textarea id="auftrag" rows={4} maxLength={maxLen} value={auftrag} onChange={(e) => setAuftrag(e.target.value)} disabled={busy} required
-        placeholder="z. B. Aufgabe 2 mit kleineren Zahlen, und im Zugang A einen zusätzlichen Hinweis zur Formel" />
+    <div>
+      <form id="nb-form" onSubmit={submit}>
+        <label htmlFor="auftrag" className="sr">Was soll an der Seite geändert werden?</label>
+        <textarea id="auftrag" rows={4} maxLength={maxLen} value={auftrag} onChange={(e) => setAuftrag(e.target.value)} disabled={busy} required
+          placeholder="z. B. Aufgabe 2 mit kleineren Zahlen, und im Zugang A einen zusätzlichen Hinweis zur Formel" />
+      </form>
       <div className="between nb-acts">
-        <button className="btn" disabled={busy || !auftrag.trim()}>{busy ? "Wird nachgebessert …" : "Nachbessern"}</button>
+        <div className="nb-knoepfe">
+          <button className="btn" form="nb-form" disabled={busy || !auftrag.trim()}>{busy ? "Wird nachgebessert …" : "Nachbessern"}</button>
+          {extra}
+        </div>
         <span className="small-note">{auftrag.length.toLocaleString("de-CH")} / {maxLen.toLocaleString("de-CH")}</span>
       </div>
       {log.length > 0 && <pre className="log" aria-live="polite">{log.join("\n")}</pre>}
       {error && <div className="msg err" role="alert">{error}</div>}
       {fertig && <div className="msg ok" role="status">Nachgebessert: {fertig}</div>}
-    </form>
+    </div>
   );
 }

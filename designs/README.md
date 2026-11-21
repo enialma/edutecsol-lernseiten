@@ -29,7 +29,11 @@ gleich; ein Design bestimmt nur das Aussehen.
      dieselben Variablen in `:root{…}` setzen (`--navy`, `--terra`, `--ochre`, `--cream`, `--ok`, `--err` …),
      denn die KI verwendet diese Variablen auch im eigenen CSS der Seite;
    - nur Systemschriften, keine Webfonts und keine externen Dateien (die Seiten laufen offline);
-   - helle Hintergründe (Grafiken der KI sind oft auf Weiss gezeichnet);
+   - helle Hintergründe (Grafiken der KI sind oft auf Weiss gezeichnet). Für ein dunkles Design
+     `dunkel.css` als Vorlage nehmen und `@dunkel ja` in den Kopf schreiben: Grafiken (`.viz`, `svg`)
+     bekommen dort eine helle Fläche mit den Farben von Klassisch, gedruckt wird hell, und feste helle
+     Hintergründe im eigenen CSS der Seite (z. B. `background:#fff`) ersetzt der Server bei der
+     Auslieferung durch `var(--card)`;
    - genug Kontrast für Text und Rückmeldungen (mindestens 4.5:1);
    - keine `display`-Regeln für `.panel`, `.score` und `.loesung`.
 4. `npm run dev` oder `node scripts/build-designs.mjs` ausführen; das erzeugt `lib/designs.generated.ts`.

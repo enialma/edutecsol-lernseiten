@@ -11,6 +11,7 @@ import { coachAction, copyAction, deletePageAction, loesungAction, pageGruppenAc
 import { loesungSchaltbar } from "@/lib/loesung";
 import { MAX_AUFTRAG, MAX_NACHBESSERUNGEN } from "@/lib/nachbessern";
 import NachbessernForm from "./NachbessernForm";
+import FassungenFenster from "./FassungenFenster";
 import { DESIGNS, STANDARD_DESIGN, designWaehlbar } from "@/lib/designs";
 import { gruppenOfPages, listGruppen } from "@/lib/gruppen";
 import { coachAllowedFor, coachTopicsForPage, coachUsageForPage, defaultStilFor, COACH_DEN, COACH_NAME, COACH_STIL_LABELS, IS_GENERIC } from "@/lib/coach";
@@ -38,6 +39,31 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
   const fassungen = canEdit ? await listFassungen(page.id) : [];
   // Fassungen mit Auftrag = gelungene Nachbesserungen (bei höchstens 5 greift das Aufräumen nach 20 nie)
   const nachbessernRest = isAdmin ? null : Math.max(0, MAX_NACHBESSERUNGEN - fassungen.filter((f) => f.auftrag).length);
+  // Alle Fassungen (ältere und neuere) im kleinen Fenster neben «Nachbessern»
+  const fassungenKnopf = fassungen.length > 0 ? (
+    <FassungenFenster anzahl={fassungen.length}>
+      <ol aria-labelledby="nb-dialog-h">
+        {fassungen.map((f) => (
+          <li key={f.id} className={f.aktiv ? "aktiv" : undefined}>
+            <div className="nb-text">
+              <small>{f.created_at}{f.aktiv && <span className="tag frei">aktiv</span>}</small>
+              <span>{f.auftrag ? `«${f.auftrag.length > 140 ? f.auftrag.slice(0, 140) + " …" : f.auftrag}»` : "Fassung vor dem ersten Nachbessern"}</span>
+            </div>
+            <div className="nb-acts-row">
+              <a className="btn small ghost" href={`/app/seiten/${page.id}/html?fassung=${f.id}`} target="_blank" rel="noopener">Ansehen</a>
+              {!f.aktiv && (
+                <form action={fassungAction}>
+                  <input type="hidden" name="id" value={page.id} />
+                  <input type="hidden" name="fassung" value={f.id} />
+                  <button className="btn small ghost">Verwenden</button>
+                </form>
+              )}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </FassungenFenster>
+  ) : null;
   // Vorschau lädt nach Nachbessern oder Fassungswechsel neu (andere src)
   const pv = `${page.html_bytes}-${fassungen.find((f) => f.aktiv)?.id ?? 0}-${page.design ?? ""}`;
   // Design wechseln: Lernseiten mit austauschbarem Block; ohne gespeicherte Wahl gilt das Standarddesign
@@ -244,42 +270,20 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
                 {nachbessernRest !== null && <span className="small-note">noch {nachbessernRest} von {MAX_NACHBESSERUNGEN}</span>}
               </div>
               {nachbessernRest === 0 ? (
-                <p className="box-text soft">
-                  Diese Seite wurde schon {MAX_NACHBESSERUNGEN}-mal nachgebessert, mehr geht pro Seite nicht. Unten kannst du weiterhin jede Fassung ansehen und verwenden.
-                </p>
+                <>
+                  <p className="box-text soft">
+                    Diese Seite wurde schon {MAX_NACHBESSERUNGEN}-mal nachgebessert, mehr geht pro Seite nicht. Unter «Fassungen» kannst du weiterhin jede Fassung ansehen und verwenden.
+                  </p>
+                  {fassungenKnopf && <div className="nb-knoepfe">{fassungenKnopf}</div>}
+                </>
               ) : (
                 <>
                   <p className="box-text soft">
                     Beschreibe, was an der Seite geändert werden soll. Die KI ändert nur diese Stellen, der Rest bleibt gleich. Der Freigabelink bleibt derselbe.
                     {nachbessernRest !== null && ` Pro Seite geht das ${MAX_NACHBESSERUNGEN}-mal.`}
                   </p>
-                  <NachbessernForm pageId={page.id} maxLen={MAX_AUFTRAG} />
+                  <NachbessernForm pageId={page.id} maxLen={MAX_AUFTRAG} extra={fassungenKnopf} />
                 </>
-              )}
-              {fassungen.length > 0 && (
-                <div className="nb-fassungen">
-                  <div className="mini-label" id="l-fa">Fassungen, neueste zuerst</div>
-                  <ol aria-labelledby="l-fa">
-                    {fassungen.map((f) => (
-                      <li key={f.id} className={f.aktiv ? "aktiv" : undefined}>
-                        <div className="nb-text">
-                          <small>{f.created_at}{f.aktiv && <span className="tag frei">aktiv</span>}</small>
-                          <span>{f.auftrag ? `«${f.auftrag.length > 140 ? f.auftrag.slice(0, 140) + " …" : f.auftrag}»` : "Fassung vor dem ersten Nachbessern"}</span>
-                        </div>
-                        <div className="nb-acts-row">
-                          <a className="btn small ghost" href={`/app/seiten/${page.id}/html?fassung=${f.id}`} target="_blank" rel="noopener">Ansehen</a>
-                          {!f.aktiv && (
-                            <form action={fassungAction}>
-                              <input type="hidden" name="id" value={page.id} />
-                              <input type="hidden" name="fassung" value={f.id} />
-                              <button className="btn small ghost">Verwenden</button>
-                            </form>
-                          )}
-                        </div>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
               )}
             </section>
           )}

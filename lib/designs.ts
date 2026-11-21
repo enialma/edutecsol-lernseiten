@@ -41,5 +41,26 @@ export function mitSeitenDesign(html: string, design: string | null): string {
 
 /** Tauscht das Design einer fertigen Seite aus; ohne Block bleibt die Seite unverändert. */
 export function mitDesign(html: string, id: string): string {
-  return designWechselbar(html) ? html.replace(BLOCK, () => `<style id="lw-basis">\n${designCss(id)}\n</style>`) : html;
+  if (!designWechselbar(html)) return html;
+  const neu = html.replace(BLOCK, () => `<style id="lw-basis">\n${designCss(id)}\n</style>`);
+  return DESIGN_DATEIEN.find((d) => d.id === id)?.dunkel ? fuerDunkel(neu) : neu;
+}
+
+// Alle <style>-Blöcke ausser lw-basis, also das eigene CSS, das die KI pro Seite schreibt
+const EIGENES_CSS = /(<style\b(?![^>]*\bid=["']lw-basis["'])[^>]*>)([\s\S]*?)(<\/style>)/gi;
+
+/**
+ * Für dunkle Designs: Im eigenen CSS der Seite trägt die KI manchmal feste helle Hintergründe oder dunkle
+ * Schrift ein (z. B. background:#fff). Auf dunklem Grund wäre das unlesbar, darum werden sie bei der
+ * Auslieferung durch die Variablen ersetzt. Gespeichert bleibt die Seite unverändert; in Grafiken
+ * (.viz, svg) gelten ohnehin die hellen Farben, dort ändert sich dadurch nichts.
+ */
+function fuerDunkel(html: string): string {
+  return html.replace(EIGENES_CSS, (_, auf: string, css: string, zu: string) =>
+    auf +
+    css
+      .replace(/(^|[;{\s])(background(?:-color)?\s*:\s*)(#fff(?:fff)?|white)\b/gi, "$1$2var(--card)")
+      .replace(/(^|[;{\s])(color\s*:\s*)(#1E3246|#000(?:000)?|black)\b/gi, "$1$2var(--ink)") +
+    zu
+  );
 }

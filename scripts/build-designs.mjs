@@ -9,7 +9,7 @@ const OUT = new URL("../lib/designs.generated.ts", import.meta.url);
 // Kommentare raus, damit sie nicht in jede Lernseite wandern; Zeilen sonst unverändert
 const strip = (css) => css.replace(/\/\*[\s\S]*?\*\//g, "").split("\n").map((l) => l.trimEnd()).filter((l) => l.trim()).join("\n");
 
-/** Funktionsregeln und alle Designs mit ihren Angaben aus dem Kopfkommentar (@name, @beschreibung, @farben, @reihenfolge). */
+/** Funktionsregeln und alle Designs mit ihren Angaben aus dem Kopfkommentar (@name, @beschreibung, @farben, @reihenfolge, @dunkel). */
 export function ladeDesigns() {
   const funktion = strip(readFileSync(new URL("_funktion.css", DIR), "utf8"));
   const designs = readdirSync(DIR)
@@ -29,6 +29,7 @@ export function ladeDesigns() {
         beschreibung: tag("beschreibung") ?? "",
         farben: (tag("farben") ?? "").split(/\s+/).filter(Boolean),
         reihenfolge: Number(tag("reihenfolge") ?? 99),
+        dunkel: tag("dunkel") === "ja",
         css,
       };
     })
