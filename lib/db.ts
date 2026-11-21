@@ -157,6 +157,8 @@ export function ready(): Promise<void> {
       await sql.query(`CREATE INDEX IF NOT EXISTS page_fassungen_page ON page_fassungen (page_id, created_at DESC)`);
       await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS fassung_id INTEGER`);
       await sql.query(`ALTER TABLE generations ADD COLUMN IF NOT EXISTS nachbessern BOOLEAN NOT NULL DEFAULT FALSE`);
+      // Design der Seite (designs/*.css), beim Ausliefern eingesetzt; NULL = Seite unverändert ausliefern (ältere Seiten)
+      await sql.query(`ALTER TABLE pages ADD COLUMN IF NOT EXISTS design TEXT`);
       await sql.query(`CREATE TABLE IF NOT EXISTS coach_usage (
         page_id       INTEGER NOT NULL REFERENCES pages(id) ON DELETE CASCADE,
         day           DATE NOT NULL,

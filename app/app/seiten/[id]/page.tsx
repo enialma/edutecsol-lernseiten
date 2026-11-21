@@ -7,10 +7,11 @@ import { getPage, listFassungen } from "@/lib/pages";
 import { DIFFART_LABELS, NIVEAU_LABELS, SPRACHE_LABELS, TWIST_LABELS, normalizeLernseite, type GenParams } from "@/lib/prompt";
 import { SOZIALFORMEN, zugangOptionen } from "@/lib/achsen";
 import AppShell from "../../../AppShell";
-import { coachAction, copyAction, deletePageAction, loesungAction, pageGruppenAction, renameAction, shareAction, fassungAction, visibilityAction } from "../actions";
+import { coachAction, copyAction, deletePageAction, loesungAction, pageGruppenAction, renameAction, shareAction, designAction, fassungAction, visibilityAction } from "../actions";
 import { loesungSchaltbar } from "@/lib/loesung";
 import { MAX_AUFTRAG, MAX_NACHBESSERUNGEN } from "@/lib/nachbessern";
 import NachbessernForm from "./NachbessernForm";
+import { DESIGNS, STANDARD_DESIGN, designWaehlbar } from "@/lib/designs";
 import { gruppenOfPages, listGruppen } from "@/lib/gruppen";
 import { coachAllowedFor, coachTopicsForPage, coachUsageForPage, defaultStilFor, COACH_DEN, COACH_NAME, COACH_STIL_LABELS, IS_GENERIC } from "@/lib/coach";
 import { getMoodleBase } from "@/lib/moodle";
@@ -38,7 +39,10 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
   // Fassungen mit Auftrag = gelungene Nachbesserungen (bei höchstens 5 greift das Aufräumen nach 20 nie)
   const nachbessernRest = isAdmin ? null : Math.max(0, MAX_NACHBESSERUNGEN - fassungen.filter((f) => f.auftrag).length);
   // Vorschau lädt nach Nachbessern oder Fassungswechsel neu (andere src)
-  const pv = `${page.html_bytes}-${fassungen.find((f) => f.aktiv)?.id ?? 0}`;
+  const pv = `${page.html_bytes}-${fassungen.find((f) => f.aktiv)?.id ?? 0}-${page.design ?? ""}`;
+  // Design wechseln: Lernseiten mit austauschbarem Block; ohne gespeicherte Wahl gilt das Standarddesign
+  const designOk = canEdit && designWaehlbar(page);
+  const designAktiv = page.design ?? STANDARD_DESIGN;
   const coachUse = canEdit && coachOk ? await coachUsageForPage(page.id) : null;
   const coachTopics = canEdit && coachOk && page.coach ? await coachTopicsForPage(page.id) : [];
   const topicMax = Math.max(1, ...coachTopics.map((t) => t.n));
@@ -277,6 +281,26 @@ export default async function SeitePage({ params }: { params: Promise<{ id: stri
                   </ol>
                 </div>
               )}
+            </section>
+          )}
+
+          {designOk && (
+            <section className="box pad block" aria-labelledby="h-de">
+              <h2 id="h-de">Design</h2>
+              <p className="box-text soft">Ändert Farben, Schriften und die Form von Knöpfen und Reitern. Inhalt, Fassungen und Freigabelink bleiben gleich.</p>
+              <div className="designs" role="group" aria-labelledby="h-de">
+                {DESIGNS.map((d) => (
+                  <form action={designAction} key={d.id}>
+                    <input type="hidden" name="id" value={page.id} />
+                    <input type="hidden" name="design" value={d.id} />
+                    <button className={`design-opt${designAktiv === d.id ? " on" : ""}`} aria-pressed={designAktiv === d.id} disabled={designAktiv === d.id}>
+                      <span className="design-dots" aria-hidden="true">{d.farben.map((f) => <i key={f} style={{ background: f }} />)}</span>
+                      <b>{d.name}</b>
+                      <span>{d.beschreibung}</span>
+                    </button>
+                  </form>
+                ))}
+              </div>
             </section>
           )}
 

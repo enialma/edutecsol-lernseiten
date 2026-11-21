@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { systemPrompt, userPrompt, type GenParams, type Typ } from "@/lib/prompt";
 import { DIFFART_WAHL, EIGEN_PREFIX, INFO, MAX_EIGEN_LEN, MAX_EIGENE, SOZIALFORMEN, defaultZugaenge, zugangOptionen, type DiffartWahl, type InfoText } from "@/lib/achsen";
 import { MAX_UPLOAD_BYTES } from "@/lib/limits";
+import type { Design } from "@/lib/designs";
 
 // Aufrunden, damit eine knapp zu grosse Datei nicht als «4 MB» neben «höchstens 4 MB» erscheint
 const mb = (bytes: number) => (Math.ceil(bytes / 1024 / 1024 * 10) / 10).toLocaleString("de-CH");
@@ -26,6 +27,7 @@ type State = {
   diffart: DiffartWahl; zugaenge: string[]; eigeneBerufsfelder: string[]; sozialformen: string[];
   sprache: string; zweitsprache: string; twist: string; niveau: string; provider: string; bild: number; modell: string;
   aufgaben: string; aufgabenText: string; latex: boolean;
+  design: string;
 };
 
 /** Erklärzeilen für einen Info-Kreis aus den Knopf-Optionen und den Texten in lib/achsen.ts. */
@@ -69,6 +71,21 @@ function InfoKreis({ id, title, items, note }: { id: string; title: string; item
         <dl>{items.map(([dt, dd]) => <Fragment key={dt}><dt>{dt}</dt><dd>{dd}</dd></Fragment>)}</dl>
         {note && <p>{note}</p>}
       </div>
+    </div>
+  );
+}
+
+/** Designauswahl als Vorschaukarten (Farbtupfer, Name, ein Satz); gleiche Klassen wie auf der Detailseite. */
+function DesignWahl({ designs, value, onPick, disabled }: { designs: Design[]; value: string; onPick: (v: string) => void; disabled: boolean }) {
+  return (
+    <div className="designs" role="radiogroup" aria-label="Design">
+      {designs.map((d) => (
+        <button type="button" key={d.id} role="radio" aria-checked={value === d.id} className={`design-opt${value === d.id ? " on" : ""}`} onClick={() => onPick(d.id)} disabled={disabled}>
+          <span className="design-dots" aria-hidden="true">{d.farben.map((f) => <i key={f} style={{ background: f }} />)}</span>
+          <b>{d.name}</b>
+          <span>{d.beschreibung}</span>
+        </button>
+      ))}
     </div>
   );
 }
@@ -197,7 +214,7 @@ const TYP_KURZ: Record<string, string> = {
 };
 const label = (opts: string[][], v: string) => opts.find(([x]) => x === v)?.[1] ?? v;
 
-export default function Form({ providers, presets, bilder, initialBild, initialTyp, isAdmin }: { providers: ProviderOpt[]; presets: Preset[]; bilder: Bild[]; initialBild: number; initialTyp?: string; isAdmin: boolean }) {
+export default function Form({ providers, presets, bilder, initialBild, initialTyp, isAdmin, designs }: { providers: ProviderOpt[]; presets: Preset[]; bilder: Bild[]; initialBild: number; initialTyp?: string; isAdmin: boolean; designs: Design[] }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const pickRef = useRef<HTMLButtonElement>(null);
@@ -210,6 +227,7 @@ export default function Form({ providers, presets, bilder, initialBild, initialT
     bild: bilder.some((b) => b.id === initialBild) ? initialBild : 0,
     modell: "",
     aufgaben: "", aufgabenText: "", latex: false,
+    design: designs[0]?.id ?? "klassisch",
   });
   const [step, setStep] = useState(1);
   const [busy, setBusy] = useState(false);
@@ -397,6 +415,13 @@ export default function Form({ providers, presets, bilder, initialBild, initialT
                         ? "Ein Arbeitsblatt zum Austeilen: Kernaufgabe und Zugänge untereinander, jeder Zugang auf einer neuen Seite, mit Platz zum Bearbeiten und Lösungsblatt. Als Word herunterladen oder drucken."
                         : "Eine Kernaufgabe mit mehreren Zugängen, Selbstkontrolle und Lehrpersonen-Bereich."}
               </p>
+              {s.typ === "lernseite" && designs.length > 1 && (
+                <>
+                  <FieldHead label="Design" />
+                  <DesignWahl designs={designs} value={s.design} onPick={(v) => set("design", v)} disabled={busy} />
+                  <p className="fs-note">Bestimmt Farben, Schriften und die Form von Knöpfen und Reitern. Inhalt und Aufbau bleiben gleich, und du kannst das Design später auf der Seite noch wechseln.</p>
+                </>
+              )}
               {pruefung && (
                 <>
                   <FieldHead label="Dauer der Übungsprüfung" />
@@ -544,6 +569,7 @@ export default function Form({ providers, presets, bilder, initialBild, initialT
             <div><dt>Material</dt><dd>{materialText}</dd></div>
             {s.thema.trim() && <div><dt>Thema</dt><dd>{s.thema.trim()}</dd></div>}
             <div><dt>Typ</dt><dd>{typName}{pruefung ? ` · ${s.dauer} Minuten` : ""}</dd></div>
+            {s.typ === "lernseite" && designs.length > 1 && <div><dt>Design</dt><dd>{designs.find((d) => d.id === s.design)?.name ?? s.design}</dd></div>}
             <div><dt>Rahmen</dt><dd>{rahmenFehlt ? "Fach und Zielstufe fehlen noch" : `${s.fach.trim()} · ${s.stufe.trim()}`}</dd></div>
             {lernseite && <div><dt>Zugänge</dt><dd>{label(DIFFART, s.diffart)}: {zugangNamen.join(", ")}</dd></div>}
             {lernseite && <div><dt>Sozialform</dt><dd>{s.sozialformen.map((v) => label(SOZIAL, v)).join(", ")}</dd></div>}

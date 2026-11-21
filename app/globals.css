@@ -241,6 +241,18 @@ main.work .box h2{font-size:1.125rem;font-weight:600;margin:0}
 .presets{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;margin:0 0 1.25rem}
 button.type{font:inherit;text-align:left;cursor:pointer}
 .type.on{border-color:var(--navy);box-shadow:inset 0 0 0 1px var(--navy);background:var(--cream)}
+/* Designauswahl (Erzeugen, Schritt 2, und Detailseite) */
+.designs{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.6rem}
+.design-opt{font:inherit;text-align:left;cursor:pointer;background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:.85rem 1rem;color:var(--ink);display:flex;flex-direction:column;gap:.3rem;width:100%;transition:border-color .15s}
+.design-opt:hover{border-color:var(--navy)}
+.design-opt.on{border-color:var(--navy);box-shadow:inset 0 0 0 1px var(--navy);background:var(--cream)}
+.design-opt b{font-weight:600}
+.design-opt > span:last-child{font-size:.84rem;line-height:1.4;color:var(--ink-soft)}
+.design-dots{display:flex;gap:.3rem}
+.design-dots i{width:18px;height:18px;border-radius:50%;border:1px solid rgba(0,0,0,.12);display:block}
+.designs form{margin:0;display:flex}
+.design-opt:disabled{cursor:default}
+.design-opt:disabled:not(.on){opacity:.6}
 .kis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.6rem}
 .ki{font:inherit;display:flex;flex-direction:column;align-items:flex-start;gap:.2rem;text-align:left;padding:.85rem 1rem;border-radius:var(--r);min-height:64px;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line-strong)}
 .ki b{font-weight:600;font-size:.95rem}

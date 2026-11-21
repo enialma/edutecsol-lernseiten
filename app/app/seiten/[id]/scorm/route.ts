@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { getPage } from "@/lib/pages";
 import { lernseiteToScorm } from "@/lib/scorm";
+import { mitSeitenDesign } from "@/lib/designs";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -11,7 +12,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const { id } = await params;
   const page = await getPage(Number(id), Number(session.user.id), session.user.role === "admin");
   if (!page) return new Response("Nicht gefunden.", { status: 404 });
-  const buf = await lernseiteToScorm(page.html, { id: page.id, title: page.title });
+  const buf = await lernseiteToScorm(mitSeitenDesign(page.html, page.design), { id: page.id, title: page.title });
   const slug = page.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "lernseite";
   return new Response(new Uint8Array(buf), {
     headers: {

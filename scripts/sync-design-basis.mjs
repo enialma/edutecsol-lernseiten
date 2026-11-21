@@ -1,9 +1,13 @@
-// Überträgt die Designbasis aus lib/design-basis.ts in den statischen Prompt-Generator (public/prompt-generator-v2.html),
+// Überträgt die Designbasis (Standarddesign aus designs/klassisch.css + designs/_funktion.css, Grundgerüst aus
+// lib/design-basis.ts) in den statischen Prompt-Generator (public/prompt-generator-v2.html),
 // damit kopierte Prompts dieselbe Gestaltung liefern wie die Plattform. Aufruf: node scripts/sync-design-basis.mjs
 import { readFileSync, writeFileSync } from "node:fs";
+import { ladeDesigns } from "./build-designs.mjs";
 
 const ts = readFileSync("lib/design-basis.ts", "utf8");
-const css = ts.match(/export const DESIGN_CSS = `([\s\S]*?)`;/)[1];
+const { funktion, designs } = ladeDesigns();
+// Gleiche Reihenfolge wie designCss() in lib/designs.ts: Design zuerst, Funktionsregeln danach
+const css = `${designs.find((d) => d.id === "klassisch").css}\n${funktion}`;
 const skeleton = ts.match(/export const DESIGN_SKELETON = `([\s\S]*?)`;/)[1];
 
 const text = `§DESIGNBASIS (für die Website, zwingend)
@@ -22,6 +26,7 @@ ${skeleton}
 
 const file = "public/prompt-generator-v2.html";
 let html = readFileSync(file, "utf8");
+// Marker muss mit dem bestehenden Block in prompt-generator-v2.html übereinstimmen, daher Text unverändert lassen
 const START = "/* DESIGNBASIS-START (automatisch aus lib/design-basis.ts, nicht von Hand ändern) */";
 const END = "/* DESIGNBASIS-END */";
 const block = `${START}\n  const DESIGNBASIS = ${JSON.stringify(text)};\n  ${END}`;

@@ -6,6 +6,7 @@ import { quotaFor } from "@/lib/quota";
 import { listImages } from "@/lib/images";
 import AppShell from "../../AppShell";
 import Form from "./Form";
+import { DESIGNS } from "@/lib/designs";
 
 export const dynamic = "force-dynamic";
 
@@ -36,7 +37,7 @@ export default async function ErzeugenPage({ searchParams }: { searchParams: Pro
           {providers.length === 0 ? (
             <div className="msg err">{swissOnly ? "Infomaniak ist gerade nicht eingerichtet. Bitte info@edutecsol.ch melden." : "Noch kein KI-Anbieter konfiguriert (ANTHROPIC_API_KEY, OPENAI_API_KEY oder INFOMANIAK_TOKEN fehlt)."}</div>
           ) : (
-            <Form providers={providers} presets={presets} bilder={bilder} initialBild={bild ? Number(bild) : 0} initialTyp={typ} isAdmin={session!.user.role === "admin"} />
+            <Form providers={providers} presets={presets} bilder={bilder} initialBild={bild ? Number(bild) : 0} initialTyp={typ} isAdmin={session!.user.role === "admin"} designs={DESIGNS} />
           )}
               </AppShell>
     </>

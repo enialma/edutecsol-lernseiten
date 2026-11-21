@@ -4,9 +4,10 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { auth } from "@/auth";
 import { importBeispiele } from "@/lib/beispiele";
-import { deletePage, duplicatePage, getPage, setCoach, setLoesung, setFassung, setShare, setVisibility, updateTitle } from "@/lib/pages";
+import { deletePage, duplicatePage, getPage, setCoach, setLoesung, setDesign, setFassung, setShare, setVisibility, updateTitle } from "@/lib/pages";
 import { setPageGruppen } from "@/lib/gruppen";
 import { isSwissOnly } from "@/lib/users";
+import { designWaehlbar, istDesign } from "@/lib/designs";
 
 /** Zuordnung einer Seite zu Klassen und Gruppen (Checkboxen «gruppe» auf der Detailseite). */
 export async function pageGruppenAction(fd: FormData) {
@@ -57,6 +58,18 @@ export async function loesungAction(fd: FormData) {
   const { userId, isAdmin } = await who();
   const id = Number(fd.get("id"));
   await setLoesung(id, userId, isAdmin, fd.get("on") === "1");
+  revalidatePath(`/app/seiten/${id}`);
+}
+
+/** Design einer Seite wechseln (nur CSS, Inhalt und Fassungen bleiben). */
+export async function designAction(fd: FormData) {
+  const { userId, isAdmin } = await who();
+  const id = Number(fd.get("id"));
+  const design = fd.get("design");
+  if (!istDesign(design)) throw new Error("Unbekanntes Design.");
+  const page = await getPage(id, userId, isAdmin);
+  if (!page || !designWaehlbar(page)) throw new Error("Für diese Seite lässt sich das Design nicht wechseln.");
+  await setDesign(id, userId, isAdmin, design);
   revalidatePath(`/app/seiten/${id}`);
 }
 

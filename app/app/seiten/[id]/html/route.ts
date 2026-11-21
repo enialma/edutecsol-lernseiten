@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { getFassungHtml, getPage } from "@/lib/pages";
+import { mitSeitenDesign } from "@/lib/designs";
 import { withPrintCss } from "@/lib/print";
 import { withCoach } from "@/lib/coach-embed";
 import { coachAllowedFor, COACH_NAME } from "@/lib/coach";
@@ -20,7 +21,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   const canEdit = page.user_id === Number(session.user.id) || session.user.role === "admin";
   const fassung = fassungId > 0 && canEdit ? await getFassungHtml(page.id, fassungId) : null;
   if (fassungId > 0 && !fassung) return new Response("Fassung nicht gefunden.", { status: 404 });
-  let html = withPrintCss(fassung ?? page.html);
+  let html = withPrintCss(mitSeitenDesign(fassung ?? page.html, page.design));
   // Vorschau fuer die Lehrperson: Coach wie beim Freigabelink einblenden (nicht beim Download, offline kein Coach)
   if (!download && page.coach && page.owner_coach && page.share_token && coachAllowedFor(page)) html = withCoach(html, page.share_token, COACH_NAME);
   return new Response(html, {

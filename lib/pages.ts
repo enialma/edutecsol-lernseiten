@@ -40,13 +40,15 @@ export type PageMeta = {
   /** Lösungen über den Freigabelink sichtbar; loesung_version = erzeugt ab 2.10.2026 (Schalter verfügbar, siehe lib/loesung.ts) */
   loesung_offen: boolean;
   loesung_version: boolean;
+  /** Design aus designs/ (wird beim Ausliefern eingesetzt); null bei Seiten ohne austauschbaren Design-Block */
+  design: string | null;
 };
 export type PageFull = PageMeta & { html: string };
 
 const META = `p.id, p.user_id, p.title, p.fach, p.stufe, p.thema, p.params, p.material_name, p.provider, p.model,
   p.input_tokens, p.output_tokens, p.duration_ms, p.notiz, p.share_token, p.pool, p.school, p.copied_from,
   p.coach, p.coach_stil, p.coach_provider, u.coach AS owner_coach,
-  p.loesung_offen, p.created_at >= TIMESTAMPTZ '2026-10-02 00:00 Europe/Zurich' AS loesung_version,
+  p.loesung_offen, p.design, p.created_at >= TIMESTAMPTZ '2026-10-02 00:00 Europe/Zurich' AS loesung_version,
   to_char(p.created_at, 'DD.MM.YYYY HH24:MI') AS created_at, length(p.html) AS html_bytes,
   u.email AS owner_email, u.name AS owner_name, i.name AS owner_institution, COALESCE(i.swiss_only, FALSE) AS owner_swiss_only`;
 
@@ -56,6 +58,11 @@ export async function setCoach(id: number, userId: number, isAdmin: boolean, s: 
     [id, isAdmin, userId, s.on, s.stil, s.provider]);
   return rows.length;
 }
+/** Design einer Seite wechseln (nur Besitzerin oder Admin; ob die Seite das zulässt, prüft der Aufrufer mit designWaehlbar). */
+export async function setDesign(id: number, userId: number, isAdmin: boolean, design: string) {
+  await q(`UPDATE pages p SET design = $3 WHERE p.id = $1 AND (${canEdit(isAdmin)})`, [id, userId, design]);
+}
+
 /** Lösungen über den Freigabelink zeigen oder ausblenden (nur Besitzerin oder Admin). */
 export async function setLoesung(id: number, userId: number, isAdmin: boolean, on: boolean) {
   await q(`UPDATE pages p SET loesung_offen = $3 WHERE p.id = $1 AND (${canEdit(isAdmin)})`, [id, userId, on]);
@@ -67,14 +74,14 @@ const sameSchool = (n: number) => `(p.school = TRUE AND u.institution_id IS NOT 
 export async function createPage(input: {
   userId: number; title: string; fach?: string; stufe?: string; thema?: string; params: unknown;
   materialName?: string | null; provider: string; model?: string; inputTokens: number; outputTokens: number;
-  durationMs: number; html: string; notiz?: string | null; copiedFrom?: number | null;
+  durationMs: number; html: string; notiz?: string | null; copiedFrom?: number | null; design?: string | null;
 }): Promise<number> {
   const rows = await q(
-    `INSERT INTO pages (user_id, title, fach, stufe, thema, params, material_name, provider, model, input_tokens, output_tokens, duration_ms, html, notiz, copied_from)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING id`,
+    `INSERT INTO pages (user_id, title, fach, stufe, thema, params, material_name, provider, model, input_tokens, output_tokens, duration_ms, html, notiz, copied_from, design)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING id`,
     [input.userId, input.title, input.fach || null, input.stufe || null, input.thema || null, JSON.stringify(input.params),
      input.materialName ?? null, input.provider, input.model ?? null, input.inputTokens, input.outputTokens, input.durationMs,
-     input.html, input.notiz ?? null, input.copiedFrom ?? null]
+     input.html, input.notiz ?? null, input.copiedFrom ?? null, input.design ?? null]
   );
   return Number(rows[0].id);
 }
@@ -156,7 +163,7 @@ export async function duplicatePage(id: number, userId: number, isAdmin: boolean
   return createPage({
     userId, title: src.title, fach: src.fach ?? undefined, stufe: src.stufe ?? undefined, thema: src.thema ?? undefined,
     params: src.params, materialName: src.material_name, provider: src.provider, model: src.model ?? undefined,
-    inputTokens: 0, outputTokens: 0, durationMs: 0, html: src.html, notiz: src.notiz, copiedFrom: src.id,
+    inputTokens: 0, outputTokens: 0, durationMs: 0, html: src.html, notiz: src.notiz, copiedFrom: src.id, design: src.design,
   });
 }
 

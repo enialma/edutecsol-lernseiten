@@ -8,6 +8,7 @@ import { createPage } from "@/lib/pages";
 import { LIMITS, logGeneration, quotaFor } from "@/lib/quota";
 import { extractHtml, systemPrompt, titleFromHtml, userPrompt, type GenParams } from "@/lib/prompt";
 import { injectDesignBasis } from "@/lib/design-basis";
+import { STANDARD_DESIGN, designWechselbar, istDesign, type DesignId } from "@/lib/designs";
 import { DIFFART_WAHL, MAX_EIGEN_LEN, MAX_EIGENE, SOZIALFORMEN, zugangOptionen, type Sozialform } from "@/lib/achsen";
 import { TASKS, type Einsatz } from "@/lib/bildprompt";
 import { getImageMeta, setImageShare } from "@/lib/images";
@@ -65,6 +66,8 @@ export async function POST(req: Request) {
     niveau: pick(fd.get("niveau"), ["reproduzieren", "anwenden", "beurteilen"] as const, "anwenden"),
   };
   if (!params.fach || !params.stufe) return new Response("Fach und Zielstufe sind Pflicht.", { status: 400 });
+  // Design wählbar (vorerst nur Lernseite); andere Typen bekommen das Standarddesign ohne gespeicherte Wahl
+  const design: DesignId | null = params.typ === "lernseite" ? (istDesign(fd.get("design")) ? (fd.get("design") as DesignId) : STANDARD_DESIGN) : null;
 
   // Achsen und Feinsteuerung, nur für Lernseiten: Zugänge, eigene Berufsfelder, Sozialformen, Aufgabenanzahl, Aufgabenvorgaben, LaTeX
   if (params.typ === "lernseite" || params.typ === "arbeitsblatt") {
@@ -164,7 +167,7 @@ export async function POST(req: Request) {
 
         spent = result;
         if (result.stopReason === "refusal") throw new Error("Das Modell hat die Anfrage abgelehnt.");
-        const html = injectDesignBasis(extractHtml(result.text));
+        const html = injectDesignBasis(extractHtml(result.text), design ?? STANDARD_DESIGN);
         if (!/<html[\s>]/i.test(html) || !/<\/html>/i.test(html)) {
           throw new Error(result.stopReason === "max_tokens" ? "Antwort wurde abgeschnitten (zu lang). Bitte Thema enger fassen." : "Antwort enthielt keine vollständige HTML-Seite.");
         }
@@ -174,6 +177,8 @@ export async function POST(req: Request) {
           userId, title, fach: params.fach, stufe: params.stufe, thema: params.thema, params,
           materialName: material?.name || null, provider: result.provider, model: result.model,
           inputTokens: result.inputTokens, outputTokens: result.outputTokens, durationMs: Date.now() - t0, html, notiz,
+          // Design nur speichern, wenn die Seite den austauschbaren Block hat (sonst liesse es sich nicht wechseln)
+          design: design && designWechselbar(html) ? design : null,
         });
         await logGeneration({ userId, ...result, ok: true });
         spent = null;
